@@ -23,26 +23,51 @@ contract SyntheXPool is ERC20 {
     }
 
     /* -------------------------------------------------------------------------- */
-    /*                               View Functions                               */
+    /*                               Admin Functions                              */
     /* -------------------------------------------------------------------------- */
     function enableSynth(address _token) public {
+        require(synthex.owner() == msg.sender, "SyntheXPool: Only owner can enable synth");
         synths[_token] = true;
         _synthsList.push(_token);
     }
 
+    function disableSynth(address _token) public {
+        require(synthex.owner() == msg.sender, "SyntheXPool: Only owner can disable synth");
+        synths[_token] = false;
+    }
+
+    function removeSynth(address _token) public {
+        require(synthex.owner() == msg.sender, "SyntheXPool: Only owner can remove synth");
+        synths[_token] = false;
+        for (uint i = 0; i < _synthsList.length; i++) {
+            if (_synthsList[i] == _token) {
+                _synthsList[i] = _synthsList[_synthsList.length - 1];
+                _synthsList.pop();
+                break;
+            }
+        }
+    }
+
+    /* -------------------------------------------------------------------------- */
+    /*                               View Functions                               */
+    /* -------------------------------------------------------------------------- */
     function getSynths() public view returns (address[] memory) {
         return _synthsList;
     }
 
+    /* -------------------------------------------------------------------------- */
+    /*                                  Override                                  */
+    /* -------------------------------------------------------------------------- */
     function _beforeTokenTransfer(address from, address to, uint256 amount) internal virtual override {
         super._beforeTokenTransfer(from, to, amount);
-        // revert("Debt tokens cannot be transferred");
+        if(from != address(0) && to != address(0)) {
+            revert("SyntheXPool: Cannot transfer debt tokens");
+        }
     }
 
     /* -------------------------------------------------------------------------- */
     /*                              Public Functions                              */
     /* -------------------------------------------------------------------------- */
-
     function issueSynth(address _token, address account, uint amount, uint amountUSD) public {
         require(msg.sender == address(synthex), "Only SyntheX can issue");
         require(synths[_token], "Synth not enabled");

@@ -5,7 +5,7 @@ import "hardhat-gas-reporter"
 const config: HardhatUserConfig = {
   solidity: "0.8.17",
   gasReporter: {
-    enabled: false,
+    enabled: true,
     currency: 'USD',
     gasPrice: 25,
     coinmarketcap: '54e57674-6e99-404b-8528-cbf6a9f1e471'

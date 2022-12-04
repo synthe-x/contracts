@@ -1,0 +1,19 @@
+{
+    "collaterals": [
+        {
+            "id": "0x0",
+            "volatilityRatio": "0.8"
+        }
+    ],
+    "tradingPools": [
+        {
+            "name": "",
+            "symbol": "",
+            "synths": [
+                {
+                    "name": ""
+                }
+            ]
+        }
+    ]
+}
