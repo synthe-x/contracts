@@ -5,8 +5,10 @@ import { deploy } from "../scripts/deploy";
 import { initiate } from "../scripts/initiate";
 
 describe("SyntheX", function () {
+
 	let synthex: any, oracle: any, cryptoPool: any, eth: any, susd: any, sbtc: any, seth: any;
 	let owner: any, user1: any, user2: any, user3: any;
+
 	before(async () => {
 		// Contracts are deployed using the first signer/account by default
 		[owner, user1, user2, user3] = await ethers.getSigners();
@@ -15,7 +17,6 @@ describe("SyntheX", function () {
 		synthex = deployments.synthex;
 		oracle = deployments.oracle;
 		cryptoPool = deployments.cryptoPool;
-
 
 		const tokens = await initiate(synthex, cryptoPool, oracle);
 		eth = tokens.eth;
@@ -58,7 +59,7 @@ describe("SyntheX", function () {
 	});
 
     it("exchange", async () => {
-        // user3 exchanges 100000 susd for 10 seth
+        // user3 exchanges 30000 susd for 30 seth
         await synthex.connect(user3).exchange(cryptoPool.address, susd.address, seth.address, ethers.utils.parseEther("30000"));
         // eth 1000 -> 1500
 		const Feed = await ethers.getContractFactory("PriceFeed");
@@ -68,6 +69,24 @@ describe("SyntheX", function () {
 
     it("update debt for users", async () => {
         expect(await synthex.getUserTotalDebtUSD(user1.address)).to.be.closeTo(ethers.utils.parseEther("11818.18"), ethers.utils.parseEther("0.01"));
-        expect(await synthex.getUserTotalDebtUSD(user3.address)).to.closeTo(ethers.utils.parseEther("118181.81"), ethers.utils.parseEther("0.01"));
+        expect(await synthex.getUserTotalDebtUSD(user3.address)).to.be.closeTo(ethers.utils.parseEther("118181.81"), ethers.utils.parseEther("0.01"));
     })
+
+	it("burn synths", async function () {
+		// user1 burns 10 seth
+		await synthex.connect(user1).burn(cryptoPool.address, seth.address, ethers.utils.parseEther("7.87866666666")); // $ 10000
+		let sethToTransfer = await seth.balanceOf(user1.address);
+		// console.log("Transfering", ethers.utils.formatEther(sethToTransfer), "seth to user2");
+		await seth.connect(user1).transfer(user3.address, sethToTransfer);
+		// user3 burns 100000 susd
+		let susdBalance = await susd.balanceOf(user3.address);
+		// console.log("Burning", ethers.utils.formatEther(susdBalance), "susd");
+		await synthex.connect(user3).burn(cryptoPool.address, susd.address, susdBalance); // $ 30000/118181
+		let sethBalance = await seth.balanceOf(user3.address);
+		// console.log("Burning", ethers.utils.formatEther(sethBalance), "seth");
+		await synthex.connect(user3).burn(cryptoPool.address, seth.address, sethBalance.mul(ethers.BigNumber.from("99999")).div(ethers.BigNumber.from("100000"))); // $ 45000/118181
+
+		expect(await synthex.getUserTotalDebtUSD(user1.address)).to.be.closeTo(ethers.utils.parseEther("0.00"), ethers.utils.parseEther("0.2"));
+		expect(await synthex.getUserTotalDebtUSD(user3.address)).to.be.closeTo(ethers.utils.parseEther("0.00"), ethers.utils.parseEther("0.4"));
+	})
 });

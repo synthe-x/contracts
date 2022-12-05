@@ -1,42 +1,85 @@
-import { ethers } from "hardhat";
+import hre, { ethers } from "hardhat";
 import { Contract } from 'ethers';
+import fs from 'fs';
 
-export async function initiate(synthex: Contract, pool: Contract, oracle: Contract) {
+export async function initiate(synthex: Contract, oracle: Contract) {
+  const config = JSON.parse(fs.readFileSync( process.cwd() + `/deployments/${hre.network.name}/config.json`, 'utf8'));
+  const deployments = JSON.parse(fs.readFileSync( process.cwd() + `/deployments/${hre.network.name}/deployments.json`, 'utf8'));
+  
+  if(!deployments.contracts) deployments.contracts = {};
+  if(!deployments.sources) deployments.sources = {};
+
+  const MockToken = await ethers.getContractFactory("MockToken");
   const ERC20X = await ethers.getContractFactory("ERC20X");
   const PriceFeed = await ethers.getContractFactory("PriceFeed");
-  const Collateral = await ethers.getContractFactory("MockToken");
-  
-  // collateral eth
-  const eth = await Collateral.deploy("Ethereum", "ETH");
-  const ethPriceFeed = await PriceFeed.deploy(ethers.utils.parseUnits("1000", 8));
-  await ethPriceFeed.deployed();
-  await oracle.setFeed(eth.address, ethPriceFeed.address, 10);
 
-  await synthex.enableCollateral(eth.address, ethers.utils.parseEther("0.9"));
-  
-  // susd
-  const susd = await ERC20X.deploy("Synth USD", "sUSD", pool.address);
-  await susd.deployed();
-  const susdPriceFeed = await PriceFeed.deploy(ethers.utils.parseUnits("1", 8));
-  await susdPriceFeed.deployed();
-  await oracle.setFeed(susd.address, susdPriceFeed.address, 10);
-  await pool.enableSynth(susd.address);
+  for(let i in config.collaterals){
+    let collateral = config.collaterals[i].address;
+    if(!collateral){
+      // deploy collateral token
+      const token = await MockToken.deploy(config.collaterals[i].name, config.collaterals[i].symbol);
+      await token.deployed();
+      collateral = token.address;
+      deployments.contracts[config.collaterals[i].symbol] = {
+        address: collateral,
+        source: "MockToken",
+        constructorArguments: [config.collaterals[i].name, config.collaterals[i].symbol]
+      };
+      deployments.sources["MockToken"] = MockToken.interface.format("json")
+    }
+    let feed = config.collaterals[i].feed;
+    if(!feed){
+      // deploy price feed
+      const priceFeed = await PriceFeed.deploy(ethers.utils.parseUnits(config.collaterals[i].price, 8));
+      await priceFeed.deployed();
+      await oracle.setFeed(collateral, priceFeed.address, 10);
+      feed = priceFeed.address;
+    }
+    await synthex.enableCollateral(collateral, ethers.utils.parseEther(config.collaterals[i].volatilityRatio));
+  }
 
-  // sbtc
-  const sbtc = await ERC20X.deploy("Synth BTC", "sBTC", pool.address);
-  await sbtc.deployed();
-  const sbtcPriceFeed = await PriceFeed.deploy(ethers.utils.parseUnits("10000", 8));
-  await sbtcPriceFeed.deployed();
-  await oracle.setFeed(sbtc.address, sbtcPriceFeed.address, 10);
-  await pool.enableSynth(sbtc.address);
+  const SyntheXPool = await ethers.getContractFactory("SyntheXPool");
 
-  // seth
-  const seth = await ERC20X.deploy("Synth ETH", "sETH", pool.address);
-  await seth.deployed();
-  const sethPriceFeed = await PriceFeed.deploy(ethers.utils.parseUnits("1000", 8));
-  await sethPriceFeed.deployed();
-  await oracle.setFeed(seth.address, sethPriceFeed.address, 10);
-  await pool.enableSynth(seth.address);
+  for(let i in config.tradingPools){
+    // deploy pools
+    const pool = await SyntheXPool.deploy(config.tradingPools[i].name, config.tradingPools[i].symbol, synthex.address);
+    await pool.deployed();
+    // enable trading pool
+    await synthex.enableTradingPool(pool.address, ethers.utils.parseEther(config.tradingPools[i].volatilityRatio))
+    // add to deployments
+    deployments.contracts[config.tradingPools[i].symbol] = {
+      address: pool.address,
+      source: "SyntheXPool",
+      constructorArguments: [config.tradingPools[i].name, config.tradingPools[i].symbol, synthex.address]
+    };
+    deployments.sources["SyntheXPool"] = SyntheXPool.interface.format("json")
 
-  return { susd, sbtc, seth, eth };
+    for(let j in config.tradingPools[i].synths){
+      let synth = config.tradingPools[i].synths[j].address;
+      if(!synth){
+        // deploy token
+        const token = await ERC20X.deploy(config.tradingPools[i].synths[j].name, config.tradingPools[i].synths[j].symbol, pool.address);
+        await token.deployed();
+        synth = token.address;
+        deployments.contracts[config.tradingPools[i].synths[j].symbol] = {
+          address: synth,
+          source: "ERC20X",
+          constructorArguments: [config.tradingPools[i].synths[j].name, config.tradingPools[i].synths[j].symbol, pool.address]
+        };
+        deployments.sources["ERC20X"] = ERC20X.interface.format("json")
+      }
+      let feed =  config.tradingPools[i].synths[j].feed;
+      if(!feed){
+        // deploy price feed
+        const priceFeed = await PriceFeed.deploy(ethers.utils.parseUnits(config.tradingPools[i].synths[j].price, 8));
+        await priceFeed.deployed();
+        await oracle.setFeed(synth, priceFeed.address, 10);
+        feed = priceFeed.address;
+      }
+      await pool.enableSynth(synth);
+    }
+  }
+
+  // save deployments
+  fs.writeFileSync(process.cwd() + `/deployments/${hre.network.name}/deployments.json`, JSON.stringify(deployments, null, 2));
 }

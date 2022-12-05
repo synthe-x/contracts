@@ -4,7 +4,7 @@ import { initiate } from "./initiate";
 
 async function main() {
   const contracts = await deploy()
-  initiate(contracts.synthex, contracts.cryptoPool, contracts.oracle)
+  initiate(contracts.synthex, contracts.oracle)
 }
 
 // We recommend this pattern to be able to use async/await everywhere
