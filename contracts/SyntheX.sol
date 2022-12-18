@@ -17,6 +17,27 @@ contract SyntheX is Ownable, SyntheXStorage {
     using SafeMath for uint256;
     using Math for uint256;
 
+    event CollateralEnabled(address indexed asset, uint256 volatilityRatio);
+    event CollateralDisabled(address indexed asset);
+    event CollateralRemoved(address indexed asset);
+    event TradingPoolEnabled(address indexed pool, uint256 volatilityRatio);
+    event TradingPoolDisabled(address indexed pool);
+    event TradingPoolRemoved(address indexed pool);
+    
+    event NewPriceOracle(address indexed oracle);
+
+    event Deposit(address indexed user, address indexed asset, uint256 amount);
+    event Withdraw(address indexed user, address indexed asset, uint256 amount);
+    event Issue(address indexed user, address indexed tradingPool, address indexed asset, uint256 amount);
+    event Burn(address indexed user, address indexed tradingPool, address indexed asset, uint256 amount);
+
+    event Exchange(address indexed user, address indexed tradingPool, address indexed fromAsset, address toAsset, uint256 fromAmount, uint256 toAmount);
+
+    SYN public syn;
+
+    uint compInitialIndex = 1e36;
+    uint safeCRatio = 13e17;
+
     constructor(address _syn){
         syn = SYN(_syn);
     }
@@ -208,7 +229,7 @@ contract SyntheX is Ownable, SyntheXStorage {
         accountCollateralBalance[msg.sender] -= _amount;
 
         // check health
-        require(healthFactor(msg.sender) > 1e18, "Health factor below 1");
+        require(healthFactor(msg.sender) > safeCRatio, "Health factor below safeCRatio");
 
         emit Withdraw(msg.sender, _collateral, _amount);
     }

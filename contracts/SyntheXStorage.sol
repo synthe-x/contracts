@@ -7,24 +7,6 @@ import "./SYN.sol";
 
 contract SyntheXStorage {
 
-    event CollateralEnabled(address indexed asset, uint256 volatilityRatio);
-    event CollateralDisabled(address indexed asset);
-    event CollateralRemoved(address indexed asset);
-    event TradingPoolEnabled(address indexed pool, uint256 volatilityRatio);
-    event TradingPoolDisabled(address indexed pool);
-    event TradingPoolRemoved(address indexed pool);
-    
-    event NewPriceOracle(address indexed oracle);
-
-    event Deposit(address indexed user, address indexed asset, uint256 amount);
-    event Withdraw(address indexed user, address indexed asset, uint256 amount);
-    event Issue(address indexed user, address indexed tradingPool, address indexed asset, uint256 amount);
-    event Burn(address indexed user, address indexed tradingPool, address indexed asset, uint256 amount);
-
-    event Exchange(address indexed user, address indexed tradingPool, address indexed fromAsset, address toAsset, uint256 fromAmount, uint256 toAmount);
-
-    uint compInitialIndex = 1e36;
-
     /**
      * @dev Price oracle contract address
      */
@@ -91,5 +73,4 @@ contract SyntheXStorage {
     /// @notice The COMP accrued but not yet transferred to each user
     mapping(address => uint) public synAccrued;
 
-    SYN public syn;
 }
