@@ -2,11 +2,18 @@
 pragma solidity ^0.8.9;
 
 import "./PriceOracle.sol";
+import "./SYN.sol";
+
 
 contract SyntheXStorage {
 
-    event NewCollateralAsset(address indexed asset, uint256 volatilityRatio);
-    event NewTradingPool(address indexed pool, uint256 volatilityRatio);
+    event CollateralEnabled(address indexed asset, uint256 volatilityRatio);
+    event CollateralDisabled(address indexed asset);
+    event CollateralRemoved(address indexed asset);
+    event TradingPoolEnabled(address indexed pool, uint256 volatilityRatio);
+    event TradingPoolDisabled(address indexed pool);
+    event TradingPoolRemoved(address indexed pool);
+    
     event NewPriceOracle(address indexed oracle);
 
     event Deposit(address indexed user, address indexed asset, uint256 amount);
@@ -15,6 +22,8 @@ contract SyntheXStorage {
     event Burn(address indexed user, address indexed tradingPool, address indexed asset, uint256 amount);
 
     event Exchange(address indexed user, address indexed tradingPool, address indexed fromAsset, address toAsset, uint256 fromAmount, uint256 toAmount);
+
+    uint compInitialIndex = 1e36;
 
     /**
      * @dev Price oracle contract address
@@ -61,4 +70,26 @@ contract SyntheXStorage {
      * @dev Array of collateral asset addresses
      */
     address[] public collateralsList;
+
+    struct SynMarketState {
+        // The market's last updated compBorrowIndex or compSupplyIndex
+        uint224 index;
+
+        // The block number the index was last updated at
+        uint32 timestamp;
+    }
+    
+    /// @notice The speed at which SYN is distributed to the corresponding market (per second)
+    mapping(address => uint) public synRewardSpeeds;
+
+    /// @notice The SYN market borrow state for each market
+    mapping(address => SynMarketState) public synRewardState;
+    
+    /// @notice The COMP borrow index for each market for each borrower as of the last time they accrued COMP
+    mapping(address => mapping(address => uint)) public synBorrowerIndex;
+    
+    /// @notice The COMP accrued but not yet transferred to each user
+    mapping(address => uint) public synAccrued;
+
+    SYN public syn;
 }

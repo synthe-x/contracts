@@ -13,6 +13,7 @@ export async function initiate(synthex: Contract, oracle: Contract) {
   const ERC20X = await ethers.getContractFactory("ERC20X");
   const PriceFeed = await ethers.getContractFactory("PriceFeed");
 
+  console.log("Initiating Collaterals...");
   for(let i in config.collaterals){
     let collateral = config.collaterals[i].address;
     if(!collateral){
@@ -37,9 +38,9 @@ export async function initiate(synthex: Contract, oracle: Contract) {
     }
     await synthex.enableCollateral(collateral, ethers.utils.parseEther(config.collaterals[i].volatilityRatio));
   }
-
+  console.log("Collaterals initiated.");
   const SyntheXPool = await ethers.getContractFactory("SyntheXPool");
-
+  console.log("Initiating Trading Pools...");
   for(let i in config.tradingPools){
     // deploy pools
     const pool = await SyntheXPool.deploy(config.tradingPools[i].name, config.tradingPools[i].symbol, synthex.address);
@@ -79,6 +80,7 @@ export async function initiate(synthex: Contract, oracle: Contract) {
       await pool.enableSynth(synth);
     }
   }
+  console.log("Trading Pools initiated.");
 
   // save deployments
   fs.writeFileSync(process.cwd() + `/deployments/${hre.network.name}/deployments.json`, JSON.stringify(deployments, null, 2));

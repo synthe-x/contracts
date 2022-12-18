@@ -11,56 +11,56 @@
 		{
 			"name": "Crypto",
 			"symbol": "CRY",
-			"volatilityRatio": "0.8",
+			"volatilityRatio": "0.7",
 			"synths": [
 				{
-					"name": "Bitcoin",
-					"symbol": "BTC",
+					"name": "Bitcoin X",
+					"symbol": "BTCx",
                     "price": "17332.10"
 				},
 				{
-					"name": "Ethereum",
-					"symbol": "ETH",
+					"name": "Ethereum X",
+					"symbol": "ETHx",
                     "price": "1230.22"
 				},
 				{
-					"name": "Binance Coin",
-					"symbol": "BNB",
+					"name": "Binance Coin X",
+					"symbol": "BNBx",
                     "price": "295.22"
 				},
 				{
-					"name": "USD Coin",
-					"symbol": "USDC",
+					"name": "US Dollar CX",
+					"symbol": "USDcx",
                     "price": "1.00"
 				},
 				{
-					"name": "Cardano",
-					"symbol": "ADA",
+					"name": "Cardano X",
+					"symbol": "ADAx",
                     "price": "0.32"
 				},
 				{
-					"name": "Aave",
-					"symbol": "AAVE",
+					"name": "Aave X",
+					"symbol": "AAVEx",
                     "price": "66.39"
 				},
 				{
-					"name": "Chainlink",
-					"symbol": "LINK",
+					"name": "Chainlink X",
+					"symbol": "LINKx",
                     "price": "7.55"
 				},
 				{
-					"name": "Uniswap",
-					"symbol": "UNI",
+					"name": "Uniswap X",
+					"symbol": "UNIx",
                     "price": "6.38"
 				},
 				{
-					"name": "Dogecoin",
-					"symbol": "DOGE",
+					"name": "Dogecoin X",
+					"symbol": "DOGEx",
                     "price": "0.1074"
 				},
 				{
-					"name": "Polkadot",
-					"symbol": "DOT",
+					"name": "Polkadot X",
+					"symbol": "DOTx",
                     "price": "5.70"
 				}
 			]
@@ -68,56 +68,61 @@
         {
             "name": "Stocks",
             "symbol": "STK",
-			"volatilityRatio": "0.8",
+			"volatilityRatio": "0.9",
             "synths": [
                 {
-                    "name": "Apple",
-                    "symbol": "AAPL",
+                    "name": "Apple X",
+                    "symbol": "AAPLx",
                     "price": "130.00"
                 },
                 {
-                    "name": "Tesla",
-                    "symbol": "TSLA",
+                    "name": "Tesla X",
+                    "symbol": "TSLAx",
                     "price": "700.00"
                 },
                 {
-                    "name": "Amazon",
-                    "symbol": "AMZN",
+                    "name": "Amazon X",
+                    "symbol": "AMZNx",
                     "price": "3500.00"
                 },
                 {
-                    "name": "Facebook",
-                    "symbol": "FB",
+                    "name": "Facebook X",
+                    "symbol": "FBx",
                     "price": "300.00"
                 },
                 {
-                    "name": "Microsoft",
-                    "symbol": "MSFT",
+                    "name": "Microsoft X",
+                    "symbol": "MSFTx",
                     "price": "250.00"
                 },
                 {
-                    "name": "Google",
-                    "symbol": "GOOG",
-                    "price": "2500.00"
+                    "name": "S&P 500 X",
+                    "symbol": "^GSPCx",
+                    "price": "3934.00"
                 },
                 {
-                    "name": "Netflix",
-                    "symbol": "NFLX",
+                    "name": "Netflix X",
+                    "symbol": "NFLXx",
                     "price": "500.00"
                 },
                 {
-                    "name": "Alphabet",
-                    "symbol": "GOOGL",
+                    "name": "Alphabet X",
+                    "symbol": "GOOGLx",
                     "price": "2500.00"
                 },
                 {
-                    "name": "Nvidia",
-                    "symbol": "NVDA",
+                    "name": "Nvidia X",
+                    "symbol": "NVDAx",
                     "price": "500.00"
                 },
                 {
-                    "name": "AMD",
-                    "symbol": "AMD",
+                    "name": "AMD X",
+                    "symbol": "AMDx",
+                    "price": "100.00"
+                },
+                {
+                    "name": "US Dollar SX",
+                    "symbol": "USDsx",
                     "price": "100.00"
                 }
             ]
@@ -125,56 +130,56 @@
         {
             "name": "Foreign Exchange",
             "symbol": "FX",
-			"volatilityRatio": "0.8",
+			"volatilityRatio": "0.95",
             "synths": [
                 {
-                    "name": "US Dollar",
-                    "symbol": "USD",
+                    "name": "US Dollar FX",
+                    "symbol": "USDfx",
                     "price": "1.00"
                 },
                 {
-                    "name": "Euro",
-                    "symbol": "EUR",
+                    "name": "Euro X",
+                    "symbol": "EURx",
                     "price": "0.85"
                 },
                 {
-                    "name": "Japanese Yen",
-                    "symbol": "JPY",
+                    "name": "Japanese Yen X",
+                    "symbol": "JPYx",
                     "price": "0.0094"
                 },
                 {
-                    "name": "British Pound",
-                    "symbol": "GBP",
+                    "name": "British Pound X",
+                    "symbol": "GBPx",
                     "price": "1.25"
                 },
                 {
-                    "name": "Swiss Franc",
-                    "symbol": "CHF",
+                    "name": "Swiss Franc X",
+                    "symbol": "CHFx",
                     "price": "1.10"
                 },
                 {
-                    "name": "Canadian Dollar",
-                    "symbol": "CAD",
+                    "name": "Canadian Dollar X",
+                    "symbol": "CADx",
                     "price": "0.80"
                 },
                 {
-                    "name": "Australian Dollar",
-                    "symbol": "AUD",
+                    "name": "Australian Dollar X",
+                    "symbol": "AUDx",
                     "price": "0.75"
                 },
                 {
-                    "name": "Korean Republic won",
-                    "symbol": "WON",
+                    "name": "Korean Republic won X",
+                    "symbol": "WONx",
                     "price": "0.0009"
                 },
                 {
-                    "name": "United Arab Emirates Dirham",
-                    "symbol": "AED",
+                    "name": "UAE Dirham X",
+                    "symbol": "AEDx",
                     "price": "0.27"
                 },
                 {
-                    "name": "Indian Rupee",
-                    "symbol": "INR",
+                    "name": "Indian Rupee X",
+                    "symbol": "INRx",
                     "price": "0.013"
                 }
             ]

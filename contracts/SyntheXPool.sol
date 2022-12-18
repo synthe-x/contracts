@@ -10,11 +10,15 @@ import "./PriceOracle.sol";
 import "./SyntheX.sol";
 
 // Uncomment this line to use console.log
-import "hardhat/console.sol";
+// import "hardhat/console.sol";
 
 contract SyntheXPool is ERC20 {
     using SafeMath for uint256;
     using Math for uint256;
+
+    event SynthEnabled(address indexed synth);
+    event SynthDisabled(address indexed synth);
+    event SynthRemoved(address indexed synth);
 
     SyntheX synthex;
 
@@ -35,9 +39,11 @@ contract SyntheXPool is ERC20 {
      * @notice The synth contract must have pool (this contract) as owner
      */
     function enableSynth(address _synth) public onlyOwner {
-        require(synthex.owner() == msg.sender, "SyntheXPool: Only owner can enable synth");
-        synths[_synth] = true;
-        _synthsList.push(_synth);
+        if(!synths[_synth]){
+            synths[_synth] = true;
+            _synthsList.push(_synth);
+            emit SynthEnabled(_synth);
+        }
     }
 
     /**
@@ -46,8 +52,10 @@ contract SyntheXPool is ERC20 {
      * @notice Only the owner can call this function
      */
     function disableSynth(address _synth) public onlyOwner {
-        require(synthex.owner() == msg.sender, "SyntheXPool: Only owner can disable synth");
-        synths[_synth] = false;
+        if(synths[_synth]){
+            synths[_synth] = false;
+            emit SynthDisabled(_synth);
+        }
     }
 
     /**
@@ -56,12 +64,12 @@ contract SyntheXPool is ERC20 {
      * @notice Removes from synthList => would not contribute to pool debt
      */
     function removeSynth(address _synth) public onlyOwner {
-        require(synthex.owner() == msg.sender, "SyntheXPool: Only owner can remove synth");
         synths[_synth] = false;
         for (uint i = 0; i < _synthsList.length; i++) {
             if (_synthsList[i] == _synth) {
                 _synthsList[i] = _synthsList[_synthsList.length - 1];
                 _synthsList.pop();
+                emit SynthRemoved(_synth);
                 break;
             }
         }
@@ -117,7 +125,7 @@ contract SyntheXPool is ERC20 {
      * @param _amountUSD The amount of USD to issue
      * @notice Only SyntheX can call this function
      */
-    function issueSynth(address _synth, address _user, uint _amount, uint _amountUSD) public onlyInternal {
+    function mint(address _synth, address _user, uint _amount, uint _amountUSD) public onlyInternal {
         require(synths[_synth], "Synth not enabled");
 
         if(totalSupply() == 0){
@@ -129,6 +137,9 @@ contract SyntheXPool is ERC20 {
             uint mintAmount = _amountUSD * 1e18 / debtSharePrice;
             _mint(_user, mintAmount);
         }
+    }
+
+    function mintSynth(address _synth, address _user, uint _amount) public onlyInternal {
         ERC20X(_synth).mint(_user, _amount);
     }
 
@@ -139,12 +150,15 @@ contract SyntheXPool is ERC20 {
      * @param _amount The amount of synths to burn
      * @param _amountUSD The amount of USD to burn
      */
-    function burnSynth(address _synth, address _user, uint _amount, uint _amountUSD) public onlyInternal {
+    function burn(address _synth, address _user, uint _amount, uint _amountUSD) public onlyInternal {
         uint _totalDebt = synthex.getPoolTotalDebtUSD(address(this));
         uint totalSupply = totalSupply();
         uint debtSharePrice = _totalDebt * 1e18 / totalSupply;
         uint burnAmount = _amountUSD * 1e18 / debtSharePrice;
         _burn(_user, burnAmount);
+    }
+
+    function burnSynth(address _synth, address _user, uint _amount) public onlyInternal {
         ERC20X(_synth).burn(_user, _amount);
     }
 

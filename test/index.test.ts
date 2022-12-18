@@ -2,7 +2,7 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import { deploy } from "../scripts/deploy";
-import { initiate } from "../scripts/initiate";
+import { initiate } from "../scripts/test_initiate";
 
 describe("SyntheX", function () {
 
@@ -13,16 +13,14 @@ describe("SyntheX", function () {
 		// Contracts are deployed using the first signer/account by default
 		[owner, user1, user2, user3] = await ethers.getSigners();
 
-		const deployments = await deploy();
+		const deployments = await initiate();
 		synthex = deployments.synthex;
 		oracle = deployments.oracle;
-		cryptoPool = deployments.cryptoPool;
-
-		const tokens = await initiate(synthex, cryptoPool, oracle);
-		eth = tokens.eth;
-		susd = tokens.susd;
-		sbtc = tokens.sbtc;
-		seth = tokens.seth;
+		cryptoPool = deployments.pool;
+		eth = deployments.eth;
+		susd = deployments.susd;
+		sbtc = deployments.sbtc;
+		seth = deployments.seth;
 	});
 
 	it("Should stake eth", async function () {

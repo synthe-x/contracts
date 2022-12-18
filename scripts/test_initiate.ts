@@ -2,9 +2,14 @@ import { ethers } from "hardhat";
 import { Contract } from "ethers";
 
 export async function initiate() {
+	// deploy SYN
+	const SYN = await ethers.getContractFactory("SYN");
+	const syn = await SYN.deploy();
+	await syn.deployed();
+
     // deploy synthex
     const SyntheX = await ethers.getContractFactory("SyntheX");
-    const synthex = await SyntheX.deploy();
+    const synthex = await SyntheX.deploy(syn.address);
     await synthex.deployed();
 
     // deploy priceoracle
@@ -27,6 +32,8 @@ export async function initiate() {
 		pool.address,
 		ethers.utils.parseEther("0.9")
 	);
+	await syn.mint(synthex.address, ethers.utils.parseEther("100000000"));
+	await synthex.setPoolSpeed(pool.address, ethers.utils.parseEther("0.1"));
 
 	const ERC20X = await ethers.getContractFactory("ERC20X");
 	const PriceFeed = await ethers.getContractFactory("PriceFeed");
@@ -72,5 +79,5 @@ export async function initiate() {
 	await oracle.setFeed(seth.address, sethPriceFeed.address, 10);
 	await pool.enableSynth(seth.address);
 
-	return { pool, susd, sbtc, seth, eth };
+	return { syn, synthex, oracle, pool, susd, sbtc, seth, eth };
 }
