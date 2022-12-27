@@ -1,20 +1,29 @@
 import { HardhatUserConfig } from "hardhat/config";
+import '@openzeppelin/hardhat-upgrades';
 import "@nomicfoundation/hardhat-toolbox";
 import "hardhat-gas-reporter"
 require('dotenv').config();
 
 const config: HardhatUserConfig = {
-  solidity: "0.8.17",
+  solidity: {
+    version: "0.8.17",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 1000,
+      },
+    },
+  },
   networks: {
     arbitrumGoerli: {
-      url: "https://arbitrum-goerli.infura.io/v3/bb621c9372d048979f8677ba78fe41d7",
+      url: "https://arb-goerli.g.alchemy.com/v2/HyNaane88yHFsK8Yrn4gf2OOzHkd6GAJ",
       accounts: [`0x${process.env.PRIVATE_KEY}`],
     }
   },
   gasReporter: {
-    enabled: false,
+    enabled: true,
     currency: 'USD',
-    gasPrice: 25,
+    gasPrice: 13,
     coinmarketcap: '54e57674-6e99-404b-8528-cbf6a9f1e471'
   },
   etherscan:{

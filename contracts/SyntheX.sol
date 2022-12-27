@@ -3,7 +3,6 @@ pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
-
 // ownable
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -33,18 +32,244 @@ contract SyntheX is Ownable, SyntheXStorage {
 
     event Exchange(address indexed user, address indexed tradingPool, address indexed fromAsset, address toAsset, uint256 fromAmount, uint256 toAmount);
 
+    event SetPoolRewardSpeed(address indexed pool, uint256 rewardSpeed);
+    event NewExchangeFee(uint256 _exchangeFee);
+    event DistributedSYN(address indexed pool, address _account, uint256 accountDelta, uint rewardIndex);
+
     SYN public syn;
+    address public ETH_ADDRESS = address(0); // 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
 
     uint compInitialIndex = 1e36;
     uint safeCRatio = 13e17;
+
+    uint256 public exchangeFee;
+    uint256 private exchangeFeeMantissa = 1e18;
 
     constructor(address _syn){
         syn = SYN(_syn);
     }
 
     /* -------------------------------------------------------------------------- */
+    /*                              Public Functions                              */
+    /* -------------------------------------------------------------------------- */
+    /**
+     * @dev Enable a pool
+     * @param _tradingPool The address of the trading pool
+     */
+    function enterPool(address _tradingPool) public {
+        tradingPools[_tradingPool].accountMembership[msg.sender] = true;
+        accountPools[msg.sender].push(_tradingPool);
+
+    }
+
+    /**
+     * @dev Exit a pool
+     * @param _tradingPool The address of the trading pool
+     */
+    function exitPool(address _tradingPool) public {
+        tradingPools[_tradingPool].accountMembership[msg.sender] = false;
+        // remove from list
+        for (uint i = 0; i < accountPools[msg.sender].length; i++) {
+            if (accountPools[msg.sender][i] == _tradingPool) {
+                accountPools[msg.sender][i] = accountPools[msg.sender][accountPools[msg.sender].length - 1];
+                accountPools[msg.sender].pop();
+                break;
+            }
+        }
+    }
+
+    /**
+     * @dev Enable a collateral
+     * @param _collateral The address of the collateral
+     */
+    function enterCollateral(address _collateral) public {
+        collaterals[_collateral].accountMembership[msg.sender] = true;
+        accountCollaterals[msg.sender].push(_collateral);
+    }
+
+    /**
+     * @dev Exit a collateral
+     * @param _collateral The address of the collateral
+     */
+    function exitCollateral(address _collateral) public {
+        collaterals[_collateral].accountMembership[msg.sender] = false;
+        // remove from list
+        for (uint i = 0; i < accountCollaterals[msg.sender].length; i++) {
+            if (accountCollaterals[msg.sender][i] == _collateral) {
+                accountCollaterals[msg.sender][i] = accountCollaterals[msg.sender][accountCollaterals[msg.sender].length - 1];
+                accountCollaterals[msg.sender].pop();
+                break;
+            }
+        }
+    }
+
+    /**
+     * @dev Enter a collateral and deposit collateral
+     * @param _collateral The address of the collateral
+     * @param _amount The amount of collateral to deposit
+     */
+    function enterAndDeposit(address _collateral, uint _amount) public payable {
+        enterCollateral(_collateral);
+        deposit(_collateral, _amount);
+    }
+
+    /**
+     * @dev Deposit collateral
+     * @param _collateral The address of the erc20 collateral;  for ETH
+     * @param _amount The amount of collateral to deposit
+     */
+    function deposit(address _collateral, uint _amount) public payable {
+        require(collaterals[_collateral].isEnabled, "Collateral not enabled");
+        require(collaterals[_collateral].accountMembership[msg.sender], "Account not in collateral");
+        // Transfer of tokens
+        if(_collateral == ETH_ADDRESS){
+            require(msg.value == _amount, "Incorrect ETH amount");
+        } else {
+            ERC20(_collateral).transferFrom(msg.sender, address(this), _amount);
+        }
+        // Update balance
+        accountCollateralBalance[msg.sender][_collateral] += _amount;
+        emit Deposit(msg.sender, _collateral, _amount);
+    }
+
+    /**
+     * @dev Withdraw collateral
+     * @param _collateral The address of the collateral
+     * @param _amount The amount of collateral to withdraw
+     */
+    function withdraw(address _collateral, uint _amount) public {
+        require(accountCollateralBalance[msg.sender][_collateral] >= _amount, "Insufficient balance");
+        ERC20(_collateral).transfer(msg.sender, _amount);
+        accountCollateralBalance[msg.sender][_collateral] -= _amount;
+
+        // check health
+        require(healthFactor(msg.sender) > safeCRatio, "Health factor below safeCRatio");
+
+        emit Withdraw(msg.sender, _collateral, _amount);
+    }
+
+    /**
+     * @dev Enter a pool and issue a synthetic asset
+     * @param _tradingPool The address of the trading pool
+     * @param _synth The address of the synthetic asset
+     * @param _amount The amount of synthetic asset to issue
+     */
+    function enterAndIssue(address _tradingPool, address _synth, uint _amount) public {
+        enterPool(_tradingPool);
+        issue(_tradingPool, _synth, _amount);
+    }
+
+    /**
+     * @dev Issue a synthetic asset
+     * @param _tradingPool The address of the trading pool
+     * @param _synth The address of the synthetic asset
+     * @param _amount The amount of synthetic asset to issue
+     */
+    function issue(address _tradingPool, address _synth, uint _amount) public {
+        Market storage pool = tradingPools[_tradingPool];
+        require(pool.isEnabled, "Trading pool not enabled");
+        require(pool.accountMembership[msg.sender], "Account not in trading pool");
+        require(SyntheXPool(_tradingPool).isSynthEnabled(_synth), "Synth not enabled");
+        
+        updateSYNIndex(_tradingPool);
+        distributeAccountSYN(_tradingPool, msg.sender);
+
+        uint amountUSD = _amount * oracle.getPrice(_synth)/1e18;
+        SyntheXPool(_tradingPool).mint(msg.sender, amountUSD);
+        SyntheXPool(_tradingPool).mintSynth(_synth, msg.sender, _amount);
+
+        require(healthFactor(msg.sender) > safeCRatio, "Health factor below safeCRatio");
+
+        emit Issue(msg.sender, _tradingPool, _synth, _amount);
+    }
+
+    /**
+     * @dev Redeem a synthetic asset
+     * @param _tradingPool The address of the trading pool
+     * @param _synth The address of the synthetic asset
+     * @param _amount The amount of synthetic asset to redeem
+     */
+    function burn(address _tradingPool, address _synth, uint _amount) public {
+        Market storage pool = tradingPools[_tradingPool];
+        require(pool.isEnabled, "Trading pool not enabled");
+        require(pool.accountMembership[msg.sender], "Account not in trading pool");
+        
+        updateSYNIndex(_tradingPool);
+        distributeAccountSYN(_tradingPool, msg.sender);
+
+        uint amountUSD = _amount * oracle.getPrice(_synth)/1e18;
+        uint burnablePerc = getUserPoolDebtUSD(msg.sender, _tradingPool).min(amountUSD).mul(1e18).div(amountUSD);
+        SyntheXPool(_tradingPool).burn(msg.sender, amountUSD.mul(burnablePerc).div(1e18));
+        SyntheXPool(_tradingPool).burnSynth(_synth, msg.sender, _amount.mul(burnablePerc).div(1e18));
+
+        emit Burn(msg.sender, _tradingPool, _synth, _amount);
+    }
+
+    /**
+     * @dev Exchange a synthetic asset for another
+     * @param _tradingPool The address of the trading pool
+     * @param _synthFrom The address of the synthetic asset to exchange
+     * @param _synthTo The address of the synthetic asset to receive
+     * @param _amount The amount of synthetic asset to exchange
+     */
+    function exchange(address _tradingPool, address _synthFrom, address _synthTo, uint _amount) public {
+        uint amountDst = _amount.mul(oracle.getPrice(_synthFrom)).div(oracle.getPrice(_synthTo));
+        SyntheXPool(_tradingPool).exchange(_synthFrom, _synthTo, msg.sender, _amount, amountDst);
+
+        emit Exchange(msg.sender, _tradingPool, _synthFrom, _synthTo, _amount, amountDst);
+    }
+
+    function setPoolSpeed(address _tradingPool, uint _speed) public onlyOwner {
+        Market storage pool = tradingPools[_tradingPool];
+        require(pool.isEnabled, "Trading pool not enabled");
+
+        updateSYNIndex(_tradingPool);
+        synRewardSpeeds[_tradingPool] = _speed;
+        emit SetPoolRewardSpeed(_tradingPool, _speed);
+    }
+
+    /**
+     * @dev Liquidate an account
+     * @param _account The address of the account to liquidate
+     * @param _tradingPool The address of the trading pool
+     * @param _inAsset The address of the asset to liquidate
+     * @param _inAmount The amount of asset to liquidate
+     * @param _outAsset The address of the collateral to receive
+     */
+    function liquidate(address _account, address _tradingPool, address _inAsset, uint _inAmount, address _outAsset) external {
+        require(healthFactor(_account) < 1e18, "Health factor above 1");
+        uint incentive = getLTV(_account);
+        uint inAssetPrice = oracle.getPrice(_inAsset);
+        uint outAssetPrice = oracle.getPrice(_outAsset);
+
+        // give back inAmountUSD*(discount) of collateral
+        Market storage collateral = collaterals[_outAsset];
+        require(collateral.isEnabled, "Collateral not enabled");
+        require(collateral.accountMembership[_account], "Account not in collateral");
+        uint _outAmount = accountCollateralBalance[_account][_outAsset].min((_inAmount * inAssetPrice)/(outAssetPrice));
+        accountCollateralBalance[_account][_outAsset] -= _outAmount * incentive / 1e18;
+
+        // burn synth & debt and transfer collateral to liquidator
+        SyntheXPool(_tradingPool).burn(_account, _outAmount * outAssetPrice / 1e18);
+        SyntheXPool(_tradingPool).burnSynth(_inAsset, msg.sender, _outAmount * outAssetPrice / inAssetPrice);
+        accountCollateralBalance[msg.sender][_outAsset] += _outAmount * incentive / 1e18;
+    }
+
+    
+    /* -------------------------------------------------------------------------- */
     /*                               Admin Functions                              */
     /* -------------------------------------------------------------------------- */
+
+    /**
+     * @dev Set the exchange fee
+     * @param _exchangeFee The new exchange fee
+     * @notice Only the owner can call this function
+     */
+    function setExchangeFee(uint256 _exchangeFee) public onlyOwner {
+        exchangeFee = _exchangeFee;
+        emit NewExchangeFee(_exchangeFee);
+    }
+
     /**
      * @dev Add a new trading pool
      * @param _tradingPool The address of the trading pool
@@ -141,201 +366,12 @@ contract SyntheX is Ownable, SyntheXStorage {
     }
 
     /* -------------------------------------------------------------------------- */
-    /*                              Public Functions                              */
+    /*                           SYN Reward Distribution                          */
     /* -------------------------------------------------------------------------- */
     /**
-     * @dev Enable a pool
-     * @param _tradingPool The address of the trading pool
+     * @notice Accrue COMP to the market by updating the supply index
+     * @param _tradingPool The market whose supply index to update
      */
-    function enterPool(address _tradingPool) public {
-        tradingPools[_tradingPool].accountMembership[msg.sender] = true;
-        accountPools[msg.sender].push(_tradingPool);
-
-    }
-
-    /**
-     * @dev Exit a pool
-     * @param _tradingPool The address of the trading pool
-     */
-    function exitPool(address _tradingPool) public {
-        tradingPools[_tradingPool].accountMembership[msg.sender] = false;
-        // remove from list
-        for (uint i = 0; i < accountPools[msg.sender].length; i++) {
-            if (accountPools[msg.sender][i] == _tradingPool) {
-                accountPools[msg.sender][i] = accountPools[msg.sender][accountPools[msg.sender].length - 1];
-                accountPools[msg.sender].pop();
-                break;
-            }
-        }
-    }
-
-    /**
-     * @dev Enable a collateral
-     * @param _collateral The address of the collateral
-     */
-    function enterCollateral(address _collateral) public {
-        collaterals[_collateral].accountMembership[msg.sender] = true;
-        accountCollaterals[msg.sender].push(_collateral);
-    }
-
-    /**
-     * @dev Exit a collateral
-     * @param _collateral The address of the collateral
-     */
-    function exitCollateral(address _collateral) public {
-        collaterals[_collateral].accountMembership[msg.sender] = false;
-        // remove from list
-        for (uint i = 0; i < accountCollaterals[msg.sender].length; i++) {
-            if (accountCollaterals[msg.sender][i] == _collateral) {
-                accountCollaterals[msg.sender][i] = accountCollaterals[msg.sender][accountCollaterals[msg.sender].length - 1];
-                accountCollaterals[msg.sender].pop();
-                break;
-            }
-        }
-    }
-
-    /**
-     * @dev Enter a collateral and deposit collateral
-     * @param _collateral The address of the collateral
-     * @param _amount The amount of collateral to deposit
-     */
-    function enterAndDeposit(address _collateral, uint _amount) public {
-        enterCollateral(_collateral);
-        deposit(_collateral, _amount);
-    }
-
-    /**
-     * @dev Deposit collateral
-     * @param _collateral The address of the collateral
-     * @param _amount The amount of collateral to deposit
-     */
-    function deposit(address _collateral, uint _amount) public {
-        require(collaterals[_collateral].isEnabled, "Collateral not enabled");
-        require(collaterals[_collateral].accountMembership[msg.sender], "Account not in collateral");
-        ERC20(_collateral).transferFrom(msg.sender, address(this), _amount);
-        accountCollateralBalance[msg.sender] += _amount;
-
-        emit Deposit(msg.sender, _collateral, _amount);
-    }
-
-    /**
-     * @dev Withdraw collateral
-     * @param _collateral The address of the collateral
-     * @param _amount The amount of collateral to withdraw
-     */
-    function withdraw(address _collateral, uint _amount) public {
-        require(accountCollateralBalance[msg.sender] >= _amount, "Insufficient balance");
-        ERC20(_collateral).transfer(msg.sender, _amount);
-        accountCollateralBalance[msg.sender] -= _amount;
-
-        // check health
-        require(healthFactor(msg.sender) > safeCRatio, "Health factor below safeCRatio");
-
-        emit Withdraw(msg.sender, _collateral, _amount);
-    }
-
-    /**
-     * @dev Enter a pool and issue a synthetic asset
-     * @param _tradingPool The address of the trading pool
-     * @param _synth The address of the synthetic asset
-     * @param _amount The amount of synthetic asset to issue
-     */
-    function enterAndIssue(address _tradingPool, address _synth, uint _amount) public {
-        enterPool(_tradingPool);
-        issue(_tradingPool, _synth, _amount);
-    }
-
-    /**
-     * @dev Issue a synthetic asset
-     * @param _tradingPool The address of the trading pool
-     * @param _synth The address of the synthetic asset
-     * @param _amount The amount of synthetic asset to issue
-     */
-    function issue(address _tradingPool, address _synth, uint _amount) public {
-        Market storage pool = tradingPools[_tradingPool];
-        require(pool.isEnabled, "Trading pool not enabled");
-        require(pool.accountMembership[msg.sender], "Account not in trading pool");
-        
-        updateSYNIndex(_tradingPool);
-        distributeAccountSYN(_tradingPool, msg.sender);
-
-        uint amountUSD = _amount * oracle.getPrice(_synth)/1e18;
-        SyntheXPool(_tradingPool).mint(_synth, msg.sender, _amount, amountUSD);
-        SyntheXPool(_tradingPool).mintSynth(_synth, msg.sender, _amount);
-
-        emit Issue(msg.sender, _tradingPool, _synth, _amount);
-    }
-
-    /**
-     * @dev Redeem a synthetic asset
-     * @param _tradingPool The address of the trading pool
-     * @param _synth The address of the synthetic asset
-     * @param _amount The amount of synthetic asset to redeem
-     */
-    function burn(address _tradingPool, address _synth, uint _amount) public {
-        Market storage pool = tradingPools[_tradingPool];
-        require(pool.isEnabled, "Trading pool not enabled");
-        require(pool.accountMembership[msg.sender], "Account not in trading pool");
-        
-        updateSYNIndex(_tradingPool);
-        distributeAccountSYN(_tradingPool, msg.sender);
-
-        uint amountUSD = _amount * oracle.getPrice(_synth)/1e18;
-        SyntheXPool(_tradingPool).burn(_synth, msg.sender, _amount, amountUSD);
-        SyntheXPool(_tradingPool).burnSynth(_synth, msg.sender, _amount);
-
-        emit Burn(msg.sender, _tradingPool, _synth, _amount);
-    }
-
-    /**
-     * @dev Exchange a synthetic asset for another
-     * @param _tradingPool The address of the trading pool
-     * @param _synthFrom The address of the synthetic asset to exchange
-     * @param _synthTo The address of the synthetic asset to receive
-     * @param _amount The amount of synthetic asset to exchange
-     */
-    function exchange(address _tradingPool, address _synthFrom, address _synthTo, uint _amount) public {
-        uint amountDst = _amount * oracle.getPrice(_synthFrom) / oracle.getPrice(_synthTo);
-        SyntheXPool(_tradingPool).exchange(_synthFrom, _synthTo, msg.sender, _amount, amountDst);
-
-        emit Exchange(msg.sender, _tradingPool, _synthFrom, _synthTo, _amount, amountDst);
-    }
-
-    function setPoolSpeed(address _tradingPool, uint _speed) public onlyOwner {
-        Market storage pool = tradingPools[_tradingPool];
-        require(pool.isEnabled, "Trading pool not enabled");
-
-        updateSYNIndex(_tradingPool);
-        synRewardSpeeds[_tradingPool] = _speed;
-    }
-
-    /**
-     * @dev Liquidate an account
-     * @param _account The address of the account to liquidate
-     * @param _tradingPool The address of the trading pool
-     * @param _inAsset The address of the asset to liquidate
-     * @param _inAmount The amount of asset to liquidate
-     * @param _outAsset The address of the collateral to receive
-     */
-    function liquidate(address _account, address _tradingPool, address _inAsset, uint _inAmount, address _outAsset) external {
-        uint health = healthFactor(_account);
-        require(health < 1e18, "Health factor above 1");
-        uint discount = (1e18 - health)/2;
-
-        // give back inAmountUSD*(1+discount) of collateral
-        Market storage collateral = collaterals[_outAsset];
-        require(collateral.isEnabled, "Collateral not enabled");
-        require(collateral.accountMembership[msg.sender], "Account not in collateral");
-        uint collateralBalance = accountCollateralBalance[msg.sender];
-        uint _outAmount = collateralBalance.max((_inAmount * oracle.getPrice(_inAsset) / oracle.getPrice(_outAsset))*((1e18+discount)/1e18));
-        accountCollateralBalance[msg.sender] -= _outAmount;
-
-        // burn synth and transfer collateral to liquidator
-        SyntheXPool(_tradingPool).burnSynth(_inAsset, msg.sender, _outAmount * oracle.getPrice(_inAsset) / oracle.getPrice(_outAsset));
-        IERC20(_outAsset).transfer(msg.sender, _outAmount);
-    }
-
-    
     function updateSYNIndex(address _tradingPool) internal {
         SynMarketState storage poolRewardState = synRewardState[_tradingPool];
         uint borrowSpeed = synRewardSpeeds[_tradingPool];
@@ -388,7 +424,7 @@ contract SyntheX is Ownable, SyntheXStorage {
         uint accountAccrued = synAccrued[_account] + accountDelta;
         synAccrued[_account] = accountAccrued;
 
-        // emit DistributedSupplierComp(CToken(cToken), supplier, supplierDelta, supplyIndex);
+        emit DistributedSYN(_tradingPool, _account, accountDelta, borrowIndex);
     }
 
     /**
@@ -407,26 +443,22 @@ contract SyntheX is Ownable, SyntheXStorage {
     function claimSYN2(address holder, address[] memory cTokens) public {
         address[] memory holders = new address[](1);
         holders[0] = holder;
-        claimSYN3(holders, cTokens, true, true);
+        claimSYN3(holders, cTokens);
     }
 
     /**
      * @notice Claim all comp accrued by the holders
      * @param holders The addresses to claim COMP for
      * @param _tradingPools The list of markets to claim COMP in
-     * @param borrowers Whether or not to claim COMP earned by borrowing
-     * @param suppliers Whether or not to claim COMP earned by supplying
      */
-    function claimSYN3(address[] memory holders, address[] memory _tradingPools, bool borrowers, bool suppliers) public {
+    function claimSYN3(address[] memory holders, address[] memory _tradingPools) public {
         for (uint i = 0; i < _tradingPools.length; i++) {
             SyntheXPool cToken = SyntheXPool(_tradingPools[i]);
             require(tradingPools[address(cToken)].isEnabled, "market must be listed");
 
-            if (suppliers == true) {
-                updateSYNIndex(address(cToken));
-                for (uint j = 0; j < holders.length; j++) {
-                    distributeAccountSYN(address(cToken), holders[j]);
-                }
+            updateSYNIndex(address(cToken));
+            for (uint j = 0; j < holders.length; j++) {
+                distributeAccountSYN(address(cToken), holders[j]);
             }
         }
         for (uint j = 0; j < holders.length; j++) {
@@ -480,6 +512,18 @@ contract SyntheX is Ownable, SyntheXStorage {
     }
 
     /**
+     * @dev Get the health factor of an account
+     * @param _account The address of the account
+     * @return The health factor of the account
+     */
+    function getLTV(address _account) public view returns(uint) {
+        uint totalCollateral = getUserTotalCollateralUSD(_account);
+        uint totalDebt = getUserTotalDebtUSD(_account);
+        if(totalDebt == 0) return type(uint).max;
+        return totalCollateral * 1e18 / totalDebt;
+    }
+
+    /**
      * @dev Get the total collateral of an account
      * @param _account The address of the account
      * @return The total collateral of the account
@@ -488,7 +532,7 @@ contract SyntheX is Ownable, SyntheXStorage {
         uint totalCollateral = 0;
         for(uint i = 0; i < accountCollaterals[_account].length; i++){
             address collateral = accountCollaterals[_account][i];
-            totalCollateral += accountCollateralBalance[_account] * oracle.getPrice(collateral) * collaterals[collateral].volatilityRatio / 1e36;
+            totalCollateral += accountCollateralBalance[_account][collateral] * oracle.getPrice(collateral) * collaterals[collateral].volatilityRatio / 1e36;
         }
         return totalCollateral;
     }
@@ -502,7 +546,7 @@ contract SyntheX is Ownable, SyntheXStorage {
         uint totalCollateral = 0;
         for(uint i = 0; i < accountCollaterals[_account].length; i++){
             address collateral = accountCollaterals[_account][i];
-            totalCollateral += accountCollateralBalance[_account] * oracle.getPrice(collateral) * collaterals[collateral].volatilityRatio / 1e36;
+            totalCollateral += accountCollateralBalance[_account][collateral] * oracle.getPrice(collateral) * collaterals[collateral].volatilityRatio / 1e36;
         }
         return totalCollateral;
     }
@@ -565,5 +609,26 @@ contract SyntheX is Ownable, SyntheXStorage {
             totalDebt += ERC20X(synth).totalSupply() * oracle.getPrice(synth) / 1e18;
         }
         return totalDebt;
+    }
+
+    /**
+     * @dev Get dynamic total $SYN accrued by an account
+     */
+    function getSYNAccrued(address _account) public returns(uint){
+        for (uint i = 0; i < tradingPoolsList.length; i++) {
+            SyntheXPool pool = SyntheXPool(tradingPoolsList[i]);
+            require(tradingPools[address(pool)].isEnabled, "market must be listed");
+
+            updateSYNIndex(address(pool));
+            distributeAccountSYN(address(pool), _account);
+        }
+        return getSYNAccruedStored(_account);
+    }
+
+    /**
+     * @dev Get stored total $SYN accrued by an account
+     */
+    function getSYNAccruedStored(address _account) public view returns(uint){
+        return synAccrued[_account];
     }
 }

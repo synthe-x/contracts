@@ -40,24 +40,18 @@ export async function initiate() {
 	const Collateral = await ethers.getContractFactory("MockToken");
 
 	// collateral eth
-	const eth = await Collateral.deploy("Ethereum", "ETH");
-	const ethPriceFeed = await PriceFeed.deploy(
-		ethers.utils.parseUnits("1000", 8)
-	);
+	const ethPriceFeed = await PriceFeed.deploy(ethers.utils.parseUnits("1000", 8));
 	await ethPriceFeed.deployed();
-	await oracle.setFeed(eth.address, ethPriceFeed.address, 10);
-
-	await synthex.enableCollateral(eth.address, ethers.utils.parseEther("0.9"));
+	await oracle.setFeed(ethers.constants.AddressZero, ethPriceFeed.address, 10);
+	await synthex.enableCollateral(ethers.constants.AddressZero, ethers.utils.parseEther("0.9"));
 
 	// susd
 	const susd = await ERC20X.deploy("Synth USD", "sUSD", pool.address);
 	await susd.deployed();
-	const susdPriceFeed = await PriceFeed.deploy(
-		ethers.utils.parseUnits("1", 8)
-	);
+	const susdPriceFeed = await PriceFeed.deploy(ethers.utils.parseUnits("1", 8));
 	await susdPriceFeed.deployed();
 	await oracle.setFeed(susd.address, susdPriceFeed.address, 10);
-	await pool.enableSynth(susd.address);
+	await pool.enableSynth(susd.address, ethers.utils.parseEther('0.02'));
 
 	// sbtc
 	const sbtc = await ERC20X.deploy("Synth BTC", "sBTC", pool.address);
@@ -67,7 +61,7 @@ export async function initiate() {
 	);
 	await sbtcPriceFeed.deployed();
 	await oracle.setFeed(sbtc.address, sbtcPriceFeed.address, 10);
-	await pool.enableSynth(sbtc.address);
+	await pool.enableSynth(sbtc.address, ethers.utils.parseEther('0.04'));
 
 	// seth
 	const seth = await ERC20X.deploy("Synth ETH", "sETH", pool.address);
@@ -77,7 +71,7 @@ export async function initiate() {
 	);
 	await sethPriceFeed.deployed();
 	await oracle.setFeed(seth.address, sethPriceFeed.address, 10);
-	await pool.enableSynth(seth.address);
+	await pool.enableSynth(seth.address, ethers.utils.parseEther('0.08'));
 
-	return { syn, synthex, oracle, pool, susd, sbtc, seth, eth };
+	return { syn, synthex, oracle, ethPriceFeed, sbtcPriceFeed, pool, susd, sbtc, seth };
 }

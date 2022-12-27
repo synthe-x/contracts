@@ -7,8 +7,9 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract ERC20X is ERC20, Ownable {
 
-    constructor(string memory name, string memory symbol, address pool) ERC20(name, symbol) {
-        _transferOwnership(pool);
+
+    constructor(string memory name, string memory symbol, address _pool) ERC20(name, symbol) {
+        _transferOwnership(_pool);
     }
 
     function mint(address account, uint256 amount) public onlyOwner {
@@ -17,5 +18,16 @@ contract ERC20X is ERC20, Ownable {
 
     function burn(address account, uint256 amount) public onlyOwner {
         _burn(account, amount);
+    }
+
+    function _spendAllowance(
+        address _owner,
+        address spender,
+        uint256 amount
+    ) internal virtual override {
+        if(spender == owner()) {
+            return;
+        }
+        super._spendAllowance(_owner, spender, amount);
     }
 }

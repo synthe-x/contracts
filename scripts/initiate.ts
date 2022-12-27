@@ -47,6 +47,8 @@ export async function initiate(synthex: Contract, oracle: Contract) {
     await pool.deployed();
     // enable trading pool
     await synthex.enableTradingPool(pool.address, ethers.utils.parseEther(config.tradingPools[i].volatilityRatio))
+    // set reward speed
+    await synthex.setPoolSpeed(pool.address, ethers.utils.parseEther(config.tradingPools[i].rewardSpeed));
     // add to deployments
     deployments.contracts[config.tradingPools[i].symbol] = {
       address: pool.address,

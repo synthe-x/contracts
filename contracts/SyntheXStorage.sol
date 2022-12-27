@@ -25,7 +25,7 @@ contract SyntheXStorage {
     /**
      * @dev Collateral asset addresses
      */
-    mapping(address => uint) public accountCollateralBalance;
+    mapping(address => mapping(address => uint)) public accountCollateralBalance;
 
     struct Market {
         bool isEnabled;

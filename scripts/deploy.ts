@@ -1,5 +1,6 @@
 import hre, { ethers } from "hardhat";
 import fs from 'fs';
+const { upgrades } = require("hardhat");
 
 export async function deploy() {
   // read deployments
@@ -12,7 +13,7 @@ export async function deploy() {
 
   // deploy synthex
   const SyntheX = await ethers.getContractFactory("SyntheX");
-  const synthex = await SyntheX.deploy(syn.address);
+  const synthex = await upgrades.deployProxy(SyntheX, [syn.address]);
   await synthex.deployed();
 
   await syn.mint(synthex.address, ethers.utils.parseEther("100000000"))
