@@ -1,28 +1,9 @@
-# SyntheX v0.1.0
+# SyntheX v0.0.1
 
-## Pools
+## Deployments
 
-### 1. Crypto
+### Arbitrum Goerli Testnet
 
-| AssetName | AssetSymbol | Address |
-| --------- | ----------- | ------- |
-| Bitcoin | BTCX | - |
-| Ethereum | ETHX | - |
-| USD Coin | USDCX | - |
-| DAI Stablecoin | DAIX | - |
-| ChainLink | LINKX | - |
+## SYN Token
 
-### 2. Stocks
-
-| AssetName | AssetSymbol | Address |
-| --------- | ----------- | ------- |
-| Google | GOOGLX | - |
-| Microsoft | MSFTX | - |
-
-### 3. Forex
-
-| AssetName | AssetSymbol | Address |
-| --------- | ----------- | ------- |
-| US Dollar | USDX | - |
-| Indian Rupee | INRX | - |
-| Japanese Yen | YENX | - |# contracts-v0.1
+### Total Supply: 1,000,000,000 $SYN

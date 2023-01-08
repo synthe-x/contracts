@@ -1,8 +1,9 @@
 // import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import { initiate } from "../scripts/test";
+import initiate from "../scripts/test";
 import { time } from "@nomicfoundation/hardhat-network-helpers";
+import { ETH_ADDRESS } from "../scripts/utils/const";
 
 describe("Testing rewards", function () {
 
@@ -24,10 +25,10 @@ describe("Testing rewards", function () {
 	});
 
 	it("Should deposit eth", async function () {
-		await synthex.connect(user1).enterAndDeposit(ethers.constants.AddressZero, ethers.utils.parseEther("50"), {value: ethers.utils.parseEther("50")});    // $ 50000
+		await synthex.connect(user1).enterAndDeposit(ETH_ADDRESS, ethers.utils.parseEther("50"), {value: ethers.utils.parseEther("50")});    // $ 50000
 		expect(await synthex.healthFactor(user1.address)).to.equal(ethers.constants.MaxUint256);
 
-		await synthex.connect(user2).enterAndDeposit(ethers.constants.AddressZero, ethers.utils.parseEther("50"), {value: ethers.utils.parseEther("50")});    // $ 50000
+		await synthex.connect(user2).enterAndDeposit(ETH_ADDRESS, ethers.utils.parseEther("50"), {value: ethers.utils.parseEther("50")});    // $ 50000
 		expect(await synthex.healthFactor(user2.address)).to.equal(ethers.constants.MaxUint256);
 	});
 
@@ -59,8 +60,8 @@ describe("Testing rewards", function () {
     it("claim SYN", async function () {
         expect(await syn.balanceOf(user1.address)).to.equal(ethers.constants.Zero);
         expect(await syn.balanceOf(user2.address)).to.equal(ethers.constants.Zero);
-        await synthex.claimSYN1(user1.address);
-        await synthex.claimSYN1(user2.address);
+        await synthex['claimSYN(address)'](user1.address);
+        await synthex['claimSYN(address)'](user2.address);
         expect(await syn.balanceOf(user1.address)).to.be.greaterThan(ethers.utils.parseEther("128100"));
         expect(await syn.balanceOf(user2.address)).to.be.greaterThan(ethers.utils.parseEther("128100"));
     })

@@ -1,20 +1,21 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-import "@openzeppelin/contracts/utils/math/Math.sol";
-// ownable
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "./SyntheXPool.sol";
 import "hardhat/console.sol";
+import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
+import "./SyntheXPool.sol";
 import "./SyntheXStorage.sol";
 import "./SYN.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
-
-contract SyntheX is Ownable, SyntheXStorage {
-    using SafeMath for uint256;
-    using Math for uint256;
+/// @custom:security-contact prasad@chainscore.finance
+contract SyntheX is AccessControlUpgradeable, ReentrancyGuardUpgradeable, PausableUpgradeable, SyntheXStorage {
+    using SafeMathUpgradeable for uint256;
+    using MathUpgradeable for uint256;
 
     event CollateralEnabled(address indexed asset, uint256 volatilityRatio);
     event CollateralDisabled(address indexed asset);
@@ -33,20 +34,21 @@ contract SyntheX is Ownable, SyntheXStorage {
     event Exchange(address indexed user, address indexed tradingPool, address indexed fromAsset, address toAsset, uint256 fromAmount, uint256 toAmount);
 
     event SetPoolRewardSpeed(address indexed pool, uint256 rewardSpeed);
-    event NewExchangeFee(uint256 _exchangeFee);
+    event NewExchangeFee(uint256 _exchangeFee); 
     event DistributedSYN(address indexed pool, address _account, uint256 accountDelta, uint rewardIndex);
 
-    SYN public syn;
-    address public ETH_ADDRESS = address(0); // 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
+    constructor(){}
 
-    uint compInitialIndex = 1e36;
-    uint safeCRatio = 13e17;
-
-    uint256 public exchangeFee;
-    uint256 private exchangeFeeMantissa = 1e18;
-
-    constructor(address _syn){
-        syn = SYN(_syn);
+    function initialize(address _syn) public initializer {
+        __AccessControl_init();
+        __ReentrancyGuard_init();
+        __Pausable_init();
+        syn = SyntheXToken(_syn);
+        safeCRatio = 13e17;
+        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _setupRole(ADMIN_ROLE, msg.sender);
+        _setupRole(POOL_MANAGER_ROLE, msg.sender);
+        _setupRole(PAUSE_GUARDIAN_ROLE, msg.sender);
     }
 
     /* -------------------------------------------------------------------------- */
@@ -118,7 +120,7 @@ contract SyntheX is Ownable, SyntheXStorage {
      * @param _collateral The address of the erc20 collateral;  for ETH
      * @param _amount The amount of collateral to deposit
      */
-    function deposit(address _collateral, uint _amount) public payable {
+    function deposit(address _collateral, uint _amount) public payable whenNotPaused nonReentrant {
         require(collaterals[_collateral].isEnabled, "Collateral not enabled");
         require(collaterals[_collateral].accountMembership[msg.sender], "Account not in collateral");
         // Transfer of tokens
@@ -137,7 +139,7 @@ contract SyntheX is Ownable, SyntheXStorage {
      * @param _collateral The address of the collateral
      * @param _amount The amount of collateral to withdraw
      */
-    function withdraw(address _collateral, uint _amount) public {
+    function withdraw(address _collateral, uint _amount) public whenNotPaused nonReentrant {
         require(accountCollateralBalance[msg.sender][_collateral] >= _amount, "Insufficient balance");
         ERC20(_collateral).transfer(msg.sender, _amount);
         accountCollateralBalance[msg.sender][_collateral] -= _amount;
@@ -165,11 +167,11 @@ contract SyntheX is Ownable, SyntheXStorage {
      * @param _synth The address of the synthetic asset
      * @param _amount The amount of synthetic asset to issue
      */
-    function issue(address _tradingPool, address _synth, uint _amount) public {
+    function issue(address _tradingPool, address _synth, uint _amount) public whenNotPaused nonReentrant {
         Market storage pool = tradingPools[_tradingPool];
         require(pool.isEnabled, "Trading pool not enabled");
         require(pool.accountMembership[msg.sender], "Account not in trading pool");
-        require(SyntheXPool(_tradingPool).isSynthEnabled(_synth), "Synth not enabled");
+        require(SyntheXPool(_tradingPool).synths(_synth), "Synth not enabled");
         
         updateSYNIndex(_tradingPool);
         distributeAccountSYN(_tradingPool, msg.sender);
@@ -189,7 +191,7 @@ contract SyntheX is Ownable, SyntheXStorage {
      * @param _synth The address of the synthetic asset
      * @param _amount The amount of synthetic asset to redeem
      */
-    function burn(address _tradingPool, address _synth, uint _amount) public {
+    function burn(address _tradingPool, address _synth, uint _amount) public whenNotPaused nonReentrant {
         Market storage pool = tradingPools[_tradingPool];
         require(pool.isEnabled, "Trading pool not enabled");
         require(pool.accountMembership[msg.sender], "Account not in trading pool");
@@ -212,14 +214,19 @@ contract SyntheX is Ownable, SyntheXStorage {
      * @param _synthTo The address of the synthetic asset to receive
      * @param _amount The amount of synthetic asset to exchange
      */
-    function exchange(address _tradingPool, address _synthFrom, address _synthTo, uint _amount) public {
+    function exchange(address _tradingPool, address _synthFrom, address _synthTo, uint _amount) public whenNotPaused nonReentrant {
         uint amountDst = _amount.mul(oracle.getPrice(_synthFrom)).div(oracle.getPrice(_synthTo));
         SyntheXPool(_tradingPool).exchange(_synthFrom, _synthTo, msg.sender, _amount, amountDst);
 
         emit Exchange(msg.sender, _tradingPool, _synthFrom, _synthTo, _amount, amountDst);
     }
 
-    function setPoolSpeed(address _tradingPool, uint _speed) public onlyOwner {
+    /**
+     * @dev Set the reward speed for a trading pool
+     * @param _tradingPool The address of the trading pool
+     * @param _speed The reward speed
+     */
+    function setPoolSpeed(address _tradingPool, uint _speed) public onlyRole(POOL_MANAGER_ROLE) {
         Market storage pool = tradingPools[_tradingPool];
         require(pool.isEnabled, "Trading pool not enabled");
 
@@ -236,8 +243,11 @@ contract SyntheX is Ownable, SyntheXStorage {
      * @param _inAmount The amount of asset to liquidate
      * @param _outAsset The address of the collateral to receive
      */
-    function liquidate(address _account, address _tradingPool, address _inAsset, uint _inAmount, address _outAsset) external {
-        require(healthFactor(_account) < 1e18, "Health factor above 1");
+    function liquidate(address _account, address _tradingPool, address _inAsset, uint _inAmount, address _outAsset) external whenNotPaused nonReentrant {
+        uint _healthFactor = healthFactor(_account);
+        require(_healthFactor < 1e18, "Health factor above 1");
+        require(_healthFactor > 0, "Account is already liquidated");
+
         uint incentive = getLTV(_account);
         uint inAssetPrice = oracle.getPrice(_inAsset);
         uint outAssetPrice = oracle.getPrice(_outAsset);
@@ -246,26 +256,55 @@ contract SyntheX is Ownable, SyntheXStorage {
         Market storage collateral = collaterals[_outAsset];
         require(collateral.isEnabled, "Collateral not enabled");
         require(collateral.accountMembership[_account], "Account not in collateral");
-        uint _outAmount = accountCollateralBalance[_account][_outAsset].min((_inAmount * inAssetPrice)/(outAssetPrice));
-        accountCollateralBalance[_account][_outAsset] -= _outAmount * incentive / 1e18;
+
+        uint collateralBalance = accountCollateralBalance[_account][_outAsset];
+
+        // collateral to sieze
+        uint collateralToSieze = (_inAmount * inAssetPrice)/(outAssetPrice);
+        uint repayAmountUSD = 0;
+
+        // 100 > 4 * 1.2
+        if(collateralBalance > collateralToSieze * incentive / 1e18){
+            collateralToSieze = collateralToSieze * incentive / 1e18;
+        } 
+        // 95.2 < 80 * 1.2
+        else {
+            collateralToSieze = collateralBalance;
+        }
+        repayAmountUSD = collateralToSieze * outAssetPrice / incentive;
+
+        accountCollateralBalance[_account][_outAsset] -= collateralToSieze;
 
         // burn synth & debt and transfer collateral to liquidator
-        SyntheXPool(_tradingPool).burn(_account, _outAmount * outAssetPrice / 1e18);
-        SyntheXPool(_tradingPool).burnSynth(_inAsset, msg.sender, _outAmount * outAssetPrice / inAssetPrice);
-        accountCollateralBalance[msg.sender][_outAsset] += _outAmount * incentive / 1e18;
+        SyntheXPool(_tradingPool).burn(_account, repayAmountUSD);
+        SyntheXPool(_tradingPool).burnSynth(_inAsset, msg.sender, repayAmountUSD * 1e18 / inAssetPrice);
+        accountCollateralBalance[msg.sender][_outAsset] += collateralToSieze;
     }
-
     
     /* -------------------------------------------------------------------------- */
     /*                               Admin Functions                              */
     /* -------------------------------------------------------------------------- */
 
     /**
+     * @dev Pause the contract
+     */
+    function pause() public onlyRole(ADMIN_ROLE) {
+        _pause();
+    }
+
+    /**
+     * @dev Unpause the contract
+     */
+    function unpause() public onlyRole(ADMIN_ROLE) {
+        _unpause();
+    }
+
+    /**
      * @dev Set the exchange fee
      * @param _exchangeFee The new exchange fee
      * @notice Only the owner can call this function
      */
-    function setExchangeFee(uint256 _exchangeFee) public onlyOwner {
+    function setExchangeFee(uint256 _exchangeFee) public onlyRole(ADMIN_ROLE) {
         exchangeFee = _exchangeFee;
         emit NewExchangeFee(_exchangeFee);
     }
@@ -275,7 +314,7 @@ contract SyntheX is Ownable, SyntheXStorage {
      * @param _tradingPool The address of the trading pool
      * @param _volatilityRatio The volatility ratio of the trading pool
      */
-    function enableTradingPool(address _tradingPool, uint _volatilityRatio) public onlyOwner {
+    function enableTradingPool(address _tradingPool, uint _volatilityRatio) public onlyRole(POOL_MANAGER_ROLE) {
         Market storage pool = tradingPools[_tradingPool];
         if(!pool.isEnabled){
             pool.isEnabled = true;
@@ -289,7 +328,7 @@ contract SyntheX is Ownable, SyntheXStorage {
      * @dev Disable a trading pool
      * @param _tradingPool The address of the trading pool
      */
-    function disableTradingPool(address _tradingPool) public onlyOwner {
+    function disableTradingPool(address _tradingPool) public onlyRole(POOL_MANAGER_ROLE) {
         if(tradingPools[_tradingPool].isEnabled){
             tradingPools[_tradingPool].isEnabled = false;
             emit TradingPoolDisabled(_tradingPool);
@@ -300,7 +339,7 @@ contract SyntheX is Ownable, SyntheXStorage {
      * @dev Remove a trading pool
      * @param _tradingPool The address of the trading pool
      */
-    function removeTradingPool(address _tradingPool) public onlyOwner {
+    function removeTradingPool(address _tradingPool) public onlyRole(POOL_MANAGER_ROLE) {
         tradingPools[_tradingPool].isEnabled = false;
         // remove from list
         for (uint i = 0; i < tradingPoolsList.length; i++) {
@@ -318,7 +357,7 @@ contract SyntheX is Ownable, SyntheXStorage {
      * @param _collateral The address of the collateral
      * @param _volatilityRatio The volatility ratio of the collateral
      */
-    function enableCollateral(address _collateral, uint _volatilityRatio) public onlyOwner {
+    function enableCollateral(address _collateral, uint _volatilityRatio) public onlyRole(ADMIN_ROLE) {
         Market storage collateral = collaterals[_collateral];
         if(!collateral.isEnabled){
             collateral.isEnabled = true;
@@ -332,7 +371,7 @@ contract SyntheX is Ownable, SyntheXStorage {
      * @dev Disable a collateral
      * @param _collateral The address of the collateral
      */
-    function disableCollateral(address _collateral) public onlyOwner {
+    function disableCollateral(address _collateral) public onlyRole(ADMIN_ROLE) {
         if(collaterals[_collateral].isEnabled){
             collaterals[_collateral].isEnabled = false;
             emit CollateralDisabled(_collateral);
@@ -343,7 +382,7 @@ contract SyntheX is Ownable, SyntheXStorage {
      * @dev Remove a collateral
      * @param _collateral The address of the collateral
      */
-    function removeCollateral(address _collateral) public onlyOwner {
+    function removeCollateral(address _collateral) public onlyRole(ADMIN_ROLE) {
         collaterals[_collateral].isEnabled = false;
         // remove from list
         for (uint i = 0; i < collateralsList.length; i++) {
@@ -360,7 +399,7 @@ contract SyntheX is Ownable, SyntheXStorage {
      * @dev Set the price oracle
      * @param _oracle The address of the price oracle
      */
-    function setOracle(address _oracle) public onlyOwner {
+    function setOracle(address _oracle) public onlyRole(ADMIN_ROLE) {
         oracle = PriceOracle(_oracle);
         emit NewPriceOracle(_oracle);
     }
@@ -431,8 +470,8 @@ contract SyntheX is Ownable, SyntheXStorage {
      * @notice Claim all the comp accrued by holder in all markets
      * @param holder The address to claim COMP for
      */
-    function claimSYN1(address holder) public {
-        return claimSYN2(holder, tradingPoolsList);
+    function claimSYN(address holder) public {
+        return claimSYN(holder, tradingPoolsList);
     }
 
     /**
@@ -440,10 +479,10 @@ contract SyntheX is Ownable, SyntheXStorage {
      * @param holder The address to claim COMP for
      * @param cTokens The list of markets to claim COMP in
      */
-    function claimSYN2(address holder, address[] memory cTokens) public {
+    function claimSYN(address holder, address[] memory cTokens) public {
         address[] memory holders = new address[](1);
         holders[0] = holder;
-        claimSYN3(holders, cTokens);
+        claimSYN(holders, cTokens);
     }
 
     /**
@@ -451,7 +490,7 @@ contract SyntheX is Ownable, SyntheXStorage {
      * @param holders The addresses to claim COMP for
      * @param _tradingPools The list of markets to claim COMP in
      */
-    function claimSYN3(address[] memory holders, address[] memory _tradingPools) public {
+    function claimSYN(address[] memory holders, address[] memory _tradingPools) public {
         for (uint i = 0; i < _tradingPools.length; i++) {
             SyntheXPool cToken = SyntheXPool(_tradingPools[i]);
             require(tradingPools[address(cToken)].isEnabled, "market must be listed");
@@ -473,7 +512,7 @@ contract SyntheX is Ownable, SyntheXStorage {
      * @param amount The amount of COMP to (possibly) transfer
      * @return The amount of COMP which was NOT transferred to the user
      */
-    function grantSYNInternal(address user, uint amount) internal returns (uint) {
+    function grantSYNInternal(address user, uint amount) internal whenNotPaused nonReentrant returns (uint) {
         uint compRemaining = syn.balanceOf(address(this));
         if (amount > 0 && amount <= compRemaining) {
             syn.transfer(user, amount);
@@ -532,7 +571,7 @@ contract SyntheX is Ownable, SyntheXStorage {
         uint totalCollateral = 0;
         for(uint i = 0; i < accountCollaterals[_account].length; i++){
             address collateral = accountCollaterals[_account][i];
-            totalCollateral += accountCollateralBalance[_account][collateral] * oracle.getPrice(collateral) * collaterals[collateral].volatilityRatio / 1e36;
+            totalCollateral += accountCollateralBalance[_account][collateral] * oracle.getPrice(collateral) / 1e18;
         }
         return totalCollateral;
     }
@@ -591,9 +630,7 @@ contract SyntheX is Ownable, SyntheXStorage {
         if(totalDebtShare == 0){
             return 0;
         }
-        uint debtShare = IERC20(_tradingPool).balanceOf(_account).mul(1e18).div(totalDebtShare);
-        uint debt = getPoolTotalDebtUSD(_tradingPool);
-        return debtShare.mul(debt).div(1e18); 
+        return IERC20(_tradingPool).balanceOf(_account).mul(getPoolTotalDebtUSD(_tradingPool)).div(totalDebtShare); 
     }
 
     /**

@@ -1,9 +1,10 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-import "@openzeppelin/contracts/utils/math/Math.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "./ERC20X.sol";
 import "./PriceOracle.sol";
@@ -12,21 +13,24 @@ import "./SyntheX.sol";
 // Uncomment this line to use console.log
 import "hardhat/console.sol";
 
-contract SyntheXPool is ERC20 {
-    using SafeMath for uint256;
-    using Math for uint256;
+contract SyntheXPool is ERC20Upgradeable {
+    using SafeMathUpgradeable for uint256;
+    using MathUpgradeable for uint256;
 
     event SynthEnabled(address indexed synth);
     event SynthDisabled(address indexed synth);
     event SynthRemoved(address indexed synth);
 
-    SyntheX synthex;
+    event FeeUpdated(uint fee);
 
-    mapping(address => bool) synths;
-    mapping(address => uint) public fees;
+    SyntheX public synthex;
+
+    mapping(address => bool) public synths;
+    uint public fee;
     address[] private _synthsList;
 
-    constructor(string memory name, string memory symbol, address _synthex) ERC20(name, symbol) {
+    function initialize(string memory name, string memory symbol, address _synthex) public initializer {
+        __ERC20_init(name, symbol);
         synthex = SyntheX(_synthex);
     }
 
@@ -39,22 +43,21 @@ contract SyntheXPool is ERC20 {
      * @notice Only the owner can call this function
      * @notice The synth contract must have pool (this contract) as owner
      */
-    function enableSynth(address _synth, uint fee) public onlyOwner {
+    function enableSynth(address _synth) public onlyOwner {
         if(!synths[_synth]){
             synths[_synth] = true;
-            fees[_synth] = fee;
             _synthsList.push(_synth);
             emit SynthEnabled(_synth);
         }
     }
 
     /**
-     * @dev Update the fee for a synth
+     * @dev Update the fee for the pool
+     * @param _fee The new fee
      */
-    function updateFee(address _synth, uint fee) public onlyOwner {
-        if(synths[_synth]){
-            fees[_synth] = fee;
-        }
+    function updateFee(uint _fee) public onlyOwner {
+        fee = _fee;
+        emit FeeUpdated(_fee);
     }
 
     /**
@@ -82,7 +85,7 @@ contract SyntheXPool is ERC20 {
                 _synthsList.pop();
                 emit SynthRemoved(_synth);
                 break;
-            }
+            } 
         }
     }
 
@@ -94,13 +97,6 @@ contract SyntheXPool is ERC20 {
      */
     function getSynths() public view returns (address[] memory) {
         return _synthsList;
-    }
-
-    /**
-     * @dev Returns if the synth is enabled in the pool
-     */
-    function isSynthEnabled(address _synth) public view returns (bool) {
-        return synths[_synth];
     }
 
     /* -------------------------------------------------------------------------- */
@@ -120,7 +116,7 @@ contract SyntheXPool is ERC20 {
      * @dev Only synthex owner can call admin functions
      */
     modifier onlyOwner(){
-        require(synthex.owner() == msg.sender, "SyntheXPool: Only owner can mint");
+        require(synthex.hasRole(synthex.POOL_MANAGER_ROLE(), msg.sender), "SyntheXPool: Only owner can mint");
         _;
     }
 
@@ -165,8 +161,7 @@ contract SyntheXPool is ERC20 {
     function burn(address _user, uint _amountUSD) public onlyInternal {
         uint _totalDebt = synthex.getPoolTotalDebtUSD(address(this));
         uint totalSupply = totalSupply();
-        uint debtSharePrice = _totalDebt * 1e18 / totalSupply;
-        uint burnAmount = _amountUSD * 1e18 / debtSharePrice;
+        uint burnAmount = totalSupply * _amountUSD / _totalDebt;
         _burn(_user, burnAmount);
     }
 
@@ -184,13 +179,12 @@ contract SyntheXPool is ERC20 {
      */
     function exchange(address _fromSynth, address _toSynth, address _user, uint _fromAmount, uint _toAmount) public onlyInternal {
         require(synths[_toSynth], "Synth not enabled");
-        // total fees
-        uint fee = fees[_fromSynth] + fees[_toSynth];
+        uint _fee = fee;
         // burn from synth
         ERC20X(_fromSynth).burn(_user, _fromAmount);
         // mint to synth
-        ERC20X(_toSynth).mint(_user, _toAmount * (1e18 - fee) / 1e18);
-        // mint fee to pool
-        ERC20X(_toSynth).mint(address(synthex), _toAmount * fee / 1e18);
+        ERC20X(_toSynth).mint(_user, _toAmount * (1e18 - _fee) / 1e18);
+        // mint fee to synthex
+        ERC20X(_toSynth).mint(msg.sender, _toAmount * _fee / 1e18);
     }
 }

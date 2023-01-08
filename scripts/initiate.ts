@@ -1,4 +1,4 @@
-import hre, { ethers } from "hardhat";
+import hre, { ethers, upgrades } from "hardhat";
 import { Contract } from 'ethers';
 import fs from 'fs';
 
@@ -19,7 +19,6 @@ export async function initiate(synthex: Contract, oracle: Contract) {
     if(!collateral){
       // deploy collateral token
       const token = await MockToken.deploy(config.collaterals[i].name, config.collaterals[i].symbol);
-      await token.deployed();
       collateral = token.address;
       deployments.contracts[config.collaterals[i].symbol] = {
         address: collateral,
@@ -32,7 +31,6 @@ export async function initiate(synthex: Contract, oracle: Contract) {
     if(!feed){
       // deploy price feed
       const priceFeed = await PriceFeed.deploy(ethers.utils.parseUnits(config.collaterals[i].price, 8));
-      await priceFeed.deployed();
       await oracle.setFeed(collateral, priceFeed.address, 10);
       feed = priceFeed.address;
     }
@@ -43,8 +41,7 @@ export async function initiate(synthex: Contract, oracle: Contract) {
   console.log("Initiating Trading Pools...");
   for(let i in config.tradingPools){
     // deploy pools
-    const pool = await SyntheXPool.deploy(config.tradingPools[i].name, config.tradingPools[i].symbol, synthex.address);
-    await pool.deployed();
+    const pool = await upgrades.deployProxy(SyntheXPool, [config.tradingPools[i].name, config.tradingPools[i].symbol, synthex.address]);
     // enable trading pool
     await synthex.enableTradingPool(pool.address, ethers.utils.parseEther(config.tradingPools[i].volatilityRatio))
     // set reward speed
@@ -62,7 +59,6 @@ export async function initiate(synthex: Contract, oracle: Contract) {
       if(!synth){
         // deploy token
         const token = await ERC20X.deploy(config.tradingPools[i].synths[j].name, config.tradingPools[i].synths[j].symbol, pool.address);
-        await token.deployed();
         synth = token.address;
         deployments.contracts[config.tradingPools[i].synths[j].symbol] = {
           address: synth,
@@ -75,11 +71,10 @@ export async function initiate(synthex: Contract, oracle: Contract) {
       if(!feed){
         // deploy price feed
         const priceFeed = await PriceFeed.deploy(ethers.utils.parseUnits(config.tradingPools[i].synths[j].price, 8));
-        await priceFeed.deployed();
         await oracle.setFeed(synth, priceFeed.address, 10);
         feed = priceFeed.address;
       }
-      await pool.enableSynth(synth);
+      await pool.enableSynth(synth, '500000000000000');
     }
   }
   console.log("Trading Pools initiated.");

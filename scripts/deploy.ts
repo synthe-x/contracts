@@ -15,19 +15,21 @@ export async function deploy() {
   const SyntheX = await ethers.getContractFactory("SyntheX");
   const synthex = await upgrades.deployProxy(SyntheX, [syn.address]);
   await synthex.deployed();
+  console.log("SyntheX deployed to:", synthex.address);
 
   await syn.mint(synthex.address, ethers.utils.parseEther("100000000"))
   
-  deployments.contracts = {}
-  deployments.sources = {}
+  // override existing deployments
+  deployments.contracts = {};
+  deployments.sources = {};
+
+  // add synthex to deployments
   deployments.contracts["SyntheX"] = {
     address: synthex.address,
     source: "SyntheX",
     constructorArguments: [syn.address]
   };
   deployments.sources["SyntheX"] = synthex.interface.format("json")
-
-  console.log("SyntheX deployed to:", synthex.address);
 
   // deploy priceoracle
   const Oracle = await ethers.getContractFactory("PriceOracle");

@@ -1,9 +1,8 @@
 // import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
-import { BigNumber } from "ethers";
 import { ethers } from "hardhat";
-import { deploy } from "../scripts/deploy";
-import { initiate } from "../scripts/test";
+import initiate from "../scripts/test";
+import { ETH_ADDRESS } from "../scripts/utils/const";
 
 describe("SyntheX", function () {
 
@@ -24,9 +23,9 @@ describe("SyntheX", function () {
 	});
 
 	it("Should stake eth", async function () {
-		await synthex.connect(user1).enterAndDeposit(ethers.constants.AddressZero, ethers.utils.parseEther("20"), {value: ethers.utils.parseEther("20").toString()});    // $ 20000
-		await synthex.connect(user2).enterAndDeposit(ethers.constants.AddressZero, ethers.utils.parseEther("10"), {value: ethers.utils.parseEther("10").toString()});    // $ 10000
-		await synthex.connect(user3).enterAndDeposit(ethers.constants.AddressZero, ethers.utils.parseEther("200"), {value: ethers.utils.parseEther("200").toString()});   // $ 100000
+		await synthex.connect(user1).enterAndDeposit(ETH_ADDRESS, ethers.utils.parseEther("20"), {value: ethers.utils.parseEther("20").toString()});    // $ 20000
+		await synthex.connect(user2).enterAndDeposit(ETH_ADDRESS, ethers.utils.parseEther("10"), {value: ethers.utils.parseEther("10").toString()});    // $ 10000
+		await synthex.connect(user3).enterAndDeposit(ETH_ADDRESS, ethers.utils.parseEther("200"), {value: ethers.utils.parseEther("200").toString()});   // $ 100000
 
 		expect(await synthex.healthFactor(user1.address)).to.equal(ethers.constants.MaxUint256);
 		expect(await synthex.healthFactor(user2.address)).to.equal(ethers.constants.MaxUint256);
@@ -51,7 +50,7 @@ describe("SyntheX", function () {
 		expect(await synthex.getUserTotalDebtUSD(user3.address)).to.be.equal(ethers.utils.parseEther("90000.00"));
 
 		expect(await seth.balanceOf(user1.address)).to.equal(0);
-		expect(await sbtc.balanceOf(user1.address)).to.equal(ethers.utils.parseEther("1").mul('88').div('100'));
+		expect(await sbtc.balanceOf(user1.address)).to.equal(ethers.utils.parseEther("1").mul('999').div('1000')); // minus 0.1% fee
     })
 
     it("update debt for users", async () => {
