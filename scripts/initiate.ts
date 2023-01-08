@@ -13,7 +13,7 @@ export async function initiate(synthex: Contract, oracle: Contract) {
   const ERC20X = await ethers.getContractFactory("ERC20X");
   const PriceFeed = await ethers.getContractFactory("PriceFeed");
 
-  console.log("Initiating Collaterals...");
+  console.log("\nDeploying Collaterals... 💬");
   for(let i in config.collaterals){
     let collateral = config.collaterals[i].address;
     if(!collateral){
@@ -35,10 +35,11 @@ export async function initiate(synthex: Contract, oracle: Contract) {
       feed = priceFeed.address;
     }
     await synthex.enableCollateral(collateral, ethers.utils.parseEther(config.collaterals[i].volatilityRatio));
+    console.log(`\t Collateral ${config.collaterals[i].symbol} deployed`);
   }
-  console.log("Collaterals initiated.");
+  console.log("Collaterals deployed successfully ✅ \n");
   const SyntheXPool = await ethers.getContractFactory("SyntheXPool");
-  console.log("Initiating Trading Pools...");
+  console.log("Deploying Trading Pools... 💬");
   for(let i in config.tradingPools){
     // deploy pools
     const pool = await upgrades.deployProxy(SyntheXPool, [config.tradingPools[i].name, config.tradingPools[i].symbol, synthex.address]);
@@ -46,6 +47,8 @@ export async function initiate(synthex: Contract, oracle: Contract) {
     await synthex.enableTradingPool(pool.address, ethers.utils.parseEther(config.tradingPools[i].volatilityRatio))
     // set reward speed
     await synthex.setPoolSpeed(pool.address, ethers.utils.parseEther(config.tradingPools[i].rewardSpeed));
+    // set fee
+    await pool.updateFee(ethers.utils.parseEther(config.tradingPools[i].fee));
     // add to deployments
     deployments.contracts[config.tradingPools[i].symbol] = {
       address: pool.address,
@@ -53,6 +56,7 @@ export async function initiate(synthex: Contract, oracle: Contract) {
       constructorArguments: [config.tradingPools[i].name, config.tradingPools[i].symbol, synthex.address]
     };
     deployments.sources["SyntheXPool"] = SyntheXPool.interface.format("json")
+    console.log(`\t Trading Pool ${config.tradingPools[i].symbol} deployed`)
 
     for(let j in config.tradingPools[i].synths){
       let synth = config.tradingPools[i].synths[j].address;
@@ -74,10 +78,11 @@ export async function initiate(synthex: Contract, oracle: Contract) {
         await oracle.setFeed(synth, priceFeed.address, 10);
         feed = priceFeed.address;
       }
-      await pool.enableSynth(synth, '500000000000000');
+      await pool.enableSynth(synth);
+      console.log(`\t\t Synth ${config.tradingPools[i].synths[j].symbol} added`);
     }
   }
-  console.log("Trading Pools initiated.");
+  console.log("Trading Pools deployed successfully ✅\n");
 
   // save deployments
   fs.writeFileSync(process.cwd() + `/deployments/${hre.network.name}/deployments.json`, JSON.stringify(deployments, null, 2));
