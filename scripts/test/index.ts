@@ -29,7 +29,7 @@ export default async function main() {
 	);
 	await pool.deployed();
 
-	await pool.updateFee(ethers.utils.parseEther('0.001'));
+	await pool.updateFee(ethers.utils.parseEther('0.001')); // 0.1%
 
 	await synthex.enableTradingPool(
 		pool.address,

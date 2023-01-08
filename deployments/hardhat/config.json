@@ -1,7 +1,7 @@
 {
   "name": "synthex",
-  "version": "0.25.0",
-  "latest": "0.25.1",
+  "version": "0.0.0",
+  "latest": "0.0.0",
   "collaterals": [
     {
       "name": "Ethereum",
@@ -16,7 +16,7 @@
       "symbol": "CRY",
       "volatilityRatio": "0.7",
       "rewardSpeed": "2.5",
-      "fee": "0.015",
+      "fee": "0.0015",
       "synths": [
         {
           "name": "Bitcoin X",
@@ -75,7 +75,7 @@
       "symbol": "STK",
       "volatilityRatio": "0.9",
       "rewardSpeed": "1.1",
-      "fee": "0.01",
+      "fee": "0.001",
       "synths": [
         {
           "name": "Apple X",
@@ -139,7 +139,7 @@
       "symbol": "FX",
       "volatilityRatio": "0.95",
       "rewardSpeed": "0.85",
-      "fee": "0.005",
+      "fee": "0.0005",
       "synths": [
         {
           "name": "US Dollar FX",

@@ -1,191 +1,197 @@
 {
-	"collaterals": [
-		{
-			"name": "Ethereum",
-            "symbol": "ETH",
-			"volatilityRatio": "0.8",
-            "price": "1230.22"
-		}
-	],
-	"tradingPools": [
-		{
-			"name": "Crypto",
-			"symbol": "CRY",
-			"volatilityRatio": "0.7",
-            "rewardSpeed": "2.5",
-			"synths": [
-				{
-					"name": "Bitcoin X",
-					"symbol": "BTCx",
-                    "price": "17332.10"
-				},
-				{
-					"name": "Ethereum X",
-					"symbol": "ETHx",
-                    "price": "1230.22"
-				},
-				{
-					"name": "Binance Coin X",
-					"symbol": "BNBx",
-                    "price": "295.22"
-				},
-				{
-					"name": "US Dollar CX",
-					"symbol": "USDcx",
-                    "price": "1.00"
-				},
-				{
-					"name": "Cardano X",
-					"symbol": "ADAx",
-                    "price": "0.32"
-				},
-				{
-					"name": "Aave X",
-					"symbol": "AAVEx",
-                    "price": "66.39"
-				},
-				{
-					"name": "Chainlink X",
-					"symbol": "LINKx",
-                    "price": "7.55"
-				},
-				{
-					"name": "Uniswap X",
-					"symbol": "UNIx",
-                    "price": "6.38"
-				},
-				{
-					"name": "Dogecoin X",
-					"symbol": "DOGEx",
-                    "price": "0.1074"
-				},
-				{
-					"name": "Polkadot X",
-					"symbol": "DOTx",
-                    "price": "5.70"
-				}
-			]
-		},
+  "name": "synthex",
+  "version": "0.1.0",
+  "latest": "0.1.0",
+  "collaterals": [
+    {
+      "name": "Ethereum",
+      "symbol": "ETH",
+      "volatilityRatio": "0.8",
+      "price": "1230.22"
+    }
+  ],
+  "tradingPools": [
+    {
+      "name": "Crypto",
+      "symbol": "CRY",
+      "volatilityRatio": "0.7",
+      "rewardSpeed": "2.5",
+      "fee": "0.0015",
+      "synths": [
         {
-            "name": "Stocks",
-            "symbol": "STK",
-			"volatilityRatio": "0.9",
-            "rewardSpeed": "1.1",
-            "synths": [
-                {
-                    "name": "Apple X",
-                    "symbol": "AAPLx",
-                    "price": "130.00"
-                },
-                {
-                    "name": "Tesla X",
-                    "symbol": "TSLAx",
-                    "price": "700.00"
-                },
-                {
-                    "name": "Amazon X",
-                    "symbol": "AMZNx",
-                    "price": "3500.00"
-                },
-                {
-                    "name": "Facebook X",
-                    "symbol": "FBx",
-                    "price": "300.00"
-                },
-                {
-                    "name": "Microsoft X",
-                    "symbol": "MSFTx",
-                    "price": "250.00"
-                },
-                {
-                    "name": "S&P 500 X",
-                    "symbol": "^GSPCx",
-                    "price": "3934.00"
-                },
-                {
-                    "name": "Netflix X",
-                    "symbol": "NFLXx",
-                    "price": "500.00"
-                },
-                {
-                    "name": "Alphabet X",
-                    "symbol": "GOOGLx",
-                    "price": "2500.00"
-                },
-                {
-                    "name": "Nvidia X",
-                    "symbol": "NVDAx",
-                    "price": "500.00"
-                },
-                {
-                    "name": "AMD X",
-                    "symbol": "AMDx",
-                    "price": "100.00"
-                },
-                {
-                    "name": "US Dollar SX",
-                    "symbol": "USDsx",
-                    "price": "1.00"
-                }
-            ]
+          "name": "Bitcoin X",
+          "symbol": "BTCx",
+          "price": "17332.10"
         },
         {
-            "name": "Foreign Exchange",
-            "symbol": "FX",
-			"volatilityRatio": "0.95",
-            "rewardSpeed": "0.85",
-            "synths": [
-                {
-                    "name": "US Dollar FX",
-                    "symbol": "USDfx",
-                    "price": "1.00"
-                },
-                {
-                    "name": "Euro X",
-                    "symbol": "EURx",
-                    "price": "0.85"
-                },
-                {
-                    "name": "Japanese Yen X",
-                    "symbol": "JPYx",
-                    "price": "0.0094"
-                },
-                {
-                    "name": "British Pound X",
-                    "symbol": "GBPx",
-                    "price": "1.25"
-                },
-                {
-                    "name": "Swiss Franc X",
-                    "symbol": "CHFx",
-                    "price": "1.10"
-                },
-                {
-                    "name": "Canadian Dollar X",
-                    "symbol": "CADx",
-                    "price": "0.80"
-                },
-                {
-                    "name": "Australian Dollar X",
-                    "symbol": "AUDx",
-                    "price": "0.75"
-                },
-                {
-                    "name": "Korean Republic won X",
-                    "symbol": "WONx",
-                    "price": "0.0009"
-                },
-                {
-                    "name": "UAE Dirham X",
-                    "symbol": "AEDx",
-                    "price": "0.27"
-                },
-                {
-                    "name": "Indian Rupee X",
-                    "symbol": "INRx",
-                    "price": "0.013"
-                }
-            ]
+          "name": "Ethereum X",
+          "symbol": "ETHx",
+          "price": "1230.22"
+        },
+        {
+          "name": "Binance Coin X",
+          "symbol": "BNBx",
+          "price": "295.22"
+        },
+        {
+          "name": "US Dollar CX",
+          "symbol": "USDcx",
+          "price": "1.00"
+        },
+        {
+          "name": "Cardano X",
+          "symbol": "ADAx",
+          "price": "0.32"
+        },
+        {
+          "name": "Aave X",
+          "symbol": "AAVEx",
+          "price": "66.39"
+        },
+        {
+          "name": "Chainlink X",
+          "symbol": "LINKx",
+          "price": "7.55"
+        },
+        {
+          "name": "Uniswap X",
+          "symbol": "UNIx",
+          "price": "6.38"
+        },
+        {
+          "name": "Dogecoin X",
+          "symbol": "DOGEx",
+          "price": "0.1074"
+        },
+        {
+          "name": "Polkadot X",
+          "symbol": "DOTx",
+          "price": "5.70"
         }
-	]
+      ]
+    },
+    {
+      "name": "Stocks",
+      "symbol": "STK",
+      "volatilityRatio": "0.9",
+      "rewardSpeed": "1.1",
+      "fee": "0.001",
+      "synths": [
+        {
+          "name": "Apple X",
+          "symbol": "AAPLx",
+          "price": "130.00"
+        },
+        {
+          "name": "Tesla X",
+          "symbol": "TSLAx",
+          "price": "700.00"
+        },
+        {
+          "name": "Amazon X",
+          "symbol": "AMZNx",
+          "price": "3500.00"
+        },
+        {
+          "name": "Facebook X",
+          "symbol": "FBx",
+          "price": "300.00"
+        },
+        {
+          "name": "Microsoft X",
+          "symbol": "MSFTx",
+          "price": "250.00"
+        },
+        {
+          "name": "S&P 500 X",
+          "symbol": "^GSPCx",
+          "price": "3934.00"
+        },
+        {
+          "name": "Netflix X",
+          "symbol": "NFLXx",
+          "price": "500.00"
+        },
+        {
+          "name": "Alphabet X",
+          "symbol": "GOOGLx",
+          "price": "2500.00"
+        },
+        {
+          "name": "Nvidia X",
+          "symbol": "NVDAx",
+          "price": "500.00"
+        },
+        {
+          "name": "AMD X",
+          "symbol": "AMDx",
+          "price": "100.00"
+        },
+        {
+          "name": "US Dollar SX",
+          "symbol": "USDsx",
+          "price": "1.00"
+        }
+      ]
+    },
+    {
+      "name": "Foreign Exchange",
+      "symbol": "FX",
+      "volatilityRatio": "0.95",
+      "rewardSpeed": "0.85",
+      "fee": "0.0005",
+      "synths": [
+        {
+          "name": "US Dollar FX",
+          "symbol": "USDfx",
+          "price": "1.00"
+        },
+        {
+          "name": "Euro X",
+          "symbol": "EURx",
+          "price": "0.85"
+        },
+        {
+          "name": "Japanese Yen X",
+          "symbol": "JPYx",
+          "price": "0.0094"
+        },
+        {
+          "name": "British Pound X",
+          "symbol": "GBPx",
+          "price": "1.25"
+        },
+        {
+          "name": "Swiss Franc X",
+          "symbol": "CHFx",
+          "price": "1.10"
+        },
+        {
+          "name": "Canadian Dollar X",
+          "symbol": "CADx",
+          "price": "0.80"
+        },
+        {
+          "name": "Australian Dollar X",
+          "symbol": "AUDx",
+          "price": "0.75"
+        },
+        {
+          "name": "Korean Republic won X",
+          "symbol": "WONx",
+          "price": "0.0009"
+        },
+        {
+          "name": "UAE Dirham X",
+          "symbol": "AEDx",
+          "price": "0.27"
+        },
+        {
+          "name": "Indian Rupee X",
+          "symbol": "INRx",
+          "price": "0.013"
+        }
+      ]
+    }
+  ]
 }

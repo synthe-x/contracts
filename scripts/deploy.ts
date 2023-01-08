@@ -2,13 +2,7 @@ import hre, { ethers } from "hardhat";
 import fs from 'fs';
 const { upgrades } = require("hardhat");
 
-export async function deploy() {
-  // read deployments
-  const deployments = JSON.parse(fs.readFileSync( process.cwd() + `/deployments/${hre.network.name}/deployments.json`, 'utf8'));
-  const config = JSON.parse(fs.readFileSync( process.cwd() + `/deployments/${hre.network.name}/config.json`, 'utf8'));
-  // override existing deployments
-  deployments.contracts = {};
-  deployments.sources = {};
+export async function deploy(deployments: any, config: any) {
 
   // deploy SYN
   const SYN = await ethers.getContractFactory("SyntheXToken");
@@ -58,9 +52,6 @@ export async function deploy() {
   console.log("PriceOracle deployed to:", oracle.address);
 
   await synthex.setOracle(oracle.address);
-
-  // save deployments
-  fs.writeFileSync(process.cwd() + `/deployments/${hre.network.name}/deployments.json`, JSON.stringify(deployments, null, 2));
 
   return { synthex, oracle };
 }

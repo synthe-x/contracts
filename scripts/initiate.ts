@@ -1,14 +1,7 @@
 import hre, { ethers, upgrades } from "hardhat";
 import { Contract } from 'ethers';
-import fs from 'fs';
 
-export async function initiate(synthex: Contract, oracle: Contract) {
-  const config = JSON.parse(fs.readFileSync( process.cwd() + `/deployments/${hre.network.name}/config.json`, 'utf8'));
-  const deployments = JSON.parse(fs.readFileSync( process.cwd() + `/deployments/${hre.network.name}/deployments.json`, 'utf8'));
-  
-  if(!deployments.contracts) deployments.contracts = {};
-  if(!deployments.sources) deployments.sources = {};
-
+export async function initiate(synthex: Contract, oracle: Contract, deployments: any, config: any) {
   const MockToken = await ethers.getContractFactory("MockToken");
   const ERC20X = await ethers.getContractFactory("ERC20X");
   const PriceFeed = await ethers.getContractFactory("PriceFeed");
@@ -37,9 +30,11 @@ export async function initiate(synthex: Contract, oracle: Contract) {
     await synthex.enableCollateral(collateral, ethers.utils.parseEther(config.collaterals[i].volatilityRatio));
     console.log(`\t Collateral ${config.collaterals[i].symbol} deployed`);
   }
+
   console.log("Collaterals deployed successfully ✅ \n");
   const SyntheXPool = await ethers.getContractFactory("SyntheXPool");
   console.log("Deploying Trading Pools... 💬");
+
   for(let i in config.tradingPools){
     // deploy pools
     const pool = await upgrades.deployProxy(SyntheXPool, [config.tradingPools[i].name, config.tradingPools[i].symbol, synthex.address]);
@@ -83,7 +78,4 @@ export async function initiate(synthex: Contract, oracle: Contract) {
     }
   }
   console.log("Trading Pools deployed successfully ✅\n");
-
-  // save deployments
-  fs.writeFileSync(process.cwd() + `/deployments/${hre.network.name}/deployments.json`, JSON.stringify(deployments, null, 2));
 }
