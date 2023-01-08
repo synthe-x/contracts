@@ -36,7 +36,7 @@ async function upgrade() {
         version: config.latest,
 		block: (await ethers.provider.getBlockNumber()).toString()
     };
-    deployments.sources['SyntheX_'+config.latest] = JSON.parse(synthex.interface.format('json') as string);
+    deployments.sources['SyntheX_'+config.latest] = synthex.interface.format('json');
 
 	fs.writeFileSync(
 		process.cwd() + `/deployments/${hre.network.name}/deployments.json`,

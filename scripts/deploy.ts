@@ -33,11 +33,11 @@ export async function deploy(deployments: any, config: any) {
     version: config.latest,
     block: (await ethers.provider.getBlockNumber()).toString()
   };
-  deployments.sources['SyntheX_'+config.latest] = JSON.parse(synthex.interface.format('json') as string);
+  deployments.sources['SyntheX_'+config.latest] = synthex.interface.format('json');
 
   await syn.mint(synthex.address, ethers.utils.parseEther("100000000"))
 
-  // deploy priceoracle
+  // deploy price oracle
   const Oracle = await ethers.getContractFactory("PriceOracle");
   const oracle = await Oracle.deploy();
   await oracle.deployed();
@@ -50,6 +50,23 @@ export async function deploy(deployments: any, config: any) {
   deployments.sources["PriceOracle"] = oracle.interface.format("json")
 
   console.log("PriceOracle deployed to:", oracle.address);
+
+
+  // deploy multicall
+  const Multicall = await ethers.getContractFactory("Multicall2");
+  const multicall = await Multicall.deploy();
+  await multicall.deployed();
+
+  deployments.contracts["Multicall2"] = {
+    address: multicall.address,
+    source: "Multicall2",
+    constructorArguments: []
+  };
+
+  deployments.sources["Multicall2"] = multicall.interface.format("json")
+
+  console.log("Multicall deployed to:", multicall.address);
+
 
   await synthex.setOracle(oracle.address);
 
