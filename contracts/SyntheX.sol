@@ -260,24 +260,18 @@ contract SyntheX is AccessControlUpgradeable, ReentrancyGuardUpgradeable, Pausab
         uint collateralBalance = accountCollateralBalance[_account][_outAsset];
 
         // collateral to sieze
-        uint collateralToSieze = (_inAmount * inAssetPrice)/(outAssetPrice);
-        uint repayAmountUSD = 0;
+        uint collateralToSieze = (_inAmount * inAssetPrice) * incentive/(1e18 * outAssetPrice) ;
 
-        // 100 > 4 * 1.2
-        if(collateralBalance > collateralToSieze * incentive / 1e18){
-            collateralToSieze = collateralToSieze * incentive / 1e18;
-        } 
-        // 95.2 < 80 * 1.2
-        else {
+        // if collateral to sieze is more than collateral balance, sieze all collateral
+        if(collateralBalance < collateralToSieze){
             collateralToSieze = collateralBalance;
         }
-        repayAmountUSD = collateralToSieze * outAssetPrice / incentive;
 
         accountCollateralBalance[_account][_outAsset] -= collateralToSieze;
 
         // burn synth & debt and transfer collateral to liquidator
-        SyntheXPool(_tradingPool).burn(_account, repayAmountUSD);
-        SyntheXPool(_tradingPool).burnSynth(_inAsset, msg.sender, repayAmountUSD * 1e18 / inAssetPrice);
+        SyntheXPool(_tradingPool).burn(_account, collateralToSieze * outAssetPrice / incentive);
+        SyntheXPool(_tradingPool).burnSynth(_inAsset, msg.sender, collateralToSieze * outAssetPrice * 1e18 / (incentive * inAssetPrice));
         accountCollateralBalance[msg.sender][_outAsset] += collateralToSieze;
     }
     
