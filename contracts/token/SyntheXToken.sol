@@ -9,7 +9,6 @@ import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20FlashMint.sol";
 
-// TODO: add fee (0.01%), check flashloan
 contract SyntheXToken is ERC20, ERC20Burnable, Pausable, AccessControl, ERC20Permit, ERC20Votes, ERC20FlashMint {
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
@@ -19,6 +18,18 @@ contract SyntheXToken is ERC20, ERC20Burnable, Pausable, AccessControl, ERC20Per
         _grantRole(PAUSER_ROLE, msg.sender);
         _mint(msg.sender, 32100000 * 10 ** decimals());
         _grantRole(MINTER_ROLE, msg.sender);
+    }
+
+    function _flashFeeReceiver() internal view override returns (address){
+        // TODO update fee vault address
+        return address(0);
+    }
+
+    function _flashFee(address token, uint256 amount) internal view override returns (uint256) {
+        // silence warning about unused variable without the addition of bytecode.
+        token;
+        // TODO store/update fee param
+        return amount * (1e18 + 1e16) / 1e18;
     }
 
     function pause() public onlyRole(PAUSER_ROLE) {

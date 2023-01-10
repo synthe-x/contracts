@@ -1,22 +1,62 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-import "./PriceFeed.sol";
+import "./interfaces/IPriceOracle.sol";
+import "./interfaces/IChainlinkAggregator.sol";
 
-contract PriceOracle {
-    mapping(address => address) public feeds;
-    mapping(address => uint) public extraDecimals;
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-    function setFeed(address _token, address _feed, uint _extraDecimals) public {
-        feeds[_token] = _feed;
-        extraDecimals[_token] = _extraDecimals;
+contract PriceOracle is IPriceOracle, Ownable {
+    /**
+     * @dev Mapping to store price feed for an asset
+     */
+    mapping(address => IChainlinkAggregator) public feeds;
+
+    /**
+     * @dev Set price feed for an asset
+     * @param _token Asset address
+     * @param _feed Price feed address
+     */
+    function setFeed(address _token, address _feed) public onlyOwner {
+        feeds[_token] = IChainlinkAggregator(_feed);
+        emit FeedUpdated(_token, _feed);
     }
 
+    /**
+     * @dev Get price feed address for an asset
+     * @param _token Asset address
+     */
     function getFeed(address _token) public view returns (address) {
-        return feeds[_token];
+        return address(feeds[_token]);
     }
 
-    function getPrice(address _token) public view returns(uint) {
-        return PriceFeed(feeds[_token]).getPrice() * (10 ** extraDecimals[_token]);
+    /**
+     * @dev Get price for an asset
+     * @param _asset Asset address
+     * @return Price
+     */
+    function getAssetPrice(address _asset) public view returns(Price memory) {
+        IChainlinkAggregator _feed = feeds[_asset];
+        int256 price = _feed.latestAnswer();
+        require(price > 0, "PriceOracle: Price is <= 0");
+        uint8 decimals = _feed.decimals();
+
+        return Price({
+            price: uint256(price),
+            decimals: decimals
+        });
+    }
+
+    /**
+     * @dev Get prices for multiple assets
+     * @param _assets Array of asset addresses
+     * @return Array of prices
+     */
+    function getAssetPrices(address[] memory _assets) public view returns(Price[] memory){
+        Price[] memory prices = new Price[](_assets.length);
+        for(uint i = 0; i < _assets.length; i++) {
+            prices[i] = getAssetPrice(_assets[i]);
+        }
+        return prices;
     }
 }
