@@ -11,11 +11,13 @@ import "./SYN.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 /// @custom:security-contact prasad@chainscore.finance
 contract SyntheX is AccessControlUpgradeable, ReentrancyGuardUpgradeable, PausableUpgradeable, SyntheXStorage {
     using SafeMathUpgradeable for uint256;
     using MathUpgradeable for uint256;
+    using SafeERC20 for ERC20;
 
     event CollateralEnabled(address indexed asset, uint256 volatilityRatio);
     event CollateralDisabled(address indexed asset);
@@ -38,12 +40,13 @@ contract SyntheX is AccessControlUpgradeable, ReentrancyGuardUpgradeable, Pausab
     event DistributedSYN(address indexed pool, address _account, uint256 accountDelta, uint rewardIndex);
 
     constructor(){}
-
+    address synTknAdd;
     function initialize(address _syn) public initializer {
         __AccessControl_init();
         __ReentrancyGuard_init();
         __Pausable_init();
-        syn = SyntheXToken(_syn);
+         syn = SyntheXToken(_syn);
+         synTknAdd = _syn;
         safeCRatio = 13e17;
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _setupRole(ADMIN_ROLE, msg.sender);
@@ -127,7 +130,7 @@ contract SyntheX is AccessControlUpgradeable, ReentrancyGuardUpgradeable, Pausab
         if(_collateral == ETH_ADDRESS){
             require(msg.value == _amount, "Incorrect ETH amount");
         } else {
-            ERC20(_collateral).transferFrom(msg.sender, address(this), _amount);
+            ERC20(_collateral).safeTransferFrom(msg.sender, address(this), _amount);
         }
         // Update balance
         accountCollateralBalance[msg.sender][_collateral] += _amount;
@@ -141,7 +144,7 @@ contract SyntheX is AccessControlUpgradeable, ReentrancyGuardUpgradeable, Pausab
      */
     function withdraw(address _collateral, uint _amount) public whenNotPaused nonReentrant {
         require(accountCollateralBalance[msg.sender][_collateral] >= _amount, "Insufficient balance");
-        ERC20(_collateral).transfer(msg.sender, _amount);
+        ERC20(_collateral).safeTransfer(msg.sender, _amount);
         accountCollateralBalance[msg.sender][_collateral] -= _amount;
 
         // check health
@@ -176,7 +179,7 @@ contract SyntheX is AccessControlUpgradeable, ReentrancyGuardUpgradeable, Pausab
         updateSYNIndex(_tradingPool);
         distributeAccountSYN(_tradingPool, msg.sender);
 
-        uint amountUSD = _amount * oracle.getPrice(_synth)/1e18;
+        uint amountUSD = (_amount * oracle.getPrice(_synth))/1e18;
         SyntheXPool(_tradingPool).mint(msg.sender, amountUSD);
         SyntheXPool(_tradingPool).mintSynth(_synth, msg.sender, _amount);
 
@@ -199,8 +202,8 @@ contract SyntheX is AccessControlUpgradeable, ReentrancyGuardUpgradeable, Pausab
         updateSYNIndex(_tradingPool);
         distributeAccountSYN(_tradingPool, msg.sender);
 
-        uint amountUSD = _amount * oracle.getPrice(_synth)/1e18;
-        uint burnablePerc = getUserPoolDebtUSD(msg.sender, _tradingPool).min(amountUSD).mul(1e18).div(amountUSD);
+        uint amountUSD = (_amount * oracle.getPrice(_synth))/1e18;
+        uint burnablePerc = (getUserPoolDebtUSD(msg.sender, _tradingPool).min(amountUSD).mul(1e18)).div(amountUSD);
         SyntheXPool(_tradingPool).burn(msg.sender, amountUSD.mul(burnablePerc).div(1e18));
         SyntheXPool(_tradingPool).burnSynth(_synth, msg.sender, _amount.mul(burnablePerc).div(1e18));
 
@@ -509,7 +512,8 @@ contract SyntheX is AccessControlUpgradeable, ReentrancyGuardUpgradeable, Pausab
     function grantSYNInternal(address user, uint amount) internal whenNotPaused nonReentrant returns (uint) {
         uint compRemaining = syn.balanceOf(address(this));
         if (amount > 0 && amount <= compRemaining) {
-            syn.transfer(user, amount);
+            // syn.transfer(user, amount);
+             ERC20(synTknAdd).safeTransfer(user, amount);
             return 0;
         }
         return amount;
