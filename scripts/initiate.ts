@@ -24,7 +24,7 @@ export async function initiate(synthex: Contract, oracle: Contract, deployments:
     if(!feed){
       // deploy price feed
       const priceFeed = await PriceFeed.deploy(ethers.utils.parseUnits(config.collaterals[i].price, 8), 8);
-      await oracle.setFeed(collateral, priceFeed.address, 10);
+      await oracle.setFeed(collateral, priceFeed.address);
       feed = priceFeed.address;
     }
     await synthex.enableCollateral(collateral, ethers.utils.parseEther(config.collaterals[i].volatilityRatio));
@@ -70,7 +70,7 @@ export async function initiate(synthex: Contract, oracle: Contract, deployments:
       if(!feed){
         // deploy price feed
         const priceFeed = await PriceFeed.deploy(ethers.utils.parseUnits(config.tradingPools[i].synths[j].price, 8), 8);
-        await oracle.setFeed(synth, priceFeed.address, 10);
+        await oracle.setFeed(synth, priceFeed.address);
         feed = priceFeed.address;
       }
       await pool.enableSynth(synth);

@@ -2,10 +2,10 @@
   "name": "hardhat-project",
   "scripts": {
     "compile": "hardhat compile",
-    "test": "hardhat test",
+    "test": "hardhat test --network hardhat",
     "console": "hardhat console",
     "node": "hardhat node",
-    "deploy": "hardhat run scripts"
+    "deploy": "hardhat run scripts --network hardhat"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^2.0.0",
