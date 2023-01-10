@@ -12,6 +12,7 @@ const config: HardhatUserConfig = {
         enabled: true,
         runs: 1000,
       },
+      viaIR: true
     },
   },
   networks: {
@@ -21,7 +22,7 @@ const config: HardhatUserConfig = {
     }
   },
   gasReporter: {
-    enabled: true,
+    enabled: false,
     currency: 'USD',
     gasPrice: 13,
     coinmarketcap: '54e57674-6e99-404b-8528-cbf6a9f1e471'

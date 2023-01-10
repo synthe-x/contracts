@@ -2,11 +2,10 @@
 pragma solidity ^0.8.9;
 
 import "./PriceOracle.sol";
-import "./SYN.sol";
+import "./token/SyntheXToken.sol";
 
 contract SyntheXStorage {
     SyntheXToken public syn;
-    address constant public ETH_ADDRESS = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
 
     uint256 public exchangeFee;
     uint256 constant public exchangeFeeMantissa = 1e18;
@@ -37,6 +36,10 @@ contract SyntheXStorage {
      */
     mapping(address => mapping(address => uint)) public accountCollateralBalance;
 
+    /**
+     * @dev Market data structure
+     * Compatible with both collateral market and trading pool
+     */
     struct Market {
         bool isEnabled;
         uint volatilityRatio;

@@ -44,7 +44,7 @@ describe("Testing liquidation", function () {
 
 
 		// increasing btc price to $20000
-		await sbtcPriceFeed.setPrice(ethers.utils.parseUnits("20000", 8));
+		await sbtcPriceFeed.setPrice(ethers.utils.parseUnits("20000", 8), 8);
 
 		// debt now: $100000
 		totalDebt = ethers.utils.parseEther("100000");
@@ -54,9 +54,8 @@ describe("Testing liquidation", function () {
 		// user2: 33% ($33333)
 		expect(await synthex.getUserTotalDebtUSD(user2.address)).to.be.equal(totalDebt.div(3));
 
-
 		// increasing btc price to $80000
-		await sbtcPriceFeed.setPrice(ethers.utils.parseUnits("80000", 8));
+		await sbtcPriceFeed.setPrice(ethers.utils.parseUnits("80000", 8), 8);
 
 		// debt now: $250000
 		totalDebt = ethers.utils.parseEther("250000");

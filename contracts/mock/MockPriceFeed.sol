@@ -2,16 +2,18 @@
 pragma solidity ^0.8.9;
 import "../interfaces/IChainlinkAggregator.sol";
 
-contract PriceFeed is IChainlinkAggregator {
+contract MockPriceFeed is IChainlinkAggregator {
     int public price;
     uint8 private _decimals;
 
-    constructor(int _price) {
+    constructor(int _price, uint8 __decimals) {
         price = _price;
+        _decimals = __decimals;
     }
 
-    function setPrice(int _price) public {
+    function setPrice(int _price, uint8 __decimals) public {
         price = _price;
+        _decimals = __decimals;
     }
     
     function latestAnswer() external view returns (int256){

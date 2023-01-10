@@ -58,9 +58,9 @@ describe("SyntheX", function () {
 		const debtUser3 = await synthex.getUserTotalDebtUSD(user3.address);
 
 		// btc 10000 -> 15000
-		const Feed = await ethers.getContractFactory("PriceFeed");
+		const Feed = await ethers.getContractFactory("MockPriceFeed");
 		const feed = Feed.attach(await oracle.getFeed(sbtc.address));
-        await feed.setPrice(ethers.utils.parseUnits("20000", 8));
+        await feed.setPrice(ethers.utils.parseUnits("20000", 8), 8);
 
         expect(await synthex.getUserTotalDebtUSD(user1.address)).to.be.closeTo(debtUser1.mul('110').div('100'), ethers.utils.parseEther("50"));
         expect(await synthex.getUserTotalDebtUSD(user3.address)).to.be.closeTo(debtUser3.mul('110').div('100'), ethers.utils.parseEther("500"));

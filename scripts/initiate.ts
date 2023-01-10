@@ -4,7 +4,7 @@ import { Contract } from 'ethers';
 export async function initiate(synthex: Contract, oracle: Contract, deployments: any, config: any) {
   const MockToken = await ethers.getContractFactory("MockToken");
   const ERC20X = await ethers.getContractFactory("ERC20X");
-  const PriceFeed = await ethers.getContractFactory("PriceFeed");
+  const PriceFeed = await ethers.getContractFactory("MockPriceFeed");
 
   console.log("\nDeploying Collaterals... 💬");
   for(let i in config.collaterals){
@@ -23,7 +23,7 @@ export async function initiate(synthex: Contract, oracle: Contract, deployments:
     let feed = config.collaterals[i].feed;
     if(!feed){
       // deploy price feed
-      const priceFeed = await PriceFeed.deploy(ethers.utils.parseUnits(config.collaterals[i].price, 8));
+      const priceFeed = await PriceFeed.deploy(ethers.utils.parseUnits(config.collaterals[i].price, 8), 8);
       await oracle.setFeed(collateral, priceFeed.address, 10);
       feed = priceFeed.address;
     }
@@ -69,7 +69,7 @@ export async function initiate(synthex: Contract, oracle: Contract, deployments:
       let feed =  config.tradingPools[i].synths[j].feed;
       if(!feed){
         // deploy price feed
-        const priceFeed = await PriceFeed.deploy(ethers.utils.parseUnits(config.tradingPools[i].synths[j].price, 8));
+        const priceFeed = await PriceFeed.deploy(ethers.utils.parseUnits(config.tradingPools[i].synths[j].price, 8), 8);
         await oracle.setFeed(synth, priceFeed.address, 10);
         feed = priceFeed.address;
       }

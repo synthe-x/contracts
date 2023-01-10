@@ -31,15 +31,16 @@ contract PriceOracle is IPriceOracle, Ownable {
     }
 
     /**
-     * @dev Get price for an asset
+     * @dev Get price for an asset from price feed
      * @param _asset Asset address
      * @return Price
      */
     function getAssetPrice(address _asset) public view returns(Price memory) {
         IChainlinkAggregator _feed = feeds[_asset];
         int256 price = _feed.latestAnswer();
-        require(price > 0, "PriceOracle: Price is <= 0");
         uint8 decimals = _feed.decimals();
+
+        require(price > 0, "PriceOracle: Price is <= 0");
 
         return Price({
             price: uint256(price),
@@ -49,12 +50,12 @@ contract PriceOracle is IPriceOracle, Ownable {
 
     /**
      * @dev Get prices for multiple assets
-     * @param _assets Array of asset addresses
+     * @param _assets Asset addresses
      * @return Array of prices
      */
-    function getAssetPrices(address[] memory _assets) public view returns(Price[] memory){
+    function getAssetPrices(address[] memory _assets) public view returns(Price[] memory) {
         Price[] memory prices = new Price[](_assets.length);
-        for(uint i = 0; i < _assets.length; i++) {
+        for(uint256 i = 0; i < _assets.length; i++) {
             prices[i] = getAssetPrice(_assets[i]);
         }
         return prices;
