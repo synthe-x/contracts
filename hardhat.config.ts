@@ -4,6 +4,8 @@ import "@nomicfoundation/hardhat-toolbox";
 import "hardhat-gas-reporter"
 require('dotenv').config();
 
+const PRIVATE_KEY = process.env.PRIVATE_KEY ?? 'ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80';
+
 const config: HardhatUserConfig = {
   solidity: {
     version: "0.8.17",
@@ -18,7 +20,7 @@ const config: HardhatUserConfig = {
   networks: {
     arbitrumGoerli: {
       url: "https://arb-goerli.g.alchemy.com/v2/HyNaane88yHFsK8Yrn4gf2OOzHkd6GAJ",
-      accounts: [`0x${process.env.PRIVATE_KEY}`],
+      accounts: [`0x${PRIVATE_KEY}`],
     }
   },
   gasReporter: {
