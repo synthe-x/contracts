@@ -4,9 +4,7 @@ pragma solidity ^0.8.9;
 import "./PriceOracle.sol";
 import "./SYN.sol";
 
-
 contract SyntheXStorage {
-
     SyntheXToken public syn;
     address constant public ETH_ADDRESS = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
 

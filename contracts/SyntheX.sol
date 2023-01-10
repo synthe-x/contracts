@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-import "hardhat/console.sol";
+// import "hardhat/console.sol";
 import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
@@ -11,13 +11,14 @@ import "./SYN.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 
 /// @custom:security-contact prasad@chainscore.finance
+// TODO: UUPS, Interfaces, test health factor
 contract SyntheX is AccessControlUpgradeable, ReentrancyGuardUpgradeable, PausableUpgradeable, SyntheXStorage {
     using SafeMathUpgradeable for uint256;
     using MathUpgradeable for uint256;
-    using SafeERC20 for ERC20;
+    using SafeERC20Upgradeable for ERC20Upgradeable;
 
     event CollateralEnabled(address indexed asset, uint256 volatilityRatio);
     event CollateralDisabled(address indexed asset);
@@ -40,14 +41,13 @@ contract SyntheX is AccessControlUpgradeable, ReentrancyGuardUpgradeable, Pausab
     event DistributedSYN(address indexed pool, address _account, uint256 accountDelta, uint rewardIndex);
 
     constructor(){}
-    address synTknAdd;
+    
     function initialize(address _syn) public initializer {
         __AccessControl_init();
         __ReentrancyGuard_init();
         __Pausable_init();
-         syn = SyntheXToken(_syn);
-         synTknAdd = _syn;
-        safeCRatio = 13e17;
+        syn = SyntheXToken(_syn);
+        safeCRatio = 2e18; // 2.0
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _setupRole(ADMIN_ROLE, msg.sender);
         _setupRole(POOL_MANAGER_ROLE, msg.sender);
@@ -130,7 +130,7 @@ contract SyntheX is AccessControlUpgradeable, ReentrancyGuardUpgradeable, Pausab
         if(_collateral == ETH_ADDRESS){
             require(msg.value == _amount, "Incorrect ETH amount");
         } else {
-            ERC20(_collateral).safeTransferFrom(msg.sender, address(this), _amount);
+            ERC20Upgradeable(_collateral).safeTransferFrom(msg.sender, address(this), _amount);
         }
         // Update balance
         accountCollateralBalance[msg.sender][_collateral] += _amount;
@@ -144,7 +144,7 @@ contract SyntheX is AccessControlUpgradeable, ReentrancyGuardUpgradeable, Pausab
      */
     function withdraw(address _collateral, uint _amount) public whenNotPaused nonReentrant {
         require(accountCollateralBalance[msg.sender][_collateral] >= _amount, "Insufficient balance");
-        ERC20(_collateral).safeTransfer(msg.sender, _amount);
+        ERC20Upgradeable(_collateral).safeTransfer(msg.sender, _amount);
         accountCollateralBalance[msg.sender][_collateral] -= _amount;
 
         // check health
@@ -513,7 +513,7 @@ contract SyntheX is AccessControlUpgradeable, ReentrancyGuardUpgradeable, Pausab
         uint compRemaining = syn.balanceOf(address(this));
         if (amount > 0 && amount <= compRemaining) {
             // syn.transfer(user, amount);
-             ERC20(synTknAdd).safeTransfer(user, amount);
+            ERC20Upgradeable(address(syn)).safeTransfer(user, amount);
             return 0;
         }
         return amount;
@@ -657,13 +657,6 @@ contract SyntheX is AccessControlUpgradeable, ReentrancyGuardUpgradeable, Pausab
             updateSYNIndex(address(pool));
             distributeAccountSYN(address(pool), _account);
         }
-        return getSYNAccruedStored(_account);
-    }
-
-    /**
-     * @dev Get stored total $SYN accrued by an account
-     */
-    function getSYNAccruedStored(address _account) public view returns(uint){
         return synAccrued[_account];
     }
 }

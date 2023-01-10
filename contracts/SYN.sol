@@ -9,6 +9,7 @@ import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20FlashMint.sol";
 
+// TODO: add fee (0.01%), check flashloan
 contract SyntheXToken is ERC20, ERC20Burnable, Pausable, AccessControl, ERC20Permit, ERC20Votes, ERC20FlashMint {
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");

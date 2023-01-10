@@ -12,7 +12,7 @@
   ],
   "tradingPools": [
     {
-      "name": "Crypto",
+      "name": "Crypto Market",
       "symbol": "CRY",
       "volatilityRatio": "0.7",
       "rewardSpeed": "2.5",
@@ -71,7 +71,7 @@
       ]
     },
     {
-      "name": "Stocks",
+      "name": "US Stock Market",
       "symbol": "STK",
       "volatilityRatio": "0.9",
       "rewardSpeed": "1.1",
