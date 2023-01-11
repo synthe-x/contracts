@@ -68,6 +68,10 @@ contract SyntheX is AccessControlUpgradeable, ReentrancyGuardUpgradeable, Pausab
         _setupRole(POOL_MANAGER_ROLE, msg.sender);
     }
 
+    function dummy() public pure returns (uint256) {
+        return 1;
+    }
+
     /* -------------------------------------------------------------------------- */
     /*                              Public Functions                              */
     /* -------------------------------------------------------------------------- */
