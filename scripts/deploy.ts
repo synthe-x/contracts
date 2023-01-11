@@ -12,7 +12,10 @@ export async function deploy(deployments: any, config: any, deployerAddress: str
 
   // deploy synthex
   const SyntheX = await ethers.getContractFactory("SyntheX");
-  const synthex = await upgrades.deployProxy(SyntheX, [syn.address, deployerAddress, deployerAddress, deployerAddress]);
+  const synthex = await upgrades.deployProxy(SyntheX, [syn.address, deployerAddress, deployerAddress, deployerAddress], {
+    initializer: 'initialize(address,address,address,address)',
+    type: 'uups'
+  });
   
   // save synthex to deployments
   deployments.contracts["SyntheX"] = {
@@ -22,7 +25,6 @@ export async function deploy(deployments: any, config: any, deployerAddress: str
   };
   deployments.sources["SyntheX"] = synthex.interface.format("json")
   await synthex.deployed();
-	await upgrades.admin.transferProxyAdminOwnership(config.admin);
 
   console.log(`\nSyntheX ${config.latest} deployed to: ${synthex.address}`);
 

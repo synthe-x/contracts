@@ -4,6 +4,7 @@ pragma solidity ^0.8.9;
 // import "hardhat/console.sol";
 import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "./SyntheXPool.sol";
 import "./SyntheXStorage.sol";
@@ -16,7 +17,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeab
 
 /// @custom:security-contact prasad@chainscore.finance
 // TODO: UUPS, Interfaces, test health factor
-contract SyntheX is AccessControlUpgradeable, ReentrancyGuardUpgradeable, PausableUpgradeable, SyntheXStorage {
+contract SyntheX is UUPSUpgradeable, AccessControlUpgradeable, ReentrancyGuardUpgradeable, PausableUpgradeable, SyntheXStorage {
     using SafeMathUpgradeable for uint256;
     using MathUpgradeable for uint256;
     using SafeERC20Upgradeable for ERC20Upgradeable;
@@ -68,9 +69,8 @@ contract SyntheX is AccessControlUpgradeable, ReentrancyGuardUpgradeable, Pausab
         _setupRole(POOL_MANAGER_ROLE, msg.sender);
     }
 
-    function dummy() public pure returns (uint256) {
-        return 1;
-    }
+    ///@dev required by the OZ UUPS module
+   function _authorizeUpgrade(address) internal override onlyRole(ADMIN_ROLE) {}
 
     /* -------------------------------------------------------------------------- */
     /*                              Public Functions                              */
