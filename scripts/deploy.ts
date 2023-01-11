@@ -1,8 +1,9 @@
 import hre, { ethers } from "hardhat";
-import fs from 'fs';
 const { upgrades } = require("hardhat");
 
-export async function deploy(deployments: any, config: any) {
+
+
+export async function deploy(deployments: any, config: any, deployerAddress: string) {
 
   // deploy SYN
   const SYN = await ethers.getContractFactory("SyntheXToken");
@@ -11,7 +12,7 @@ export async function deploy(deployments: any, config: any) {
 
   // deploy synthex
   const SyntheX = await ethers.getContractFactory("SyntheX");
-  const synthex = await upgrades.deployProxy(SyntheX, [syn.address]);
+  const synthex = await upgrades.deployProxy(SyntheX, [syn.address, deployerAddress, deployerAddress, deployerAddress]);
   
   // save synthex to deployments
   deployments.contracts["SyntheX"] = {
@@ -21,7 +22,9 @@ export async function deploy(deployments: any, config: any) {
   };
   deployments.sources["SyntheX"] = synthex.interface.format("json")
   await synthex.deployed();
-  console.log("\nSyntheX deployed to:", synthex.address);
+	await upgrades.admin.transferProxyAdminOwnership(config.admin);
+
+  console.log(`\nSyntheX ${config.latest} deployed to: ${synthex.address}`);
 
   // save implementation to deployments
   const implementationAddress = await upgrades.erc1967.getImplementationAddress(synthex.address);
@@ -50,7 +53,7 @@ export async function deploy(deployments: any, config: any) {
   deployments.sources["PriceOracle"] = oracle.interface.format("json")
 
   console.log("PriceOracle deployed to:", oracle.address);
-
+  await synthex.setOracle(oracle.address);
 
   // deploy multicall
   const Multicall = await ethers.getContractFactory("Multicall2");
@@ -66,9 +69,6 @@ export async function deploy(deployments: any, config: any) {
   deployments.sources["Multicall2"] = multicall.interface.format("json")
 
   console.log("Multicall deployed to:", multicall.address);
-
-
-  await synthex.setOracle(oracle.address);
 
   return { synthex, oracle };
 }

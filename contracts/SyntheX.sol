@@ -43,18 +43,29 @@ contract SyntheX is AccessControlUpgradeable, ReentrancyGuardUpgradeable, Pausab
 
     constructor(){}
     
-    function initialize(address _syn) public initializer {
+    function initialize(address _syn, address admin, address pauser, address poolManager) public initializer {
         __AccessControl_init();
         __ReentrancyGuard_init();
         __Pausable_init();
         
         syn = SyntheXToken(_syn);
+        // TEMP set to 1.3
         safeCRatio = 1.3e18; // 2.0
         
-        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        // Setup roles
+        // Set admin as roleAdmin for all roles
+        _setupRole(DEFAULT_ADMIN_ROLE, admin);
+        _setRoleAdmin(ADMIN_ROLE, DEFAULT_ADMIN_ROLE);
+        _setupRole(ADMIN_ROLE, admin);
+        _setRoleAdmin(POOL_MANAGER_ROLE, DEFAULT_ADMIN_ROLE);
+        _setupRole(POOL_MANAGER_ROLE, poolManager);
+        _setRoleAdmin(PAUSE_GUARDIAN_ROLE, DEFAULT_ADMIN_ROLE);
+        _setupRole(PAUSE_GUARDIAN_ROLE, pauser);
+
+        // TEMP set deployer as poolManager to initiate the markets
+        // Needs to be revoked by deployer after deployment
         _setupRole(ADMIN_ROLE, msg.sender);
         _setupRole(POOL_MANAGER_ROLE, msg.sender);
-        _setupRole(PAUSE_GUARDIAN_ROLE, msg.sender);
     }
 
     /* -------------------------------------------------------------------------- */

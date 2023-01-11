@@ -77,5 +77,9 @@ export async function initiate(synthex: Contract, oracle: Contract, deployments:
       console.log(`\t\t Synth ${config.tradingPools[i].synths[j].symbol} added`);
     }
   }
+  
+  
   console.log("Trading Pools deployed successfully ✅\n");
+
+
 }
