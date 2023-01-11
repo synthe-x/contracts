@@ -48,7 +48,7 @@ export async function initiate(synthex: Contract, oracle: Contract, deployments:
     deployments.contracts[config.tradingPools[i].symbol] = {
       address: pool.address,
       source: "SyntheXPool",
-      constructorArguments: [config.tradingPools[i].name, config.tradingPools[i].symbol, synthex.address]
+      constructorArguments: [] // not needed for verification
     };
     deployments.sources["SyntheXPool"] = SyntheXPool.interface.format("json")
     console.log(`\t Trading Pool ${config.tradingPools[i].symbol} deployed`)
@@ -78,8 +78,5 @@ export async function initiate(synthex: Contract, oracle: Contract, deployments:
     }
   }
   
-  
   console.log("Trading Pools deployed successfully ✅\n");
-
-
 }

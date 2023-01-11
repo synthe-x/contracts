@@ -21,7 +21,7 @@ export async function deploy(deployments: any, config: any, deployerAddress: str
   deployments.contracts["SyntheX"] = {
     address: synthex.address,
     source: "SyntheX",
-    constructorArguments: [syn.address]
+    constructorArguments: [] // empty needed for verification
   };
   deployments.sources["SyntheX"] = synthex.interface.format("json")
   await synthex.deployed();

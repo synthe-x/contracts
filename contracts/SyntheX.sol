@@ -795,4 +795,11 @@ contract SyntheX is UUPSUpgradeable, AccessControlUpgradeable, ReentrancyGuardUp
         }
         return synAccrued[_account];
     }
+
+    /**
+     * @dev dummy 
+     */
+    function dummy() public pure returns(uint){
+        return 88220;
+    } 
 }
