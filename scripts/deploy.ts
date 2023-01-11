@@ -12,7 +12,7 @@ export async function deploy(deployments: any, config: any, deployerAddress: str
 
   // deploy synthex
   const SyntheX = await ethers.getContractFactory("SyntheX");
-  const synthex = await upgrades.deployProxy(SyntheX, [syn.address, deployerAddress, deployerAddress, deployerAddress], {
+  const synthex = await upgrades.deployProxy(SyntheX, [syn.address, config.admin, config.pauser, config.poolManager], {
     initializer: 'initialize(address,address,address,address)',
     type: 'uups'
   });

@@ -24,7 +24,7 @@ async function upgrade() {
         (parseInt(config.latest.split(".")[2]) + 1);
 
 	const SyntheX = await ethers.getContractFactory("SyntheX");
-	const proposal = await defender.proposeUpgrade(deployments.contracts['SyntheX'].address, SyntheX);
+	const proposal = await defender.proposeUpgrade(deployments.contracts['SyntheX'].address, SyntheX, {title: `Upgrade to ${config.latest}`, multisig: config.admin});
 	console.log("Upgrade proposal created at:", proposal.url);
     
     deployments.contracts['SyntheX'].implementations[config.latest] = {
