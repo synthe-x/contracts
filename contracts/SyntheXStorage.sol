@@ -3,6 +3,7 @@ pragma solidity ^0.8.9;
 
 import "./PriceOracle.sol";
 import "./token/SyntheXToken.sol";
+import "./utils/AddressManager.sol";
 
 contract SyntheXStorage {
     SyntheXToken public syn;
@@ -11,15 +12,6 @@ contract SyntheXStorage {
     uint256 constant public exchangeFeeMantissa = 1e18;
     uint256 public safeCRatio;
     uint256 constant public compInitialIndex = 1e36;
-
-    bytes32 constant public PAUSE_GUARDIAN_ROLE = keccak256("PAUSE_GUARDIAN_ROLE");
-    bytes32 constant public ADMIN_ROLE = keccak256("ADMIN_ROLE");
-    bytes32 constant public POOL_MANAGER_ROLE = keccak256("POOL_MANAGER_ROLE");
-
-    /**
-     * @dev Price oracle contract address
-     */
-    PriceOracle public oracle; 
 
     /**
      * @dev Pools the user has entered into
@@ -87,7 +79,7 @@ contract SyntheXStorage {
     mapping(address => uint) public synAccrued;
 
     /// @notice Address manager contract address
-    address public addressManager;
+    AddressManager public addressManager;
 
     uint256[99] private __gap;
 }

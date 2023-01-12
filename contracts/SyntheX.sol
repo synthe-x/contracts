@@ -17,14 +17,21 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeab
 import "./utils/Vault.sol";
 
 /// @custom:security-contact prasad@chainscore.finance
-// TODO: UUPS, Interfaces, test health factor
-contract SyntheX is UUPSUpgradeable, AccessControlUpgradeable, ReentrancyGuardUpgradeable, PausableUpgradeable, SyntheXStorage {
+// TODO: Interfaces
+contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgradeable, SyntheXStorage {
     using SafeMathUpgradeable for uint256;
     using MathUpgradeable for uint256;
     using SafeERC20Upgradeable for ERC20Upgradeable;
 
     string public constant NAME = "SyntheX";
     string public constant VERSION = "0.3.0";
+
+    bytes32 constant public PAUSE_GUARDIAN_ROLE = keccak256("PAUSE_GUARDIAN_ROLE");
+    bytes32 constant public ADMIN_ROLE = keccak256("ADMIN_ROLE");
+    bytes32 constant public POOL_MANAGER_ROLE = keccak256("POOL_MANAGER_ROLE");
+
+    bytes32 constant public PRICE_ORACLE = keccak256("PRICE_ORACLE");
+    bytes32 constant public VAULT = keccak256("VAULT");
 
     event CollateralEnabled(address indexed asset, uint256 volatilityRatio);
     event CollateralDisabled(address indexed asset);
@@ -48,31 +55,19 @@ contract SyntheX is UUPSUpgradeable, AccessControlUpgradeable, ReentrancyGuardUp
 
     constructor(){}
 
-    function initialize(address _syn, address admin, address pauser, address poolManager, address _addressManager) public initializer {
-        __AccessControl_init();
+    function initialize(address _syn, address _addressManager) public initializer {
         __ReentrancyGuard_init();
         __Pausable_init();
         
         syn = SyntheXToken(_syn);
         // TEMP set to 1.3
         safeCRatio = 1.3e18; // 2.0
-        addressManager = _addressManager;
-        
-        // Setup roles
-        // Set admin as roleAdmin for all roles
-        _setupRole(DEFAULT_ADMIN_ROLE, admin);
-        _setRoleAdmin(ADMIN_ROLE, DEFAULT_ADMIN_ROLE);
-        _setupRole(ADMIN_ROLE, admin);
-        _setRoleAdmin(POOL_MANAGER_ROLE, DEFAULT_ADMIN_ROLE);
-        _setupRole(POOL_MANAGER_ROLE, poolManager);
-        _setRoleAdmin(PAUSE_GUARDIAN_ROLE, DEFAULT_ADMIN_ROLE);
-        _setupRole(PAUSE_GUARDIAN_ROLE, pauser);
+        addressManager = AddressManager(_addressManager);
+    }
 
-        // TEMP set deployer as poolManager to initiate the markets
-        // Needs to be revoked by deployer after deployment
-        _setupRole(ADMIN_ROLE, msg.sender);
-        _setupRole(POOL_MANAGER_ROLE, msg.sender);
-
+    modifier onlyRole(bytes32 role) {
+        require(addressManager.getAddress(role) == msg.sender, "SyntheX: Not authorized");
+        _;
     }
 
     ///@dev required by the OZ UUPS module
@@ -237,7 +232,7 @@ contract SyntheX is UUPSUpgradeable, AccessControlUpgradeable, ReentrancyGuardUp
         distributeAccountSYN(_tradingPool, msg.sender);
 
         // get price from oracle
-        IPriceOracle.Price memory price = oracle.getAssetPrice(_synth);
+        IPriceOracle.Price memory price = oracle().getAssetPrice(_synth);
 
         // amoount to issue in USD; needed to issue debt
         uint amountUSD = _amount.mul(price.price).div(10**price.decimals);
@@ -266,7 +261,7 @@ contract SyntheX is UUPSUpgradeable, AccessControlUpgradeable, ReentrancyGuardUp
         distributeAccountSYN(_tradingPool, msg.sender);
 
         // get synth price
-        IPriceOracle.Price memory price = oracle.getAssetPrice(_synth);
+        IPriceOracle.Price memory price = oracle().getAssetPrice(_synth);
 
         // amount in USD for debt calculation
         uint amountUSD = _amount.mul(price.price).div(10**price.decimals);
@@ -296,7 +291,7 @@ contract SyntheX is UUPSUpgradeable, AccessControlUpgradeable, ReentrancyGuardUp
         address[] memory t = new address[](2);
         t[0] = _synthFrom;
         t[1] = _synthTo;
-        prices = oracle.getAssetPrices(t);
+        prices = oracle().getAssetPrices(t);
 
         // _amount in terms of _synthTo
         uint amountDst = _amount.mul(prices[0].price).mul(10**prices[1].decimals).div(prices[1].price).div(10**prices[0].decimals);
@@ -350,7 +345,7 @@ contract SyntheX is UUPSUpgradeable, AccessControlUpgradeable, ReentrancyGuardUp
         address[] memory t = new address[](2);
         t[0] = _inAsset;
         t[1] = _outAsset;
-        prices = oracle.getAssetPrices(t);
+        prices = oracle().getAssetPrices(t);
 
         // give back inAmountUSD*(discount) of collateral
         Market storage collateral = collaterals[_outAsset];
@@ -518,15 +513,6 @@ contract SyntheX is UUPSUpgradeable, AccessControlUpgradeable, ReentrancyGuardUp
                 break;
             }
         }
-    }
-
-    /**
-     * @dev Set the price oracle
-     * @param _oracle The address of the price oracle
-     */
-    function setOracle(address _oracle) public onlyRole(ADMIN_ROLE) {
-        oracle = PriceOracle(_oracle);
-        emit NewPriceOracle(_oracle);
     }
 
     /* -------------------------------------------------------------------------- */
@@ -697,9 +683,10 @@ contract SyntheX is UUPSUpgradeable, AccessControlUpgradeable, ReentrancyGuardUp
         uint totalCollateral = 0;
         address collateral;
         IPriceOracle.Price memory price;
+        IPriceOracle _oracle = oracle();
         for(uint i = 0; i < accountCollaterals[_account].length; i++){
             collateral = accountCollaterals[_account][i];
-            price = oracle.getAssetPrice(collateral);
+            price = _oracle.getAssetPrice(collateral);
             totalCollateral = totalCollateral.add(accountCollateralBalance[_account][collateral].mul(price.price).div(10**price.decimals));
         }
         return totalCollateral;
@@ -714,9 +701,10 @@ contract SyntheX is UUPSUpgradeable, AccessControlUpgradeable, ReentrancyGuardUp
         uint totalCollateral = 0;
         address collateral;
         IPriceOracle.Price memory price;
+        IPriceOracle _oracle = oracle();
         for(uint i = 0; i < accountCollaterals[_account].length; i++){
             collateral = accountCollaterals[_account][i];
-            price = oracle.getAssetPrice(collateral);
+            price = _oracle.getAssetPrice(collateral);
             totalCollateral = totalCollateral.add(
                 accountCollateralBalance[_account][collateral]
                 .mul(price.price)
@@ -768,24 +756,8 @@ contract SyntheX is UUPSUpgradeable, AccessControlUpgradeable, ReentrancyGuardUp
         if(totalDebtShare == 0){
             return 0;
         }
-        return IERC20(_tradingPool).balanceOf(_account).mul(getPoolTotalDebtUSD(_tradingPool)).div(totalDebtShare); 
-    }
-
-    /**
-     * @dev Get the total debt of a trading pool
-     * @param _tradingPool The address of the trading pool
-     * @return The total debt of the trading pool
-     */
-    function getPoolTotalDebtUSD(address _tradingPool) public view returns(uint) {
-        address[] memory _synths = SyntheXPool(_tradingPool).getSynths();
-        uint totalDebt = 0;
-        IPriceOracle.Price memory price;
-        for(uint i = 0; i < _synths.length; i++){
-            address synth = _synths[i];
-            price = oracle.getAssetPrice(synth);
-            totalDebt = totalDebt.add(ERC20X(synth).totalSupply().mul(price.price).div(10**price.decimals));
-        }
-        return totalDebt;
+        uint poolDebt = SyntheXPool(_tradingPool).getTotalDebtUSD();
+        return IERC20(_tradingPool).balanceOf(_account).mul(poolDebt).div(totalDebtShare); 
     }
 
     /**
@@ -800,5 +772,12 @@ contract SyntheX is UUPSUpgradeable, AccessControlUpgradeable, ReentrancyGuardUp
             distributeAccountSYN(address(pool), _account);
         }
         return synAccrued[_account];
+    }
+
+    /**
+     * @dev Get Asset price from oracle
+     */
+    function oracle() public view returns(IPriceOracle){
+        return IPriceOracle(addressManager.getAddress(PRICE_ORACLE));
     }
 }
