@@ -2,7 +2,7 @@ import hre, { ethers, upgrades } from "hardhat";
 import { Contract } from 'ethers';
 
 export async function initiate(synthex: Contract, oracle: Contract, deployments: any, config: any, addressManager: Contract) {
-  
+
   console.log("\nDeploying Collaterals... 💬");
 
   for(let i in config.collaterals){
@@ -28,6 +28,7 @@ export async function initiate(synthex: Contract, oracle: Contract, deployments:
   for(let i in config.tradingPools){
     // deploy pools
     const pool = await _deploy('SyntheXPool', [config.tradingPools[i].name, config.tradingPools[i].symbol, synthex.address, addressManager.address], deployments, {name: config.tradingPools[i].symbol, upgradable: true});
+
     // enable trading pool
     await synthex.enableTradingPool(pool.address, ethers.utils.parseEther(config.tradingPools[i].volatilityRatio))
     // set reward speed
