@@ -14,6 +14,7 @@ import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol"
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import "./utils/Vault.sol";
 
 /// @custom:security-contact prasad@chainscore.finance
 // TODO: UUPS, Interfaces, test health factor
@@ -43,8 +44,10 @@ contract SyntheX is UUPSUpgradeable, AccessControlUpgradeable, ReentrancyGuardUp
     event DistributedSYN(address indexed pool, address _account, uint256 accountDelta, uint rewardIndex);
 
     constructor(){}
-    
-    function initialize(address _syn, address admin, address pauser, address poolManager) public initializer {
+
+    Vault public synthexVault;
+
+    function initialize(address _syn, address admin, address pauser, address poolManager, address _addressStorage) public initializer {
         __AccessControl_init();
         __ReentrancyGuard_init();
         __Pausable_init();
@@ -67,6 +70,7 @@ contract SyntheX is UUPSUpgradeable, AccessControlUpgradeable, ReentrancyGuardUp
         // Needs to be revoked by deployer after deployment
         _setupRole(ADMIN_ROLE, msg.sender);
         _setupRole(POOL_MANAGER_ROLE, msg.sender);
+
     }
 
     ///@dev required by the OZ UUPS module

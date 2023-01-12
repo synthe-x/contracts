@@ -13,7 +13,7 @@ describe("SyntheX", function () {
 		// Contracts are deployed using the first signer/account by default
 		[owner, user1, user2, user3] = await ethers.getSigners();
 
-		const deployments = await initiate();
+		const deployments = await initiate(owner.address);
 		synthex = deployments.synthex;
 		oracle = deployments.oracle;
 		cryptoPool = deployments.pool;
@@ -23,9 +23,9 @@ describe("SyntheX", function () {
 	});
 
 	it("Should stake eth", async function () {
-		await synthex.connect(user1).enterAndDeposit(ETH_ADDRESS, ethers.utils.parseEther("20"), {value: ethers.utils.parseEther("20").toString()});    // $ 20000
-		await synthex.connect(user2).enterAndDeposit(ETH_ADDRESS, ethers.utils.parseEther("10"), {value: ethers.utils.parseEther("10").toString()});    // $ 10000
-		await synthex.connect(user3).enterAndDeposit(ETH_ADDRESS, ethers.utils.parseEther("200"), {value: ethers.utils.parseEther("200").toString()});   // $ 100000
+		await synthex.connect(user1).enterAndDeposit(ETH_ADDRESS, ethers.utils.parseEther("20"), {value: ethers.utils.parseEther("20").toString(), gasLimit: 3e7});    // $ 20000
+		await synthex.connect(user2).enterAndDeposit(ETH_ADDRESS, ethers.utils.parseEther("10"), {value: ethers.utils.parseEther("10").toString(), gasLimit: 3e7});    // $ 10000
+		await synthex.connect(user3).enterAndDeposit(ETH_ADDRESS, ethers.utils.parseEther("200"), {value: ethers.utils.parseEther("200").toString(), gasLimit: 3e7});   // $ 100000
 
 		expect(await synthex.healthFactor(user1.address)).to.equal(ethers.constants.MaxUint256);
 		expect(await synthex.healthFactor(user2.address)).to.equal(ethers.constants.MaxUint256);
