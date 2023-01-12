@@ -8,14 +8,13 @@ contract Vault is AccessControlUpgradeable {
     using SafeERC20Upgradeable for ERC20Upgradeable;
 
     address public adminAddress;
-    // bytes32 constant public ADMIN_ROLE = keccak256("ADMIN_ROLE");
     bytes32 constant public SYNTHEX_ADMIN_ROLE = keccak256("SYNTHEX_ADMIN_ROLE");
 
 
     constructor(address _adminAddress) {
         adminAddress = _adminAddress;
         _setupRole(DEFAULT_ADMIN_ROLE, _adminAddress);
-        _setupRole(SYNTHEX_ADMIN_ROLE, msg.sender);  // deploying contract
+        _setupRole(SYNTHEX_ADMIN_ROLE, msg.sender);  // deploying address
     }
 
 

@@ -28,10 +28,12 @@ contract SyntheXPool is ERC20Upgradeable {
     mapping(address => bool) public synths;
     uint public fee;
     address[] private _synthsList;
+    address private addressManager;
 
-    function initialize(string memory name, string memory symbol, address _synthex) public initializer {
+    function initialize(string memory name, string memory symbol, address _synthex, address _addressManager) public initializer {
         __ERC20_init(name, symbol);
         synthex = SyntheX(_synthex);
+        addressManager = _addressManager;
     }
 
     /* -------------------------------------------------------------------------- */

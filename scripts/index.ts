@@ -40,7 +40,7 @@ async function main() {
 	const synthex = contracts.synthex;
 
 	// initiate the contracts
-	await initiate(contracts.synthex, contracts.oracle, deployments, config);
+	await initiate(contracts.synthex, contracts.oracle, deployments, config, contracts.addressManager);
 
 	await synthex.renounceRole(await synthex.ADMIN_ROLE(), deployer.address);
 	await synthex.renounceRole(
