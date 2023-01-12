@@ -3,12 +3,18 @@ import '@openzeppelin/hardhat-upgrades';
 import "@nomicfoundation/hardhat-toolbox";
 import "hardhat-gas-reporter"
 import "@openzeppelin/hardhat-defender"
+import "hardhat-openzeppelin-defender";
+
 require('dotenv').config();
 
 const PRIVATE_KEY = process.env.PRIVATE_KEY ?? 'ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80';
 
 const config: HardhatUserConfig = {
   defender: {
+    apiKey: process.env.DEFENDER_TEAM_API_KEY!,
+    apiSecret: process.env.DEFENDER_TEAM_API_SECRET_KEY!,
+  },
+  OpenzeppelinDefenderCredential: {
     apiKey: process.env.DEFENDER_TEAM_API_KEY!,
     apiSecret: process.env.DEFENDER_TEAM_API_SECRET_KEY!,
   },
@@ -26,6 +32,7 @@ const config: HardhatUserConfig = {
     arbitrumGoerli: {
       url: "https://nd-389-970-162.p2pify.com/17b0fbe8312c9ff963057d537b9c7864",
       accounts: [`0x${PRIVATE_KEY}`],
+      chainId: 421613,
     }
   },
   gasReporter: {

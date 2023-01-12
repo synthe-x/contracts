@@ -1,9 +1,10 @@
-import { ethers } from "hardhat";
+import hre, { ethers } from "hardhat";
 import { Contract } from "ethers";
 import { ETH_ADDRESS } from "../utils/const";
 const { upgrades } = require("hardhat");
 
-export default async function main() {
+export default async function main(deployerAddress: string) {
+
 	// deploy SYN
 	const SYN = await ethers.getContractFactory("SyntheXToken");
 	const syn = await SYN.deploy();
@@ -11,7 +12,7 @@ export default async function main() {
 
     // deploy synthex
     const SyntheX = await ethers.getContractFactory("SyntheX");
-    const synthex = await upgrades.deployProxy(SyntheX, [syn.address]);
+    const synthex = await upgrades.deployProxy(SyntheX, [syn.address, deployerAddress, deployerAddress, deployerAddress], {type: 'uups'});
     await synthex.deployed();
 
     // deploy priceoracle

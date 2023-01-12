@@ -14,7 +14,7 @@ describe("Testing rewards", function () {
 		// Contracts are deployed using the first signer/account by default
         [owner, user1, user2] = await ethers.getSigners();
 
-		const deployments = await initiate();
+		const deployments = await initiate(owner.address);
 		synthex = deployments.synthex;
         syn = deployments.syn;
 		oracle = deployments.oracle;

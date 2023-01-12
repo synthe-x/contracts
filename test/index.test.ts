@@ -13,7 +13,7 @@ describe("SyntheX", function () {
 		// Contracts are deployed using the first signer/account by default
 		[owner, user1, user2, user3] = await ethers.getSigners();
 
-		const deployments = await initiate();
+		const deployments = await initiate(owner.address);
 		synthex = deployments.synthex;
 		oracle = deployments.oracle;
 		cryptoPool = deployments.pool;
