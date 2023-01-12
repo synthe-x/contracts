@@ -8,8 +8,8 @@ import deploy from "./index";
  * @dev user2 issues n2 btc
  * @dev user3 issues n3 usd
  */
-export default async function main(user1: SignerWithAddress, user2: SignerWithAddress, user3: SignerWithAddress) {
-    const deployments = await deploy();
+export default async function main(deployerAddress: string, user1: SignerWithAddress, user2: SignerWithAddress, user3: SignerWithAddress) {
+    const deployments = await deploy(deployerAddress);
     const { synthex, pool, seth, sbtc, susd } = deployments;
 
     await synthex.connect(user1).enterAndDeposit(ETH_ADDRESS, ethers.utils.parseEther("100"), {value: ethers.utils.parseEther("100")});
