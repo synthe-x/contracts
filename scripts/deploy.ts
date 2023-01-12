@@ -1,31 +1,21 @@
 import hre, { ethers } from "hardhat";
+import { _deploy } from './utils/helper';
 const { upgrades } = require("hardhat");
-
-
 
 export async function deploy(deployments: any, config: any, deployerAddress: string) {
   // deploy storage contract
-  const AddressManager = await ethers.getContractFactory("AddressManager");
-  const addressManager = await AddressManager.deploy();
-  await addressManager.deployed();
-
-  console.log(`AddressManager deployed to: ${addressManager.address}`);
+  const addressManager = await _deploy("AddressManager", [], deployments)
 
   //Vault
-
-  const Vault = await ethers.getContractFactory("Vault");
-  const vault = await Vault.deploy( config.admin);
-  await vault.deployed();
-  await addressManager.setAddress("Vault", vault.address);
-
+  const vault = await _deploy("Vault", [config.admin], deployments);
+  
+  await addressManager.setAddress(ethers.utils.id("VAULT"), vault.address);
 
   // deploy SYN
   const SYN = await ethers.getContractFactory("SyntheXToken");
   const syn = await SYN.deploy();
   await syn.deployed();
- 
-  await addressManager.setAddress("SyntheXToken", syn.address);
-
+  await addressManager.setAddress(ethers.utils.id("SYN"), syn.address);
 
   // deploy synthex
   const SyntheX = await ethers.getContractFactory("SyntheX");
@@ -33,7 +23,6 @@ export async function deploy(deployments: any, config: any, deployerAddress: str
     initializer: 'initialize(address,address,address,address,address)',
     type: 'uups'
   });
-  
 
   // save synthex to deployments
   deployments.contracts["SyntheX"] = {
@@ -44,7 +33,7 @@ export async function deploy(deployments: any, config: any, deployerAddress: str
   deployments.sources["SyntheX"] = synthex.interface.format("json")
   await synthex.deployed();
 
-  await addressManager.setAddress("SyntheX", synthex.address);
+  await addressManager.setAddress(ethers.utils.id("SYNTHEX"), synthex.address);
 
   console.log(`\nSyntheX ${config.latest} deployed to: ${synthex.address}`);
 
@@ -73,7 +62,7 @@ export async function deploy(deployments: any, config: any, deployerAddress: str
     constructorArguments: []
   };
   deployments.sources["PriceOracle"] = oracle.interface.format("json")
-  await addressManager.setAddress("PriceOracle", oracle.address);
+  await addressManager.setAddress(ethers.utils.id("PRICE_ORACLE"), oracle.address);
 
   console.log("PriceOracle deployed to:", oracle.address);
   await synthex.setOracle(oracle.address);
@@ -90,7 +79,6 @@ export async function deploy(deployments: any, config: any, deployerAddress: str
   };
 
   deployments.sources["Multicall2"] = multicall.interface.format("json")
-  await addressManager.setAddress("Multicall2", multicall.address);
 
   console.log("Multicall deployed to:", multicall.address);
 

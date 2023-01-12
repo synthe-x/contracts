@@ -2,14 +2,13 @@
 pragma solidity ^0.8.9;
 
 contract AddressManager {
-    mapping(string => address) private addresses;
+    mapping(bytes32 => address) private addresses;
 
-    function getAddress(string memory _key) public view returns (address) {
+    function getAddress(bytes32 _key) public view returns (address) {
         return addresses[_key];
     }
 
-    function setAddress(string memory _key, address _value) public {
+    function setAddress(bytes32 _key, address _value) public {
         addresses[_key] = _value;
     }
-
 }

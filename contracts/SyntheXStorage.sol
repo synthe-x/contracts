@@ -86,5 +86,8 @@ contract SyntheXStorage {
     /// @notice The COMP accrued but not yet transferred to each user
     mapping(address => uint) public synAccrued;
 
-    uint256[100] private __gap;
+    /// @notice Address manager contract address
+    address public addressManager;
+
+    uint256[99] private __gap;
 }

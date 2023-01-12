@@ -1,33 +1,22 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract Vault is AccessControlUpgradeable {
-    using SafeERC20Upgradeable for ERC20Upgradeable;
+contract Vault is Ownable {
+    using SafeERC20 for ERC20;
 
-    address public adminAddress;
-    bytes32 constant public SYNTHEX_ADMIN_ROLE = keccak256("SYNTHEX_ADMIN_ROLE");
-
-
-    constructor(address _adminAddress) {
-        adminAddress = _adminAddress;
-        _setupRole(DEFAULT_ADMIN_ROLE, _adminAddress);
-        _setupRole(SYNTHEX_ADMIN_ROLE, msg.sender);  // deploying address
+    constructor(address _admin) {
+        _transferOwnership(_admin);
     }
-
 
     function withdraw(address _tokenAddress, uint256 amount)
         external
-        onlyRole(DEFAULT_ADMIN_ROLE)
+        onlyOwner
     {
-        require(balance(_tokenAddress) >= amount, "Vault: Not enough amount on the Vault");
-        ERC20Upgradeable(_tokenAddress).safeTransfer(adminAddress, amount);
-    }
-
-
-    function balance(address _tokenAddress) public view returns (uint256) {
-        return ERC20Upgradeable(_tokenAddress).balanceOf(address(this));
+        // require(ERC20(_tokenAddress).balanceOf(address(this)) >= amount, "Vault: Not enough amount on the Vault");
+        ERC20(_tokenAddress).safeTransfer(owner(), amount);
     }
 }

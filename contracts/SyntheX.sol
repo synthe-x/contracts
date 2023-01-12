@@ -23,6 +23,9 @@ contract SyntheX is UUPSUpgradeable, AccessControlUpgradeable, ReentrancyGuardUp
     using MathUpgradeable for uint256;
     using SafeERC20Upgradeable for ERC20Upgradeable;
 
+    string public constant NAME = "SyntheX";
+    string public constant VERSION = "0.3.0";
+
     event CollateralEnabled(address indexed asset, uint256 volatilityRatio);
     event CollateralDisabled(address indexed asset);
     event CollateralRemoved(address indexed asset);
@@ -45,9 +48,7 @@ contract SyntheX is UUPSUpgradeable, AccessControlUpgradeable, ReentrancyGuardUp
 
     constructor(){}
 
-    Vault public synthexVault;
-
-    function initialize(address _syn, address admin, address pauser, address poolManager, address _addressStorage) public initializer {
+    function initialize(address _syn, address admin, address pauser, address poolManager, address _addressManager) public initializer {
         __AccessControl_init();
         __ReentrancyGuard_init();
         __Pausable_init();
@@ -55,6 +56,7 @@ contract SyntheX is UUPSUpgradeable, AccessControlUpgradeable, ReentrancyGuardUp
         syn = SyntheXToken(_syn);
         // TEMP set to 1.3
         safeCRatio = 1.3e18; // 2.0
+        addressManager = _addressManager;
         
         // Setup roles
         // Set admin as roleAdmin for all roles
@@ -74,7 +76,7 @@ contract SyntheX is UUPSUpgradeable, AccessControlUpgradeable, ReentrancyGuardUp
     }
 
     ///@dev required by the OZ UUPS module
-   function _authorizeUpgrade(address) internal override onlyRole(ADMIN_ROLE) {}
+    function _authorizeUpgrade(address) internal override onlyRole(ADMIN_ROLE) {}
 
     /* -------------------------------------------------------------------------- */
     /*                              Public Functions                              */
@@ -799,11 +801,4 @@ contract SyntheX is UUPSUpgradeable, AccessControlUpgradeable, ReentrancyGuardUp
         }
         return synAccrued[_account];
     }
-
-    /**
-     * @dev dummy 
-     */
-    function dummy() public pure returns(uint){
-        return 88220;
-    } 
 }
