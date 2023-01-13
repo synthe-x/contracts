@@ -41,6 +41,5 @@ export const _deploy = async (
 		deployments.contracts[name].latest = implementationAddress;
 		deployments.sources[name+'_'+config.latest] = contract.interface.format('json');
 	}
-
 	return contract;
 };

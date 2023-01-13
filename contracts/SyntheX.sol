@@ -26,22 +26,15 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
     string public constant NAME = "SyntheX";
     string public constant VERSION = "0.3.0";
 
-    bytes32 constant public PAUSE_GUARDIAN_ROLE = keccak256("PAUSE_GUARDIAN_ROLE");
-    bytes32 constant public ADMIN_ROLE = keccak256("ADMIN_ROLE");
-    bytes32 constant public POOL_MANAGER_ROLE = keccak256("POOL_MANAGER_ROLE");
-
-    bytes32 constant public PRICE_ORACLE = keccak256("PRICE_ORACLE");
-    bytes32 constant public VAULT = keccak256("VAULT");
+    bytes32 public constant ADMIN = keccak256("ADMIN");
+    bytes32 public constant POOL_MANAGER = keccak256("POOL_MANAGER");
+    bytes32 public constant PRICE_ORACLE = keccak256("PRICE_ORACLE");
 
     event CollateralEnabled(address indexed asset, uint256 volatilityRatio);
     event CollateralDisabled(address indexed asset);
-    event CollateralRemoved(address indexed asset);
     event TradingPoolEnabled(address indexed pool, uint256 volatilityRatio);
     event TradingPoolDisabled(address indexed pool);
-    event TradingPoolRemoved(address indexed pool);
     
-    event NewPriceOracle(address indexed oracle);
-
     event Deposit(address indexed user, address indexed asset, uint256 amount);
     event Withdraw(address indexed user, address indexed asset, uint256 amount);
     event Issue(address indexed user, address indexed tradingPool, address indexed asset, uint256 amount);
@@ -50,28 +43,30 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
     event Exchange(address indexed user, address indexed tradingPool, address indexed fromAsset, address toAsset, uint256 fromAmount, uint256 toAmount);
 
     event SetPoolRewardSpeed(address indexed pool, uint256 rewardSpeed);
-    event NewExchangeFee(uint256 _exchangeFee); 
     event DistributedSYN(address indexed pool, address _account, uint256 accountDelta, uint rewardIndex);
 
     constructor(){}
 
-    function initialize(address _syn, address _addressManager) public initializer {
+    function initialize(address _syn, address _addressStorage) public initializer {
         __ReentrancyGuard_init();
         __Pausable_init();
         
         syn = SyntheXToken(_syn);
-        // TEMP set to 1.3
-        safeCRatio = 1.3e18; // 2.0
-        addressManager = AddressManager(_addressManager);
+        compInitialIndex = 1e36;
+        addressStorage = AddressStorage(_addressStorage);
     }
 
-    modifier onlyRole(bytes32 role) {
-        require(addressManager.getAddress(role) == msg.sender, "SyntheX: Not authorized");
+    function setSafeCRatio(uint256 _safeCRatio) public onlyAdmin(ADMIN) {
+        safeCRatio = _safeCRatio;
+    }
+
+    modifier onlyAdmin(bytes32 role) {
+        require(addressStorage.getAddress(role) == msg.sender, "SyntheX: Not authorized");
         _;
     }
 
     ///@dev required by the OZ UUPS module
-    function _authorizeUpgrade(address) internal override onlyRole(ADMIN_ROLE) {}
+    function _authorizeUpgrade(address) internal override onlyAdmin(ADMIN) {}
 
     /* -------------------------------------------------------------------------- */
     /*                              Public Functions                              */
@@ -129,6 +124,7 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
 
     /**
      * @dev Enter a collateral and deposit collateral
+     * @notice Only to make UX better
      * @param _collateral The address of the collateral
      * @dev if erc20 deposit, _collateral = asset address
      * @dev if eth deposit, _collateral = address(0)
@@ -201,12 +197,15 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
 
     /**
      * @dev Enter a pool and issue a synthetic asset
+     * @notice Only to make UX better
      * @param _tradingPool The address of the trading pool
      * @param _synth The address of the synthetic asset
      * @param _amount The amount of synthetic asset to issue
      */
     function enterAndIssue(address _tradingPool, address _synth, uint _amount) public {
+        // enter the trading pool
         enterPool(_tradingPool);
+        // issue the synth from trading pool
         issue(_tradingPool, _synth, _amount);
     }
 
@@ -308,7 +307,7 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
      * @param _tradingPool The address of the trading pool
      * @param _speed The reward speed
      */
-    function setPoolSpeed(address _tradingPool, uint _speed) public onlyRole(POOL_MANAGER_ROLE) {
+    function setPoolSpeed(address _tradingPool, uint _speed) public onlyAdmin(POOL_MANAGER) {
         // get pool
         Market storage pool = tradingPools[_tradingPool];
         // ensure pool is enabled
@@ -396,25 +395,15 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
     /**
      * @dev Pause the contract
      */
-    function pause() public onlyRole(ADMIN_ROLE) {
+    function pause() public onlyAdmin(ADMIN) {
         _pause();
     }
 
     /**
      * @dev Unpause the contract
      */
-    function unpause() public onlyRole(ADMIN_ROLE) {
+    function unpause() public onlyAdmin(ADMIN) {
         _unpause();
-    }
-
-    /**
-     * @dev Set the exchange fee
-     * @param _exchangeFee The new exchange fee
-     * @notice Only the owner can call this function
-     */
-    function setExchangeFee(uint256 _exchangeFee) public onlyRole(ADMIN_ROLE) {
-        exchangeFee = _exchangeFee;
-        emit NewExchangeFee(_exchangeFee);
     }
 
     /**
@@ -422,7 +411,7 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
      * @param _tradingPool The address of the trading pool
      * @param _volatilityRatio The volatility ratio of the trading pool
      */
-    function enableTradingPool(address _tradingPool, uint _volatilityRatio) public onlyRole(POOL_MANAGER_ROLE) {
+    function enableTradingPool(address _tradingPool, uint _volatilityRatio) public onlyAdmin(POOL_MANAGER) {
         Market storage pool = tradingPools[_tradingPool];
         // if already enabled, return
         if(pool.isEnabled){
@@ -432,8 +421,6 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
         pool.isEnabled = true;
         // set pool's volatility ratio
         pool.volatilityRatio = _volatilityRatio;
-        // add to list of all trading pools
-        tradingPoolsList.push(_tradingPool);
         // emit event
         emit TradingPoolEnabled(_tradingPool, _volatilityRatio);
     }
@@ -442,27 +429,10 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
      * @dev Disable a trading pool
      * @param _tradingPool The address of the trading pool
      */
-    function disableTradingPool(address _tradingPool) public onlyRole(POOL_MANAGER_ROLE) {
+    function disableTradingPool(address _tradingPool) public onlyAdmin(POOL_MANAGER) {
         if(tradingPools[_tradingPool].isEnabled){
             tradingPools[_tradingPool].isEnabled = false;
             emit TradingPoolDisabled(_tradingPool);
-        }
-    }
-
-    /**
-     * @dev Remove a trading pool
-     * @param _tradingPool The address of the trading pool
-     */
-    function removeTradingPool(address _tradingPool) public onlyRole(POOL_MANAGER_ROLE) {
-        tradingPools[_tradingPool].isEnabled = false;
-        // remove from list
-        for (uint i = 0; i < tradingPoolsList.length; i++) {
-            if (tradingPoolsList[i] == _tradingPool) {
-                tradingPoolsList[i] = tradingPoolsList[tradingPoolsList.length - 1];
-                tradingPoolsList.pop();
-                emit TradingPoolRemoved(_tradingPool);
-                break;
-            }
         }
     }
 
@@ -471,7 +441,7 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
      * @param _collateral The address of the collateral
      * @param _volatilityRatio The volatility ratio of the collateral
      */
-    function enableCollateral(address _collateral, uint _volatilityRatio) public onlyRole(ADMIN_ROLE) {
+    function enableCollateral(address _collateral, uint _volatilityRatio) public onlyAdmin(ADMIN) {
         Market storage collateral = collaterals[_collateral];
         // if already enabled, return
         if(collateral.isEnabled){
@@ -481,37 +451,20 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
         collateral.isEnabled = true;
         // set collateral's volatility ratio
         collateral.volatilityRatio = _volatilityRatio;
-        // add to list of all collaterals
-        collateralsList.push(_collateral);
         // emit event
         emit CollateralEnabled(_collateral, _volatilityRatio);
     }
 
     /**
-     * @dev Disable a collateral
+     * @dev Disables a collateral, does not remove it from the system
+     * @notice Collateral can be re-enabled
+     * @notice Collateral can be withdrawn by users
      * @param _collateral The address of the collateral
      */
-    function disableCollateral(address _collateral) public onlyRole(ADMIN_ROLE) {
+    function disableCollateral(address _collateral) public onlyAdmin(ADMIN) {
         if(collaterals[_collateral].isEnabled){
             collaterals[_collateral].isEnabled = false;
             emit CollateralDisabled(_collateral);
-        }
-    }
-
-    /**
-     * @dev Remove a collateral
-     * @param _collateral The address of the collateral
-     */
-    function removeCollateral(address _collateral) public onlyRole(ADMIN_ROLE) {
-        collaterals[_collateral].isEnabled = false;
-        // remove from list
-        for (uint i = 0; i < collateralsList.length; i++) {
-            if (collateralsList[i] == _collateral) {
-                collateralsList[i] = collateralsList[collateralsList.length - 1];
-                collateralsList.pop();
-                emit CollateralRemoved(_collateral);
-                break;
-            }
         }
     }
 
@@ -544,7 +497,6 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
      * @param _account The address of the supplier to distribute COMP to
      */
     function distributeAccountSYN(address _tradingPool, address _account) internal {
-        // TODO: Don't distribute supplier COMP if the user is not in the supplier market.
         // This check should be as gas efficient as possible as distributeSupplierComp is called in many places.
         // - We really don't want to call an external contract as that's quite expensive.
 
@@ -578,37 +530,29 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
     }
 
     /**
-     * @notice Claim all the comp accrued by holder in all markets
-     * @param holder The address to claim COMP for
+     * @notice Claim all the SYN accrued by holder in the specified markets
+     * @param holder The address to claim SYN for
+     * @param tradingPoolsList The list of markets to claim SYN in
      */
-    function claimSYN(address holder) public {
-        return claimSYN(holder, tradingPoolsList);
-    }
-
-    /**
-     * @notice Claim all the comp accrued by holder in the specified markets
-     * @param holder The address to claim COMP for
-     * @param cTokens The list of markets to claim COMP in
-     */
-    function claimSYN(address holder, address[] memory cTokens) public {
+    function claimSYN(address holder, address[] memory tradingPoolsList) public {
         address[] memory holders = new address[](1);
         holders[0] = holder;
-        claimSYN(holders, cTokens);
+        claimSYN(holders, tradingPoolsList);
     }
 
     /**
-     * @notice Claim all comp accrued by the holders
+     * @notice Claim all SYN accrued by the holders
      * @param holders The addresses to claim COMP for
      * @param _tradingPools The list of markets to claim COMP in
      */
     function claimSYN(address[] memory holders, address[] memory _tradingPools) public {
         for (uint i = 0; i < _tradingPools.length; i++) {
-            SyntheXPool cToken = SyntheXPool(_tradingPools[i]);
-            require(tradingPools[address(cToken)].isEnabled, "market must be listed");
+            address pool = _tradingPools[i];
+            require(tradingPools[pool].isEnabled, "market must be listed");
 
-            updateSYNIndex(address(cToken));
+            updateSYNIndex(pool);
             for (uint j = 0; j < holders.length; j++) {
-                distributeAccountSYN(address(cToken), holders[j]);
+                distributeAccountSYN(pool, holders[j]);
             }
         }
         for (uint j = 0; j < holders.length; j++) {
@@ -626,7 +570,6 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
     function grantSYNInternal(address user, uint amount) internal whenNotPaused nonReentrant returns (uint) {
         uint compRemaining = syn.balanceOf(address(this));
         if (amount > 0 && amount <= compRemaining) {
-            // syn.transfer(user, amount);
             ERC20Upgradeable(address(syn)).safeTransfer(user, amount);
             return 0;
         }
@@ -709,8 +652,8 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
                 accountCollateralBalance[_account][collateral]
                 .mul(price.price)
                 .mul(collaterals[collateral].volatilityRatio)
-                .div(1e18)          // adjust for volatility ratio
-                .div(10**price.decimals)    // adjust for price
+                .div(1e18)                      // adjust for volatility ratio
+                .div(10**price.decimals)        // adjust for price
             ); 
         }
         return totalCollateral;
@@ -763,11 +706,10 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
     /**
      * @dev Get total $SYN accrued by an account
      */
-    function getSYNAccrued(address _account) public returns(uint){
+    function getSYNAccrued(address _account, address[] memory tradingPoolsList) public returns(uint){
         for (uint i = 0; i < tradingPoolsList.length; i++) {
             SyntheXPool pool = SyntheXPool(tradingPoolsList[i]);
             require(tradingPools[address(pool)].isEnabled, "market must be listed");
-
             updateSYNIndex(address(pool));
             distributeAccountSYN(address(pool), _account);
         }
@@ -778,6 +720,6 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
      * @dev Get Asset price from oracle
      */
     function oracle() public view returns(IPriceOracle){
-        return IPriceOracle(addressManager.getAddress(PRICE_ORACLE));
+        return IPriceOracle(addressStorage.getAddress(PRICE_ORACLE));
     }
 }

@@ -28,7 +28,7 @@ export async function initiate(synthex: Contract, oracle: Contract, deployments:
   console.log("Deploying Trading Pools... 💬");
   for(let i in config.tradingPools){
     // deploy pools
-    const pool = await _deploy('SyntheXPool', [config.tradingPools[i].name, config.tradingPools[i].symbol, synthex.address, addressManager.address], deployments, {name: config.tradingPools[i].symbol, upgradable: true});
+    const pool = await _deploy('SyntheXPool', [config.tradingPools[i].name, config.tradingPools[i].symbol, addressManager.address], deployments, {name: config.tradingPools[i].symbol, upgradable: true});
 
     // enable trading pool
     await synthex.enableTradingPool(pool.address, ethers.utils.parseEther(config.tradingPools[i].volatilityRatio))
@@ -43,7 +43,7 @@ export async function initiate(synthex: Contract, oracle: Contract, deployments:
       let synth = config.tradingPools[i].synths[j].address;
       if(!synth){
         // deploy token
-        const token = await _deploy('ERC20X', [config.tradingPools[i].synths[j].name, config.tradingPools[i].synths[j].symbol, pool.address], deployments, { name: config.tradingPools[i].synths[j].symbol });
+        const token = await _deploy('ERC20X', [config.tradingPools[i].synths[j].name, config.tradingPools[i].synths[j].symbol, pool.address, addressManager.address], deployments, { name: config.tradingPools[i].synths[j].symbol });
         synth = token.address;
       }
       let feed =  config.tradingPools[i].synths[j].feed;

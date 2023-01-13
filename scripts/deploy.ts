@@ -1,26 +1,25 @@
 import hre, { ethers } from "hardhat";
+import { PRICE_ORACLE, SYNTHEX, VAULT } from "./utils/const";
 import { _deploy } from './utils/helper';
 const { upgrades } = require("hardhat");
 
 export async function deploy(deployments: any, config: any, deployerAddress: string) {
   // deploy storage contract
-  const addressManager = await _deploy("AddressManager", [], deployments)
-
-  //Vault
-  const vault = await _deploy("Vault", [config.admin], deployments);
+  const addressManager = await _deploy("AddressStorage", [deployerAddress], deployments)
   
-  await addressManager.setAddress(ethers.utils.id("VAULT"), vault.address);
+  // vault
+  const vault = await _deploy("Vault", [config.admin], deployments);
+  await addressManager.setAddress(VAULT, vault.address);
 
   // deploy SYN
   const SYN = await ethers.getContractFactory("SyntheXToken");
   const syn = await SYN.deploy();
   await syn.deployed();
-  await addressManager.setAddress(ethers.utils.id("SYN"), syn.address);
-
+  
   // deploy synthex
   const SyntheX = await ethers.getContractFactory("SyntheX");
-  const synthex = await upgrades.deployProxy(SyntheX, [syn.address, config.admin, config.pauser, config.poolManager, addressManager.address], {
-    initializer: 'initialize(address,address,address,address,address)',
+  const synthex = await upgrades.deployProxy(SyntheX, [syn.address, addressManager.address], {
+    initializer: 'initialize(address,address)',
     type: 'uups'
   });
 
@@ -32,8 +31,9 @@ export async function deploy(deployments: any, config: any, deployerAddress: str
   };
   deployments.sources["SyntheX"] = synthex.interface.format("json")
   await synthex.deployed();
+  await synthex.setSafeCRatio(ethers.utils.parseEther(config.safeCRatio));
 
-  await addressManager.setAddress(ethers.utils.id("SYNTHEX"), synthex.address);
+  await addressManager.setAddress(SYNTHEX, synthex.address);
 
   console.log(`\nSyntheX ${config.latest} deployed to: ${synthex.address}`);
 
@@ -62,10 +62,8 @@ export async function deploy(deployments: any, config: any, deployerAddress: str
     constructorArguments: []
   };
   deployments.sources["PriceOracle"] = oracle.interface.format("json")
-  await addressManager.setAddress(ethers.utils.id("PRICE_ORACLE"), oracle.address);
-
+  await addressManager.setAddress(PRICE_ORACLE, oracle.address);
   console.log("PriceOracle deployed to:", oracle.address);
-  await synthex.setOracle(oracle.address);
 
   // deploy multicall
   const Multicall = await ethers.getContractFactory("Multicall2");
