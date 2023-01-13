@@ -18,7 +18,14 @@ contract PriceOracle is IPriceOracle, Ownable {
      * @param _feed Price feed address
      */
     function setFeed(address _token, address _feed) public onlyOwner {
+        // wrap in chainlink interface
         feeds[_token] = IChainlinkAggregator(_feed);
+
+        // sanity check
+        require(feeds[_token].latestAnswer() > 0, "PriceOracle: Price is <= 0");
+        require(feeds[_token].decimals() >= 0, "PriceOracle: Decimals is <= 0");
+
+        // emit event
         emit FeedUpdated(_token, _feed);
     }
 
@@ -41,6 +48,7 @@ contract PriceOracle is IPriceOracle, Ownable {
         uint8 decimals = _feed.decimals();
 
         require(price > 0, "PriceOracle: Price is <= 0");
+        require(decimals >= 0, "PriceOracle: Decimals is <= 0");
 
         return Price({
             price: uint256(price),
