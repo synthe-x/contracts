@@ -427,6 +427,9 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
     
     /**
      * @dev Disable a trading pool
+     * @dev Synths will not be issued from the pool anymore
+     * @dev Will still be calculated for debt
+     * @dev Can be re-enabled
      * @param _tradingPool The address of the trading pool
      */
     function disableTradingPool(address _tradingPool) public onlyAdmin(POOL_MANAGER) {
@@ -459,6 +462,7 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
      * @dev Disables a collateral, does not remove it from the system
      * @notice Collateral can be re-enabled
      * @notice Collateral can be withdrawn by users
+     * @notice Will still be considered for calculation as collateral against debt
      * @param _collateral The address of the collateral
      */
     function disableCollateral(address _collateral) public onlyAdmin(ADMIN) {
@@ -530,9 +534,10 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
     }
 
     /**
-     * @notice Claim all the SYN accrued by holder in the specified markets
+     * @dev Claim all the SYN accrued by holder in the specified markets
      * @param holder The address to claim SYN for
      * @param tradingPoolsList The list of markets to claim SYN in
+     * @dev We're taking a list of markets as input instead of a storing a list of them in contract
      */
     function claimSYN(address holder, address[] memory tradingPoolsList) public {
         address[] memory holders = new address[](1);
@@ -546,10 +551,10 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
      * @param _tradingPools The list of markets to claim COMP in
      */
     function claimSYN(address[] memory holders, address[] memory _tradingPools) public {
+        // Iterate through all holders and trading pools
         for (uint i = 0; i < _tradingPools.length; i++) {
             address pool = _tradingPools[i];
-            require(tradingPools[pool].isEnabled, "market must be listed");
-
+            require(tradingPools[pool].isEnabled, "Market must be enabled");
             updateSYNIndex(pool);
             for (uint j = 0; j < holders.length; j++) {
                 distributeAccountSYN(pool, holders[j]);
@@ -561,19 +566,37 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
     }
 
     /**
-     * @notice Transfer COMP to the user
-     * @dev Note: If there is not enough COMP, we do not perform the transfer all.
-     * @param user The address of the user to transfer COMP to
-     * @param amount The amount of COMP to (possibly) transfer
-     * @return The amount of COMP which was NOT transferred to the user
+     * @notice Transfer SYN to the user
+     * @dev Note: If there is not enough SYN, we do not perform the transfer all.
+     * @param user The address of the user to transfer SYN to
+     * @param amount The amount of SYN to (possibly) transfer
+     * @return The amount of SYN which was NOT transferred to the user
      */
     function grantSYNInternal(address user, uint amount) internal whenNotPaused nonReentrant returns (uint) {
-        uint compRemaining = syn.balanceOf(address(this));
-        if (amount > 0 && amount <= compRemaining) {
+        // check if there is enough SYN
+        uint synRemaining = syn.balanceOf(address(this));
+        if (amount > 0 && amount <= synRemaining) {
             ERC20Upgradeable(address(syn)).safeTransfer(user, amount);
             return 0;
         }
         return amount;
+    }
+
+    /**
+     * @dev Get total $SYN accrued by an account
+     * @dev Only for getting dynamic reward amount in frontend. To be statically called
+     */
+    function getSYNAccrued(address _account, address[] memory tradingPoolsList) public returns(uint){
+        // Iterate over all the trading pools and update the reward index and account's reward amount
+        for (uint i = 0; i < tradingPoolsList.length; i++) {
+            SyntheXPool pool = SyntheXPool(tradingPoolsList[i]);
+            require(tradingPools[address(pool)].isEnabled, "Market must be listed");
+            // Update the market's reward index
+            updateSYNIndex(address(pool));
+            // Update the account's reward amount
+            distributeAccountSYN(address(pool), _account);
+        }
+        return synAccrued[_account];
     }
 
     /* -------------------------------------------------------------------------- */
@@ -583,54 +606,75 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
      * @dev Returns if the collateral is enabled for an account
      */
     function collateralMembership(address market, address account) public view returns(bool){
+        // reading the mapping accountMembership from struct collateral
         return collaterals[market].accountMembership[account];
     }
 
     /**
-     * @dev Returns if the trading pool is enabled for an account
+     * @dev Returns if the trading pool is enabled for an account.
      */
     function tradingPoolMembership(address market, address account) public view returns(bool){
+        // reading the mapping accountMembership from struct tradingPool
         return tradingPools[market].accountMembership[account];
     }
 
     /**
-     * @dev Get the health factor of an account
-     * @param _account The address of the account
-     * @return The health factor of the account
+     * @dev Get the health factor of an account.
+     * @dev Health Factor = Total Adjusted Collateral / Total Adjusted Debt
+     * @dev Total Adjusted Collateral = Sum(collateral.amount * (collateral.volatilityRatio))
+     * @dev Total Adjusted Debt = Sum(debt.amount / (debt.volatilityRatio))
+     * @param _account The address of the account.
+     * @return The health factor of the account.
      */
     function healthFactor(address _account) public view returns(uint) {
+        // Total adjusted collateral in USD
         uint totalCollateral = getAdjustedUserTotalCollateralUSD(_account);
+        // Total adjusted debt in USD
         uint totalDebt = getAdjustedUserTotalDebtUSD(_account);
+        // If total debt is 0, health factor is infinite
         if(totalDebt == 0) return type(uint).max;
+        // health factor = collateral / debt
         return totalCollateral * 1e18 / totalDebt;
     }
 
     /**
-     * @dev Get the health factor of an account
+     * @dev Get the Loan-To-Value ratio of an account
+     * @dev LTV = Total Collateral / Total Debt
      * @param _account The address of the account
      * @return The health factor of the account
      */
     function getLTV(address _account) public view returns(uint) {
+        // Total collateral in USD
         uint totalCollateral = getUserTotalCollateralUSD(_account);
+        // Total debt in USD
         uint totalDebt = getUserTotalDebtUSD(_account);
+        // If total debt is 0, LTV is infinite
         if(totalDebt == 0) return type(uint).max;
+        // LTV = collateral / debt
         return totalCollateral * 1e18 / totalDebt;
     }
 
     /**
-     * @dev Get the total collateral of an account
+     * @dev Returns the total collateral amount of an account
      * @param _account The address of the account
      * @return The total collateral of the account
      */
     function getUserTotalCollateralUSD(address _account) public view returns(uint) {
+        // Total collateral in USD
         uint totalCollateral = 0;
-        address collateral;
-        IPriceOracle.Price memory price;
+
+        // Read and cache the price oracle
         IPriceOracle _oracle = oracle();
+
+        // Iterate over all the collaterals of the account
         for(uint i = 0; i < accountCollaterals[_account].length; i++){
-            collateral = accountCollaterals[_account][i];
-            price = _oracle.getAssetPrice(collateral);
-            totalCollateral = totalCollateral.add(accountCollateralBalance[_account][collateral].mul(price.price).div(10**price.decimals));
+            address collateral = accountCollaterals[_account][i];
+            IPriceOracle.Price memory price = _oracle.getAssetPrice(collateral);
+            // Add the collateral amount in USD
+            // CollateralAmountUSD = CollateralAmount * Price / 10^PriceDecimals
+            totalCollateral = totalCollateral.add(
+                accountCollateralBalance[_account][collateral].mul(price.price).div(10**price.decimals)
+            );
         }
         return totalCollateral;
     }
@@ -641,13 +685,18 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
      * @return The total debt of the account
      */
     function getAdjustedUserTotalCollateralUSD(address _account) public view returns(uint) {
+        // Total collateral in USD
         uint totalCollateral = 0;
-        address collateral;
-        IPriceOracle.Price memory price;
+        
+        // Read and cache the price oracle
         IPriceOracle _oracle = oracle();
+
+        // Iterate over all the collaterals of the account
         for(uint i = 0; i < accountCollaterals[_account].length; i++){
-            collateral = accountCollaterals[_account][i];
-            price = _oracle.getAssetPrice(collateral);
+            address collateral = accountCollaterals[_account][i];
+            IPriceOracle.Price memory price = _oracle.getAssetPrice(collateral);
+            // Add the adjusted collateral amount in USD
+            // AdjustedCollateralAmountUSD = CollateralAmount * Price * volatilityRatio / 10^PriceDecimals
             totalCollateral = totalCollateral.add(
                 accountCollateralBalance[_account][collateral]
                 .mul(price.price)
@@ -665,9 +714,13 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
      * @return The total debt of the account
      */
     function getUserTotalDebtUSD(address _account) public view returns(uint) {
+        // Total debt in USD
         uint totalDebt = 0;
+        // Read and cache the trading pools the user is in
         address[] memory _accountPools = accountPools[_account];
+        // Iterate over all the trading pools of the account
         for(uint i = 0; i < _accountPools.length; i++){
+            // Add the debt amount in USD
             totalDebt = totalDebt.add(getUserPoolDebtUSD(_account, _accountPools[i]));
         }
         return totalDebt;
@@ -679,11 +732,18 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
      * @return The total debt of the account
      */
     function getAdjustedUserTotalDebtUSD(address _account) public view returns(uint) {
+        // Total adjusted debt in USD
         uint adjustedTotalDebt = 0;
+        // Read and cache the trading pools the user is in
         address[] memory _accountPools = accountPools[_account];
+        // Iterate over all the trading pools of the account
         for(uint i = 0; i < _accountPools.length; i++){
-            Market storage pool = tradingPools[_accountPools[i]];
-            adjustedTotalDebt = adjustedTotalDebt.add(getUserPoolDebtUSD(_account, _accountPools[i]).mul(1e18).div(pool.volatilityRatio));
+            // Add the adjusted debt amount in USD
+            adjustedTotalDebt = adjustedTotalDebt.add(
+                getUserPoolDebtUSD(_account, _accountPools[i])
+                .mul(1e18)
+                .div(tradingPools[_accountPools[i]].volatilityRatio)
+            );
         }
         return adjustedTotalDebt;
     }
@@ -695,29 +755,20 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
      * @return The debt of the account in the trading pool
      */
     function getUserPoolDebtUSD(address _account, address _tradingPool) public view returns(uint){
+        // Get the total debt shares (supply) of the trading pool
         uint totalDebtShare = IERC20(_tradingPool).totalSupply();
+        // If totalShares == 0, there's no debt
         if(totalDebtShare == 0){
             return 0;
         }
+        // Get the total debt of the trading pool in USD
         uint poolDebt = SyntheXPool(_tradingPool).getTotalDebtUSD();
+        // Get the debt of the account in the trading pool, based on its debt share balance
         return IERC20(_tradingPool).balanceOf(_account).mul(poolDebt).div(totalDebtShare); 
     }
 
     /**
-     * @dev Get total $SYN accrued by an account
-     */
-    function getSYNAccrued(address _account, address[] memory tradingPoolsList) public returns(uint){
-        for (uint i = 0; i < tradingPoolsList.length; i++) {
-            SyntheXPool pool = SyntheXPool(tradingPoolsList[i]);
-            require(tradingPools[address(pool)].isEnabled, "market must be listed");
-            updateSYNIndex(address(pool));
-            distributeAccountSYN(address(pool), _account);
-        }
-        return synAccrued[_account];
-    }
-
-    /**
-     * @dev Get Asset price from oracle
+     * @dev Get price oracle
      */
     function oracle() public view returns(IPriceOracle){
         return IPriceOracle(addressStorage.getAddress(PRICE_ORACLE));
