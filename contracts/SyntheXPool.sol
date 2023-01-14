@@ -10,18 +10,14 @@ import "./ERC20X.sol";
 import "./PriceOracle.sol";
 import "./SyntheX.sol";
 import "./utils/AddressStorage.sol";
+import "./interfaces/ISyntheXPool.sol";
 
 // Uncomment this line to use console.log
 // import "hardhat/console.sol";
 
-contract SyntheXPool is ERC20Upgradeable {
+contract SyntheXPool is ERC20Upgradeable, ISyntheXPool {
     using SafeMathUpgradeable for uint256;
     using MathUpgradeable for uint256;
-
-    event SynthEnabled(address indexed synth);
-    event SynthDisabled(address indexed synth);
-    event SynthRemoved(address indexed synth);
-    event FeeUpdated(uint fee);
 
     /**
      * @dev Address storage keys
@@ -70,7 +66,7 @@ contract SyntheXPool is ERC20Upgradeable {
      * @notice Only the owner can call this function
      * @notice The synth contract must have pool (this contract) as owner
      */
-    function enableSynth(address _synth) public onlyAdmin {
+    function enableSynth(address _synth) virtual override public onlyAdmin {
         if(!synths[_synth]){
             synths[_synth] = true;
             _synthsList.push(_synth); 
@@ -82,7 +78,7 @@ contract SyntheXPool is ERC20Upgradeable {
      * @dev Update the fee for the pool
      * @param _fee The new fee
      */
-    function updateFee(uint _fee) public onlyAdmin {
+    function updateFee(uint _fee) virtual override public onlyAdmin {
         fee = _fee;
         emit FeeUpdated(_fee);
     }
@@ -92,7 +88,7 @@ contract SyntheXPool is ERC20Upgradeable {
      * @param _synth The address of the synth to disable
      * @notice Only the owner can call this function
      */
-    function disableSynth(address _synth) public onlyAdmin {
+    function disableSynth(address _synth) virtual override public onlyAdmin {
         if(synths[_synth]){
             synths[_synth] = false;
             emit SynthDisabled(_synth);
@@ -104,7 +100,7 @@ contract SyntheXPool is ERC20Upgradeable {
      * @param _synth The address of the synth to remove
      * @notice Removes from synthList => would not contribute to pool debt
      */
-    function removeSynth(address _synth) public onlyAdmin {
+    function removeSynth(address _synth) virtual override public onlyAdmin {
         synths[_synth] = false;
         for (uint i = 0; i < _synthsList.length; i++) {
             if (_synthsList[i] == _synth) {
@@ -122,15 +118,15 @@ contract SyntheXPool is ERC20Upgradeable {
     /**
      * @dev Returns the list of synths in the pool
      */
-    function getSynths() public view returns (address[] memory) {
+    function getSynths() virtual override public view returns (address[] memory) {
         return _synthsList;
     }
 
-    function oracle() public view returns(IPriceOracle) {
+    function oracle() virtual override public view returns(IPriceOracle) {
         return IPriceOracle(addressStorage.getAddress(PRICE_ORACLE));
     }
 
-    function vault() public view returns (address) {
+    function vault() virtual override public view returns (address) {
         return addressStorage.getAddress(VAULT);
     }
 
@@ -138,7 +134,7 @@ contract SyntheXPool is ERC20Upgradeable {
      * @dev Get the total debt of a trading pool
      * @return The total debt of the trading pool
      */
-    function getTotalDebtUSD() public view returns(uint) {
+    function getTotalDebtUSD() virtual override public view returns(uint) {
         // Get the list of synths in this trading pool
         address[] memory _synths = getSynths();
         // Total debt in USD
@@ -195,7 +191,7 @@ contract SyntheXPool is ERC20Upgradeable {
      * @param _amountUSD The amount of USD to issue
      * @notice Only SyntheX can call this function
      */
-    function mint(address _user, uint _amountUSD) public onlyInternal {
+    function mint(address _user, uint _amountUSD) virtual override public onlyInternal {
         if(totalSupply() == 0){
             _mint(_user, _amountUSD);
         } else {
@@ -220,7 +216,7 @@ contract SyntheXPool is ERC20Upgradeable {
      * @param _user The address of the user
      * @param _amount The amount of synths to issue
      */
-    function mintSynth(address _synth, address _user, uint _amount) public onlyInternal {
+    function mintSynth(address _synth, address _user, uint _amount) virtual override public onlyInternal {
         // Fetch the fee and cache it
         uint _fee = fee;
         // Mint amount minus fee
@@ -234,7 +230,7 @@ contract SyntheXPool is ERC20Upgradeable {
      * @param _user The address of the user
      * @param _amountUSD The amount of USD to burn
      */
-    function burn(address _user, uint _amountUSD) public onlyInternal {
+    function burn(address _user, uint _amountUSD) virtual override public onlyInternal {
         uint _totalDebt = getTotalDebtUSD();
         uint totalSupply = totalSupply();
         uint burnAmount = totalSupply * _amountUSD / _totalDebt;
@@ -247,7 +243,7 @@ contract SyntheXPool is ERC20Upgradeable {
      * @param _user The address of the user
      * @param _amount The amount of synths to burn
      */
-    function burnSynth(address _synth, address _user, uint _amount) public onlyInternal {
+    function burnSynth(address _synth, address _user, uint _amount) virtual override public onlyInternal {
         // Burn amount
         ERC20X(_synth).burn(_user, _amount);
     }
@@ -260,7 +256,7 @@ contract SyntheXPool is ERC20Upgradeable {
      * @param _fromAmount The amount of synths to exchange from
      * @param _toAmount The amount of synths to exchange to
      */
-    function exchange(address _fromSynth, address _toSynth, address _user, uint _fromAmount, uint _toAmount) public onlyInternal {
+    function exchange(address _fromSynth, address _toSynth, address _user, uint _fromAmount, uint _toAmount) virtual override public onlyInternal {
         require(synths[_toSynth], "Synth not enabled");
         uint _fee = fee;
         // burn from synth
