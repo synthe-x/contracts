@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-// import 'hardhat/console.sol';
+import 'hardhat/console.sol';
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
@@ -137,11 +137,11 @@ contract StakingRewards is IStaking, UUPSUpgradeable, OwnableUpgradeable, Reentr
     /* ========== RESTRICTED FUNCTIONS ========== */
 
     // Add rewards to staking contract
-    function addReward(uint256 reward)  external onlyOwner updateReward(address(0)) {
+    function addReward(uint256 reward) external onlyOwner updateReward(address(0)) {
         IERC20Upgradeable(rewardsToken).safeTransferFrom(msg.sender, address(this), reward);
         if (block.timestamp >= periodFinish) {
           rewardRate = reward.div(rewardsDuration);
-        } 
+        }
         else {
             uint256 remaining = periodFinish.sub(block.timestamp);
             uint256 leftover = remaining.mul(rewardRate);
@@ -189,8 +189,4 @@ contract StakingRewards is IStaking, UUPSUpgradeable, OwnableUpgradeable, Reentr
         }
         _;
     }
-
-    
-
-
 }

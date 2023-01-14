@@ -20,20 +20,29 @@ import "./interfaces/ISyntheX.sol";
 
 /// @custom:security-contact prasad@chainscore.finance
 // TODO: Interfaces
-contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgradeable, SyntheXStorage, ISyntheX {
+contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgradeable, SyntheXStorage {
     using SafeMathUpgradeable for uint256;
     using MathUpgradeable for uint256;
     using SafeERC20Upgradeable for ERC20Upgradeable;
 
+    /**
+     * @dev Contract name and version
+     */
     string public constant NAME = "SyntheX";
-    string public constant VERSION = "0.3.0";
+    string public constant VERSION = "0";
 
+    /**
+     * @dev Address storage keys
+     */
     bytes32 public constant ADMIN = keccak256("ADMIN");
     bytes32 public constant POOL_MANAGER = keccak256("POOL_MANAGER");
     bytes32 public constant PRICE_ORACLE = keccak256("PRICE_ORACLE");
 
-    constructor(){}
-
+    /**
+     * @dev Initialize the contract
+     * @param _syn The address of the SyntheX token
+     * @param _addressStorage The address of the address storage contract
+     */
     function initialize(address _syn, address _addressStorage) public initializer {
         __ReentrancyGuard_init();
         __Pausable_init();

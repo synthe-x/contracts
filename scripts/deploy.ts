@@ -1,5 +1,5 @@
 import hre, { ethers } from "hardhat";
-import { PRICE_ORACLE, SYNTHEX, VAULT, SEALED_SYN, STAKING } from "./utils/const";
+import { PRICE_ORACLE, SYNTHEX, VAULT } from "./utils/const";
 import { _deploy } from './utils/helper';
 const { upgrades } = require("hardhat");
 
@@ -15,13 +15,21 @@ export async function deploy(deployments: any, config: any, deployerAddress: str
   const SYN = await ethers.getContractFactory("SyntheXToken");
   const syn = await SYN.deploy();
   await syn.deployed();
+
+  //deploy Sealed SYN
+  const SealedSYN = await ethers.getContractFactory("SealedSYN");
+  const sealedSYN = await SealedSYN.deploy();
+  await sealedSYN.deployed();
+  console.log(`SealedSYN ${config.latest} deployed to: ${sealedSYN.address}`);
   
   // deploy synthex
   const SyntheX = await ethers.getContractFactory("SyntheX");
-  const synthex = await upgrades.deployProxy(SyntheX, [syn.address, addressManager.address], {
+  const synthex = await upgrades.deployProxy(SyntheX, [sealedSYN.address, addressManager.address], {
     initializer: 'initialize(address,address)',
     type: 'uups'
   });
+
+  await sealedSYN.mint(synthex.address, ethers.utils.parseEther("100000000"));
 
   // save synthex to deployments
   deployments.contracts["SyntheX"] = {
@@ -49,23 +57,18 @@ export async function deploy(deployments: any, config: any, deployerAddress: str
   };
   deployments.sources['SyntheX_'+config.latest] = synthex.interface.format('json');
 
-  await syn.mint(synthex.address, ethers.utils.parseEther("100000000"))
-
-  //deploy Sealed SYN
-  const SealedSYN = await ethers.getContractFactory("SealedSYN");
-  const sealedSYN = await SealedSYN.deploy();
-  await sealedSYN.deployed();
-  console.log(`\SealedSYN ${config.latest} deployed to: ${sealedSYN.address}`);
-
-  await addressManager.setAddress(SEALED_SYN, synthex.address);
-
-  
   // deploy staking rewards
+  // SYN on staking sSYN
   const StakingRewards = await ethers.getContractFactory("StakingRewards");
-  const stakingRewards = await upgrades.deployProxy(StakingRewards, [sealedSYN.address, syn.address], {
+  const stakingRewards = await upgrades.deployProxy(StakingRewards, [syn.address, sealedSYN.address], {
     initializer: 'initialize(address,address)',
     type: 'uups'
   });
+
+  // add rewards
+  await syn.mint(deployerAddress, ethers.utils.parseEther("100000000"));
+  await syn.approve(stakingRewards.address, ethers.utils.parseEther("100000000"));
+  await stakingRewards.addReward(ethers.utils.parseEther("10000000"));
 
   // save deployments
   deployments.contracts["StakingRewards"] = {
@@ -75,7 +78,6 @@ export async function deploy(deployments: any, config: any, deployerAddress: str
   };
   deployments.sources["StakingRewards"] = stakingRewards.interface.format("json")
   await stakingRewards.deployed();
-  await addressManager.setAddress(STAKING, stakingRewards.address);
 
   console.log(`\StakingRewards ${config.latest} deployed to: ${stakingRewards.address}`);
 

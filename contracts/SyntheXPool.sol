@@ -15,7 +15,7 @@ import "./interfaces/ISyntheXPool.sol";
 // Uncomment this line to use console.log
 // import "hardhat/console.sol";
 
-contract SyntheXPool is ERC20Upgradeable, ISyntheXPool {
+contract SyntheXPool is ISyntheXPool, ERC20Upgradeable {
     using SafeMathUpgradeable for uint256;
     using MathUpgradeable for uint256;
 

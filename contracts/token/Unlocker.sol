@@ -3,8 +3,9 @@ pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
 
-contract Unlocker is Ownable {
+contract Unlocker is Ownable, Pausable {
 
     event UnlockRequested(address indexed user, bytes32 requestId, uint amount);
     event Unlocked(address indexed user, bytes32 requestId, uint amount);
@@ -28,12 +29,30 @@ contract Unlocker is Ownable {
         SYN = IERC20(_SYN);
     }
 
+    /* -------------------------------------------------------------------------- */
+    /*                               Admin Functions                              */
+    /* -------------------------------------------------------------------------- */
     function setLockPeriod(uint _lockPeriod) external onlyOwner {
         lockPeriod = _lockPeriod;
         emit SetLockPeriod(_lockPeriod);
     }
 
-    function requestUnlock(uint _amount) external {
+    function withdrawSYN(uint _amount) external onlyOwner {
+        SYN.transfer(msg.sender, _amount);
+    }
+
+    function pause() external onlyOwner {
+        _pause();
+    }
+
+    function unpause() external onlyOwner {
+        _unpause();
+    }
+
+    /* -------------------------------------------------------------------------- */
+    /*                              Public Functions                              */
+    /* -------------------------------------------------------------------------- */
+    function requestUnlock(uint _amount) external whenNotPaused {
         bytes32 requestId = keccak256(abi.encodePacked(msg.sender, unlockRequestCount[msg.sender]));
         require(unlockRequests[requestId].amount == 0, "Unlock request already exists");
 
@@ -44,7 +63,7 @@ contract Unlocker is Ownable {
         emit UnlockRequested(msg.sender, requestId, _amount);
     }
 
-    function unlock(bytes32 _requestId) external {
+    function unlock(bytes32 _requestId) external whenNotPaused {
         Unlock memory unlockRequest = unlockRequests[_requestId];
         require(unlockRequest.amount > 0, "Unlock request does not exist");
         require(block.timestamp >= unlockRequest.requestTime + lockPeriod, "Unlock period has not passed");

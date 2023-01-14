@@ -7,5 +7,3 @@ export const SYNTHEX = ethers.utils.id('SYNTHEX');
 export const PRICE_ORACLE = ethers.utils.id('PRICE_ORACLE');
 export const POOL_MANAGER = ethers.utils.id('POOL_MANAGER');
 export const ADMIN = ethers.utils.id('ADMIN');
-export const SEALED_SYN = ethers.utils.id('SEALED_SYN');
-export const STAKING = ethers.utils.id('STAKING');

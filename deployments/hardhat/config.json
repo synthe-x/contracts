@@ -1,7 +1,7 @@
 {
   "name": "synthex",
-  "version": "0.17.0",
-  "latest": "0.17.0",
+  "version": "0.19.0",
+  "latest": "0.19.0",
   "admin": "0x084cD22eA15E4C262408e561a5AFa8431Bd7fa5d",
   "poolManager": "0x46c18c6d5526E17B34a3deB43e5E9Ba2A659c23a",
   "safeCRatio": "1.3",
