@@ -16,7 +16,7 @@ describe("Testing rewards", function () {
 
 		const deployments = await initiate(owner.address);
 		synthex = deployments.synthex;
-        syn = deployments.syn;
+        syn = deployments.sealedSYN;
 		oracle = deployments.oracle;
 		cryptoPool = deployments.pool;
 		susd = deployments.susd;
@@ -25,22 +25,22 @@ describe("Testing rewards", function () {
 	});
 
 	it("Should deposit eth", async function () {
-		await synthex.connect(user1).enterAndDeposit(ETH_ADDRESS, ethers.utils.parseEther("50"), {value: ethers.utils.parseEther("50")});    // $ 50000
+		await synthex.connect(user1).deposit(ETH_ADDRESS, ethers.utils.parseEther("50"), {value: ethers.utils.parseEther("50")});    // $ 50000
 		expect(await synthex.healthFactor(user1.address)).to.equal(ethers.constants.MaxUint256);
 
-		await synthex.connect(user2).enterAndDeposit(ETH_ADDRESS, ethers.utils.parseEther("50"), {value: ethers.utils.parseEther("50")});    // $ 50000
+		await synthex.connect(user2).deposit(ETH_ADDRESS, ethers.utils.parseEther("50"), {value: ethers.utils.parseEther("50")});    // $ 50000
 		expect(await synthex.healthFactor(user2.address)).to.equal(ethers.constants.MaxUint256);
 	});
 
 	it("user1 issue synths", async function () {
 		// user1 issues 10 seth
-        await synthex.connect(user1).enterAndIssue(cryptoPool.address, seth.address, ethers.utils.parseEther("10")); // $ 10000
+        await synthex.connect(user1).issue(cryptoPool.address, seth.address, ethers.utils.parseEther("10")); // $ 10000
         expect(await synthex.getUserTotalDebtUSD(user1.address)).to.be.equal(ethers.utils.parseEther("10000.00"));
 	});
 
     it("user2 issue synths", async function () {
 		// user1 issues 10 seth
-        await synthex.connect(user2).enterAndIssue(cryptoPool.address, seth.address, ethers.utils.parseEther("10")); // $ 10000
+        await synthex.connect(user2).issue(cryptoPool.address, seth.address, ethers.utils.parseEther("10")); // $ 10000
 
         expect(await synthex.getUserTotalDebtUSD(user2.address)).to.be.equal(ethers.utils.parseEther("10000.00"));
 	});

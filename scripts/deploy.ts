@@ -79,7 +79,7 @@ export async function deploy(deployments: any, config: any, deployerAddress: str
   deployments.sources["StakingRewards"] = stakingRewards.interface.format("json")
   await stakingRewards.deployed();
 
-  console.log(`\StakingRewards ${config.latest} deployed to: ${stakingRewards.address}`);
+  console.log(`StakingRewards deployed to: ${stakingRewards.address}`);
 
   // deploy price oracle
   const Oracle = await ethers.getContractFactory("PriceOracle");

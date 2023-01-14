@@ -11,15 +11,15 @@ interface ISyntheX {
     function exitPool(address _tradingPool) external;
     function enterCollateral(address _collateral) external;
     function exitCollateral(address _collateral) external;
-    function enterAndDeposit(address _collateral, uint _amount) external payable;
     function deposit(address _collateral, uint _amount) external payable ;
     function withdraw(address _collateral, uint _amount) external;
-    function enterAndIssue(address _tradingPool, address _synth, uint _amount) external;
     function issue(address _tradingPool, address _synth, uint _amount) external;
     function burn(address _tradingPool, address _synth, uint _amount) external;
     function exchange(address _tradingPool, address _synthFrom, address _synthTo, uint _amount) external;
     function setPoolSpeed(address _tradingPool, uint _speed) external ;
     function liquidate(address _account, address _tradingPool, address _inAsset, uint _inAmount, address _outAsset) external;
+    
+    
     /* -------------------------------------------------------------------------- */
     /*                               Admin Functions                              */
     /* -------------------------------------------------------------------------- */
@@ -28,12 +28,16 @@ interface ISyntheX {
     function enableCollateral(address _collateral, uint _volatilityRatio) external;
     function disableCollateral(address _collateral) external;
     function setSafeCRatio(uint256 _safeCRatio) external;
+    
+    
     /* -------------------------------------------------------------------------- */
     /*                          $SYN Reward Distribution                          */
     /* -------------------------------------------------------------------------- */
     function claimSYN(address holder, address[] memory tradingPoolsList) external ;
     function claimSYN(address[] memory holders, address[] memory _tradingPools) external;
     function getSYNAccrued(address _account, address[] memory tradingPoolsList) external returns(uint);
+
+
     /* -------------------------------------------------------------------------- */
     /*                               View Functions                               */
     /* -------------------------------------------------------------------------- */
@@ -47,6 +51,8 @@ interface ISyntheX {
     function getAdjustedUserTotalDebtUSD(address _account) external view returns(uint) ;
     function getUserPoolDebtUSD(address _account, address _tradingPool) external view returns(uint);
     function oracle() external view returns(IPriceOracle);
+
+
     /* -------------------------------------------------------------------------- */
     /*                               Events                                       */
     /* -------------------------------------------------------------------------- */

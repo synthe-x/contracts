@@ -19,7 +19,6 @@ import "./interfaces/ISyntheX.sol";
 
 
 /// @custom:security-contact prasad@chainscore.finance
-// TODO: Interfaces
 contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgradeable, SyntheXStorage {
     using SafeMathUpgradeable for uint256;
     using MathUpgradeable for uint256;
@@ -70,7 +69,6 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
     function enterPool(address _tradingPool) virtual override public {
         tradingPools[_tradingPool].accountMembership[msg.sender] = true;
         accountPools[msg.sender].push(_tradingPool);
-
     }
 
     /**
@@ -78,13 +76,15 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
      * @param _tradingPool The address of the trading pool
      */
     function exitPool(address _tradingPool) virtual override public {
+        require(getUserPoolDebtUSD(msg.sender, _tradingPool) == 0, "SyntheX: Pool debt must be zero");
         tradingPools[_tradingPool].accountMembership[msg.sender] = false;
+        address[] storage pools = accountPools[msg.sender];
         // remove from list
-        for (uint i = 0; i < accountPools[msg.sender].length; i++) {
-            if (accountPools[msg.sender][i] == _tradingPool) {
-                accountPools[msg.sender][i] = accountPools[msg.sender][accountPools[msg.sender].length - 1];
-                accountPools[msg.sender].pop();
-                break;
+        for (uint i = 0; i < pools.length; i++) {
+            if (pools[i] == _tradingPool) {
+                pools[i] = pools[pools.length - 1];
+                pools.pop();
+                return;
             }
         }
     }
@@ -115,19 +115,6 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
     }
 
     /**
-     * @dev Enter a collateral and deposit collateral
-     * @notice Only to make UX better
-     * @param _collateral The address of the collateral
-     * @dev if erc20 deposit, _collateral = asset address
-     * @dev if eth deposit, _collateral = address(0)
-     * @param _amount The amount of collateral to deposit
-     */
-    function enterAndDeposit(address _collateral, uint _amount) virtual override public payable {
-        enterCollateral(_collateral);
-        deposit(_collateral, _amount);
-    }
-
-    /**
      * @dev Deposit collateral
      * @param _collateral The address of the erc20 collateral; for ETH
      * @param _amount The amount of collateral to deposit
@@ -138,7 +125,9 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         // ensure collateral is globally enabled
         require(collateral.isEnabled, "Collateral not enabled");
         // ensure user has entered the market
-        require(collateral.accountMembership[msg.sender], "Account not in collateral");
+        if(!collateral.accountMembership[msg.sender]){
+            enterCollateral(_collateral);
+        }
         
         // Transfer of tokens
         // if eth deposit; _collateral should be set address(0)
@@ -188,20 +177,6 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
     }
 
     /**
-     * @dev Enter a pool and issue a synthetic asset
-     * @notice Only to make UX better
-     * @param _tradingPool The address of the trading pool
-     * @param _synth The address of the synthetic asset
-     * @param _amount The amount of synthetic asset to issue
-     */
-    function enterAndIssue(address _tradingPool, address _synth, uint _amount) virtual override public {
-        // enter the trading pool
-        enterPool(_tradingPool);
-        // issue the synth from trading pool
-        issue(_tradingPool, _synth, _amount);
-    }
-
-    /**
      * @dev Issue a synthetic asset
      * @param _tradingPool The address of the trading pool
      * @param _synth The address of the synthetic asset
@@ -213,7 +188,9 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         // ensure the pool is enabled
         require(pool.isEnabled, "Trading pool not enabled");
         // ensure the account is in the pool
-        require(pool.accountMembership[msg.sender], "Account not in trading pool");
+        if(!pool.accountMembership[msg.sender]){
+            enterPool(_tradingPool);
+        }
         // ensure the synth to issue is enabled from the trading pool
         require(SyntheXPool(_tradingPool).synths(_synth), "Synth not enabled");
         
@@ -257,7 +234,6 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         // amount in USD for debt calculation
         uint amountUSD = _amount.mul(price.price).div(10**price.decimals);
 
-        // TODO test below logic
         uint burnablePerc = getUserPoolDebtUSD(msg.sender, _tradingPool).min(amountUSD).mul(1e18).div(amountUSD);
         SyntheXPool(_tradingPool).burn(msg.sender, amountUSD.mul(burnablePerc).div(1e18));
         SyntheXPool(_tradingPool).burnSynth(_synth, msg.sender, _amount.mul(burnablePerc).div(1e18));

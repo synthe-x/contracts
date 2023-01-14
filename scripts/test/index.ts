@@ -22,9 +22,14 @@ export default async function main(deployerAddress: string) {
 	const syn = await SYN.deploy();
 	await syn.deployed();
 
+	// deploy Sealed SYN
+	const SealedSYN = await ethers.getContractFactory("SealedSYN");
+	const sealedSYN = await SealedSYN.deploy();
+	await sealedSYN.deployed();	
+
     // deploy synthex
     const SyntheX = await ethers.getContractFactory("SyntheX");
-    const synthex = await upgrades.deployProxy(SyntheX, [syn.address, addressManager.address], {type: 'uups'});
+    const synthex = await upgrades.deployProxy(SyntheX, [sealedSYN.address, addressManager.address], {type: 'uups'});
     await synthex.deployed();
 
 	await addressManager.setAddress(SYNTHEX, synthex.address);
@@ -44,11 +49,19 @@ export default async function main(deployerAddress: string) {
 	);
 	await pool.deployed();
 
+	// deploy staking rewards
+	// SYN on staking sSYN
+	const StakingRewards = await ethers.getContractFactory("StakingRewards");
+	const stakingRewards = await upgrades.deployProxy(StakingRewards, [syn.address, sealedSYN.address], {
+		initializer: 'initialize(address,address)',
+		type: 'uups'
+	});
+
 	await synthex.enableTradingPool(
 		pool.address,
 		ethers.utils.parseEther("0.9")
 	);
-	await syn.mint(synthex.address, ethers.utils.parseEther("100000000"));
+	await sealedSYN.mint(synthex.address, ethers.utils.parseEther("100000000"));
 	await synthex.setPoolSpeed(pool.address, ethers.utils.parseEther("0.1"));
 
 	const ERC20X = await ethers.getContractFactory("ERC20X");
@@ -84,5 +97,5 @@ export default async function main(deployerAddress: string) {
 	await oracle.setFeed(seth.address, ethPriceFeed.address);
 	await pool.enableSynth(seth.address);
 
-	return { syn, synthex, oracle, ethPriceFeed, sbtcPriceFeed, pool, susd, sbtc, seth, vault, addressManager };
+	return { syn, synthex, oracle, ethPriceFeed, sbtcPriceFeed, pool, susd, sbtc, seth, vault, addressManager, stakingRewards, sealedSYN };
 }

@@ -35,16 +35,16 @@ describe("Testing Fee", function () {
 
 
 	it("Should deposit eth", async function () {
-		await synthex.connect(user1).enterAndDeposit(ETH_ADDRESS, ethers.utils.parseEther("50"), {value: ethers.utils.parseEther("50")});    // $ 50000
+		await synthex.connect(user1).deposit(ETH_ADDRESS, ethers.utils.parseEther("50"), {value: ethers.utils.parseEther("50")});    // $ 50000
 		expect(await synthex.accountCollateralBalance(user1.address, ETH_ADDRESS)).to.equal(ethers.utils.parseEther("50"));
 
-		await synthex.connect(user2).enterAndDeposit(ETH_ADDRESS, ethers.utils.parseEther("50"), {value: ethers.utils.parseEther("50")});    // $ 50000
+		await synthex.connect(user2).deposit(ETH_ADDRESS, ethers.utils.parseEther("50"), {value: ethers.utils.parseEther("50")});    // $ 50000
 		expect(await synthex.accountCollateralBalance(user2.address, ETH_ADDRESS)).to.equal(ethers.utils.parseEther("50"));
 	});
 
     it("user1 issue synths", async function () {
 		// user1 issues 10 seth
-        await synthex.connect(user1).enterAndIssue(cryptoPool.address, seth.address, ethers.utils.parseEther("10")); // $ 10000
+        await synthex.connect(user1).issue(cryptoPool.address, seth.address, ethers.utils.parseEther("10")); // $ 10000
         expect(await synthex.getUserTotalDebtUSD(user1.address)).to.be.equal(ethers.utils.parseEther("10000.00"));
         // After issuing 10 ETH, balance should be 9.9 ETH
         // 10 - 0.1 (1%) fee
@@ -66,7 +66,7 @@ describe("Testing Fee", function () {
 
     it("user2 issue synths", async function () {
 		// user2 issues 10 seth
-        await synthex.connect(user2).enterAndIssue(cryptoPool.address, seth.address, ethers.utils.parseEther("10")); // $ 10000
+        await synthex.connect(user2).issue(cryptoPool.address, seth.address, ethers.utils.parseEther("10")); // $ 10000
         expect(await synthex.getUserTotalDebtUSD(user2.address)).to.be.equal(ethers.utils.parseEther("10000.00"));
         // After issuing 10 ETH, balance should be 9.99 ETH
         // 10 - 0.01 (0.1%) fee

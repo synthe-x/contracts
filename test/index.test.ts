@@ -23,9 +23,9 @@ describe("SyntheX", function () {
 	});
 
 	it("Should stake eth", async function () {
-		await synthex.connect(user1).enterAndDeposit(ETH_ADDRESS, ethers.utils.parseEther("20"), {value: ethers.utils.parseEther("20").toString()});    // $ 20000
-		await synthex.connect(user2).enterAndDeposit(ETH_ADDRESS, ethers.utils.parseEther("10"), {value: ethers.utils.parseEther("10").toString()});    // $ 10000
-		await synthex.connect(user3).enterAndDeposit(ETH_ADDRESS, ethers.utils.parseEther("200"), {value: ethers.utils.parseEther("200").toString()});   // $ 100000
+		await synthex.connect(user1).deposit(ETH_ADDRESS, ethers.utils.parseEther("20"), {value: ethers.utils.parseEther("20").toString()});    // $ 20000
+		await synthex.connect(user2).deposit(ETH_ADDRESS, ethers.utils.parseEther("10"), {value: ethers.utils.parseEther("10").toString()});    // $ 10000
+		await synthex.connect(user3).deposit(ETH_ADDRESS, ethers.utils.parseEther("200"), {value: ethers.utils.parseEther("200").toString()});   // $ 100000
 
 		expect(await synthex.healthFactor(user1.address)).to.equal(ethers.constants.MaxUint256);
 		expect(await synthex.healthFactor(user2.address)).to.equal(ethers.constants.MaxUint256);
@@ -34,9 +34,9 @@ describe("SyntheX", function () {
 
 	it("issue synths", async function () {
 		// user1 issues 10 seth
-        await synthex.connect(user1).enterAndIssue(cryptoPool.address, seth.address, ethers.utils.parseEther("10")); // $ 10000
+        await synthex.connect(user1).issue(cryptoPool.address, seth.address, ethers.utils.parseEther("10")); // $ 10000
         // user3 issues 100000 susd
-        await synthex.connect(user3).enterAndIssue(cryptoPool.address, susd.address, ethers.utils.parseEther("90000")); // $ 90000
+        await synthex.connect(user3).issue(cryptoPool.address, susd.address, ethers.utils.parseEther("90000")); // $ 90000
 
         expect(await synthex.getUserTotalDebtUSD(user1.address)).to.be.equal(ethers.utils.parseEther("10000.00"));
         expect(await synthex.getUserTotalDebtUSD(user3.address)).to.be.equal(ethers.utils.parseEther("90000.00"));
