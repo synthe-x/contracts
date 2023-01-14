@@ -36,6 +36,22 @@ async function upgrade() {
     };
     deployments.sources['SyntheX_'+config.latest] = SyntheX.interface.format('json');
 
+
+
+   const StakingRewards = await ethers.getContractFactory("StakingRewards");
+   const stakingRewards =  await defender.proposeUpgrade(deployments.contracts['StakingRewards'].address, StakingRewards, {title: `Upgrade to ${config.latest}`, multisig: config.admin});
+	
+    deployments.contracts['StakingRewards'].implementations[config.latest] = {
+        address: proposal.metadata.newImplementationAddress,
+        source: 'StakingRewards_'+config.latest,
+        constructorArguments: [],
+        version: config.latest,
+		block: (await ethers.provider.getBlockNumber()).toString()
+    };
+    deployments.sources['StakingRewards_'+config.latest] = StakingRewards.interface.format('json');
+
+
+
 	fs.writeFileSync(
 		process.cwd() + `/deployments/${hre.network.name}/deployments.json`,
 		JSON.stringify(deployments, null, 2)

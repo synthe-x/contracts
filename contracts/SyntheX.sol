@@ -15,10 +15,12 @@ import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "./utils/Vault.sol";
+import "./interfaces/ISyntheX.sol";
+
 
 /// @custom:security-contact prasad@chainscore.finance
 // TODO: Interfaces
-contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgradeable, SyntheXStorage {
+contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgradeable, SyntheXStorage, ISyntheX {
     using SafeMathUpgradeable for uint256;
     using MathUpgradeable for uint256;
     using SafeERC20Upgradeable for ERC20Upgradeable;
@@ -30,21 +32,6 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
     bytes32 public constant POOL_MANAGER = keccak256("POOL_MANAGER");
     bytes32 public constant PRICE_ORACLE = keccak256("PRICE_ORACLE");
 
-    event CollateralEnabled(address indexed asset, uint256 volatilityRatio);
-    event CollateralDisabled(address indexed asset);
-    event TradingPoolEnabled(address indexed pool, uint256 volatilityRatio);
-    event TradingPoolDisabled(address indexed pool);
-    
-    event Deposit(address indexed user, address indexed asset, uint256 amount);
-    event Withdraw(address indexed user, address indexed asset, uint256 amount);
-    event Issue(address indexed user, address indexed tradingPool, address indexed asset, uint256 amount);
-    event Burn(address indexed user, address indexed tradingPool, address indexed asset, uint256 amount);
-
-    event Exchange(address indexed user, address indexed tradingPool, address indexed fromAsset, address toAsset, uint256 fromAmount, uint256 toAmount);
-
-    event SetPoolRewardSpeed(address indexed pool, uint256 rewardSpeed);
-    event DistributedSYN(address indexed pool, address _account, uint256 accountDelta, uint rewardIndex);
-
     constructor(){}
 
     function initialize(address _syn, address _addressStorage) public initializer {
@@ -54,10 +41,6 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
         syn = SyntheXToken(_syn);
         compInitialIndex = 1e36;
         addressStorage = AddressStorage(_addressStorage);
-    }
-
-    function setSafeCRatio(uint256 _safeCRatio) public onlyAdmin(ADMIN) {
-        safeCRatio = _safeCRatio;
     }
 
     modifier onlyAdmin(bytes32 role) {
@@ -75,7 +58,7 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
      * @dev Enable a pool
      * @param _tradingPool The address of the trading pool
      */
-    function enterPool(address _tradingPool) public {
+    function enterPool(address _tradingPool) virtual override public {
         tradingPools[_tradingPool].accountMembership[msg.sender] = true;
         accountPools[msg.sender].push(_tradingPool);
 
@@ -85,7 +68,7 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
      * @dev Exit a pool
      * @param _tradingPool The address of the trading pool
      */
-    function exitPool(address _tradingPool) public {
+    function exitPool(address _tradingPool) virtual override public {
         tradingPools[_tradingPool].accountMembership[msg.sender] = false;
         // remove from list
         for (uint i = 0; i < accountPools[msg.sender].length; i++) {
@@ -101,7 +84,7 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
      * @dev Enable a collateral
      * @param _collateral The address of the collateral
      */
-    function enterCollateral(address _collateral) public {
+    function enterCollateral(address _collateral) virtual override public {
         collaterals[_collateral].accountMembership[msg.sender] = true;
         accountCollaterals[msg.sender].push(_collateral);
     }
@@ -110,7 +93,7 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
      * @dev Exit a collateral
      * @param _collateral The address of the collateral
      */
-    function exitCollateral(address _collateral) public {
+    function exitCollateral(address _collateral) virtual override public {
         collaterals[_collateral].accountMembership[msg.sender] = false;
         // remove from list
         for (uint i = 0; i < accountCollaterals[msg.sender].length; i++) {
@@ -130,7 +113,7 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
      * @dev if eth deposit, _collateral = address(0)
      * @param _amount The amount of collateral to deposit
      */
-    function enterAndDeposit(address _collateral, uint _amount) public payable {
+    function enterAndDeposit(address _collateral, uint _amount) virtual override public payable {
         enterCollateral(_collateral);
         deposit(_collateral, _amount);
     }
@@ -140,7 +123,7 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
      * @param _collateral The address of the erc20 collateral; for ETH
      * @param _amount The amount of collateral to deposit
      */
-    function deposit(address _collateral, uint _amount) public payable whenNotPaused nonReentrant {
+    function deposit(address _collateral, uint _amount) virtual override public payable whenNotPaused nonReentrant {
         // get collateral market
         Market storage collateral = collaterals[_collateral];
         // ensure collateral is globally enabled
@@ -172,7 +155,7 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
      * @dev if erc20 withdraw; _collateral should be set to asset address
      * @param _amount The amount of collateral to withdraw
      */
-    function withdraw(address _collateral, uint _amount) public whenNotPaused nonReentrant {
+    function withdraw(address _collateral, uint _amount) virtual override public whenNotPaused nonReentrant {
         // check deposit balance
         uint depositBalance = accountCollateralBalance[msg.sender][_collateral];
         // ensure user has enough deposit balance
@@ -202,7 +185,7 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
      * @param _synth The address of the synthetic asset
      * @param _amount The amount of synthetic asset to issue
      */
-    function enterAndIssue(address _tradingPool, address _synth, uint _amount) public {
+    function enterAndIssue(address _tradingPool, address _synth, uint _amount) virtual override public {
         // enter the trading pool
         enterPool(_tradingPool);
         // issue the synth from trading pool
@@ -215,7 +198,7 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
      * @param _synth The address of the synthetic asset
      * @param _amount The amount of synthetic asset to issue
      */
-    function issue(address _tradingPool, address _synth, uint _amount) public whenNotPaused nonReentrant {
+    function issue(address _tradingPool, address _synth, uint _amount) virtual override public whenNotPaused nonReentrant {
         // get trading pool market
         Market storage pool = tradingPools[_tradingPool];
         // ensure the pool is enabled
@@ -253,7 +236,7 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
      * @param _synth The address of the synthetic asset
      * @param _amount The amount of synthetic asset to redeem
      */
-    function burn(address _tradingPool, address _synth, uint _amount) public whenNotPaused nonReentrant {
+    function burn(address _tradingPool, address _synth, uint _amount) virtual override public whenNotPaused nonReentrant {
         // update reward index for the pool
         updateSYNIndex(_tradingPool);
         // distribute pending $syn to user
@@ -280,7 +263,7 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
      * @param _synthTo The address of the synthetic asset to receive
      * @param _amount The amount of synthetic asset to exchange
      */
-    function exchange(address _tradingPool, address _synthFrom, address _synthTo, uint _amount) public whenNotPaused nonReentrant {
+    function exchange(address _tradingPool, address _synthFrom, address _synthTo, uint _amount) virtual override public whenNotPaused nonReentrant {
         // ensure exchange is not to same synth
         require(_synthFrom != _synthTo, "Synths are the same");
         // ensure amount > 0
@@ -307,7 +290,7 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
      * @param _tradingPool The address of the trading pool
      * @param _speed The reward speed
      */
-    function setPoolSpeed(address _tradingPool, uint _speed) public onlyAdmin(POOL_MANAGER) {
+    function setPoolSpeed(address _tradingPool, uint _speed) virtual override public onlyAdmin(POOL_MANAGER) {
         // get pool
         Market storage pool = tradingPools[_tradingPool];
         // ensure pool is enabled
@@ -328,7 +311,7 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
      * @param _inAmount The amount of asset to liquidate
      * @param _outAsset The address of the collateral to receive
      */
-    function liquidate(address _account, address _tradingPool, address _inAsset, uint _inAmount, address _outAsset) external whenNotPaused nonReentrant {
+    function liquidate(address _account, address _tradingPool, address _inAsset, uint _inAmount, address _outAsset) virtual override external whenNotPaused nonReentrant {
         uint _healthFactor = healthFactor(_account);
         // ensure account is below liquidation threshold
         require(_healthFactor < 1e18, "Health factor above 1");
@@ -411,7 +394,7 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
      * @param _tradingPool The address of the trading pool
      * @param _volatilityRatio The volatility ratio of the trading pool
      */
-    function enableTradingPool(address _tradingPool, uint _volatilityRatio) public onlyAdmin(POOL_MANAGER) {
+    function enableTradingPool(address _tradingPool, uint _volatilityRatio) virtual override public onlyAdmin(POOL_MANAGER) {
         Market storage pool = tradingPools[_tradingPool];
         // if already enabled, return
         if(pool.isEnabled){
@@ -432,7 +415,7 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
      * @dev Can be re-enabled
      * @param _tradingPool The address of the trading pool
      */
-    function disableTradingPool(address _tradingPool) public onlyAdmin(POOL_MANAGER) {
+    function disableTradingPool(address _tradingPool) virtual override public onlyAdmin(POOL_MANAGER) {
         if(tradingPools[_tradingPool].isEnabled){
             tradingPools[_tradingPool].isEnabled = false;
             emit TradingPoolDisabled(_tradingPool);
@@ -444,7 +427,7 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
      * @param _collateral The address of the collateral
      * @param _volatilityRatio The volatility ratio of the collateral
      */
-    function enableCollateral(address _collateral, uint _volatilityRatio) public onlyAdmin(ADMIN) {
+    function enableCollateral(address _collateral, uint _volatilityRatio) virtual override public onlyAdmin(ADMIN) {
         Market storage collateral = collaterals[_collateral];
         // if already enabled, return
         if(collateral.isEnabled){
@@ -465,13 +448,16 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
      * @notice Will still be considered for calculation as collateral against debt
      * @param _collateral The address of the collateral
      */
-    function disableCollateral(address _collateral) public onlyAdmin(ADMIN) {
+    function disableCollateral(address _collateral) virtual override public onlyAdmin(ADMIN) {
         if(collaterals[_collateral].isEnabled){
             collaterals[_collateral].isEnabled = false;
             emit CollateralDisabled(_collateral);
         }
     }
 
+    function setSafeCRatio(uint256 _safeCRatio) public virtual override onlyAdmin(ADMIN) {
+        safeCRatio = _safeCRatio;
+    }
     /* -------------------------------------------------------------------------- */
     /*                          $SYN Reward Distribution                          */
     /* -------------------------------------------------------------------------- */
@@ -539,7 +525,7 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
      * @param tradingPoolsList The list of markets to claim SYN in
      * @dev We're taking a list of markets as input instead of a storing a list of them in contract
      */
-    function claimSYN(address holder, address[] memory tradingPoolsList) public {
+    function claimSYN(address holder, address[] memory tradingPoolsList) virtual override public {
         address[] memory holders = new address[](1);
         holders[0] = holder;
         claimSYN(holders, tradingPoolsList);
@@ -550,7 +536,7 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
      * @param holders The addresses to claim COMP for
      * @param _tradingPools The list of markets to claim COMP in
      */
-    function claimSYN(address[] memory holders, address[] memory _tradingPools) public {
+    function claimSYN(address[] memory holders, address[] memory _tradingPools) virtual override public {
         // Iterate through all holders and trading pools
         for (uint i = 0; i < _tradingPools.length; i++) {
             address pool = _tradingPools[i];
@@ -586,7 +572,7 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
      * @dev Get total $SYN accrued by an account
      * @dev Only for getting dynamic reward amount in frontend. To be statically called
      */
-    function getSYNAccrued(address _account, address[] memory tradingPoolsList) public returns(uint){
+    function getSYNAccrued(address _account, address[] memory tradingPoolsList) virtual override public returns(uint){
         // Iterate over all the trading pools and update the reward index and account's reward amount
         for (uint i = 0; i < tradingPoolsList.length; i++) {
             SyntheXPool pool = SyntheXPool(tradingPoolsList[i]);
@@ -605,7 +591,7 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
     /**
      * @dev Returns if the collateral is enabled for an account
      */
-    function collateralMembership(address market, address account) public view returns(bool){
+    function collateralMembership(address market, address account) virtual override public view returns(bool){
         // reading the mapping accountMembership from struct collateral
         return collaterals[market].accountMembership[account];
     }
@@ -613,7 +599,7 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
     /**
      * @dev Returns if the trading pool is enabled for an account.
      */
-    function tradingPoolMembership(address market, address account) public view returns(bool){
+    function tradingPoolMembership(address market, address account) virtual override public view returns(bool){
         // reading the mapping accountMembership from struct tradingPool
         return tradingPools[market].accountMembership[account];
     }
@@ -626,7 +612,7 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
      * @param _account The address of the account.
      * @return The health factor of the account.
      */
-    function healthFactor(address _account) public view returns(uint) {
+    function healthFactor(address _account) virtual override public view returns(uint) {
         // Total adjusted collateral in USD
         uint totalCollateral = getAdjustedUserTotalCollateralUSD(_account);
         // Total adjusted debt in USD
@@ -643,7 +629,7 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
      * @param _account The address of the account
      * @return The health factor of the account
      */
-    function getLTV(address _account) public view returns(uint) {
+    function getLTV(address _account) virtual override public view returns(uint) {
         // Total collateral in USD
         uint totalCollateral = getUserTotalCollateralUSD(_account);
         // Total debt in USD
@@ -659,7 +645,7 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
      * @param _account The address of the account
      * @return The total collateral of the account
      */
-    function getUserTotalCollateralUSD(address _account) public view returns(uint) {
+    function getUserTotalCollateralUSD(address _account) virtual override public view returns(uint) {
         // Total collateral in USD
         uint totalCollateral = 0;
 
@@ -684,7 +670,7 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
      * @param _account The address of the account
      * @return The total debt of the account
      */
-    function getAdjustedUserTotalCollateralUSD(address _account) public view returns(uint) {
+    function getAdjustedUserTotalCollateralUSD(address _account) virtual override public view returns(uint) {
         // Total collateral in USD
         uint totalCollateral = 0;
         
@@ -713,7 +699,7 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
      * @param _account The address of the account
      * @return The total debt of the account
      */
-    function getUserTotalDebtUSD(address _account) public view returns(uint) {
+    function getUserTotalDebtUSD(address _account) virtual override public view returns(uint) {
         // Total debt in USD
         uint totalDebt = 0;
         // Read and cache the trading pools the user is in
@@ -731,7 +717,7 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
      * @param _account The address of the account
      * @return The total debt of the account
      */
-    function getAdjustedUserTotalDebtUSD(address _account) public view returns(uint) {
+    function getAdjustedUserTotalDebtUSD(address _account) virtual override public view returns(uint) {
         // Total adjusted debt in USD
         uint adjustedTotalDebt = 0;
         // Read and cache the trading pools the user is in
@@ -754,7 +740,7 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
      * @param _tradingPool The address of the trading pool
      * @return The debt of the account in the trading pool
      */
-    function getUserPoolDebtUSD(address _account, address _tradingPool) public view returns(uint){
+    function getUserPoolDebtUSD(address _account, address _tradingPool) virtual override public view returns(uint){
         // Get the total debt shares (supply) of the trading pool
         uint totalDebtShare = IERC20(_tradingPool).totalSupply();
         // If totalShares == 0, there's no debt
@@ -770,7 +756,7 @@ contract SyntheX is UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgrade
     /**
      * @dev Get price oracle
      */
-    function oracle() public view returns(IPriceOracle){
+    function oracle() virtual override public view returns(IPriceOracle){
         return IPriceOracle(addressStorage.getAddress(PRICE_ORACLE));
     }
 }
