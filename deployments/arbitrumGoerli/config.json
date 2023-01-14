@@ -1,10 +1,10 @@
 {
   "name": "synthex",
-  "version": "0.2.0",
-  "latest": "0.2.2",
+  "version": "0.3.0",
+  "latest": "0.3.0",
   "admin": "0x084cD22eA15E4C262408e561a5AFa8431Bd7fa5d",
-  "pauser": "0x2646306d3191AEE905bf9065bD1B7cC71c9036D0",
   "poolManager": "0x46c18c6d5526E17B34a3deB43e5E9Ba2A659c23a",
+  "safeCRatio": "2",
   "collaterals": [
     {
       "name": "Wrapped Ethereum",
@@ -24,7 +24,7 @@
         {
           "name": "Bitcoin X",
           "symbol": "BTCx",
-          "feed": "0x66765301a65dc76F1eec04494E55d939E23f59Bb"
+          "feed": "0x6550bc2301936011c1334555e62A87705A81C12C"
         },
         {
           "name": "Ethereum X",
@@ -75,7 +75,7 @@
     },
     {
       "name": "US Stocks",
-      "symbol": "USSTO",
+      "symbol": "USST",
       "volatilityRatio": "0.9",
       "rewardSpeed": "1.1",
       "fee": "0.001",

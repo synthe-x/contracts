@@ -1,40 +1,56 @@
 {
   "contracts": {
+    "AddressStorage": {
+      "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      "abi": "AddressStorage",
+      "constructorArguments": [
+        "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+      ],
+      "block": "1"
+    },
+    "Vault": {
+      "address": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
+      "abi": "Vault",
+      "constructorArguments": [
+        "0x084cD22eA15E4C262408e561a5AFa8431Bd7fa5d"
+      ],
+      "block": "2"
+    },
     "SyntheX": {
-      "address": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
+      "address": "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707",
       "source": "SyntheX",
       "constructorArguments": [],
       "implementations": {
-        "0.10.0": {
-          "address": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
-          "source": "SyntheX_0.10.0",
+        "0.15.0": {
+          "address": "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9",
+          "source": "SyntheX_0.15.0",
           "constructorArguments": [],
-          "version": "0.10.0",
-          "block": "3"
+          "version": "0.15.0",
+          "block": "8"
         }
       }
     },
     "PriceOracle": {
-      "address": "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9",
+      "address": "0x8A791620dd6260079BF849Dc5567aDC3F2FdC318",
       "source": "PriceOracle",
       "constructorArguments": []
     },
     "Multicall2": {
-      "address": "0x0165878A594ca255338adfa4d48449f69242Eb8F",
+      "address": "0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e",
       "source": "Multicall2",
       "constructorArguments": []
     },
     "ETH": {
-      "address": "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853",
+      "address": "0x9A676e781A523b5d0C0e43731313A708CB607508",
       "abi": "MockToken",
       "constructorArguments": [
         "Ethereum",
         "ETH"
       ],
-      "block": "8"
+      "block": "15"
     },
     "ETH_PriceFeed": {
-      "address": "0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6",
+      "address": "0x0B306BF915C4d645ff596e518fAf3F9669b97016",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -43,35 +59,36 @@
         },
         8
       ],
-      "block": "9"
+      "block": "16"
     },
     "CRY": {
-      "address": "0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82",
+      "address": "0xc6e7DF5E7b4f2A278906862b61205850344D4e7d",
       "abi": "SyntheXPool",
       "constructorArguments": [],
-      "block": "14",
+      "block": "21",
       "implementations": {
         "undefined": {
-          "address": "0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e",
+          "address": "0x68B1D87F95878fE05B998F19b66F4baba5De1aed",
           "source": "CRY_undefined",
           "constructorArguments": [],
-          "block": "14"
+          "block": "21"
         }
       },
-      "latest": "0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e"
+      "latest": "0x68B1D87F95878fE05B998F19b66F4baba5De1aed"
     },
     "BTCx": {
-      "address": "0x9A9f2CCfdE556A7E9Ff0848998Aa4a0CFD8863AE",
+      "address": "0xa85233C63b9Ee964Add6F2cffe00Fd84eb32338f",
       "abi": "ERC20X",
       "constructorArguments": [
         "Bitcoin X",
         "BTCx",
-        "0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82"
+        "0xc6e7DF5E7b4f2A278906862b61205850344D4e7d",
+        "0x5FbDB2315678afecb367f032d93F642f64180aa3"
       ],
-      "block": "18"
+      "block": "25"
     },
     "BTCx_PriceFeed": {
-      "address": "0x68B1D87F95878fE05B998F19b66F4baba5De1aed",
+      "address": "0x4A679253410272dd5232B3Ff7cF5dbB88f295319",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -80,20 +97,21 @@
         },
         8
       ],
-      "block": "19"
+      "block": "26"
     },
     "ETHx": {
-      "address": "0x59b670e9fA9D0A427751Af201D676719a970857b",
+      "address": "0xc5a5C42992dECbae36851359345FE25997F5C42d",
       "abi": "ERC20X",
       "constructorArguments": [
         "Ethereum X",
         "ETHx",
-        "0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82"
+        "0xc6e7DF5E7b4f2A278906862b61205850344D4e7d",
+        "0x5FbDB2315678afecb367f032d93F642f64180aa3"
       ],
-      "block": "22"
+      "block": "29"
     },
     "ETHx_PriceFeed": {
-      "address": "0x4ed7c70F96B99c776995fB64377f0d4aB3B0e1C1",
+      "address": "0x67d269191c92Caf3cD7723F116c85e6E9bf55933",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -102,20 +120,21 @@
         },
         8
       ],
-      "block": "23"
+      "block": "30"
     },
     "BNBx": {
-      "address": "0x4A679253410272dd5232B3Ff7cF5dbB88f295319",
+      "address": "0x84eA74d481Ee0A5332c457a4d796187F6Ba67fEB",
       "abi": "ERC20X",
       "constructorArguments": [
         "Binance Coin X",
         "BNBx",
-        "0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82"
+        "0xc6e7DF5E7b4f2A278906862b61205850344D4e7d",
+        "0x5FbDB2315678afecb367f032d93F642f64180aa3"
       ],
-      "block": "26"
+      "block": "33"
     },
     "BNBx_PriceFeed": {
-      "address": "0x7a2088a1bFc9d81c55368AE168C2C02570cB814F",
+      "address": "0x9E545E3C0baAB3E08CdfD552C960A1050f373042",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -124,20 +143,21 @@
         },
         8
       ],
-      "block": "27"
+      "block": "34"
     },
     "USDcx": {
-      "address": "0x67d269191c92Caf3cD7723F116c85e6E9bf55933",
+      "address": "0x851356ae760d987E095750cCeb3bC6014560891C",
       "abi": "ERC20X",
       "constructorArguments": [
         "US Dollar CX",
         "USDcx",
-        "0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82"
+        "0xc6e7DF5E7b4f2A278906862b61205850344D4e7d",
+        "0x5FbDB2315678afecb367f032d93F642f64180aa3"
       ],
-      "block": "30"
+      "block": "37"
     },
     "USDcx_PriceFeed": {
-      "address": "0xE6E340D132b5f46d1e472DebcD681B2aBc16e57E",
+      "address": "0xf5059a5D33d5853360D16C683c16e67980206f36",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -146,20 +166,21 @@
         },
         8
       ],
-      "block": "31"
+      "block": "38"
     },
     "ADAx": {
-      "address": "0x9E545E3C0baAB3E08CdfD552C960A1050f373042",
+      "address": "0x70e0bA845a1A0F2DA3359C97E0285013525FFC49",
       "abi": "ERC20X",
       "constructorArguments": [
         "Cardano X",
         "ADAx",
-        "0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82"
+        "0xc6e7DF5E7b4f2A278906862b61205850344D4e7d",
+        "0x5FbDB2315678afecb367f032d93F642f64180aa3"
       ],
-      "block": "34"
+      "block": "41"
     },
     "ADAx_PriceFeed": {
-      "address": "0xa82fF9aFd8f496c3d6ac40E2a0F282E47488CFc9",
+      "address": "0x4826533B4897376654Bb4d4AD88B7faFD0C98528",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -168,20 +189,21 @@
         },
         8
       ],
-      "block": "35"
+      "block": "42"
     },
     "AAVEx": {
-      "address": "0xf5059a5D33d5853360D16C683c16e67980206f36",
+      "address": "0x8f86403A4DE0BB5791fa46B8e795C547942fE4Cf",
       "abi": "ERC20X",
       "constructorArguments": [
         "Aave X",
         "AAVEx",
-        "0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82"
+        "0xc6e7DF5E7b4f2A278906862b61205850344D4e7d",
+        "0x5FbDB2315678afecb367f032d93F642f64180aa3"
       ],
-      "block": "38"
+      "block": "45"
     },
     "AAVEx_PriceFeed": {
-      "address": "0x95401dc811bb5740090279Ba06cfA8fcF6113778",
+      "address": "0x9d4454B023096f34B160D6B654540c56A1F81688",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -190,20 +212,21 @@
         },
         8
       ],
-      "block": "39"
+      "block": "46"
     },
     "LINKx": {
-      "address": "0x4826533B4897376654Bb4d4AD88B7faFD0C98528",
+      "address": "0x809d550fca64d94Bd9F66E60752A544199cfAC3D",
       "abi": "ERC20X",
       "constructorArguments": [
         "Chainlink X",
         "LINKx",
-        "0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82"
+        "0xc6e7DF5E7b4f2A278906862b61205850344D4e7d",
+        "0x5FbDB2315678afecb367f032d93F642f64180aa3"
       ],
-      "block": "42"
+      "block": "49"
     },
     "LINKx_PriceFeed": {
-      "address": "0x99bbA657f2BbC93c02D617f8bA121cB8Fc104Acf",
+      "address": "0x4c5859f0F772848b2D91F1D83E2Fe57935348029",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -212,20 +235,21 @@
         },
         8
       ],
-      "block": "43"
+      "block": "50"
     },
     "UNIx": {
-      "address": "0x9d4454B023096f34B160D6B654540c56A1F81688",
+      "address": "0xb7278A61aa25c888815aFC32Ad3cC52fF24fE575",
       "abi": "ERC20X",
       "constructorArguments": [
         "Uniswap X",
         "UNIx",
-        "0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82"
+        "0xc6e7DF5E7b4f2A278906862b61205850344D4e7d",
+        "0x5FbDB2315678afecb367f032d93F642f64180aa3"
       ],
-      "block": "46"
+      "block": "53"
     },
     "UNIx_PriceFeed": {
-      "address": "0x5eb3Bc0a489C5A8288765d2336659EbCA68FCd00",
+      "address": "0xCD8a1C3ba11CF5ECfa6267617243239504a98d90",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -234,20 +258,21 @@
         },
         8
       ],
-      "block": "47"
+      "block": "54"
     },
     "DOGEx": {
-      "address": "0x4c5859f0F772848b2D91F1D83E2Fe57935348029",
+      "address": "0x7969c5eD335650692Bc04293B07F5BF2e7A673C0",
       "abi": "ERC20X",
       "constructorArguments": [
         "Dogecoin X",
         "DOGEx",
-        "0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82"
+        "0xc6e7DF5E7b4f2A278906862b61205850344D4e7d",
+        "0x5FbDB2315678afecb367f032d93F642f64180aa3"
       ],
-      "block": "50"
+      "block": "57"
     },
     "DOGEx_PriceFeed": {
-      "address": "0x1291Be112d480055DaFd8a610b7d1e203891C274",
+      "address": "0x7bc06c482DEAd17c0e297aFbC32f6e63d3846650",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -256,20 +281,21 @@
         },
         8
       ],
-      "block": "51"
+      "block": "58"
     },
     "DOTx": {
-      "address": "0xCD8a1C3ba11CF5ECfa6267617243239504a98d90",
+      "address": "0xcbEAF3BDe82155F56486Fb5a1072cb8baAf547cc",
       "abi": "ERC20X",
       "constructorArguments": [
         "Polkadot X",
         "DOTx",
-        "0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82"
+        "0xc6e7DF5E7b4f2A278906862b61205850344D4e7d",
+        "0x5FbDB2315678afecb367f032d93F642f64180aa3"
       ],
-      "block": "54"
+      "block": "61"
     },
     "DOTx_PriceFeed": {
-      "address": "0x82e01223d51Eb87e16A03E24687EDF0F294da6f1",
+      "address": "0x1429859428C0aBc9C2C47C8Ee9FBaf82cFA0F20f",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -278,35 +304,36 @@
         },
         8
       ],
-      "block": "55"
+      "block": "62"
     },
     "STK": {
-      "address": "0x7bc06c482DEAd17c0e297aFbC32f6e63d3846650",
+      "address": "0x922D6956C99E12DFeB3224DEA977D0939758A1Fe",
       "abi": "SyntheXPool",
       "constructorArguments": [],
-      "block": "58",
+      "block": "65",
       "implementations": {
         "undefined": {
-          "address": "0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e",
+          "address": "0x68B1D87F95878fE05B998F19b66F4baba5De1aed",
           "source": "STK_undefined",
           "constructorArguments": [],
-          "block": "58"
+          "block": "65"
         }
       },
-      "latest": "0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e"
+      "latest": "0x68B1D87F95878fE05B998F19b66F4baba5De1aed"
     },
     "AAPLx": {
-      "address": "0x1429859428C0aBc9C2C47C8Ee9FBaf82cFA0F20f",
+      "address": "0x04C89607413713Ec9775E14b954286519d836FEf",
       "abi": "ERC20X",
       "constructorArguments": [
         "Apple X",
         "AAPLx",
-        "0x7bc06c482DEAd17c0e297aFbC32f6e63d3846650"
+        "0x922D6956C99E12DFeB3224DEA977D0939758A1Fe",
+        "0x5FbDB2315678afecb367f032d93F642f64180aa3"
       ],
-      "block": "62"
+      "block": "69"
     },
     "AAPLx_PriceFeed": {
-      "address": "0xB0D4afd8879eD9F52b28595d31B441D079B2Ca07",
+      "address": "0x4C4a2f8c81640e47606d3fd77B353E87Ba015584",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -315,20 +342,21 @@
         },
         8
       ],
-      "block": "63"
+      "block": "70"
     },
     "TSLAx": {
-      "address": "0x5081a39b8A5f0E35a8D959395a630b68B74Dd30f",
+      "address": "0xD8a5a9b31c3C0232E196d518E89Fd8bF83AcAd43",
       "abi": "ERC20X",
       "constructorArguments": [
         "Tesla X",
         "TSLAx",
-        "0x7bc06c482DEAd17c0e297aFbC32f6e63d3846650"
+        "0x922D6956C99E12DFeB3224DEA977D0939758A1Fe",
+        "0x5FbDB2315678afecb367f032d93F642f64180aa3"
       ],
-      "block": "66"
+      "block": "73"
     },
     "TSLAx_PriceFeed": {
-      "address": "0x1fA02b2d6A771842690194Cf62D91bdd92BfE28d",
+      "address": "0xDC11f7E700A4c898AE5CAddB1082cFfa76512aDD",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -337,20 +365,21 @@
         },
         8
       ],
-      "block": "67"
+      "block": "74"
     },
     "AMZNx": {
-      "address": "0x4C4a2f8c81640e47606d3fd77B353E87Ba015584",
+      "address": "0x8198f5d8F8CfFE8f9C413d98a0A55aEB8ab9FbB7",
       "abi": "ERC20X",
       "constructorArguments": [
         "Amazon X",
         "AMZNx",
-        "0x7bc06c482DEAd17c0e297aFbC32f6e63d3846650"
+        "0x922D6956C99E12DFeB3224DEA977D0939758A1Fe",
+        "0x5FbDB2315678afecb367f032d93F642f64180aa3"
       ],
-      "block": "70"
+      "block": "77"
     },
     "AMZNx_PriceFeed": {
-      "address": "0x21dF544947ba3E8b3c32561399E88B52Dc8b2823",
+      "address": "0x0355B7B8cb128fA5692729Ab3AAa199C1753f726",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -359,20 +388,21 @@
         },
         8
       ],
-      "block": "71"
+      "block": "78"
     },
     "FBx": {
-      "address": "0xDC11f7E700A4c898AE5CAddB1082cFfa76512aDD",
+      "address": "0x172076E0166D1F9Cc711C77Adf8488051744980C",
       "abi": "ERC20X",
       "constructorArguments": [
         "Facebook X",
         "FBx",
-        "0x7bc06c482DEAd17c0e297aFbC32f6e63d3846650"
+        "0x922D6956C99E12DFeB3224DEA977D0939758A1Fe",
+        "0x5FbDB2315678afecb367f032d93F642f64180aa3"
       ],
-      "block": "74"
+      "block": "81"
     },
     "FBx_PriceFeed": {
-      "address": "0x51A1ceB83B83F1985a81C295d1fF28Afef186E02",
+      "address": "0x4EE6eCAD1c2Dae9f525404De8555724e3c35d07B",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -381,20 +411,21 @@
         },
         8
       ],
-      "block": "75"
+      "block": "82"
     },
     "MSFTx": {
-      "address": "0x0355B7B8cb128fA5692729Ab3AAa199C1753f726",
+      "address": "0x2B0d36FACD61B71CC05ab8F3D2355ec3631C0dd5",
       "abi": "ERC20X",
       "constructorArguments": [
         "Microsoft X",
         "MSFTx",
-        "0x7bc06c482DEAd17c0e297aFbC32f6e63d3846650"
+        "0x922D6956C99E12DFeB3224DEA977D0939758A1Fe",
+        "0x5FbDB2315678afecb367f032d93F642f64180aa3"
       ],
-      "block": "78"
+      "block": "85"
     },
     "MSFTx_PriceFeed": {
-      "address": "0x202CCe504e04bEd6fC0521238dDf04Bc9E8E15aB",
+      "address": "0xfbC22278A96299D91d41C453234d97b4F5Eb9B2d",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -403,20 +434,21 @@
         },
         8
       ],
-      "block": "79"
+      "block": "86"
     },
     "^GSPCx": {
-      "address": "0x4EE6eCAD1c2Dae9f525404De8555724e3c35d07B",
+      "address": "0x1c85638e118b37167e9298c2268758e058DdfDA0",
       "abi": "ERC20X",
       "constructorArguments": [
         "S&P 500 X",
         "^GSPCx",
-        "0x7bc06c482DEAd17c0e297aFbC32f6e63d3846650"
+        "0x922D6956C99E12DFeB3224DEA977D0939758A1Fe",
+        "0x5FbDB2315678afecb367f032d93F642f64180aa3"
       ],
-      "block": "82"
+      "block": "89"
     },
     "^GSPCx_PriceFeed": {
-      "address": "0xBEc49fA140aCaA83533fB00A2BB19bDdd0290f25",
+      "address": "0x367761085BF3C12e5DA2Df99AC6E1a824612b8fb",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -425,20 +457,21 @@
         },
         8
       ],
-      "block": "83"
+      "block": "90"
     },
     "NFLXx": {
-      "address": "0xfbC22278A96299D91d41C453234d97b4F5Eb9B2d",
+      "address": "0x49fd2BE640DB2910c2fAb69bB8531Ab6E76127ff",
       "abi": "ERC20X",
       "constructorArguments": [
         "Netflix X",
         "NFLXx",
-        "0x7bc06c482DEAd17c0e297aFbC32f6e63d3846650"
+        "0x922D6956C99E12DFeB3224DEA977D0939758A1Fe",
+        "0x5FbDB2315678afecb367f032d93F642f64180aa3"
       ],
-      "block": "86"
+      "block": "93"
     },
     "NFLXx_PriceFeed": {
-      "address": "0x46b142DD1E924FAb83eCc3c08e4D46E82f005e0E",
+      "address": "0x4631BCAbD6dF18D94796344963cB60d44a4136b6",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -447,20 +480,21 @@
         },
         8
       ],
-      "block": "87"
+      "block": "94"
     },
     "GOOGLx": {
-      "address": "0x367761085BF3C12e5DA2Df99AC6E1a824612b8fb",
+      "address": "0xf953b3A269d80e3eB0F2947630Da976B896A8C5b",
       "abi": "ERC20X",
       "constructorArguments": [
         "Alphabet X",
         "GOOGLx",
-        "0x7bc06c482DEAd17c0e297aFbC32f6e63d3846650"
+        "0x922D6956C99E12DFeB3224DEA977D0939758A1Fe",
+        "0x5FbDB2315678afecb367f032d93F642f64180aa3"
       ],
-      "block": "90"
+      "block": "97"
     },
     "GOOGLx_PriceFeed": {
-      "address": "0x4C2F7092C2aE51D986bEFEe378e50BD4dB99C901",
+      "address": "0xAA292E8611aDF267e563f334Ee42320aC96D0463",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -469,20 +503,21 @@
         },
         8
       ],
-      "block": "91"
+      "block": "98"
     },
     "NVDAx": {
-      "address": "0x4631BCAbD6dF18D94796344963cB60d44a4136b6",
+      "address": "0xe8D2A1E88c91DCd5433208d4152Cc4F399a7e91d",
       "abi": "ERC20X",
       "constructorArguments": [
         "Nvidia X",
         "NVDAx",
-        "0x7bc06c482DEAd17c0e297aFbC32f6e63d3846650"
+        "0x922D6956C99E12DFeB3224DEA977D0939758A1Fe",
+        "0x5FbDB2315678afecb367f032d93F642f64180aa3"
       ],
-      "block": "94"
+      "block": "101"
     },
     "NVDAx_PriceFeed": {
-      "address": "0x86A2EE8FAf9A840F7a2c64CA3d51209F9A02081D",
+      "address": "0x5067457698Fd6Fa1C6964e416b3f42713513B3dD",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -491,20 +526,21 @@
         },
         8
       ],
-      "block": "95"
+      "block": "102"
     },
     "AMDx": {
-      "address": "0xAA292E8611aDF267e563f334Ee42320aC96D0463",
+      "address": "0xCace1b78160AE76398F486c8a18044da0d66d86D",
       "abi": "ERC20X",
       "constructorArguments": [
         "AMD X",
         "AMDx",
-        "0x7bc06c482DEAd17c0e297aFbC32f6e63d3846650"
+        "0x922D6956C99E12DFeB3224DEA977D0939758A1Fe",
+        "0x5FbDB2315678afecb367f032d93F642f64180aa3"
       ],
-      "block": "98"
+      "block": "105"
     },
     "AMDx_PriceFeed": {
-      "address": "0x5c74c94173F05dA1720953407cbb920F3DF9f887",
+      "address": "0xD5ac451B0c50B9476107823Af206eD814a2e2580",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -513,20 +549,21 @@
         },
         8
       ],
-      "block": "99"
+      "block": "106"
     },
     "USDsx": {
-      "address": "0x5067457698Fd6Fa1C6964e416b3f42713513B3dD",
+      "address": "0xc96304e3c037f81dA488ed9dEa1D8F2a48278a75",
       "abi": "ERC20X",
       "constructorArguments": [
         "US Dollar SX",
         "USDsx",
-        "0x7bc06c482DEAd17c0e297aFbC32f6e63d3846650"
+        "0x922D6956C99E12DFeB3224DEA977D0939758A1Fe",
+        "0x5FbDB2315678afecb367f032d93F642f64180aa3"
       ],
-      "block": "102"
+      "block": "109"
     },
     "USDsx_PriceFeed": {
-      "address": "0x18E317A7D70d8fBf8e6E893616b52390EbBdb629",
+      "address": "0x34B40BA116d5Dec75548a9e9A8f15411461E8c70",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -535,35 +572,36 @@
         },
         8
       ],
-      "block": "103"
+      "block": "110"
     },
     "FX": {
-      "address": "0xD5ac451B0c50B9476107823Af206eD814a2e2580",
+      "address": "0x22753E4264FDDc6181dc7cce468904A80a363E44",
       "abi": "SyntheXPool",
       "constructorArguments": [],
-      "block": "106",
+      "block": "113",
       "implementations": {
         "undefined": {
-          "address": "0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e",
+          "address": "0x68B1D87F95878fE05B998F19b66F4baba5De1aed",
           "source": "FX_undefined",
           "constructorArguments": [],
-          "block": "106"
+          "block": "113"
         }
       },
-      "latest": "0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e"
+      "latest": "0x68B1D87F95878fE05B998F19b66F4baba5De1aed"
     },
     "USDfx": {
-      "address": "0x34B40BA116d5Dec75548a9e9A8f15411461E8c70",
+      "address": "0x3347B4d90ebe72BeFb30444C9966B2B990aE9FcB",
       "abi": "ERC20X",
       "constructorArguments": [
         "US Dollar FX",
         "USDfx",
-        "0xD5ac451B0c50B9476107823Af206eD814a2e2580"
+        "0x22753E4264FDDc6181dc7cce468904A80a363E44",
+        "0x5FbDB2315678afecb367f032d93F642f64180aa3"
       ],
-      "block": "110"
+      "block": "117"
     },
     "USDfx_PriceFeed": {
-      "address": "0xD0141E899a65C95a556fE2B27e5982A6DE7fDD7A",
+      "address": "0x3155755b79aA083bd953911C92705B7aA82a18F9",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -572,20 +610,21 @@
         },
         8
       ],
-      "block": "111"
+      "block": "118"
     },
     "EURx": {
-      "address": "0xA7c59f010700930003b33aB25a7a0679C860f29c",
+      "address": "0x3aAde2dCD2Df6a8cAc689EE797591b2913658659",
       "abi": "ERC20X",
       "constructorArguments": [
         "Euro X",
         "EURx",
-        "0xD5ac451B0c50B9476107823Af206eD814a2e2580"
+        "0x22753E4264FDDc6181dc7cce468904A80a363E44",
+        "0x5FbDB2315678afecb367f032d93F642f64180aa3"
       ],
-      "block": "114"
+      "block": "121"
     },
     "EURx_PriceFeed": {
-      "address": "0xfaAddC93baf78e89DCf37bA67943E1bE8F37Bb8c",
+      "address": "0xab16A69A5a8c12C732e0DEFF4BE56A70bb64c926",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -594,20 +633,21 @@
         },
         8
       ],
-      "block": "115"
+      "block": "122"
     },
     "JPYx": {
-      "address": "0x3155755b79aA083bd953911C92705B7aA82a18F9",
+      "address": "0x457cCf29090fe5A24c19c1bc95F492168C0EaFdb",
       "abi": "ERC20X",
       "constructorArguments": [
         "Japanese Yen X",
         "JPYx",
-        "0xD5ac451B0c50B9476107823Af206eD814a2e2580"
+        "0x22753E4264FDDc6181dc7cce468904A80a363E44",
+        "0x5FbDB2315678afecb367f032d93F642f64180aa3"
       ],
-      "block": "118"
+      "block": "125"
     },
     "JPYx_PriceFeed": {
-      "address": "0x5bf5b11053e734690269C6B9D438F8C9d48F528A",
+      "address": "0x525C7063E7C20997BaaE9bDa922159152D0e8417",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -616,20 +656,21 @@
         },
         8
       ],
-      "block": "119"
+      "block": "126"
     },
     "GBPx": {
-      "address": "0xab16A69A5a8c12C732e0DEFF4BE56A70bb64c926",
+      "address": "0xB82008565FdC7e44609fA118A4a681E92581e680",
       "abi": "ERC20X",
       "constructorArguments": [
         "British Pound X",
         "GBPx",
-        "0xD5ac451B0c50B9476107823Af206eD814a2e2580"
+        "0x22753E4264FDDc6181dc7cce468904A80a363E44",
+        "0x5FbDB2315678afecb367f032d93F642f64180aa3"
       ],
-      "block": "122"
+      "block": "129"
     },
     "GBPx_PriceFeed": {
-      "address": "0xE3011A37A904aB90C8881a99BD1F6E21401f1522",
+      "address": "0x2a810409872AfC346F9B5b26571Fd6eC42EA4849",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -638,20 +679,21 @@
         },
         8
       ],
-      "block": "123"
+      "block": "130"
     },
     "CHFx": {
-      "address": "0x525C7063E7C20997BaaE9bDa922159152D0e8417",
+      "address": "0x40918Ba7f132E0aCba2CE4de4c4baF9BD2D7D849",
       "abi": "ERC20X",
       "constructorArguments": [
         "Swiss Franc X",
         "CHFx",
-        "0xD5ac451B0c50B9476107823Af206eD814a2e2580"
+        "0x22753E4264FDDc6181dc7cce468904A80a363E44",
+        "0x5FbDB2315678afecb367f032d93F642f64180aa3"
       ],
-      "block": "126"
+      "block": "133"
     },
     "CHFx_PriceFeed": {
-      "address": "0x38a024C0b412B9d1db8BC398140D00F5Af3093D4",
+      "address": "0xF32D39ff9f6Aa7a7A64d7a4F00a54826Ef791a55",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -660,20 +702,21 @@
         },
         8
       ],
-      "block": "127"
+      "block": "134"
     },
     "CADx": {
-      "address": "0x2a810409872AfC346F9B5b26571Fd6eC42EA4849",
+      "address": "0x6F6f570F45833E249e27022648a26F4076F48f78",
       "abi": "ERC20X",
       "constructorArguments": [
         "Canadian Dollar X",
         "CADx",
-        "0xD5ac451B0c50B9476107823Af206eD814a2e2580"
+        "0x22753E4264FDDc6181dc7cce468904A80a363E44",
+        "0x5FbDB2315678afecb367f032d93F642f64180aa3"
       ],
-      "block": "130"
+      "block": "137"
     },
     "CADx_PriceFeed": {
-      "address": "0xb9bEECD1A582768711dE1EE7B0A1d582D9d72a6C",
+      "address": "0xCA8c8688914e0F7096c920146cd0Ad85cD7Ae8b9",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -682,20 +725,21 @@
         },
         8
       ],
-      "block": "131"
+      "block": "138"
     },
     "AUDx": {
-      "address": "0xF32D39ff9f6Aa7a7A64d7a4F00a54826Ef791a55",
+      "address": "0x976fcd02f7C4773dd89C309fBF55D5923B4c98a1",
       "abi": "ERC20X",
       "constructorArguments": [
         "Australian Dollar X",
         "AUDx",
-        "0xD5ac451B0c50B9476107823Af206eD814a2e2580"
+        "0x22753E4264FDDc6181dc7cce468904A80a363E44",
+        "0x5FbDB2315678afecb367f032d93F642f64180aa3"
       ],
-      "block": "134"
+      "block": "141"
     },
     "AUDx_PriceFeed": {
-      "address": "0xd6e1afe5cA8D00A2EFC01B89997abE2De47fdfAf",
+      "address": "0x19cEcCd6942ad38562Ee10bAfd44776ceB67e923",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -704,20 +748,21 @@
         },
         8
       ],
-      "block": "135"
+      "block": "142"
     },
     "WONx": {
-      "address": "0xCA8c8688914e0F7096c920146cd0Ad85cD7Ae8b9",
+      "address": "0x927b167526bAbB9be047421db732C663a0b77B11",
       "abi": "ERC20X",
       "constructorArguments": [
         "Korean Republic won X",
         "WONx",
-        "0xD5ac451B0c50B9476107823Af206eD814a2e2580"
+        "0x22753E4264FDDc6181dc7cce468904A80a363E44",
+        "0x5FbDB2315678afecb367f032d93F642f64180aa3"
       ],
-      "block": "138"
+      "block": "145"
     },
     "WONx_PriceFeed": {
-      "address": "0xB0f05d25e41FbC2b52013099ED9616f1206Ae21B",
+      "address": "0x32EEce76C2C2e8758584A83Ee2F522D4788feA0f",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -726,20 +771,21 @@
         },
         8
       ],
-      "block": "139"
+      "block": "146"
     },
     "AEDx": {
-      "address": "0x19cEcCd6942ad38562Ee10bAfd44776ceB67e923",
+      "address": "0x638A246F0Ec8883eF68280293FFE8Cfbabe61B44",
       "abi": "ERC20X",
       "constructorArguments": [
         "UAE Dirham X",
         "AEDx",
-        "0xD5ac451B0c50B9476107823Af206eD814a2e2580"
+        "0x22753E4264FDDc6181dc7cce468904A80a363E44",
+        "0x5FbDB2315678afecb367f032d93F642f64180aa3"
       ],
-      "block": "142"
+      "block": "149"
     },
     "AEDx_PriceFeed": {
-      "address": "0xD42912755319665397FF090fBB63B1a31aE87Cee",
+      "address": "0x6C2d83262fF84cBaDb3e416D527403135D757892",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -748,20 +794,21 @@
         },
         8
       ],
-      "block": "143"
+      "block": "150"
     },
     "INRx": {
-      "address": "0x32EEce76C2C2e8758584A83Ee2F522D4788feA0f",
+      "address": "0x5302E909d1e93e30F05B5D6Eea766363D14F9892",
       "abi": "ERC20X",
       "constructorArguments": [
         "Indian Rupee X",
         "INRx",
-        "0xD5ac451B0c50B9476107823Af206eD814a2e2580"
+        "0x22753E4264FDDc6181dc7cce468904A80a363E44",
+        "0x5FbDB2315678afecb367f032d93F642f64180aa3"
       ],
-      "block": "146"
+      "block": "153"
     },
     "INRx_PriceFeed": {
-      "address": "0x01c1DeF3b91672704716159C9041Aeca392DdFfb",
+      "address": "0x0ed64d01D0B4B655E410EF1441dD677B695639E7",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -770,12 +817,162 @@
         },
         8
       ],
-      "block": "147"
+      "block": "154"
     }
   },
   "sources": {
-    "SyntheX": "[{\"type\":\"constructor\",\"payable\":false,\"inputs\":[]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"AdminChanged\",\"inputs\":[{\"type\":\"address\",\"name\":\"previousAdmin\",\"indexed\":false},{\"type\":\"address\",\"name\":\"newAdmin\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"BeaconUpgraded\",\"inputs\":[{\"type\":\"address\",\"name\":\"beacon\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Burn\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"tradingPool\",\"indexed\":true},{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"amount\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"CollateralDisabled\",\"inputs\":[{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"CollateralEnabled\",\"inputs\":[{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"volatilityRatio\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"CollateralRemoved\",\"inputs\":[{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Deposit\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"amount\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"DistributedSYN\",\"inputs\":[{\"type\":\"address\",\"name\":\"pool\",\"indexed\":true},{\"type\":\"address\",\"name\":\"_account\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"accountDelta\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"rewardIndex\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Exchange\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"tradingPool\",\"indexed\":true},{\"type\":\"address\",\"name\":\"fromAsset\",\"indexed\":true},{\"type\":\"address\",\"name\":\"toAsset\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"fromAmount\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"toAmount\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Initialized\",\"inputs\":[{\"type\":\"uint8\",\"name\":\"version\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Issue\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"tradingPool\",\"indexed\":true},{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"amount\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"NewExchangeFee\",\"inputs\":[{\"type\":\"uint256\",\"name\":\"_exchangeFee\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"NewPriceOracle\",\"inputs\":[{\"type\":\"address\",\"name\":\"oracle\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Paused\",\"inputs\":[{\"type\":\"address\",\"name\":\"account\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"RoleAdminChanged\",\"inputs\":[{\"type\":\"bytes32\",\"name\":\"role\",\"indexed\":true},{\"type\":\"bytes32\",\"name\":\"previousAdminRole\",\"indexed\":true},{\"type\":\"bytes32\",\"name\":\"newAdminRole\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"RoleGranted\",\"inputs\":[{\"type\":\"bytes32\",\"name\":\"role\",\"indexed\":true},{\"type\":\"address\",\"name\":\"account\",\"indexed\":true},{\"type\":\"address\",\"name\":\"sender\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"RoleRevoked\",\"inputs\":[{\"type\":\"bytes32\",\"name\":\"role\",\"indexed\":true},{\"type\":\"address\",\"name\":\"account\",\"indexed\":true},{\"type\":\"address\",\"name\":\"sender\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"SetPoolRewardSpeed\",\"inputs\":[{\"type\":\"address\",\"name\":\"pool\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"rewardSpeed\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"TradingPoolDisabled\",\"inputs\":[{\"type\":\"address\",\"name\":\"pool\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"TradingPoolEnabled\",\"inputs\":[{\"type\":\"address\",\"name\":\"pool\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"volatilityRatio\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"TradingPoolRemoved\",\"inputs\":[{\"type\":\"address\",\"name\":\"pool\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Unpaused\",\"inputs\":[{\"type\":\"address\",\"name\":\"account\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Upgraded\",\"inputs\":[{\"type\":\"address\",\"name\":\"implementation\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Withdraw\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"amount\",\"indexed\":false}]},{\"type\":\"function\",\"name\":\"ADMIN_ROLE\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"bytes32\"}]},{\"type\":\"function\",\"name\":\"DEFAULT_ADMIN_ROLE\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"bytes32\"}]},{\"type\":\"function\",\"name\":\"PAUSE_GUARDIAN_ROLE\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"bytes32\"}]},{\"type\":\"function\",\"name\":\"POOL_MANAGER_ROLE\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"bytes32\"}]},{\"type\":\"function\",\"name\":\"accountCollateralBalance\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"},{\"type\":\"address\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"accountCollaterals\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"},{\"type\":\"uint256\"}],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"accountPools\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"},{\"type\":\"uint256\"}],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"burn\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"},{\"type\":\"address\",\"name\":\"_synth\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"claimSYN\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"holder\"},{\"type\":\"address[]\",\"name\":\"cTokens\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"claimSYN\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"holder\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"claimSYN\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address[]\",\"name\":\"holders\"},{\"type\":\"address[]\",\"name\":\"_tradingPools\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"collateralMembership\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"market\"},{\"type\":\"address\",\"name\":\"account\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"collaterals\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"}],\"outputs\":[{\"type\":\"bool\",\"name\":\"isEnabled\"},{\"type\":\"uint256\",\"name\":\"volatilityRatio\"}]},{\"type\":\"function\",\"name\":\"collateralsList\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"uint256\"}],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"compInitialIndex\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"deposit\",\"constant\":false,\"stateMutability\":\"payable\",\"payable\":true,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"disableCollateral\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"disableTradingPool\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"dummy\",\"constant\":true,\"stateMutability\":\"pure\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"enableCollateral\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"},{\"type\":\"uint256\",\"name\":\"_volatilityRatio\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"enableTradingPool\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"},{\"type\":\"uint256\",\"name\":\"_volatilityRatio\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"enterAndDeposit\",\"constant\":false,\"stateMutability\":\"payable\",\"payable\":true,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"enterAndIssue\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"},{\"type\":\"address\",\"name\":\"_synth\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"enterCollateral\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"enterPool\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"exchange\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"},{\"type\":\"address\",\"name\":\"_synthFrom\"},{\"type\":\"address\",\"name\":\"_synthTo\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"exchangeFee\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"exchangeFeeMantissa\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"exitCollateral\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"exitPool\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"getAdjustedUserTotalCollateralUSD\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"getAdjustedUserTotalDebtUSD\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"getLTV\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"getPoolTotalDebtUSD\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"getRoleAdmin\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"bytes32\",\"name\":\"role\"}],\"outputs\":[{\"type\":\"bytes32\"}]},{\"type\":\"function\",\"name\":\"getSYNAccrued\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"getUserPoolDebtUSD\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"},{\"type\":\"address\",\"name\":\"_tradingPool\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"getUserTotalCollateralUSD\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"getUserTotalDebtUSD\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"grantRole\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"bytes32\",\"name\":\"role\"},{\"type\":\"address\",\"name\":\"account\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"hasRole\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"bytes32\",\"name\":\"role\"},{\"type\":\"address\",\"name\":\"account\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"healthFactor\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"initialize\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_syn\"},{\"type\":\"address\",\"name\":\"admin\"},{\"type\":\"address\",\"name\":\"pauser\"},{\"type\":\"address\",\"name\":\"poolManager\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"issue\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"},{\"type\":\"address\",\"name\":\"_synth\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"liquidate\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"},{\"type\":\"address\",\"name\":\"_tradingPool\"},{\"type\":\"address\",\"name\":\"_inAsset\"},{\"type\":\"uint256\",\"name\":\"_inAmount\"},{\"type\":\"address\",\"name\":\"_outAsset\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"oracle\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"pause\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[]},{\"type\":\"function\",\"name\":\"paused\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"proxiableUUID\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"bytes32\"}]},{\"type\":\"function\",\"name\":\"removeCollateral\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"removeTradingPool\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"renounceRole\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"bytes32\",\"name\":\"role\"},{\"type\":\"address\",\"name\":\"account\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"revokeRole\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"bytes32\",\"name\":\"role\"},{\"type\":\"address\",\"name\":\"account\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"safeCRatio\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"setExchangeFee\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"uint256\",\"name\":\"_exchangeFee\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"setOracle\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_oracle\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"setPoolSpeed\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"},{\"type\":\"uint256\",\"name\":\"_speed\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"supportsInterface\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"bytes4\",\"name\":\"interfaceId\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"syn\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"synAccrued\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"synBorrowerIndex\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"},{\"type\":\"address\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"synRewardSpeeds\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"synRewardState\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"}],\"outputs\":[{\"type\":\"uint224\",\"name\":\"index\"},{\"type\":\"uint32\",\"name\":\"timestamp\"}]},{\"type\":\"function\",\"name\":\"tradingPoolMembership\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"market\"},{\"type\":\"address\",\"name\":\"account\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"tradingPools\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"}],\"outputs\":[{\"type\":\"bool\",\"name\":\"isEnabled\"},{\"type\":\"uint256\",\"name\":\"volatilityRatio\"}]},{\"type\":\"function\",\"name\":\"tradingPoolsList\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"uint256\"}],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"unpause\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[]},{\"type\":\"function\",\"name\":\"upgradeTo\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"newImplementation\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"upgradeToAndCall\",\"constant\":false,\"stateMutability\":\"payable\",\"payable\":true,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"newImplementation\"},{\"type\":\"bytes\",\"name\":\"data\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"withdraw\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]}]",
-    "SyntheX_0.10.0": "[{\"type\":\"constructor\",\"payable\":false,\"inputs\":[]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"AdminChanged\",\"inputs\":[{\"type\":\"address\",\"name\":\"previousAdmin\",\"indexed\":false},{\"type\":\"address\",\"name\":\"newAdmin\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"BeaconUpgraded\",\"inputs\":[{\"type\":\"address\",\"name\":\"beacon\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Burn\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"tradingPool\",\"indexed\":true},{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"amount\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"CollateralDisabled\",\"inputs\":[{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"CollateralEnabled\",\"inputs\":[{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"volatilityRatio\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"CollateralRemoved\",\"inputs\":[{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Deposit\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"amount\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"DistributedSYN\",\"inputs\":[{\"type\":\"address\",\"name\":\"pool\",\"indexed\":true},{\"type\":\"address\",\"name\":\"_account\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"accountDelta\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"rewardIndex\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Exchange\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"tradingPool\",\"indexed\":true},{\"type\":\"address\",\"name\":\"fromAsset\",\"indexed\":true},{\"type\":\"address\",\"name\":\"toAsset\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"fromAmount\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"toAmount\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Initialized\",\"inputs\":[{\"type\":\"uint8\",\"name\":\"version\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Issue\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"tradingPool\",\"indexed\":true},{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"amount\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"NewExchangeFee\",\"inputs\":[{\"type\":\"uint256\",\"name\":\"_exchangeFee\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"NewPriceOracle\",\"inputs\":[{\"type\":\"address\",\"name\":\"oracle\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Paused\",\"inputs\":[{\"type\":\"address\",\"name\":\"account\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"RoleAdminChanged\",\"inputs\":[{\"type\":\"bytes32\",\"name\":\"role\",\"indexed\":true},{\"type\":\"bytes32\",\"name\":\"previousAdminRole\",\"indexed\":true},{\"type\":\"bytes32\",\"name\":\"newAdminRole\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"RoleGranted\",\"inputs\":[{\"type\":\"bytes32\",\"name\":\"role\",\"indexed\":true},{\"type\":\"address\",\"name\":\"account\",\"indexed\":true},{\"type\":\"address\",\"name\":\"sender\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"RoleRevoked\",\"inputs\":[{\"type\":\"bytes32\",\"name\":\"role\",\"indexed\":true},{\"type\":\"address\",\"name\":\"account\",\"indexed\":true},{\"type\":\"address\",\"name\":\"sender\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"SetPoolRewardSpeed\",\"inputs\":[{\"type\":\"address\",\"name\":\"pool\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"rewardSpeed\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"TradingPoolDisabled\",\"inputs\":[{\"type\":\"address\",\"name\":\"pool\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"TradingPoolEnabled\",\"inputs\":[{\"type\":\"address\",\"name\":\"pool\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"volatilityRatio\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"TradingPoolRemoved\",\"inputs\":[{\"type\":\"address\",\"name\":\"pool\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Unpaused\",\"inputs\":[{\"type\":\"address\",\"name\":\"account\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Upgraded\",\"inputs\":[{\"type\":\"address\",\"name\":\"implementation\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Withdraw\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"amount\",\"indexed\":false}]},{\"type\":\"function\",\"name\":\"ADMIN_ROLE\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"bytes32\"}]},{\"type\":\"function\",\"name\":\"DEFAULT_ADMIN_ROLE\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"bytes32\"}]},{\"type\":\"function\",\"name\":\"PAUSE_GUARDIAN_ROLE\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"bytes32\"}]},{\"type\":\"function\",\"name\":\"POOL_MANAGER_ROLE\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"bytes32\"}]},{\"type\":\"function\",\"name\":\"accountCollateralBalance\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"},{\"type\":\"address\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"accountCollaterals\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"},{\"type\":\"uint256\"}],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"accountPools\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"},{\"type\":\"uint256\"}],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"burn\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"},{\"type\":\"address\",\"name\":\"_synth\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"claimSYN\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"holder\"},{\"type\":\"address[]\",\"name\":\"cTokens\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"claimSYN\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"holder\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"claimSYN\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address[]\",\"name\":\"holders\"},{\"type\":\"address[]\",\"name\":\"_tradingPools\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"collateralMembership\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"market\"},{\"type\":\"address\",\"name\":\"account\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"collaterals\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"}],\"outputs\":[{\"type\":\"bool\",\"name\":\"isEnabled\"},{\"type\":\"uint256\",\"name\":\"volatilityRatio\"}]},{\"type\":\"function\",\"name\":\"collateralsList\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"uint256\"}],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"compInitialIndex\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"deposit\",\"constant\":false,\"stateMutability\":\"payable\",\"payable\":true,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"disableCollateral\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"disableTradingPool\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"dummy\",\"constant\":true,\"stateMutability\":\"pure\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"enableCollateral\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"},{\"type\":\"uint256\",\"name\":\"_volatilityRatio\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"enableTradingPool\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"},{\"type\":\"uint256\",\"name\":\"_volatilityRatio\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"enterAndDeposit\",\"constant\":false,\"stateMutability\":\"payable\",\"payable\":true,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"enterAndIssue\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"},{\"type\":\"address\",\"name\":\"_synth\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"enterCollateral\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"enterPool\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"exchange\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"},{\"type\":\"address\",\"name\":\"_synthFrom\"},{\"type\":\"address\",\"name\":\"_synthTo\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"exchangeFee\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"exchangeFeeMantissa\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"exitCollateral\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"exitPool\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"getAdjustedUserTotalCollateralUSD\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"getAdjustedUserTotalDebtUSD\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"getLTV\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"getPoolTotalDebtUSD\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"getRoleAdmin\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"bytes32\",\"name\":\"role\"}],\"outputs\":[{\"type\":\"bytes32\"}]},{\"type\":\"function\",\"name\":\"getSYNAccrued\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"getUserPoolDebtUSD\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"},{\"type\":\"address\",\"name\":\"_tradingPool\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"getUserTotalCollateralUSD\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"getUserTotalDebtUSD\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"grantRole\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"bytes32\",\"name\":\"role\"},{\"type\":\"address\",\"name\":\"account\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"hasRole\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"bytes32\",\"name\":\"role\"},{\"type\":\"address\",\"name\":\"account\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"healthFactor\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"initialize\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_syn\"},{\"type\":\"address\",\"name\":\"admin\"},{\"type\":\"address\",\"name\":\"pauser\"},{\"type\":\"address\",\"name\":\"poolManager\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"issue\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"},{\"type\":\"address\",\"name\":\"_synth\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"liquidate\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"},{\"type\":\"address\",\"name\":\"_tradingPool\"},{\"type\":\"address\",\"name\":\"_inAsset\"},{\"type\":\"uint256\",\"name\":\"_inAmount\"},{\"type\":\"address\",\"name\":\"_outAsset\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"oracle\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"pause\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[]},{\"type\":\"function\",\"name\":\"paused\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"proxiableUUID\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"bytes32\"}]},{\"type\":\"function\",\"name\":\"removeCollateral\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"removeTradingPool\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"renounceRole\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"bytes32\",\"name\":\"role\"},{\"type\":\"address\",\"name\":\"account\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"revokeRole\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"bytes32\",\"name\":\"role\"},{\"type\":\"address\",\"name\":\"account\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"safeCRatio\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"setExchangeFee\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"uint256\",\"name\":\"_exchangeFee\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"setOracle\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_oracle\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"setPoolSpeed\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"},{\"type\":\"uint256\",\"name\":\"_speed\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"supportsInterface\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"bytes4\",\"name\":\"interfaceId\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"syn\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"synAccrued\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"synBorrowerIndex\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"},{\"type\":\"address\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"synRewardSpeeds\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"synRewardState\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"}],\"outputs\":[{\"type\":\"uint224\",\"name\":\"index\"},{\"type\":\"uint32\",\"name\":\"timestamp\"}]},{\"type\":\"function\",\"name\":\"tradingPoolMembership\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"market\"},{\"type\":\"address\",\"name\":\"account\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"tradingPools\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"}],\"outputs\":[{\"type\":\"bool\",\"name\":\"isEnabled\"},{\"type\":\"uint256\",\"name\":\"volatilityRatio\"}]},{\"type\":\"function\",\"name\":\"tradingPoolsList\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"uint256\"}],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"unpause\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[]},{\"type\":\"function\",\"name\":\"upgradeTo\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"newImplementation\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"upgradeToAndCall\",\"constant\":false,\"stateMutability\":\"payable\",\"payable\":true,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"newImplementation\"},{\"type\":\"bytes\",\"name\":\"data\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"withdraw\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]}]",
+    "AddressStorage": [
+      {
+        "type": "constructor",
+        "payable": false,
+        "inputs": [
+          {
+            "type": "address",
+            "name": "_admin"
+          }
+        ]
+      },
+      {
+        "type": "event",
+        "anonymous": false,
+        "name": "AddressUpdated",
+        "inputs": [
+          {
+            "type": "bytes32",
+            "name": "key",
+            "indexed": true
+          },
+          {
+            "type": "address",
+            "name": "value",
+            "indexed": true
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "getAddress",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "gas": 29000000,
+        "inputs": [
+          {
+            "type": "bytes32",
+            "name": "_key"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "address"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "setAddress",
+        "constant": false,
+        "payable": false,
+        "gas": 29000000,
+        "inputs": [
+          {
+            "type": "bytes32",
+            "name": "_key"
+          },
+          {
+            "type": "address",
+            "name": "_value"
+          }
+        ],
+        "outputs": []
+      }
+    ],
+    "Vault": [
+      {
+        "type": "constructor",
+        "payable": false,
+        "inputs": [
+          {
+            "type": "address",
+            "name": "_admin"
+          }
+        ]
+      },
+      {
+        "type": "event",
+        "anonymous": false,
+        "name": "OwnershipTransferred",
+        "inputs": [
+          {
+            "type": "address",
+            "name": "previousOwner",
+            "indexed": true
+          },
+          {
+            "type": "address",
+            "name": "newOwner",
+            "indexed": true
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "owner",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "gas": 29000000,
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "address"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "renounceOwnership",
+        "constant": false,
+        "payable": false,
+        "gas": 29000000,
+        "inputs": [],
+        "outputs": []
+      },
+      {
+        "type": "function",
+        "name": "transferOwnership",
+        "constant": false,
+        "payable": false,
+        "gas": 29000000,
+        "inputs": [
+          {
+            "type": "address",
+            "name": "newOwner"
+          }
+        ],
+        "outputs": []
+      },
+      {
+        "type": "function",
+        "name": "withdraw",
+        "constant": false,
+        "payable": false,
+        "gas": 29000000,
+        "inputs": [
+          {
+            "type": "address",
+            "name": "_tokenAddress"
+          },
+          {
+            "type": "uint256",
+            "name": "amount"
+          }
+        ],
+        "outputs": []
+      }
+    ],
+    "SyntheX": "[{\"type\":\"constructor\",\"payable\":false,\"inputs\":[]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"AdminChanged\",\"inputs\":[{\"type\":\"address\",\"name\":\"previousAdmin\",\"indexed\":false},{\"type\":\"address\",\"name\":\"newAdmin\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"BeaconUpgraded\",\"inputs\":[{\"type\":\"address\",\"name\":\"beacon\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Burn\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"tradingPool\",\"indexed\":true},{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"amount\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"CollateralDisabled\",\"inputs\":[{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"CollateralEnabled\",\"inputs\":[{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"volatilityRatio\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Deposit\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"amount\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"DistributedSYN\",\"inputs\":[{\"type\":\"address\",\"name\":\"pool\",\"indexed\":true},{\"type\":\"address\",\"name\":\"_account\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"accountDelta\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"rewardIndex\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Exchange\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"tradingPool\",\"indexed\":true},{\"type\":\"address\",\"name\":\"fromAsset\",\"indexed\":true},{\"type\":\"address\",\"name\":\"toAsset\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"fromAmount\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"toAmount\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Initialized\",\"inputs\":[{\"type\":\"uint8\",\"name\":\"version\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Issue\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"tradingPool\",\"indexed\":true},{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"amount\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Paused\",\"inputs\":[{\"type\":\"address\",\"name\":\"account\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"SetPoolRewardSpeed\",\"inputs\":[{\"type\":\"address\",\"name\":\"pool\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"rewardSpeed\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"TradingPoolDisabled\",\"inputs\":[{\"type\":\"address\",\"name\":\"pool\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"TradingPoolEnabled\",\"inputs\":[{\"type\":\"address\",\"name\":\"pool\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"volatilityRatio\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Unpaused\",\"inputs\":[{\"type\":\"address\",\"name\":\"account\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Upgraded\",\"inputs\":[{\"type\":\"address\",\"name\":\"implementation\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Withdraw\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"amount\",\"indexed\":false}]},{\"type\":\"function\",\"name\":\"ADMIN\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"bytes32\"}]},{\"type\":\"function\",\"name\":\"NAME\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"string\"}]},{\"type\":\"function\",\"name\":\"POOL_MANAGER\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"bytes32\"}]},{\"type\":\"function\",\"name\":\"PRICE_ORACLE\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"bytes32\"}]},{\"type\":\"function\",\"name\":\"VERSION\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"string\"}]},{\"type\":\"function\",\"name\":\"accountCollateralBalance\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"},{\"type\":\"address\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"accountCollaterals\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"},{\"type\":\"uint256\"}],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"accountPools\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"},{\"type\":\"uint256\"}],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"addressStorage\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"burn\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"},{\"type\":\"address\",\"name\":\"_synth\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"claimSYN\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"holder\"},{\"type\":\"address[]\",\"name\":\"tradingPoolsList\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"claimSYN\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address[]\",\"name\":\"holders\"},{\"type\":\"address[]\",\"name\":\"_tradingPools\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"collateralMembership\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"market\"},{\"type\":\"address\",\"name\":\"account\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"collaterals\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"}],\"outputs\":[{\"type\":\"bool\",\"name\":\"isEnabled\"},{\"type\":\"uint256\",\"name\":\"volatilityRatio\"}]},{\"type\":\"function\",\"name\":\"compInitialIndex\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"deposit\",\"constant\":false,\"stateMutability\":\"payable\",\"payable\":true,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"disableCollateral\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"disableTradingPool\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"enableCollateral\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"},{\"type\":\"uint256\",\"name\":\"_volatilityRatio\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"enableTradingPool\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"},{\"type\":\"uint256\",\"name\":\"_volatilityRatio\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"enterAndDeposit\",\"constant\":false,\"stateMutability\":\"payable\",\"payable\":true,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"enterAndIssue\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"},{\"type\":\"address\",\"name\":\"_synth\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"enterCollateral\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"enterPool\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"exchange\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"},{\"type\":\"address\",\"name\":\"_synthFrom\"},{\"type\":\"address\",\"name\":\"_synthTo\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"exitCollateral\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"exitPool\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"getAdjustedUserTotalCollateralUSD\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"getAdjustedUserTotalDebtUSD\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"getLTV\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"getSYNAccrued\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"},{\"type\":\"address[]\",\"name\":\"tradingPoolsList\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"getUserPoolDebtUSD\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"},{\"type\":\"address\",\"name\":\"_tradingPool\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"getUserTotalCollateralUSD\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"getUserTotalDebtUSD\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"healthFactor\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"initialize\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_syn\"},{\"type\":\"address\",\"name\":\"_addressStorage\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"issue\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"},{\"type\":\"address\",\"name\":\"_synth\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"liquidate\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"},{\"type\":\"address\",\"name\":\"_tradingPool\"},{\"type\":\"address\",\"name\":\"_inAsset\"},{\"type\":\"uint256\",\"name\":\"_inAmount\"},{\"type\":\"address\",\"name\":\"_outAsset\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"oracle\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"pause\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[]},{\"type\":\"function\",\"name\":\"paused\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"proxiableUUID\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"bytes32\"}]},{\"type\":\"function\",\"name\":\"safeCRatio\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"setPoolSpeed\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"},{\"type\":\"uint256\",\"name\":\"_speed\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"setSafeCRatio\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"uint256\",\"name\":\"_safeCRatio\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"syn\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"synAccrued\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"synBorrowerIndex\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"},{\"type\":\"address\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"synRewardSpeeds\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"synRewardState\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"}],\"outputs\":[{\"type\":\"uint224\",\"name\":\"index\"},{\"type\":\"uint32\",\"name\":\"timestamp\"}]},{\"type\":\"function\",\"name\":\"tradingPoolMembership\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"market\"},{\"type\":\"address\",\"name\":\"account\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"tradingPools\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"}],\"outputs\":[{\"type\":\"bool\",\"name\":\"isEnabled\"},{\"type\":\"uint256\",\"name\":\"volatilityRatio\"}]},{\"type\":\"function\",\"name\":\"unpause\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[]},{\"type\":\"function\",\"name\":\"upgradeTo\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"newImplementation\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"upgradeToAndCall\",\"constant\":false,\"stateMutability\":\"payable\",\"payable\":true,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"newImplementation\"},{\"type\":\"bytes\",\"name\":\"data\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"withdraw\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]}]",
+    "SyntheX_0.15.0": "[{\"type\":\"constructor\",\"payable\":false,\"inputs\":[]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"AdminChanged\",\"inputs\":[{\"type\":\"address\",\"name\":\"previousAdmin\",\"indexed\":false},{\"type\":\"address\",\"name\":\"newAdmin\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"BeaconUpgraded\",\"inputs\":[{\"type\":\"address\",\"name\":\"beacon\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Burn\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"tradingPool\",\"indexed\":true},{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"amount\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"CollateralDisabled\",\"inputs\":[{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"CollateralEnabled\",\"inputs\":[{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"volatilityRatio\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Deposit\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"amount\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"DistributedSYN\",\"inputs\":[{\"type\":\"address\",\"name\":\"pool\",\"indexed\":true},{\"type\":\"address\",\"name\":\"_account\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"accountDelta\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"rewardIndex\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Exchange\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"tradingPool\",\"indexed\":true},{\"type\":\"address\",\"name\":\"fromAsset\",\"indexed\":true},{\"type\":\"address\",\"name\":\"toAsset\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"fromAmount\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"toAmount\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Initialized\",\"inputs\":[{\"type\":\"uint8\",\"name\":\"version\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Issue\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"tradingPool\",\"indexed\":true},{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"amount\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Paused\",\"inputs\":[{\"type\":\"address\",\"name\":\"account\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"SetPoolRewardSpeed\",\"inputs\":[{\"type\":\"address\",\"name\":\"pool\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"rewardSpeed\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"TradingPoolDisabled\",\"inputs\":[{\"type\":\"address\",\"name\":\"pool\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"TradingPoolEnabled\",\"inputs\":[{\"type\":\"address\",\"name\":\"pool\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"volatilityRatio\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Unpaused\",\"inputs\":[{\"type\":\"address\",\"name\":\"account\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Upgraded\",\"inputs\":[{\"type\":\"address\",\"name\":\"implementation\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Withdraw\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"amount\",\"indexed\":false}]},{\"type\":\"function\",\"name\":\"ADMIN\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"bytes32\"}]},{\"type\":\"function\",\"name\":\"NAME\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"string\"}]},{\"type\":\"function\",\"name\":\"POOL_MANAGER\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"bytes32\"}]},{\"type\":\"function\",\"name\":\"PRICE_ORACLE\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"bytes32\"}]},{\"type\":\"function\",\"name\":\"VERSION\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"string\"}]},{\"type\":\"function\",\"name\":\"accountCollateralBalance\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"},{\"type\":\"address\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"accountCollaterals\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"},{\"type\":\"uint256\"}],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"accountPools\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"},{\"type\":\"uint256\"}],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"addressStorage\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"burn\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"},{\"type\":\"address\",\"name\":\"_synth\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"claimSYN\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"holder\"},{\"type\":\"address[]\",\"name\":\"tradingPoolsList\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"claimSYN\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address[]\",\"name\":\"holders\"},{\"type\":\"address[]\",\"name\":\"_tradingPools\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"collateralMembership\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"market\"},{\"type\":\"address\",\"name\":\"account\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"collaterals\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"}],\"outputs\":[{\"type\":\"bool\",\"name\":\"isEnabled\"},{\"type\":\"uint256\",\"name\":\"volatilityRatio\"}]},{\"type\":\"function\",\"name\":\"compInitialIndex\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"deposit\",\"constant\":false,\"stateMutability\":\"payable\",\"payable\":true,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"disableCollateral\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"disableTradingPool\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"enableCollateral\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"},{\"type\":\"uint256\",\"name\":\"_volatilityRatio\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"enableTradingPool\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"},{\"type\":\"uint256\",\"name\":\"_volatilityRatio\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"enterAndDeposit\",\"constant\":false,\"stateMutability\":\"payable\",\"payable\":true,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"enterAndIssue\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"},{\"type\":\"address\",\"name\":\"_synth\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"enterCollateral\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"enterPool\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"exchange\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"},{\"type\":\"address\",\"name\":\"_synthFrom\"},{\"type\":\"address\",\"name\":\"_synthTo\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"exitCollateral\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"exitPool\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"getAdjustedUserTotalCollateralUSD\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"getAdjustedUserTotalDebtUSD\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"getLTV\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"getSYNAccrued\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"},{\"type\":\"address[]\",\"name\":\"tradingPoolsList\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"getUserPoolDebtUSD\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"},{\"type\":\"address\",\"name\":\"_tradingPool\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"getUserTotalCollateralUSD\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"getUserTotalDebtUSD\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"healthFactor\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"initialize\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_syn\"},{\"type\":\"address\",\"name\":\"_addressStorage\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"issue\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"},{\"type\":\"address\",\"name\":\"_synth\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"liquidate\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"},{\"type\":\"address\",\"name\":\"_tradingPool\"},{\"type\":\"address\",\"name\":\"_inAsset\"},{\"type\":\"uint256\",\"name\":\"_inAmount\"},{\"type\":\"address\",\"name\":\"_outAsset\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"oracle\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"pause\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[]},{\"type\":\"function\",\"name\":\"paused\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"proxiableUUID\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"bytes32\"}]},{\"type\":\"function\",\"name\":\"safeCRatio\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"setPoolSpeed\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"},{\"type\":\"uint256\",\"name\":\"_speed\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"setSafeCRatio\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"uint256\",\"name\":\"_safeCRatio\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"syn\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"synAccrued\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"synBorrowerIndex\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"},{\"type\":\"address\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"synRewardSpeeds\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"synRewardState\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"}],\"outputs\":[{\"type\":\"uint224\",\"name\":\"index\"},{\"type\":\"uint32\",\"name\":\"timestamp\"}]},{\"type\":\"function\",\"name\":\"tradingPoolMembership\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"market\"},{\"type\":\"address\",\"name\":\"account\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"tradingPools\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"}],\"outputs\":[{\"type\":\"bool\",\"name\":\"isEnabled\"},{\"type\":\"uint256\",\"name\":\"volatilityRatio\"}]},{\"type\":\"function\",\"name\":\"unpause\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[]},{\"type\":\"function\",\"name\":\"upgradeTo\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"newImplementation\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"upgradeToAndCall\",\"constant\":false,\"stateMutability\":\"payable\",\"payable\":true,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"newImplementation\"},{\"type\":\"bytes\",\"name\":\"data\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"withdraw\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]}]",
     "PriceOracle": "[{\"type\":\"event\",\"anonymous\":false,\"name\":\"FeedUpdated\",\"inputs\":[{\"type\":\"address\",\"name\":\"token\",\"indexed\":true},{\"type\":\"address\",\"name\":\"feed\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"OwnershipTransferred\",\"inputs\":[{\"type\":\"address\",\"name\":\"previousOwner\",\"indexed\":true},{\"type\":\"address\",\"name\":\"newOwner\",\"indexed\":true}]},{\"type\":\"function\",\"name\":\"feeds\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"}],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"getAssetPrice\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_asset\"}],\"outputs\":[{\"type\":\"tuple\",\"components\":[{\"type\":\"uint256\",\"name\":\"price\"},{\"type\":\"uint256\",\"name\":\"decimals\"}]}]},{\"type\":\"function\",\"name\":\"getAssetPrices\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address[]\",\"name\":\"_assets\"}],\"outputs\":[{\"type\":\"tuple[]\",\"components\":[{\"type\":\"uint256\",\"name\":\"price\"},{\"type\":\"uint256\",\"name\":\"decimals\"}]}]},{\"type\":\"function\",\"name\":\"getFeed\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_token\"}],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"owner\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"renounceOwnership\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[]},{\"type\":\"function\",\"name\":\"setFeed\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_token\"},{\"type\":\"address\",\"name\":\"_feed\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"transferOwnership\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"newOwner\"}],\"outputs\":[]}]",
     "Multicall2": "[{\"type\":\"function\",\"name\":\"aggregate\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"tuple[]\",\"name\":\"calls\",\"components\":[{\"type\":\"address\",\"name\":\"target\"},{\"type\":\"bytes\",\"name\":\"callData\"}]}],\"outputs\":[{\"type\":\"uint256\",\"name\":\"blockNumber\"},{\"type\":\"bytes[]\",\"name\":\"returnData\"}]},{\"type\":\"function\",\"name\":\"blockAndAggregate\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"tuple[]\",\"name\":\"calls\",\"components\":[{\"type\":\"address\",\"name\":\"target\"},{\"type\":\"bytes\",\"name\":\"callData\"}]}],\"outputs\":[{\"type\":\"uint256\",\"name\":\"blockNumber\"},{\"type\":\"bytes32\",\"name\":\"blockHash\"},{\"type\":\"tuple[]\",\"name\":\"returnData\",\"components\":[{\"type\":\"bool\",\"name\":\"success\"},{\"type\":\"bytes\",\"name\":\"returnData\"}]}]},{\"type\":\"function\",\"name\":\"getBlockHash\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"uint256\",\"name\":\"blockNumber\"}],\"outputs\":[{\"type\":\"bytes32\",\"name\":\"blockHash\"}]},{\"type\":\"function\",\"name\":\"getBlockNumber\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\",\"name\":\"blockNumber\"}]},{\"type\":\"function\",\"name\":\"getCurrentBlockCoinbase\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"address\",\"name\":\"coinbase\"}]},{\"type\":\"function\",\"name\":\"getCurrentBlockDifficulty\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\",\"name\":\"difficulty\"}]},{\"type\":\"function\",\"name\":\"getCurrentBlockGasLimit\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\",\"name\":\"gaslimit\"}]},{\"type\":\"function\",\"name\":\"getCurrentBlockTimestamp\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\",\"name\":\"timestamp\"}]},{\"type\":\"function\",\"name\":\"getEthBalance\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"addr\"}],\"outputs\":[{\"type\":\"uint256\",\"name\":\"balance\"}]},{\"type\":\"function\",\"name\":\"getLastBlockHash\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"bytes32\",\"name\":\"blockHash\"}]},{\"type\":\"function\",\"name\":\"tryAggregate\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"bool\",\"name\":\"requireSuccess\"},{\"type\":\"tuple[]\",\"name\":\"calls\",\"components\":[{\"type\":\"address\",\"name\":\"target\"},{\"type\":\"bytes\",\"name\":\"callData\"}]}],\"outputs\":[{\"type\":\"tuple[]\",\"name\":\"returnData\",\"components\":[{\"type\":\"bool\",\"name\":\"success\"},{\"type\":\"bytes\",\"name\":\"returnData\"}]}]},{\"type\":\"function\",\"name\":\"tryBlockAndAggregate\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"bool\",\"name\":\"requireSuccess\"},{\"type\":\"tuple[]\",\"name\":\"calls\",\"components\":[{\"type\":\"address\",\"name\":\"target\"},{\"type\":\"bytes\",\"name\":\"callData\"}]}],\"outputs\":[{\"type\":\"uint256\",\"name\":\"blockNumber\"},{\"type\":\"bytes32\",\"name\":\"blockHash\"},{\"type\":\"tuple[]\",\"name\":\"returnData\",\"components\":[{\"type\":\"bool\",\"name\":\"success\"},{\"type\":\"bytes\",\"name\":\"returnData\"}]}]}]",
     "MockToken": [
@@ -1265,6 +1462,90 @@
       },
       {
         "type": "function",
+        "name": "ADMIN",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "gas": 29000000,
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "bytes32"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "POOL_MANAGER",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "gas": 29000000,
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "bytes32"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "PRICE_ORACLE",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "gas": 29000000,
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "bytes32"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "SYNTHEX",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "gas": 29000000,
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "bytes32"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "VAULT",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "gas": 29000000,
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "bytes32"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "addressStorage",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "gas": 29000000,
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "address"
+          }
+        ]
+      },
+      {
+        "type": "function",
         "name": "allowance",
         "constant": true,
         "stateMutability": "view",
@@ -1491,6 +1772,20 @@
       },
       {
         "type": "function",
+        "name": "getTotalDebtUSD",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "gas": 29000000,
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "uint256"
+          }
+        ]
+      },
+      {
+        "type": "function",
         "name": "increaseAllowance",
         "constant": false,
         "payable": false,
@@ -1528,7 +1823,7 @@
           },
           {
             "type": "address",
-            "name": "_synthex"
+            "name": "_addressStorage"
           }
         ],
         "outputs": []
@@ -1589,6 +1884,20 @@
       },
       {
         "type": "function",
+        "name": "oracle",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "gas": 29000000,
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "address"
+          }
+        ]
+      },
+      {
+        "type": "function",
         "name": "removeSynth",
         "constant": false,
         "payable": false,
@@ -1612,20 +1921,6 @@
         "outputs": [
           {
             "type": "string"
-          }
-        ]
-      },
-      {
-        "type": "function",
-        "name": "synthex",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "gas": 29000000,
-        "inputs": [],
-        "outputs": [
-          {
-            "type": "address"
           }
         ]
       },
@@ -1722,9 +2017,23 @@
           }
         ],
         "outputs": []
+      },
+      {
+        "type": "function",
+        "name": "vault",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "gas": 29000000,
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "address"
+          }
+        ]
       }
     ],
-    "CRY_undefined": "[{\"type\":\"event\",\"anonymous\":false,\"name\":\"Approval\",\"inputs\":[{\"type\":\"address\",\"name\":\"owner\",\"indexed\":true},{\"type\":\"address\",\"name\":\"spender\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"value\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"FeeUpdated\",\"inputs\":[{\"type\":\"uint256\",\"name\":\"fee\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Initialized\",\"inputs\":[{\"type\":\"uint8\",\"name\":\"version\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"SynthDisabled\",\"inputs\":[{\"type\":\"address\",\"name\":\"synth\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"SynthEnabled\",\"inputs\":[{\"type\":\"address\",\"name\":\"synth\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"SynthRemoved\",\"inputs\":[{\"type\":\"address\",\"name\":\"synth\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Transfer\",\"inputs\":[{\"type\":\"address\",\"name\":\"from\",\"indexed\":true},{\"type\":\"address\",\"name\":\"to\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"value\",\"indexed\":false}]},{\"type\":\"function\",\"name\":\"allowance\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"owner\"},{\"type\":\"address\",\"name\":\"spender\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"approve\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"spender\"},{\"type\":\"uint256\",\"name\":\"amount\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"balanceOf\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"burn\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_user\"},{\"type\":\"uint256\",\"name\":\"_amountUSD\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"burnSynth\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_synth\"},{\"type\":\"address\",\"name\":\"_user\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"decimals\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"uint8\"}]},{\"type\":\"function\",\"name\":\"decreaseAllowance\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"spender\"},{\"type\":\"uint256\",\"name\":\"subtractedValue\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"disableSynth\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_synth\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"enableSynth\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_synth\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"exchange\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_fromSynth\"},{\"type\":\"address\",\"name\":\"_toSynth\"},{\"type\":\"address\",\"name\":\"_user\"},{\"type\":\"uint256\",\"name\":\"_fromAmount\"},{\"type\":\"uint256\",\"name\":\"_toAmount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"fee\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"getSynths\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"address[]\"}]},{\"type\":\"function\",\"name\":\"increaseAllowance\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"spender\"},{\"type\":\"uint256\",\"name\":\"addedValue\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"initialize\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"string\",\"name\":\"name\"},{\"type\":\"string\",\"name\":\"symbol\"},{\"type\":\"address\",\"name\":\"_synthex\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"mint\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_user\"},{\"type\":\"uint256\",\"name\":\"_amountUSD\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"mintSynth\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_synth\"},{\"type\":\"address\",\"name\":\"_user\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"name\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"string\"}]},{\"type\":\"function\",\"name\":\"removeSynth\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_synth\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"symbol\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"string\"}]},{\"type\":\"function\",\"name\":\"synthex\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"synths\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"totalSupply\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"transfer\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"to\"},{\"type\":\"uint256\",\"name\":\"amount\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"transferFrom\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"from\"},{\"type\":\"address\",\"name\":\"to\"},{\"type\":\"uint256\",\"name\":\"amount\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"updateFee\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"uint256\",\"name\":\"_fee\"}],\"outputs\":[]}]",
+    "CRY_undefined": "[{\"type\":\"event\",\"anonymous\":false,\"name\":\"Approval\",\"inputs\":[{\"type\":\"address\",\"name\":\"owner\",\"indexed\":true},{\"type\":\"address\",\"name\":\"spender\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"value\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"FeeUpdated\",\"inputs\":[{\"type\":\"uint256\",\"name\":\"fee\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Initialized\",\"inputs\":[{\"type\":\"uint8\",\"name\":\"version\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"SynthDisabled\",\"inputs\":[{\"type\":\"address\",\"name\":\"synth\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"SynthEnabled\",\"inputs\":[{\"type\":\"address\",\"name\":\"synth\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"SynthRemoved\",\"inputs\":[{\"type\":\"address\",\"name\":\"synth\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Transfer\",\"inputs\":[{\"type\":\"address\",\"name\":\"from\",\"indexed\":true},{\"type\":\"address\",\"name\":\"to\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"value\",\"indexed\":false}]},{\"type\":\"function\",\"name\":\"ADMIN\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"bytes32\"}]},{\"type\":\"function\",\"name\":\"POOL_MANAGER\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"bytes32\"}]},{\"type\":\"function\",\"name\":\"PRICE_ORACLE\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"bytes32\"}]},{\"type\":\"function\",\"name\":\"SYNTHEX\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"bytes32\"}]},{\"type\":\"function\",\"name\":\"VAULT\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"bytes32\"}]},{\"type\":\"function\",\"name\":\"addressStorage\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"allowance\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"owner\"},{\"type\":\"address\",\"name\":\"spender\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"approve\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"spender\"},{\"type\":\"uint256\",\"name\":\"amount\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"balanceOf\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"burn\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_user\"},{\"type\":\"uint256\",\"name\":\"_amountUSD\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"burnSynth\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_synth\"},{\"type\":\"address\",\"name\":\"_user\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"decimals\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"uint8\"}]},{\"type\":\"function\",\"name\":\"decreaseAllowance\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"spender\"},{\"type\":\"uint256\",\"name\":\"subtractedValue\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"disableSynth\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_synth\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"enableSynth\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_synth\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"exchange\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_fromSynth\"},{\"type\":\"address\",\"name\":\"_toSynth\"},{\"type\":\"address\",\"name\":\"_user\"},{\"type\":\"uint256\",\"name\":\"_fromAmount\"},{\"type\":\"uint256\",\"name\":\"_toAmount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"fee\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"getSynths\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"address[]\"}]},{\"type\":\"function\",\"name\":\"getTotalDebtUSD\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"increaseAllowance\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"spender\"},{\"type\":\"uint256\",\"name\":\"addedValue\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"initialize\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"string\",\"name\":\"name\"},{\"type\":\"string\",\"name\":\"symbol\"},{\"type\":\"address\",\"name\":\"_addressStorage\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"mint\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_user\"},{\"type\":\"uint256\",\"name\":\"_amountUSD\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"mintSynth\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_synth\"},{\"type\":\"address\",\"name\":\"_user\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"name\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"string\"}]},{\"type\":\"function\",\"name\":\"oracle\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"removeSynth\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_synth\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"symbol\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"string\"}]},{\"type\":\"function\",\"name\":\"synths\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"totalSupply\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"transfer\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"to\"},{\"type\":\"uint256\",\"name\":\"amount\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"transferFrom\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"from\"},{\"type\":\"address\",\"name\":\"to\"},{\"type\":\"uint256\",\"name\":\"amount\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"updateFee\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"uint256\",\"name\":\"_fee\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"vault\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]}]",
     "ERC20X": [
       {
         "type": "constructor",
@@ -1741,6 +2050,10 @@
           {
             "type": "address",
             "name": "_pool"
+          },
+          {
+            "type": "address",
+            "name": "_addressStorage"
           }
         ]
       },
@@ -1769,23 +2082,6 @@
       {
         "type": "event",
         "anonymous": false,
-        "name": "OwnershipTransferred",
-        "inputs": [
-          {
-            "type": "address",
-            "name": "previousOwner",
-            "indexed": true
-          },
-          {
-            "type": "address",
-            "name": "newOwner",
-            "indexed": true
-          }
-        ]
-      },
-      {
-        "type": "event",
-        "anonymous": false,
         "name": "Transfer",
         "inputs": [
           {
@@ -1802,6 +2098,20 @@
             "type": "uint256",
             "name": "value",
             "indexed": false
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "addressStorage",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "gas": 29000000,
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "address"
           }
         ]
       },
@@ -1978,6 +2288,20 @@
       },
       {
         "type": "function",
+        "name": "flashLoanFee",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "gas": 29000000,
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "uint256"
+          }
+        ]
+      },
+      {
+        "type": "function",
         "name": "increaseAllowance",
         "constant": false,
         "payable": false,
@@ -2051,7 +2375,7 @@
       },
       {
         "type": "function",
-        "name": "owner",
+        "name": "pool",
         "constant": true,
         "stateMutability": "view",
         "payable": false,
@@ -2062,15 +2386,6 @@
             "type": "address"
           }
         ]
-      },
-      {
-        "type": "function",
-        "name": "renounceOwnership",
-        "constant": false,
-        "payable": false,
-        "gas": 29000000,
-        "inputs": [],
-        "outputs": []
       },
       {
         "type": "function",
@@ -2150,20 +2465,20 @@
       },
       {
         "type": "function",
-        "name": "transferOwnership",
+        "name": "updateFlashFee",
         "constant": false,
         "payable": false,
         "gas": 29000000,
         "inputs": [
           {
-            "type": "address",
-            "name": "newOwner"
+            "type": "uint256",
+            "name": "_flashLoanFee"
           }
         ],
         "outputs": []
       }
     ],
-    "STK_undefined": "[{\"type\":\"event\",\"anonymous\":false,\"name\":\"Approval\",\"inputs\":[{\"type\":\"address\",\"name\":\"owner\",\"indexed\":true},{\"type\":\"address\",\"name\":\"spender\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"value\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"FeeUpdated\",\"inputs\":[{\"type\":\"uint256\",\"name\":\"fee\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Initialized\",\"inputs\":[{\"type\":\"uint8\",\"name\":\"version\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"SynthDisabled\",\"inputs\":[{\"type\":\"address\",\"name\":\"synth\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"SynthEnabled\",\"inputs\":[{\"type\":\"address\",\"name\":\"synth\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"SynthRemoved\",\"inputs\":[{\"type\":\"address\",\"name\":\"synth\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Transfer\",\"inputs\":[{\"type\":\"address\",\"name\":\"from\",\"indexed\":true},{\"type\":\"address\",\"name\":\"to\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"value\",\"indexed\":false}]},{\"type\":\"function\",\"name\":\"allowance\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"owner\"},{\"type\":\"address\",\"name\":\"spender\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"approve\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"spender\"},{\"type\":\"uint256\",\"name\":\"amount\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"balanceOf\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"burn\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_user\"},{\"type\":\"uint256\",\"name\":\"_amountUSD\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"burnSynth\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_synth\"},{\"type\":\"address\",\"name\":\"_user\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"decimals\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"uint8\"}]},{\"type\":\"function\",\"name\":\"decreaseAllowance\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"spender\"},{\"type\":\"uint256\",\"name\":\"subtractedValue\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"disableSynth\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_synth\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"enableSynth\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_synth\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"exchange\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_fromSynth\"},{\"type\":\"address\",\"name\":\"_toSynth\"},{\"type\":\"address\",\"name\":\"_user\"},{\"type\":\"uint256\",\"name\":\"_fromAmount\"},{\"type\":\"uint256\",\"name\":\"_toAmount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"fee\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"getSynths\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"address[]\"}]},{\"type\":\"function\",\"name\":\"increaseAllowance\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"spender\"},{\"type\":\"uint256\",\"name\":\"addedValue\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"initialize\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"string\",\"name\":\"name\"},{\"type\":\"string\",\"name\":\"symbol\"},{\"type\":\"address\",\"name\":\"_synthex\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"mint\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_user\"},{\"type\":\"uint256\",\"name\":\"_amountUSD\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"mintSynth\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_synth\"},{\"type\":\"address\",\"name\":\"_user\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"name\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"string\"}]},{\"type\":\"function\",\"name\":\"removeSynth\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_synth\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"symbol\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"string\"}]},{\"type\":\"function\",\"name\":\"synthex\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"synths\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"totalSupply\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"transfer\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"to\"},{\"type\":\"uint256\",\"name\":\"amount\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"transferFrom\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"from\"},{\"type\":\"address\",\"name\":\"to\"},{\"type\":\"uint256\",\"name\":\"amount\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"updateFee\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"uint256\",\"name\":\"_fee\"}],\"outputs\":[]}]",
-    "FX_undefined": "[{\"type\":\"event\",\"anonymous\":false,\"name\":\"Approval\",\"inputs\":[{\"type\":\"address\",\"name\":\"owner\",\"indexed\":true},{\"type\":\"address\",\"name\":\"spender\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"value\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"FeeUpdated\",\"inputs\":[{\"type\":\"uint256\",\"name\":\"fee\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Initialized\",\"inputs\":[{\"type\":\"uint8\",\"name\":\"version\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"SynthDisabled\",\"inputs\":[{\"type\":\"address\",\"name\":\"synth\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"SynthEnabled\",\"inputs\":[{\"type\":\"address\",\"name\":\"synth\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"SynthRemoved\",\"inputs\":[{\"type\":\"address\",\"name\":\"synth\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Transfer\",\"inputs\":[{\"type\":\"address\",\"name\":\"from\",\"indexed\":true},{\"type\":\"address\",\"name\":\"to\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"value\",\"indexed\":false}]},{\"type\":\"function\",\"name\":\"allowance\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"owner\"},{\"type\":\"address\",\"name\":\"spender\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"approve\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"spender\"},{\"type\":\"uint256\",\"name\":\"amount\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"balanceOf\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"burn\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_user\"},{\"type\":\"uint256\",\"name\":\"_amountUSD\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"burnSynth\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_synth\"},{\"type\":\"address\",\"name\":\"_user\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"decimals\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"uint8\"}]},{\"type\":\"function\",\"name\":\"decreaseAllowance\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"spender\"},{\"type\":\"uint256\",\"name\":\"subtractedValue\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"disableSynth\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_synth\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"enableSynth\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_synth\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"exchange\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_fromSynth\"},{\"type\":\"address\",\"name\":\"_toSynth\"},{\"type\":\"address\",\"name\":\"_user\"},{\"type\":\"uint256\",\"name\":\"_fromAmount\"},{\"type\":\"uint256\",\"name\":\"_toAmount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"fee\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"getSynths\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"address[]\"}]},{\"type\":\"function\",\"name\":\"increaseAllowance\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"spender\"},{\"type\":\"uint256\",\"name\":\"addedValue\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"initialize\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"string\",\"name\":\"name\"},{\"type\":\"string\",\"name\":\"symbol\"},{\"type\":\"address\",\"name\":\"_synthex\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"mint\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_user\"},{\"type\":\"uint256\",\"name\":\"_amountUSD\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"mintSynth\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_synth\"},{\"type\":\"address\",\"name\":\"_user\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"name\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"string\"}]},{\"type\":\"function\",\"name\":\"removeSynth\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_synth\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"symbol\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"string\"}]},{\"type\":\"function\",\"name\":\"synthex\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"synths\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"totalSupply\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"transfer\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"to\"},{\"type\":\"uint256\",\"name\":\"amount\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"transferFrom\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"from\"},{\"type\":\"address\",\"name\":\"to\"},{\"type\":\"uint256\",\"name\":\"amount\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"updateFee\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"uint256\",\"name\":\"_fee\"}],\"outputs\":[]}]"
+    "STK_undefined": "[{\"type\":\"event\",\"anonymous\":false,\"name\":\"Approval\",\"inputs\":[{\"type\":\"address\",\"name\":\"owner\",\"indexed\":true},{\"type\":\"address\",\"name\":\"spender\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"value\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"FeeUpdated\",\"inputs\":[{\"type\":\"uint256\",\"name\":\"fee\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Initialized\",\"inputs\":[{\"type\":\"uint8\",\"name\":\"version\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"SynthDisabled\",\"inputs\":[{\"type\":\"address\",\"name\":\"synth\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"SynthEnabled\",\"inputs\":[{\"type\":\"address\",\"name\":\"synth\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"SynthRemoved\",\"inputs\":[{\"type\":\"address\",\"name\":\"synth\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Transfer\",\"inputs\":[{\"type\":\"address\",\"name\":\"from\",\"indexed\":true},{\"type\":\"address\",\"name\":\"to\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"value\",\"indexed\":false}]},{\"type\":\"function\",\"name\":\"ADMIN\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"bytes32\"}]},{\"type\":\"function\",\"name\":\"POOL_MANAGER\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"bytes32\"}]},{\"type\":\"function\",\"name\":\"PRICE_ORACLE\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"bytes32\"}]},{\"type\":\"function\",\"name\":\"SYNTHEX\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"bytes32\"}]},{\"type\":\"function\",\"name\":\"VAULT\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"bytes32\"}]},{\"type\":\"function\",\"name\":\"addressStorage\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"allowance\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"owner\"},{\"type\":\"address\",\"name\":\"spender\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"approve\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"spender\"},{\"type\":\"uint256\",\"name\":\"amount\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"balanceOf\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"burn\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_user\"},{\"type\":\"uint256\",\"name\":\"_amountUSD\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"burnSynth\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_synth\"},{\"type\":\"address\",\"name\":\"_user\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"decimals\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"uint8\"}]},{\"type\":\"function\",\"name\":\"decreaseAllowance\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"spender\"},{\"type\":\"uint256\",\"name\":\"subtractedValue\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"disableSynth\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_synth\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"enableSynth\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_synth\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"exchange\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_fromSynth\"},{\"type\":\"address\",\"name\":\"_toSynth\"},{\"type\":\"address\",\"name\":\"_user\"},{\"type\":\"uint256\",\"name\":\"_fromAmount\"},{\"type\":\"uint256\",\"name\":\"_toAmount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"fee\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"getSynths\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"address[]\"}]},{\"type\":\"function\",\"name\":\"getTotalDebtUSD\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"increaseAllowance\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"spender\"},{\"type\":\"uint256\",\"name\":\"addedValue\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"initialize\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"string\",\"name\":\"name\"},{\"type\":\"string\",\"name\":\"symbol\"},{\"type\":\"address\",\"name\":\"_addressStorage\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"mint\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_user\"},{\"type\":\"uint256\",\"name\":\"_amountUSD\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"mintSynth\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_synth\"},{\"type\":\"address\",\"name\":\"_user\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"name\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"string\"}]},{\"type\":\"function\",\"name\":\"oracle\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"removeSynth\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_synth\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"symbol\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"string\"}]},{\"type\":\"function\",\"name\":\"synths\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"totalSupply\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"transfer\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"to\"},{\"type\":\"uint256\",\"name\":\"amount\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"transferFrom\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"from\"},{\"type\":\"address\",\"name\":\"to\"},{\"type\":\"uint256\",\"name\":\"amount\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"updateFee\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"uint256\",\"name\":\"_fee\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"vault\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]}]",
+    "FX_undefined": "[{\"type\":\"event\",\"anonymous\":false,\"name\":\"Approval\",\"inputs\":[{\"type\":\"address\",\"name\":\"owner\",\"indexed\":true},{\"type\":\"address\",\"name\":\"spender\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"value\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"FeeUpdated\",\"inputs\":[{\"type\":\"uint256\",\"name\":\"fee\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Initialized\",\"inputs\":[{\"type\":\"uint8\",\"name\":\"version\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"SynthDisabled\",\"inputs\":[{\"type\":\"address\",\"name\":\"synth\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"SynthEnabled\",\"inputs\":[{\"type\":\"address\",\"name\":\"synth\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"SynthRemoved\",\"inputs\":[{\"type\":\"address\",\"name\":\"synth\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Transfer\",\"inputs\":[{\"type\":\"address\",\"name\":\"from\",\"indexed\":true},{\"type\":\"address\",\"name\":\"to\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"value\",\"indexed\":false}]},{\"type\":\"function\",\"name\":\"ADMIN\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"bytes32\"}]},{\"type\":\"function\",\"name\":\"POOL_MANAGER\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"bytes32\"}]},{\"type\":\"function\",\"name\":\"PRICE_ORACLE\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"bytes32\"}]},{\"type\":\"function\",\"name\":\"SYNTHEX\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"bytes32\"}]},{\"type\":\"function\",\"name\":\"VAULT\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"bytes32\"}]},{\"type\":\"function\",\"name\":\"addressStorage\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"allowance\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"owner\"},{\"type\":\"address\",\"name\":\"spender\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"approve\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"spender\"},{\"type\":\"uint256\",\"name\":\"amount\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"balanceOf\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"burn\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_user\"},{\"type\":\"uint256\",\"name\":\"_amountUSD\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"burnSynth\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_synth\"},{\"type\":\"address\",\"name\":\"_user\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"decimals\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"uint8\"}]},{\"type\":\"function\",\"name\":\"decreaseAllowance\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"spender\"},{\"type\":\"uint256\",\"name\":\"subtractedValue\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"disableSynth\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_synth\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"enableSynth\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_synth\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"exchange\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_fromSynth\"},{\"type\":\"address\",\"name\":\"_toSynth\"},{\"type\":\"address\",\"name\":\"_user\"},{\"type\":\"uint256\",\"name\":\"_fromAmount\"},{\"type\":\"uint256\",\"name\":\"_toAmount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"fee\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"getSynths\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"address[]\"}]},{\"type\":\"function\",\"name\":\"getTotalDebtUSD\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"increaseAllowance\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"spender\"},{\"type\":\"uint256\",\"name\":\"addedValue\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"initialize\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"string\",\"name\":\"name\"},{\"type\":\"string\",\"name\":\"symbol\"},{\"type\":\"address\",\"name\":\"_addressStorage\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"mint\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_user\"},{\"type\":\"uint256\",\"name\":\"_amountUSD\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"mintSynth\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_synth\"},{\"type\":\"address\",\"name\":\"_user\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"name\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"string\"}]},{\"type\":\"function\",\"name\":\"oracle\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"removeSynth\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"_synth\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"symbol\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"string\"}]},{\"type\":\"function\",\"name\":\"synths\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"totalSupply\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"transfer\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"to\"},{\"type\":\"uint256\",\"name\":\"amount\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"transferFrom\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"address\",\"name\":\"from\"},{\"type\":\"address\",\"name\":\"to\"},{\"type\":\"uint256\",\"name\":\"amount\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"updateFee\",\"constant\":false,\"payable\":false,\"gas\":29000000,\"inputs\":[{\"type\":\"uint256\",\"name\":\"_fee\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"vault\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"gas\":29000000,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]}]"
   }
 }

@@ -3,23 +3,13 @@ pragma solidity ^0.8.9;
 
 import "./PriceOracle.sol";
 import "./token/SyntheXToken.sol";
+import "./utils/AddressStorage.sol";
 
 contract SyntheXStorage {
     SyntheXToken public syn;
 
-    uint256 public exchangeFee;
-    uint256 constant public exchangeFeeMantissa = 1e18;
     uint256 public safeCRatio;
-    uint256 constant public compInitialIndex = 1e36;
-
-    bytes32 constant public PAUSE_GUARDIAN_ROLE = keccak256("PAUSE_GUARDIAN_ROLE");
-    bytes32 constant public ADMIN_ROLE = keccak256("ADMIN_ROLE");
-    bytes32 constant public POOL_MANAGER_ROLE = keccak256("POOL_MANAGER_ROLE");
-
-    /**
-     * @dev Price oracle contract address
-     */
-    PriceOracle public oracle; 
+    uint256 public compInitialIndex;
 
     /**
      * @dev Pools the user has entered into
@@ -56,16 +46,6 @@ contract SyntheXStorage {
      */
     mapping(address => Market) public collaterals;
 
-    /**
-     * @dev Array of trading pool addresses
-     */
-    address[] public tradingPoolsList;
-    
-    /**
-     * @dev Array of collateral asset addresses
-     */
-    address[] public collateralsList;
-
     struct SynMarketState {
         // The market's last updated compBorrowIndex or compSupplyIndex
         uint224 index;
@@ -86,5 +66,8 @@ contract SyntheXStorage {
     /// @notice The COMP accrued but not yet transferred to each user
     mapping(address => uint) public synAccrued;
 
-    uint256[100] private __gap;
+    /// @notice Address manager contract address
+    AddressStorage public addressStorage;
+
+    uint256[99] private __gap;
 }

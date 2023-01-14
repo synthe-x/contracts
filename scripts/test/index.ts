@@ -1,9 +1,21 @@
 import hre, { ethers } from "hardhat";
 import { Contract } from "ethers";
-import { ETH_ADDRESS } from "../utils/const";
+import { ETH_ADDRESS, POOL_MANAGER, PRICE_ORACLE, SYNTHEX, VAULT } from '../utils/const';
 const { upgrades } = require("hardhat");
 
 export default async function main(deployerAddress: string) {
+	// address manage
+	const AddressManager = await ethers.getContractFactory("AddressStorage");
+	const addressManager = await AddressManager.deploy(deployerAddress);
+	await addressManager.deployed();
+	await addressManager.setAddress(POOL_MANAGER, deployerAddress);
+
+	// vault
+	const Vault = await ethers.getContractFactory("Vault");
+	const vault = await Vault.deploy(deployerAddress);
+	await vault.deployed();
+
+	await addressManager.setAddress(VAULT, vault.address);
 
 	// deploy SYN
 	const SYN = await ethers.getContractFactory("SyntheXToken");
@@ -12,21 +24,23 @@ export default async function main(deployerAddress: string) {
 
     // deploy synthex
     const SyntheX = await ethers.getContractFactory("SyntheX");
-    const synthex = await upgrades.deployProxy(SyntheX, [syn.address, deployerAddress, deployerAddress, deployerAddress], {type: 'uups'});
+    const synthex = await upgrades.deployProxy(SyntheX, [syn.address, addressManager.address], {type: 'uups'});
     await synthex.deployed();
+
+	await addressManager.setAddress(SYNTHEX, synthex.address);
 
     // deploy priceoracle
     const Oracle = await ethers.getContractFactory("PriceOracle");
     const oracle = await Oracle.deploy();
     await oracle.deployed();
 
-    await synthex.setOracle(oracle.address);
+	await addressManager.setAddress(PRICE_ORACLE, oracle.address);
 
 	// create pool
 	const SyntheXPool = await ethers.getContractFactory("SyntheXPool");
 	const pool = await upgrades.deployProxy(
 		SyntheXPool,
-		["Crypto SyntheX", "CRYPTOX", synthex.address]
+		["Crypto SyntheX", "CRYPTOX", addressManager.address]
 	);
 	await pool.deployed();
 
@@ -41,7 +55,6 @@ export default async function main(deployerAddress: string) {
 
 	const ERC20X = await ethers.getContractFactory("ERC20X");
 	const PriceFeed = await ethers.getContractFactory("MockPriceFeed");
-	const Collateral = await ethers.getContractFactory("MockToken");
 
 	// collateral eth
 	const ethPriceFeed = await PriceFeed.deploy(ethers.utils.parseUnits("1000", 8), 8);
@@ -50,7 +63,7 @@ export default async function main(deployerAddress: string) {
 	await synthex.enableCollateral(ETH_ADDRESS, ethers.utils.parseEther("0.9"));
 
 	// susd
-	const susd = await ERC20X.deploy("SyntheX USD", "USDx", pool.address);
+	const susd = await ERC20X.deploy("SyntheX USD", "USDx", pool.address, addressManager.address);
 	await susd.deployed();
 	const susdPriceFeed = await PriceFeed.deploy(ethers.utils.parseUnits("1", 8), 8);
 	await susdPriceFeed.deployed();
@@ -58,7 +71,7 @@ export default async function main(deployerAddress: string) {
 	await pool.enableSynth(susd.address);
 
 	// sbtc
-	const sbtc = await ERC20X.deploy("SyntheX BTC", "BTCx", pool.address);
+	const sbtc = await ERC20X.deploy("SyntheX BTC", "BTCx", pool.address, addressManager.address);
 	await sbtc.deployed();
 	const sbtcPriceFeed = await PriceFeed.deploy(
 		ethers.utils.parseUnits("10000", 8), 8
@@ -68,7 +81,7 @@ export default async function main(deployerAddress: string) {
 	await pool.enableSynth(sbtc.address);
 
 	// seth
-	const seth = await ERC20X.deploy("SyntheX ETH", "ETHx", pool.address);
+	const seth = await ERC20X.deploy("SyntheX ETH", "ETHx", pool.address, addressManager.address);
 	await seth.deployed();
 	await oracle.setFeed(seth.address, ethPriceFeed.address);
 	await pool.enableSynth(seth.address);

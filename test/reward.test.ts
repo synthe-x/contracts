@@ -50,18 +50,18 @@ describe("Testing rewards", function () {
 		await time.increase(86400 * 33);
         await synthex.connect(user1).burn(cryptoPool.address, seth.address, ethers.utils.parseEther("10")); 
         // 0.1 * 85400 * 30 * 0.5 = 128100
-        expect(await synthex.callStatic.getSYNAccrued(user1.address)).to.be.greaterThan(ethers.utils.parseEther("128100"));
+        expect(await synthex.callStatic.getSYNAccrued(user1.address, [cryptoPool.address])).to.be.greaterThan(ethers.utils.parseEther("128100"));
 
         await synthex.connect(user2).burn(cryptoPool.address, seth.address, ethers.utils.parseEther("10")); 
         // 0.1 * 85400 * 30 * 0.5 = 128100
-        expect(await synthex.callStatic.getSYNAccrued(user2.address)).to.be.greaterThan(ethers.utils.parseEther("128100"));
+        expect(await synthex.callStatic.getSYNAccrued(user2.address, [cryptoPool.address])).to.be.greaterThan(ethers.utils.parseEther("128100"));
 	})
 
     it("claim SYN", async function () {
         expect(await syn.balanceOf(user1.address)).to.equal(ethers.constants.Zero);
         expect(await syn.balanceOf(user2.address)).to.equal(ethers.constants.Zero);
-        await synthex['claimSYN(address)'](user1.address);
-        await synthex['claimSYN(address)'](user2.address);
+        await synthex['claimSYN(address,address[])'](user1.address, [cryptoPool.address]);
+        await synthex['claimSYN(address,address[])'](user2.address, [cryptoPool.address]);
         expect(await syn.balanceOf(user1.address)).to.be.greaterThan(ethers.utils.parseEther("128100"));
         expect(await syn.balanceOf(user2.address)).to.be.greaterThan(ethers.utils.parseEther("128100"));
     })

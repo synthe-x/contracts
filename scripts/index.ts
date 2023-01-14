@@ -3,20 +3,13 @@ import { deploy } from "./deploy";
 import { initiate } from "./initiate";
 import fs from "fs";
 
+import { PRICE_ORACLE, SYNTHEX, VAULT, ADMIN, POOL_MANAGER } from "./utils/const";
+
 async function main() {
 	// read deployments and config
-	const deployments = JSON.parse(
-		fs.readFileSync(
-			process.cwd() + `/deployments/${hre.network.name}/deployments.json`,
-			"utf8"
-		)
-	);
-	const config = JSON.parse(
-		fs.readFileSync(
-			process.cwd() + `/deployments/${hre.network.name}/config.json`,
-			"utf8"
-		)
-	);
+	const deployments = JSON.parse(fs.readFileSync(process.cwd() + `/deployments/${hre.network.name}/deployments.json`, "utf8"));
+	const config = JSON.parse(fs.readFileSync(process.cwd() + `/deployments/${hre.network.name}/config.json`, "utf8"));
+	
 	// override existing deployments
 	deployments.contracts = {};
 	deployments.sources = {};
@@ -36,17 +29,17 @@ async function main() {
 
 	// deploy main contracts
 	const contracts = await deploy(deployments, config, deployer.address);
+	await contracts.addressManager.setAddress(ADMIN, deployer.address);
+	await contracts.addressManager.setAddress(POOL_MANAGER, deployer.address);
 
 	const synthex = contracts.synthex;
 
 	// initiate the contracts
-	await initiate(contracts.synthex, contracts.oracle, deployments, config);
+	await initiate(contracts.synthex, contracts.oracle, deployments, config, contracts.addressManager);
 
-	await synthex.renounceRole(await synthex.ADMIN_ROLE(), deployer.address);
-	await synthex.renounceRole(
-		await synthex.POOL_MANAGER_ROLE(),
-		deployer.address
-	);
+	// set admins
+	await contracts.addressManager.setAddress(POOL_MANAGER, config.poolManager);
+	await contracts.addressManager.setAddress(ADMIN, config.admin);
 
 	if (hre.network.name !== "hardhat") {
 		// Add contract to openzeppelin defender
