@@ -1,0 +1,10 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "SafeCast",
+  "sourceName": "@openzeppelin/contracts/utils/math/SafeCast.sol",
+  "abi": [],
+  "bytecode": "0x60808060405234601757603a9081601d823930815050f35b600080fdfe600080fdfea2646970667358221220c0455c3148249e59d4f4f1ab271d76a974754d06f333010b674d250abba37c6364736f6c63430008110033",
+  "deployedBytecode": "0x600080fdfea2646970667358221220c0455c3148249e59d4f4f1ab271d76a974754d06f333010b674d250abba37c6364736f6c63430008110033",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

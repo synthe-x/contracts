@@ -15,7 +15,7 @@ describe("Testing liquidation", function () {
 		// Contracts are deployed using the first signer/account by default
         [owner, user1, user2, user3] = await ethers.getSigners();
 
-		const deployments = await deploy(user1, user2, user3);
+		const deployments = await deploy(owner.address, user1, user2, user3);
 		synthex = deployments.synthex;
         syn = deployments.syn;
 		oracle = deployments.oracle;
@@ -36,7 +36,7 @@ describe("Testing liquidation", function () {
 	it("liquidation environment", async function () {
 		// initial debt: $75000
 		let totalDebt = ethers.utils.parseEther("75000")
-		expect(await synthex.getPoolTotalDebtUSD(cryptoPool.address)).to.be.equal(totalDebt);
+		expect(await cryptoPool.getTotalDebtUSD()).to.be.equal(totalDebt);
 		// user1: 33% ($25000)
 		expect(await synthex.getUserTotalDebtUSD(user1.address)).to.be.equal(totalDebt.div(3));
 		// user2: 33% ($25000)
@@ -44,23 +44,22 @@ describe("Testing liquidation", function () {
 
 
 		// increasing btc price to $20000
-		await sbtcPriceFeed.setPrice(ethers.utils.parseUnits("20000", 8));
+		await sbtcPriceFeed.setPrice(ethers.utils.parseUnits("20000", 8), 8);
 
 		// debt now: $100000
 		totalDebt = ethers.utils.parseEther("100000");
-		expect(await synthex.getPoolTotalDebtUSD(cryptoPool.address)).to.be.equal(totalDebt);
+		expect(await cryptoPool.getTotalDebtUSD()).to.be.equal(totalDebt);
 		// user1: 33% ($33333)
 		expect(await synthex.getUserTotalDebtUSD(user1.address)).to.be.equal(totalDebt.div(3));
 		// user2: 33% ($33333)
 		expect(await synthex.getUserTotalDebtUSD(user2.address)).to.be.equal(totalDebt.div(3));
 
-
 		// increasing btc price to $80000
-		await sbtcPriceFeed.setPrice(ethers.utils.parseUnits("80000", 8));
+		await sbtcPriceFeed.setPrice(ethers.utils.parseUnits("80000", 8), 8);
 
 		// debt now: $250000
 		totalDebt = ethers.utils.parseEther("250000");
-		expect(await synthex.getPoolTotalDebtUSD(cryptoPool.address)).to.be.equal(totalDebt);
+		expect(await cryptoPool.getTotalDebtUSD()).to.be.equal(totalDebt);
 		// user1: 33% ($83333)
 		expect(await synthex.getUserTotalDebtUSD(user1.address)).to.be.equal(totalDebt.div(3));
 		// user1 adjusted debt: $83333 / 0.9 = $92592
