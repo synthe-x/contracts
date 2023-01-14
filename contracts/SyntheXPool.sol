@@ -12,7 +12,7 @@ import "./SyntheX.sol";
 import "./utils/AddressStorage.sol";
 
 // Uncomment this line to use console.log
-import "hardhat/console.sol";
+// import "hardhat/console.sol";
 
 contract SyntheXPool is ERC20Upgradeable {
     using SafeMathUpgradeable for uint256;
@@ -23,17 +23,39 @@ contract SyntheXPool is ERC20Upgradeable {
     event SynthRemoved(address indexed synth);
     event FeeUpdated(uint fee);
 
+    /**
+     * @dev Address storage keys
+     */
     bytes32 public constant ADMIN = keccak256("ADMIN");
     bytes32 public constant POOL_MANAGER = keccak256("POOL_MANAGER");
     bytes32 public constant PRICE_ORACLE = keccak256("PRICE_ORACLE");
     bytes32 public constant VAULT = keccak256("VAULT");
     bytes32 public constant SYNTHEX = keccak256("SYNTHEX");
 
+    /**
+     * @dev Check if synth is enabled
+     */
     mapping(address => bool) public synths;
+    /**
+     * @dev The fee for actions in the pool
+     * @notice The fee is in basis points
+     * @notice 10000 basis points * 1e18 = 100%
+     */
     uint public fee;
+    uint private constant BASIS_POINTS = 10000;
+
+    /**
+     * @dev The list of synths in the pool to calculate total debt
+     */
     address[] private _synthsList;
+    /**
+     * @dev The address of the address storage contract
+     */
     AddressStorage public addressStorage;
 
+    /**
+     * @dev Initialize the contract
+     */
     function initialize(string memory name, string memory symbol, address _addressStorage) public initializer {
         __ERC20_init(name, symbol);
         addressStorage = AddressStorage(_addressStorage);
@@ -117,13 +139,17 @@ contract SyntheXPool is ERC20Upgradeable {
      * @return The total debt of the trading pool
      */
     function getTotalDebtUSD() public view returns(uint) {
+        // Get the list of synths in this trading pool
         address[] memory _synths = getSynths();
+        // Total debt in USD
         uint totalDebt = 0;
-        IPriceOracle.Price memory price;
+        // Fetch and cache oracle address
         IPriceOracle _oracle = oracle();
+        // Iterate through the list of synths and add each synth's total supply in USD to the total debt
         for(uint i = 0; i < _synths.length; i++){
             address synth = _synths[i];
-            price = _oracle.getAssetPrice(synth);
+            IPriceOracle.Price memory price = _oracle.getAssetPrice(synth);
+            // synthDebt = synthSupply * price
             totalDebt = totalDebt.add(ERC20X(synth).totalSupply().mul(price.price).div(10**price.decimals));
         }
         return totalDebt;
@@ -138,6 +164,7 @@ contract SyntheXPool is ERC20Upgradeable {
      */
     function _beforeTokenTransfer(address from, address to, uint256 amount) internal virtual override {
         super._beforeTokenTransfer(from, to, amount);
+        // If not minting or burning
         if(from != address(0) && to != address(0)) {
             revert("SyntheXPool: Cannot transfer debt tokens");
         }
@@ -182,6 +209,7 @@ contract SyntheXPool is ERC20Upgradeable {
             uint totalSupply = totalSupply();
             uint debtSharePrice = _totalDebt * 1e18 / totalSupply;
             uint mintAmount = _amountUSD * 1e18 / debtSharePrice;
+            // Mint the debt tokens
             _mint(_user, mintAmount);
         }
     }
@@ -193,7 +221,12 @@ contract SyntheXPool is ERC20Upgradeable {
      * @param _amount The amount of synths to issue
      */
     function mintSynth(address _synth, address _user, uint _amount) public onlyInternal {
-        ERC20X(_synth).mint(_user, _amount);
+        // Fetch the fee and cache it
+        uint _fee = fee;
+        // Mint amount minus fee
+        ERC20X(_synth).mint(_user, _amount.mul(uint(1e18).sub(_fee.div(BASIS_POINTS))).div(1e18));
+        // Mint fee
+        ERC20X(_synth).mint(addressStorage.getAddress(VAULT), _amount.mul(_fee.div(BASIS_POINTS)).div(1e18));
     }
 
     /**
@@ -215,6 +248,7 @@ contract SyntheXPool is ERC20Upgradeable {
      * @param _amount The amount of synths to burn
      */
     function burnSynth(address _synth, address _user, uint _amount) public onlyInternal {
+        // Burn amount
         ERC20X(_synth).burn(_user, _amount);
     }
 
@@ -232,8 +266,8 @@ contract SyntheXPool is ERC20Upgradeable {
         // burn from synth
         ERC20X(_fromSynth).burn(_user, _fromAmount);
         // mint to synth
-        ERC20X(_toSynth).mint(_user, _toAmount * (1e18 - _fee) / 1e18);
+        ERC20X(_toSynth).mint(_user, _toAmount.mul(uint(1e18).sub(_fee.div(BASIS_POINTS))).div(1e18));
         // mint fee to synthex
-        ERC20X(_toSynth).mint(vault(), _toAmount * _fee / 1e18);
+        ERC20X(_toSynth).mint(vault(), _toAmount.mul(_fee).div(BASIS_POINTS).div(1e18));
     }
 }

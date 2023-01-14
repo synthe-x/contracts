@@ -16,7 +16,6 @@ contract Vault is Ownable {
         external
         onlyOwner
     {
-        // require(ERC20(_tokenAddress).balanceOf(address(this)) >= amount, "Vault: Not enough amount on the Vault");
         ERC20(_tokenAddress).safeTransfer(owner(), amount);
     }
 }

@@ -19,7 +19,7 @@
       "symbol": "CRY",
       "volatilityRatio": "0.7",
       "rewardSpeed": "2.5",
-      "fee": "0.0015",
+      "fee": "15",
       "synths": [
         {
           "name": "Bitcoin X",
@@ -78,7 +78,7 @@
       "symbol": "STK",
       "volatilityRatio": "0.9",
       "rewardSpeed": "1.1",
-      "fee": "0.001",
+      "fee": "1",
       "synths": [
         {
           "name": "Apple X",
@@ -142,7 +142,7 @@
       "symbol": "FX",
       "volatilityRatio": "0.95",
       "rewardSpeed": "0.85",
-      "fee": "0.0005",
+      "fee": "5",
       "synths": [
         {
           "name": "US Dollar FX",

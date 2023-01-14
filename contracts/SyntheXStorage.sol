@@ -23,6 +23,7 @@ contract SyntheXStorage {
 
     /**
      * @dev Collateral asset addresses
+     * User => Collateral => Balance
      */
     mapping(address => mapping(address => uint)) public accountCollateralBalance;
 

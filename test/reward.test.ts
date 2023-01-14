@@ -35,15 +35,14 @@ describe("Testing rewards", function () {
 	it("user1 issue synths", async function () {
 		// user1 issues 10 seth
         await synthex.connect(user1).enterAndIssue(cryptoPool.address, seth.address, ethers.utils.parseEther("10")); // $ 10000
-
-        expect(await synthex.getUserTotalDebtUSD(user1.address)).to.be.closeTo(ethers.utils.parseEther("10000.00"), ethers.utils.parseEther("0.01"));
+        expect(await synthex.getUserTotalDebtUSD(user1.address)).to.be.equal(ethers.utils.parseEther("10000.00"));
 	});
 
     it("user2 issue synths", async function () {
 		// user1 issues 10 seth
         await synthex.connect(user2).enterAndIssue(cryptoPool.address, seth.address, ethers.utils.parseEther("10")); // $ 10000
 
-        expect(await synthex.getUserTotalDebtUSD(user2.address)).to.be.closeTo(ethers.utils.parseEther("10000.00"), ethers.utils.parseEther("0.01"));
+        expect(await synthex.getUserTotalDebtUSD(user2.address)).to.be.equal(ethers.utils.parseEther("10000.00"));
 	});
 
 	it("burn after 30 days", async function () {

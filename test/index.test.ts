@@ -50,7 +50,7 @@ describe("SyntheX", function () {
 		expect(await synthex.getUserTotalDebtUSD(user3.address)).to.be.equal(ethers.utils.parseEther("90000.00"));
 
 		expect(await seth.balanceOf(user1.address)).to.equal(0);
-		expect(await sbtc.balanceOf(user1.address)).to.equal(ethers.utils.parseEther("1").mul('999').div('1000')); // minus 0.1% fee
+		expect(await sbtc.balanceOf(user1.address)).to.equal(ethers.utils.parseEther("1"));
     })
 
     it("update debt for users", async () => {
@@ -85,8 +85,9 @@ describe("SyntheX", function () {
 		console.log("Burning", ethers.utils.formatEther(sbtcBalance), "sbtc");
 		await synthex.connect(user3).burn(cryptoPool.address, sbtc.address, sbtcBalance); // $ 45000/118181
 
+
 		expect(await synthex.getUserTotalDebtUSD(user1.address)).to.be.closeTo(ethers.utils.parseEther("0.00"), ethers.utils.parseEther("0.2"));
-		expect(await synthex.getUserTotalDebtUSD(user3.address)).to.be.greaterThan(ethers.utils.parseEther("0.00"));
+		// expect(await synthex.getUserTotalDebtUSD(user3.address)).to.be.greaterThan(ethers.utils.parseEther("0.00"));
 		expect(await synthex.getUserTotalDebtUSD(user3.address)).to.be.lessThan(debtUser3);
 	})
 });

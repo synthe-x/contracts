@@ -44,8 +44,6 @@ export default async function main(deployerAddress: string) {
 	);
 	await pool.deployed();
 
-	await pool.updateFee(ethers.utils.parseEther('0.001')); // 0.1%
-
 	await synthex.enableTradingPool(
 		pool.address,
 		ethers.utils.parseEther("0.9")
@@ -86,5 +84,5 @@ export default async function main(deployerAddress: string) {
 	await oracle.setFeed(seth.address, ethPriceFeed.address);
 	await pool.enableSynth(seth.address);
 
-	return { syn, synthex, oracle, ethPriceFeed, sbtcPriceFeed, pool, susd, sbtc, seth };
+	return { syn, synthex, oracle, ethPriceFeed, sbtcPriceFeed, pool, susd, sbtc, seth, vault, addressManager };
 }
