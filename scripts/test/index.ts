@@ -72,6 +72,7 @@ export default async function main(deployerAddress: string) {
 	await ethPriceFeed.deployed();
 	await oracle.setFeed(ETH_ADDRESS, ethPriceFeed.address);
 	await synthex.enableCollateral(ETH_ADDRESS, ethers.utils.parseEther("0.9"));
+    await synthex.setCollateralCap(ETH_ADDRESS, ethers.constants.MaxUint256);
 
 	// susd
 	const susd = await ERC20X.deploy("SyntheX USD", "USDx", pool.address, addressManager.address);

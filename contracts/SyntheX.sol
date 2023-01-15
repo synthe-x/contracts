@@ -122,6 +122,7 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
     function deposit(address _collateral, uint _amount) virtual override public payable whenNotPaused nonReentrant {
         // get collateral market
         Market storage collateral = collaterals[_collateral];
+        CollateralSupply storage supply = collateralSupplies[_collateral];
         // ensure collateral is globally enabled
         require(collateral.isEnabled, "Collateral not enabled");
         // ensure user has entered the market
@@ -142,6 +143,11 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         }
         // Update balance
         accountCollateralBalance[msg.sender][_collateral] = accountCollateralBalance[msg.sender][_collateral].add(_amount);
+
+        // Update collateral supply
+        supply.totalDeposits = supply.totalDeposits.add(_amount);
+        require(supply.totalDeposits <= supply.maxDeposits, "Collateral supply exceeded");
+
         // emit event
         emit Deposit(msg.sender, _collateral, _amount);
     }
@@ -154,6 +160,7 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
      * @param _amount The amount of collateral to withdraw
      */
     function withdraw(address _collateral, uint _amount) virtual override public whenNotPaused nonReentrant {
+        CollateralSupply storage supply = collateralSupplies[_collateral];
         // check deposit balance
         uint depositBalance = accountCollateralBalance[msg.sender][_collateral];
         // ensure user has enough deposit balance
@@ -172,6 +179,10 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
 
         // check health after withdrawal
         require(healthFactor(msg.sender) > safeCRatio, "Health factor below safeCRatio");
+
+        // Update collateral supply
+        supply.totalDeposits = supply.totalDeposits.sub(_amount);
+
         // emit successful event
         emit Withdraw(msg.sender, _collateral, _amount);
     }
@@ -440,6 +451,16 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         }
     }
 
+    /**
+     * @dev Update collateral max deposits
+     */
+    function setCollateralCap(address _collateral, uint _maxDeposit) virtual override public onlyAdmin(ADMIN) {
+        CollateralSupply storage supply = collateralSupplies[_collateral];
+        require(_maxDeposit > supply.totalDeposits, "Max deposit must be greater than current deposits");
+        supply.maxDeposits = _maxDeposit;
+        emit CollateralCapUpdated(_collateral, _maxDeposit);
+    }
+
     function setSafeCRatio(uint256 _safeCRatio) public virtual override onlyAdmin(ADMIN) {
         safeCRatio = _safeCRatio;
     }
@@ -452,13 +473,13 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
      */
     function updateSYNIndex(address _tradingPool) internal {
         SynMarketState storage poolRewardState = synRewardState[_tradingPool];
-        uint borrowSpeed = synRewardSpeeds[_tradingPool];
+        uint rewardSpeed = synRewardSpeeds[_tradingPool];
         uint deltaTimestamp = block.timestamp - poolRewardState.timestamp;
         if(deltaTimestamp == 0) return;
-        if (borrowSpeed > 0) {
+        if (rewardSpeed > 0) {
             uint borrowAmount = SyntheXPool(_tradingPool).totalSupply();
-            uint compAccrued = deltaTimestamp * borrowSpeed;
-            uint ratio = borrowAmount > 0 ? compAccrued * 1e36 / borrowAmount : 0;
+            uint synAccrued = deltaTimestamp * rewardSpeed;
+            uint ratio = borrowAmount > 0 ? synAccrued * 1e36 / borrowAmount : 0;
             poolRewardState.index = uint224(poolRewardState.index + ratio);
             poolRewardState.timestamp = uint32(block.timestamp);
         } else {

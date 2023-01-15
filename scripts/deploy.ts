@@ -1,6 +1,7 @@
 import hre, { ethers } from "hardhat";
 import { PRICE_ORACLE, SYNTHEX, VAULT } from "./utils/const";
 import { _deploy } from './utils/helper';
+import { BigNumber } from 'ethers';
 const { upgrades } = require("hardhat");
 
 export async function deploy(deployments: any, config: any, deployerAddress: string) {
@@ -64,11 +65,6 @@ export async function deploy(deployments: any, config: any, deployerAddress: str
     initializer: 'initialize(address,address)',
     type: 'uups'
   });
-  
-  // add rewards
-  await syn.mint(deployerAddress, ethers.utils.parseEther("100000000"));
-  await syn.approve(stakingRewards.address, ethers.utils.parseEther("100000000"));
-  await stakingRewards.addReward(ethers.utils.parseEther("10000000"));
 
   // save deployments
   deployments.contracts["StakingRewards"] = {
@@ -78,8 +74,14 @@ export async function deploy(deployments: any, config: any, deployerAddress: str
   };
   deployments.sources["StakingRewards"] = stakingRewards.interface.format("json")
   await stakingRewards.deployed();
-
   console.log(`StakingRewards deployed to: ${stakingRewards.address}`);
+  
+  // add rewards
+  const amount = ethers.utils.parseEther(config.stakingRewards.reward);
+  await syn.mint(deployerAddress, amount);
+  await syn.approve(stakingRewards.address, amount);
+  await stakingRewards.setRewardsDuration(BigNumber.from(config.stakingRewards.days * 24 * 60 * 60));
+  await stakingRewards.addReward(amount);
 
   // deploy price oracle
   const Oracle = await ethers.getContractFactory("PriceOracle");

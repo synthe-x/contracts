@@ -21,6 +21,7 @@ export async function initiate(synthex: Contract, oracle: Contract, deployments:
     }
     await oracle.setFeed(collateral, feed);
     await synthex.enableCollateral(collateral, ethers.utils.parseEther(config.collaterals[i].volatilityRatio));
+    await synthex.setCollateralCap(collateral, ethers.utils.parseEther(config.collaterals[i].cap));
     console.log(`\t Collateral ${config.collaterals[i].symbol} deployed successfully ✅`);
   }
   console.log("Collaterals deployed successfully 🎉 \n");

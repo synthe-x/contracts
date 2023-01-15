@@ -12,7 +12,6 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import {IERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-
 contract StakingRewards is IStaking, UUPSUpgradeable, OwnableUpgradeable, ReentrancyGuardUpgradeable, PausableUpgradeable {
 
     using SafeMath for uint256;
@@ -37,23 +36,16 @@ contract StakingRewards is IStaking, UUPSUpgradeable, OwnableUpgradeable, Reentr
     
     /* ========== CONSTRUCTOR ========== */
 
-    // constructor(address _rewardsToken, address _stakingToken) {
-    //     rewardsToken = _rewardsToken;
-    //     stakingToken = _stakingToken;
-    // }
-      constructor() {}
-
-     function initialize(address _rewardsToken, address _stakingToken) public initializer {
+    function initialize(address _rewardsToken, address _stakingToken) public initializer {
         __UUPSUpgradeable_init();
         __ReentrancyGuard_init();
         __Ownable_init();
         __Pausable_init();
       
-         rewardsToken = _rewardsToken;
-         stakingToken = _stakingToken;
-         periodFinish = 0;
-         rewardRate = 0;
-         rewardsDuration = 7 days;
+        rewardsToken = _rewardsToken;
+        stakingToken = _stakingToken;
+        periodFinish = 0;
+        rewardRate = 0;
     }
     function _authorizeUpgrade(address) internal override onlyOwner {}
 
@@ -63,7 +55,7 @@ contract StakingRewards is IStaking, UUPSUpgradeable, OwnableUpgradeable, Reentr
         return _totalSupply;
     }
 
-    //Returns staked token balance of account
+    // Returns staked token balance of account
     function balanceOf(address account) override external view returns (uint256) {
         return _balances[account];
     }
@@ -84,7 +76,7 @@ contract StakingRewards is IStaking, UUPSUpgradeable, OwnableUpgradeable, Reentr
             );
     }
 
-    //Returns earned rewards
+    // Returns earned rewards
     function earned(address account) public override view returns (uint256) {
         return _balances[account].mul(rewardPerToken().sub(userRewardPerTokenPaid[account])).div(1e18).add(rewards[account]);
     }
@@ -116,11 +108,11 @@ contract StakingRewards is IStaking, UUPSUpgradeable, OwnableUpgradeable, Reentr
         emit Withdrawn(msg.sender, amount);
     }
     
-    //Withdraws reward tokens 
-    //Updates reward Per Token Stored and store reward amount AND userRewardPerTokenPaid for msg.sender
+    // Withdraws reward tokens 
+    // Updates reward Per Token Stored and store reward amount AND userRewardPerTokenPaid for msg.sender
     function getReward() public override nonReentrant updateReward(msg.sender) {
         uint256 reward = rewards[msg.sender];
-      
+    
         if (reward > 0) {
             rewards[msg.sender] = 0;
             IERC20Upgradeable(rewardsToken).safeTransfer(msg.sender, reward);
@@ -179,7 +171,7 @@ contract StakingRewards is IStaking, UUPSUpgradeable, OwnableUpgradeable, Reentr
 
     /* ========== MODIFIERS ========== */
 
-    //Updates reward Per Token Stored and store reward amount AND userRewardPerTokenPaid for msg.sender
+    // Updates reward Per Token Stored and store reward amount AND userRewardPerTokenPaid for msg.sender
     modifier updateReward(address account) {
         rewardPerTokenStored = rewardPerToken();
         lastUpdateTime = lastTimeRewardApplicable();

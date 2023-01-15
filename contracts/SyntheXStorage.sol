@@ -25,7 +25,7 @@ contract SyntheXStorage {
      * @dev Collateral asset addresses
      * User => Collateral => Balance
      */
-    mapping(address => mapping(address => uint)) public accountCollateralBalance;
+    mapping(address => mapping(address => uint256)) public accountCollateralBalance;
 
     /**
      * @dev Market data structure
@@ -33,8 +33,13 @@ contract SyntheXStorage {
      */
     struct Market {
         bool isEnabled;
-        uint volatilityRatio;
+        uint256 volatilityRatio;
         mapping(address => bool) accountMembership;
+    }
+
+    struct CollateralSupply {
+        uint256 maxDeposits;
+        uint256 totalDeposits;
     }
 
     /**
@@ -46,6 +51,11 @@ contract SyntheXStorage {
      * @dev Mapping from collateral asset address to collateral data
      */
     mapping(address => Market) public collaterals;
+
+    /**
+     * @dev Mapping from collateral asset address to collateral supply and cap data
+     */
+    mapping(address => CollateralSupply) public collateralSupplies;
 
     struct SynMarketState {
         // The market's last updated compBorrowIndex or compSupplyIndex
