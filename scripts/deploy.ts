@@ -64,7 +64,7 @@ export async function deploy(deployments: any, config: any, deployerAddress: str
     initializer: 'initialize(address,address)',
     type: 'uups'
   });
-
+  
   // add rewards
   await syn.mint(deployerAddress, ethers.utils.parseEther("100000000"));
   await syn.approve(stakingRewards.address, ethers.utils.parseEther("100000000"));

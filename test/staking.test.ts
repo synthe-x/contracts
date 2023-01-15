@@ -1,5 +1,6 @@
 // import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
+import { BigNumber } from "ethers";
 import { ethers } from "hardhat";
 import deploy from "../scripts/test";
 import { ETH_ADDRESS } from "../scripts/utils/const";
@@ -55,12 +56,17 @@ describe("Testing Fee", function () {
 	});
 
 	it("view reward APY should be 100%", async function () {
-		// TODO calculate APY
-
 		// _totalSupply
 		expect(await stakingRewards.totalSupply()).to.equal(
 			ethers.utils.parseEther("1000")
 		);
+
+		// calculated APY
+        const rewardRate = Number(ethers.utils.formatEther(await stakingRewards.rewardRate()));
+        const totalSupply = Number(ethers.utils.formatEther(await stakingRewards.totalSupply()));
+
+        expect(rewardRate * 365*24*60*60 / totalSupply).to.be.closeTo(1, 10e-8)
+
 	});
 
     it("user2 should stake 500 syn", async function () {
@@ -76,11 +82,15 @@ describe("Testing Fee", function () {
 	});
 
 	it("view reward APY 66%", async function () {
-       	// TODO calculate APY
-
-		// _totalSupply
+        // _totalSupply
 		expect(await stakingRewards.totalSupply()).to.equal(
-			ethers.utils.parseEther("1500")
-		);
+            ethers.utils.parseEther("1500")
+        );
+
+        // calculated APY
+        const rewardRate = Number(ethers.utils.formatEther(await stakingRewards.rewardRate()));
+        const totalSupply = Number(ethers.utils.formatEther(await stakingRewards.totalSupply()));
+
+        expect(rewardRate * 365*24*60*60 / totalSupply).to.be.closeTo(2/3, 10e-8)
 	});
 });
