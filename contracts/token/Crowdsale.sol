@@ -6,11 +6,12 @@ import "./SyntheXToken.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./SealedSYN.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 
 // Crowdsale contract that allows users to buy SYN tokens with ETH
 // Issued tokens are released after 180 days
-contract Crowdsale is Ownable {
+contract Crowdsale is Ownable,ReentrancyGuard {
     using SafeMath for uint256;
 
     // start and end timestamps 
@@ -41,7 +42,12 @@ contract Crowdsale is Ownable {
     IERC20 token;
     IERC20 sealedToken;
     mapping(address=> uint256) public tokenMapping;
+    mapping(address=> uint256) public tokenBal;
     mapping(address=> uint256) public timeDuration;
+    event TokenPurchase(address purchaser, uint256 ethValue, uint256 tokenAmount);
+    event TokenUnlocked(address purchaser, uint256 tokenAmount);
+
+    error InvalidTime(uint256 startTime, uint256 endTime);
 
 
     constructor(address _token, address payable _adminWallet, uint256 _rate, uint256 _startTime,uint256  _endTime, uint256 _duration, uint256 _intervals) {
@@ -59,10 +65,11 @@ contract Crowdsale is Ownable {
      // token purchase function
     function buyTokens() public payable {
 
-        //require for token limit
-        require(msg.sender != address(0));
+        require(msg.sender != address(0) && msg.value != 0);
      
-        require(block.timestamp >= startTime && block.timestamp <= endTime && msg.value != 0);
+        // require(block.timestamp >= startTime && block.timestamp <= endTime && msg.value != 0);
+        if(block.timestamp < startTime && block.timestamp > endTime) revert InvalidTime(startTime, endTime ) ;
+
 
         uint256 weiAmount = msg.value;
 
@@ -75,28 +82,46 @@ contract Crowdsale is Ownable {
         require(totalTokensPurchased < token.balanceOf(wallet), "low token balance" );
 
         tokenMapping[msg.sender] = tokens; 
+        tokenBal[msg.sender] = tokens;
         timeDuration[msg.sender] = block.timestamp;
         wallet.transfer(msg.value);
-
+        emit TokenPurchase(msg.sender, msg.value, tokens);
     }
 
-     function getRate() public view returns(uint256){
-         return rate;
-     }
-
+  
     function updateRate(uint256 _rate) public onlyOwner {
         rate = _rate;
     }
 
+    function closeSale() external onlyOwner {
+      require(block.timestamp < endTime);
+      endTime = block.timestamp;
+    }
 
-  // TODO: intervals and duration logic
-   function unlockTokens() public {
+  // TODO: intervals and duration logic  4 intervals duration 4 months
+
+   function unlockTokens() public  nonReentrant{
      require(tokenMapping[msg.sender] != 0 );
-     require((timeDuration[msg.sender] - block.timestamp)/ 60 / 60 / 24 > 180, "can not unlock before 180 days");
-     token.transferFrom(wallet, msg.sender, tokenMapping[msg.sender]);
+     require((timeDuration[msg.sender] - block.timestamp) >  lockInDuration/unlockIntervals , "can not unlock before 180 days");
+     uint calculatedUnlockAmt =  tokenMapping[msg.sender]/ unlockIntervals;
+   
+     require(calculatedUnlockAmt > 0 && tokenBal[msg.sender] != 0 );
+
+     token.transferFrom(wallet, msg.sender, calculatedUnlockAmt);
+     timeDuration[msg.sender] = block.timestamp;
+     tokenBal[msg.sender] = tokenBal[msg.sender] - calculatedUnlockAmt;
+     
+     emit TokenUnlocked( msg.sender, calculatedUnlockAmt);
+
    }
 
 
+   function getRate() public view returns(uint256){
+         return rate;
+     }
+
+
+  
 
 
 }
