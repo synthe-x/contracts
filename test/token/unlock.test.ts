@@ -17,9 +17,11 @@ describe("Testing unlocker", function () {
         const erc20 = await ethers.getContractFactory("MockToken");
         const erc20Sealed = await ethers.getContractFactory("SealedSYN");
         token = await erc20.deploy("Token", "TOKEN");
-        sealed = await erc20Sealed.deploy();
+        sealed = await erc20Sealed.deploy(owner.address);
         unlockerContract = await TokenUnlocker.deploy(sealed.address, token.address, 86400 * 30, 86400 * 60, 0);
 
+        // grant MINTER_ROLE to owner
+        await sealed.grantRole(await sealed.MINTER_ROLE(), owner.address);
         // give sealed tokens to user1
         await sealed.mint(user1.address, ethers.utils.parseEther('1000'));
 	});

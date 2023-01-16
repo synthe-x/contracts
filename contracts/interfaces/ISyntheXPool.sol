@@ -8,15 +8,13 @@ interface ISyntheXPool {
     /*                               Admin Functions                              */
     /* -------------------------------------------------------------------------- */
     function enableSynth(address _synth) external;
-    function updateFee(uint _fee) external;
+    function updateFee(uint _fee, uint _alloc) external;
     function disableSynth(address _synth) external;
     function removeSynth(address _synth) external ;
     /* -------------------------------------------------------------------------- */
     /*                               View Functions                               */
     /* -------------------------------------------------------------------------- */
-    function getSynths() external view returns (address[] memory) ;
-    function oracle() external view returns(IPriceOracle);
-    function vault() external view returns (address) ;
+    function getSynths() external view returns (address[] memory);
     function getTotalDebtUSD() external view returns(uint);
     /* -------------------------------------------------------------------------- */
     /*                              Internal Functions                            */
@@ -32,6 +30,5 @@ interface ISyntheXPool {
     event SynthEnabled(address indexed synth);
     event SynthDisabled(address indexed synth);
     event SynthRemoved(address indexed synth);
-    event FeeUpdated(uint fee);
-    
+    event FeesUpdated(uint fee, uint issuerAlloc);
 }

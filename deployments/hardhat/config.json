@@ -41,6 +41,7 @@
       "volatilityRatio": "0.8",
       "rewardSpeed": "2.5",
       "fee": "15",
+      "issuerAlloc": "7000",
       "synths": [
         {
           "name": "Bitcoin X",
@@ -100,6 +101,7 @@
       "volatilityRatio": "0.9",
       "rewardSpeed": "1.1",
       "fee": "10",
+      "issuerAlloc": "6000",
       "synths": [
         {
           "name": "Apple X",
@@ -164,6 +166,7 @@
       "volatilityRatio": "0.95",
       "rewardSpeed": "0.85",
       "fee": "5",
+      "issuerAlloc": "5000",
       "synths": [
         {
           "name": "US Dollar FX",

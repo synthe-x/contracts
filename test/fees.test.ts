@@ -29,8 +29,9 @@ describe("Testing Fee", function () {
 	});
 
     it("update fee to 1%", async function () {
-        await cryptoPool.connect(owner).updateFee(ethers.utils.parseEther("100"));
+        await cryptoPool.connect(owner).updateFee(ethers.utils.parseEther("100"), ethers.utils.parseEther("5000"));
         expect(await cryptoPool.fee()).to.equal(ethers.utils.parseEther("100"));
+        expect(await cryptoPool.issuerAlloc()).to.equal(ethers.utils.parseEther("5000"));
     });
 
 
@@ -45,7 +46,8 @@ describe("Testing Fee", function () {
     it("user1 issue synths", async function () {
 		// user1 issues 10 seth
         await synthex.connect(user1).issue(cryptoPool.address, seth.address, ethers.utils.parseEther("10")); // $ 10000
-        expect(await synthex.getUserTotalDebtUSD(user1.address)).to.be.equal(ethers.utils.parseEther("10000.00"));
+        // 10000 - (50 (1% * 0.5) burned)
+        expect(await synthex.getUserTotalDebtUSD(user1.address)).to.be.equal(ethers.utils.parseEther("9950.00"));
         // After issuing 10 ETH, balance should be 9.9 ETH
         // 10 - 0.1 (1%) fee
         expect(await seth.balanceOf(user1.address)).to.be.equal(ethers.utils.parseEther("9.9")); 
@@ -54,20 +56,26 @@ describe("Testing Fee", function () {
     it("user1 exchanges 1 seth to sbtc", async function () {
         // user1 exchanges 1 seth to sbtc
         await synthex.connect(user1).exchange(cryptoPool.address, seth.address, sbtc.address, ethers.utils.parseEther("1")); 
+        // 9950 - (5 (1% * 0.5) burned) = 9945
+        expect(await synthex.getUserTotalDebtUSD(user1.address)).to.be.equal(ethers.utils.parseEther("9945"));
         // After exchanging 1 seth to sbtc, user should get 0.1 sbtc
         // 0.1 - 0.01 (1%) fee
         expect(await sbtc.balanceOf(user1.address)).to.be.equal(ethers.utils.parseEther("0.099")); 
     })
 
     it("update fee to 0.1%", async function () {
-        await cryptoPool.connect(owner).updateFee(ethers.utils.parseEther("10"));
+        await cryptoPool.connect(owner).updateFee(ethers.utils.parseEther("10"), ethers.utils.parseEther("5000"));
         expect(await cryptoPool.fee()).to.equal(ethers.utils.parseEther("10"));
     });
 
     it("user2 issue synths", async function () {
 		// user2 issues 10 seth
         await synthex.connect(user2).issue(cryptoPool.address, seth.address, ethers.utils.parseEther("10")); // $ 10000
-        expect(await synthex.getUserTotalDebtUSD(user2.address)).to.be.equal(ethers.utils.parseEther("10000.00"));
+        // 10000 - (2.75 (0.1% * 0.5) * ~0.5 burned)
+        expect(await synthex.getUserTotalDebtUSD(user2.address)).to.be.closeTo(ethers.utils.parseEther("9997.5"), ethers.utils.parseEther("0.1"));
+        // 9945 - (2.75 (0.1% * 0.5) * ~0.5 burned) = 9940
+        expect(await synthex.getUserTotalDebtUSD(user1.address)).to.be.closeTo(ethers.utils.parseEther("9942.5"), ethers.utils.parseEther("0.1"));
+
         // After issuing 10 ETH, balance should be 9.99 ETH
         // 10 - 0.01 (0.1%) fee
         expect(await seth.balanceOf(user2.address)).to.be.equal(ethers.utils.parseEther("9.99")); 

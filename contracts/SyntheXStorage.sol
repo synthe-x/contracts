@@ -67,11 +67,8 @@ contract SyntheXStorage {
         // The block number the index was last updated at
         uint32 timestamp;
     }
-    
-    /// @notice The reward tokens
-    address[] public rewardTokens;
 
-    /// @notice The speed at which SYN is distributed to the corresponding market (per second)
+    /// @notice The speed at which reward token is distributed to the corresponding market (per second)
     mapping(address => mapping(address => uint)) public rewardSpeeds;
 
     /// @notice The reward market borrow state for each market
@@ -83,5 +80,5 @@ contract SyntheXStorage {
     /// @notice The reward accrued but not yet transferred to each user
     mapping(address => mapping(address => uint)) public rewardAccrued;
 
-    uint256[99] private __gap;
+    uint256[49] private __gap;
 }

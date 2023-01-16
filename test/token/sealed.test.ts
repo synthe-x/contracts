@@ -4,18 +4,30 @@ import { ethers } from "hardhat";
 import initiate from "../../scripts/test";
 import { time } from "@nomicfoundation/hardhat-network-helpers";
 
-describe("Testing unlocker", function () {
+describe("Testing staking", function () {
 
 	let token: any, sealed: any, unlockerContract: any;
-	let owner: any, user1: any, user2: any, user3: any;
+	let deployer: any, owner: any, user1: any, user2: any, user3: any;
 
 	before(async () => {
 		// Contracts are deployed using the first signer/account by default
-        [owner, user1, user2] = await ethers.getSigners();
+        [deployer, owner, user1, user2] = await ethers.getSigners();
 
         const erc20Sealed = await ethers.getContractFactory("SealedSYN");
-        sealed = await erc20Sealed.deploy();
+        sealed = await erc20Sealed.deploy(deployer.address);
 	});
+
+    it("should not be able to mint without MINTER_ROLE", async function () {
+        const role = await sealed.MINTER_ROLE();
+        await expect(sealed.connect(owner).mint(user1.address, ethers.utils.parseEther('1000'))).to.be.revertedWith(
+            `AccessControl: account ${owner.address.toLowerCase()} is missing role ${role}`
+        );
+    })
+
+    it("admin should be able to grant role", async function () {
+        await sealed.grantRole(await sealed.MINTER_ROLE(), owner.address);
+        expect(await sealed.hasRole(await sealed.MINTER_ROLE(), owner.address)).to.equal(true);
+    })
 
     it('owner should be able to mint', async function () {
         await sealed.mint(user1.address, ethers.utils.parseEther('1000'));

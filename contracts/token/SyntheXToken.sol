@@ -13,10 +13,10 @@ contract SyntheXToken is ERC20, ERC20Burnable, Pausable, AccessControl, ERC20Per
     bytes32 public constant PAUSER_ROLE = keccak256("PAUSER_ROLE");
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
-    constructor() ERC20("SyntheX Token", "SYN") ERC20Permit("SyntheX Token") {
-        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
-        _grantRole(PAUSER_ROLE, msg.sender);
-        _grantRole(MINTER_ROLE, msg.sender);
+    constructor(address _admin) ERC20("SyntheX Token", "SYN") ERC20Permit("SyntheX Token") {
+        _grantRole(DEFAULT_ADMIN_ROLE, _admin);
+        _grantRole(PAUSER_ROLE, _admin);
+        _grantRole(MINTER_ROLE, _admin);
     }
 
     function pause() public onlyRole(PAUSER_ROLE) {

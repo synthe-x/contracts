@@ -3,21 +3,24 @@ pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
 
 /**
  * @title Sealed SYN
  * @author SyntheX
  * @custom:security-contact prasad@chainscore.finance
- * @notice Sealed tokens cannot be transferred
- * @notice Sealed tokens can only be minted and burned
  */
-abstract contract ERC20Sealed is ERC20, ERC20Burnable, Ownable {
+abstract contract ERC20Sealed is ERC20, ERC20Burnable, AccessControl {
 
-    function mint(address to, uint256 amount) public onlyOwner {
+    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+
+    function mint(address to, uint256 amount) public onlyRole(MINTER_ROLE) {
         _mint(to, amount);
     }
 
+    /**
+     * @notice Sealed tokens cannot be transferred, can only be minted and burned
+     */
     function _beforeTokenTransfer(
         address from,
         address to,

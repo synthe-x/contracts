@@ -5,9 +5,9 @@ import initiate from "../scripts/test";
 import { time } from "@nomicfoundation/hardhat-network-helpers";
 import { ETH_ADDRESS } from "../scripts/utils/const";
 
-describe("Testing rewards", function () {
+describe("Rewards", function () {
 
-	let synthex: any, syn: any, oracle: any, cryptoPool: any, eth: any, susd: any, sbtc: any, seth: any;
+	let synthex: any, syn: any, sealedSyn: any, oracle: any, cryptoPool: any, eth: any, susd: any, sbtc: any, seth: any;
 	let owner: any, user1: any, user2: any, user3: any;
 
 	before(async () => {
@@ -16,7 +16,7 @@ describe("Testing rewards", function () {
 
 		const deployments = await initiate(owner.address);
 		synthex = deployments.synthex;
-        syn = deployments.sealedSYN;
+        sealedSyn = deployments.sealedSYN;
 		oracle = deployments.oracle;
 		cryptoPool = deployments.pool;
 		susd = deployments.susd;
@@ -49,19 +49,19 @@ describe("Testing rewards", function () {
 		await time.increase(86400 * 33);
         await synthex.connect(user1).burn(cryptoPool.address, seth.address, ethers.utils.parseEther("10")); 
         // 0.1 * 85400 * 30 * 0.5 = 128100
-        expect(await synthex.callStatic.getSYNAccrued(user1.address, [cryptoPool.address])).to.be.greaterThan(ethers.utils.parseEther("128100"));
+        expect(await synthex.callStatic.getRewardsAccrued(sealedSyn.address, user1.address, [cryptoPool.address])).to.be.greaterThan(ethers.utils.parseEther("128100"));
 
         await synthex.connect(user2).burn(cryptoPool.address, seth.address, ethers.utils.parseEther("10")); 
         // 0.1 * 85400 * 30 * 0.5 = 128100
-        expect(await synthex.callStatic.getSYNAccrued(user2.address, [cryptoPool.address])).to.be.greaterThan(ethers.utils.parseEther("128100"));
+        expect(await synthex.callStatic.getRewardsAccrued(sealedSyn.address, user2.address, [cryptoPool.address])).to.be.greaterThan(ethers.utils.parseEther("128100"));
 	})
 
     it("claim SYN", async function () {
-        expect(await syn.balanceOf(user1.address)).to.equal(ethers.constants.Zero);
-        expect(await syn.balanceOf(user2.address)).to.equal(ethers.constants.Zero);
-        await synthex['claimSYN(address,address[])'](user1.address, [cryptoPool.address]);
-        await synthex['claimSYN(address,address[])'](user2.address, [cryptoPool.address]);
-        expect(await syn.balanceOf(user1.address)).to.be.greaterThan(ethers.utils.parseEther("128100"));
-        expect(await syn.balanceOf(user2.address)).to.be.greaterThan(ethers.utils.parseEther("128100"));
+        expect(await sealedSyn.balanceOf(user1.address)).to.equal(ethers.constants.Zero);
+        expect(await sealedSyn.balanceOf(user2.address)).to.equal(ethers.constants.Zero);
+        await synthex['claimReward(address,address,address[])'](sealedSyn.address, user1.address, [cryptoPool.address]);
+        await synthex['claimReward(address,address,address[])'](sealedSyn.address, user2.address, [cryptoPool.address]);
+        expect(await sealedSyn.balanceOf(user1.address)).to.be.greaterThan(ethers.utils.parseEther("128100"));
+        expect(await sealedSyn.balanceOf(user2.address)).to.be.greaterThan(ethers.utils.parseEther("128100"));
     })
 });

@@ -210,8 +210,10 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         // ensure the synth to issue is enabled from the trading pool
         require(SyntheXPool(_tradingPool).synths(_synth), "Synth not enabled");
         
-        // update reward index for the pool && distribute pending $syn to user
-        updateReward(_tradingPool, msg.sender);
+        // update reward index for the pool 
+        updatePoolRewardIndex(address(syn), _tradingPool);
+        // distribute pending reward tokens to user
+        distributeAccountReward(address(syn), _tradingPool, msg.sender);
 
         // get price from oracle
         IPriceOracle.Price memory price = oracle().getAssetPrice(_synth);
@@ -240,8 +242,10 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         // ensure amount is greater than 0
         require(_amount > 0, "Amount must be greater than 0");
 
-        // update reward index for the pool && distribute pending $syn to user
-        updateReward(_tradingPool, msg.sender);
+        // update reward index for the pool 
+        updatePoolRewardIndex(address(syn), _tradingPool);
+        // distribute pending reward tokens to user
+        distributeAccountReward(address(syn), _tradingPool, msg.sender);
 
         // get synth price
         IPriceOracle.Price memory price = oracle().getAssetPrice(_synth);
@@ -455,17 +459,15 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
     /*                             Reward Distribution                            */
     /* -------------------------------------------------------------------------- */
 
-    function addRewardToken(address _rewardToken) virtual public onlyAdmin(ADMIN) {
-        // check if already added
-        for(uint i = 0; i < rewardTokens.length; i++){
-            require(rewardTokens[i] != _rewardToken, "Reward token already added");
-        }
-        rewardTokens.push(_rewardToken);
+    function updateRewardToken(address _rewardToken) virtual public onlyAdmin(ADMIN) {
+        // update reward token
+        syn = SyntheXToken(_rewardToken);
         emit RewardTokenAdded(_rewardToken);
     }
     
     /**
      * @dev Set the reward speed for a trading pool
+     * @param _rewardToken The reward token
      * @param _tradingPool The address of the trading pool
      * @param _speed The reward speed
      */
@@ -482,19 +484,10 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         emit SetPoolRewardSpeed(_tradingPool, _speed);
     }
     
-    /**
-     * @notice Distribute all rewards to the user
-     * @param _account The address of the user to distribute rewards to
-     */
-    function updateReward(address _account, address _tradingPool) internal {
-        for(uint i = 0; i < rewardTokens.length; i++){
-            updatePoolRewardIndex(rewardTokens[i], _tradingPool);
-            distributeAccountReward(rewardTokens[i], _tradingPool, _account);
-        }
-    }
 
     /**
      * @notice Accrue rewards to the market
+     * @param _rewardToken The reward token
      * @param _tradingPool The market whose reward index to update
      */
     function updatePoolRewardIndex(address _rewardToken, address _tradingPool) internal {
@@ -515,6 +508,7 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
 
     /**
      * @notice Calculate COMP accrued by a supplier and possibly transfer it to them
+     * @param _rewardToken The reward token
      * @param _tradingPool The market in which the supplier is interacting
      * @param _account The address of the supplier to distribute COMP to
      */
@@ -553,76 +547,69 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
 
     /**
      * @dev Claim all the SYN accrued by holder in the specified markets
+     * @param _rewardToken The address of the reward token
      * @param holder The address to claim SYN for
      * @param tradingPoolsList The list of markets to claim SYN in
      * @dev We're taking a list of markets as input instead of a storing a list of them in contract
      */
-    function claimSYN(address holder, address[] memory tradingPoolsList) virtual override public {
+    function claimReward(address _rewardToken, address holder, address[] memory tradingPoolsList) virtual override public {
         address[] memory holders = new address[](1);
         holders[0] = holder;
-        claimSYN(holders, tradingPoolsList);
+        claimReward(_rewardToken, holders, tradingPoolsList);
     }
 
     /**
      * @notice Claim all SYN accrued by the holders
+     * @param _rewardToken The address of the reward token
      * @param holders The addresses to claim COMP for
      * @param _tradingPools The list of markets to claim COMP in
      */
-    function claimSYN(address[] memory holders, address[] memory _tradingPools) virtual override public {
+    function claimReward(address _rewardToken, address[] memory holders, address[] memory _tradingPools) virtual override public {
         // Iterate through all holders and trading pools
-        for (uint i = 0; i < _tradingPools.length; i++) {
+        for (uint i = 0; i < _tradingPools.length; i++) { 
             address pool = _tradingPools[i];
             require(tradingPools[pool].isEnabled, "Market must be enabled");
             // Iterate thru all reward tokens
-            for (uint j = 0; j < rewardTokens.length; j++) {
-                updatePoolRewardIndex(rewardTokens[j], pool);
-                for (uint k = 0; k < holders.length; k++) {
-                    distributeAccountReward(rewardTokens[j], pool, holders[k]);
-                }
+            updatePoolRewardIndex(_rewardToken, pool);
+            for (uint k = 0; k < holders.length; k++) {
+                distributeAccountReward(_rewardToken, pool, holders[k]);
             }
+            
         }
-        for (uint i = 0; i < rewardTokens.length; i++) {
-            for (uint j = 0; j < holders.length; j++) {
-                rewardAccrued[rewardTokens[i]][holders[j]] = grantRewardInternal(rewardTokens[i], holders[j], rewardAccrued[rewardTokens[i]][holders[j]]);
-            }
+        for (uint j = 0; j < holders.length; j++) {
+            rewardAccrued[_rewardToken][holders[j]] = grantRewardInternal(_rewardToken, holders[j], rewardAccrued[_rewardToken][holders[j]]);
         }
     }
 
     /** 
-     * TODO: Add a function to claim all rewards for a user
      * @notice Transfer SYN to the user
      * @dev Note: If there is not enough SYN, we do not perform the transfer all.
-     * @param user The address of the user to transfer SYN to
-     * @param amount The amount of SYN to (possibly) transfer
+     * @param _reward The address of the reward token
+     * @param _user The address of the user to transfer SYN to
+     * @param _amount The amount of SYN to (possibly) transfer
      * @return The amount of SYN which was NOT transferred to the user
      */
-    function grantRewardInternal(address reward, address user, uint amount) internal whenNotPaused nonReentrant returns (uint) {
+    function grantRewardInternal(address _reward, address _user, uint _amount) internal whenNotPaused nonReentrant returns (uint) {
         // check if there is enough SYN
-        uint synRemaining = syn.balanceOf(address(this));
-        if (amount > 0 && amount <= synRemaining) {
-            ERC20Upgradeable(address(syn)).safeTransfer(user, amount);
-            return 0;
-        }
-        return amount;
+        SyntheXToken(_reward).mint(_user, _amount);   
+        return _amount;
     }
 
     /**
      * @dev Get total $SYN accrued by an account
      * @dev Only for getting dynamic reward amount in frontend. To be statically called
      */
-    function getRewardsAccrued(address _account, address[] memory tradingPoolsList) virtual override public returns(uint[] memory rewards){
+    function getRewardsAccrued(address _rewardToken, address _account, address[] memory _tradingPoolsList) virtual override public returns(uint){
         // Iterate over all the trading pools and update the reward index and account's reward amount
-        for (uint i = 0; i < tradingPoolsList.length; i++) {
-            SyntheXPool pool = SyntheXPool(tradingPoolsList[i]);
+        for (uint i = 0; i < _tradingPoolsList.length; i++) {
+            SyntheXPool pool = SyntheXPool(_tradingPoolsList[i]);
             require(tradingPools[address(pool)].isEnabled, "Market must be listed");
-            // Update the rewards
-            updateReward(_account, address(pool));
+            // Iterate thru all reward tokens
+            updatePoolRewardIndex(_rewardToken, address(pool));
+            distributeAccountReward(_rewardToken, address(pool), _account);
         }
-        // Get the rewards
-        rewards = new uint[](rewardTokens.length);
-        for (uint i = 0; i < rewardTokens.length; i++) {
-            rewards[i] = rewardAccrued[rewardTokens[i]][_account];
-        }
+        // Get the rewards accrued
+        return rewardAccrued[_rewardToken][_account];
     }
 
     /* -------------------------------------------------------------------------- */

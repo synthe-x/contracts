@@ -26,33 +26,30 @@ contract TokenUnlocker is Ownable, Pausable {
     /// @notice Emitted when admin sets the lock period
     event SetLockPeriod(uint _lockPeriod);
     
+    /// @notice Unlock data struct
+    struct UnlockData {
+        uint amount;
+        uint claimed;
+        uint requestTime;
+    }
+
     /// @notice SEALED_TOKEN is the address of sealed token
     ERC20Sealed public SEALED_TOKEN;
     /// @notice TOKEN is the address of token be unlocked
     IERC20 public TOKEN;
-
     /// @notice Reserved for unlock is the amount of SYN that is reserved for unlock
     uint public reservedForUnlock;
-
     /// @notice Lock period is the time (in sec) that user must wait before they can claim their unlocked SYN
     uint public lockPeriod;
     /// @notice Unlock period is the time (in sec) over which tokens are unlocked
     uint public unlockPeriod;
     /// @notice PercUnlockAtRelease is the percentage of tokens that are unlocked at release
     uint public percUnlockAtRelease;
-
     /// @notice Request ID to Unlock struct mapping
     /// @notice Request ID is a hash of user address and request index
     mapping(bytes32 => UnlockData) public unlockRequests;
     /// @notice User address to request count mapping
     mapping(address => uint) public unlockRequestCount;
-
-    /// @notice Unlock struct
-    struct UnlockData {
-        uint amount;
-        uint claimed;
-        uint requestTime;
-    }
 
     /**
      * @notice Constructor

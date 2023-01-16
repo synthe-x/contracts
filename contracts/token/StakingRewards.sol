@@ -2,6 +2,9 @@
 pragma solidity ^0.8.9;
 
 import 'hardhat/console.sol';
+
+import "./ERC20Sealed.sol";
+
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
@@ -89,22 +92,23 @@ contract StakingRewards is IStaking, UUPSUpgradeable, OwnableUpgradeable, Reentr
     /* ========== MUTATIVE FUNCTIONS ========== */
 
     // Stakes tokens and updates balances of msg.sender 
-     //Updates reward Per Token Stored and store reward amount AND userRewardPerTokenPaid for msg.sender
+    // Updates reward Per Token Stored and store reward amount AND userRewardPerTokenPaid for msg.sender
     function stake(uint256 amount) external override nonReentrant whenNotPaused updateReward(msg.sender) {
         require(amount > 0, "Cannot stake 0");
         _totalSupply = _totalSupply.add(amount);
         _balances[msg.sender] = _balances[msg.sender].add(amount);
-        IERC20Upgradeable(stakingToken).safeTransferFrom(msg.sender, address(this), amount);
+        // Burn the staking tokens from the user
+        ERC20Sealed(stakingToken).burnFrom(msg.sender, amount);
         emit Staked(msg.sender, amount);
     }
 
-    //withdraws tokens and updates balances of msg.sender
-    //Updates reward Per Token Stored and store reward amount AND userRewardPerTokenPaid for msg.sender
+    // withdraws tokens and updates balances of msg.sender
+    // Updates reward Per Token Stored and store reward amount AND userRewardPerTokenPaid for msg.sender
     function withdraw(uint256 amount) public override nonReentrant updateReward(msg.sender) {
         require(amount > 0, "Cannot withdraw 0");
         _totalSupply = _totalSupply.sub(amount);
         _balances[msg.sender] = _balances[msg.sender].sub(amount);
-        IERC20Upgradeable(stakingToken).safeTransfer(msg.sender, amount);
+        ERC20Sealed(stakingToken).mint(msg.sender, amount);
         emit Withdrawn(msg.sender, amount);
     }
     

@@ -19,13 +19,13 @@ export default async function main(deployerAddress: string) {
 
 	// deploy SYN
 	const SYN = await ethers.getContractFactory("SyntheXToken");
-	const syn = await SYN.deploy();
+	const syn = await SYN.deploy(deployerAddress);
 	await syn.deployed();
 
 	// deploy Sealed SYN
 	const SealedSYN = await ethers.getContractFactory("SealedSYN");
-	const sealedSYN = await SealedSYN.deploy();
-	await sealedSYN.deployed();	
+	const sealedSYN = await SealedSYN.deploy(deployerAddress);
+	await sealedSYN.deployed();
 
     // deploy synthex
     const SyntheX = await ethers.getContractFactory("SyntheX");
@@ -50,7 +50,7 @@ export default async function main(deployerAddress: string) {
 	await pool.deployed();
 
 	// deploy staking rewards
-	// SYN on staking sSYN
+	// SEALED_SYN_STAKING_REWARD: SYN on staking sSYN
 	const StakingRewards = await ethers.getContractFactory("StakingRewards");
 	const stakingRewards = await upgrades.deployProxy(StakingRewards, [syn.address, sealedSYN.address], {
 		initializer: 'initialize(address,address)',
@@ -61,8 +61,11 @@ export default async function main(deployerAddress: string) {
 		pool.address,
 		ethers.utils.parseEther("0.9")
 	);
-	await sealedSYN.mint(synthex.address, ethers.utils.parseEther("100000000"));
-	await synthex.setPoolSpeed(pool.address, ethers.utils.parseEther("0.1"));
+	const minterRole = await sealedSYN.MINTER_ROLE();
+	await sealedSYN.grantRole(minterRole, synthex.address);
+	await sealedSYN.grantRole(minterRole, stakingRewards.address);
+	
+	await synthex.setPoolSpeed(sealedSYN.address, pool.address, ethers.utils.parseEther("0.1"));
 
 	const ERC20X = await ethers.getContractFactory("ERC20X");
 	const PriceFeed = await ethers.getContractFactory("MockPriceFeed");

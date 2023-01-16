@@ -32,9 +32,9 @@ interface ISyntheX {
     /* -------------------------------------------------------------------------- */
     /*                          $SYN Reward Distribution                          */
     /* -------------------------------------------------------------------------- */
-    function claimSYN(address holder, address[] memory tradingPoolsList) external ;
-    function claimSYN(address[] memory holders, address[] memory _tradingPools) external;
-    function getRewardsAccrued(address _account, address[] memory tradingPoolsList) external returns(uint[] memory);
+    function claimReward(address _rewardToken, address holder, address[] memory tradingPoolsList) external;
+    function claimReward(address _rewardToken, address[] memory holders, address[] memory tradingPoolsList) external;
+    function getRewardsAccrued(address _rewardToken, address _account, address[] memory tradingPoolsList) external returns(uint);
 
 
     /* -------------------------------------------------------------------------- */
