@@ -79,7 +79,7 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
      * @param _tradingPool The address of the trading pool
      */
     function exitPool(address _tradingPool) virtual override public {
-        require(getUserPoolDebtUSD(msg.sender, _tradingPool) == 0, "SyntheX: Pool debt must be zero");
+        require(SyntheXPool(_tradingPool).getUserDebtUSD(msg.sender) == 0, "SyntheX: Pool debt must be zero");
         tradingPools[_tradingPool].accountMembership[msg.sender] = false;
         address[] storage pools = accountPools[msg.sender];
         // remove from list
@@ -221,7 +221,7 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         // amoount to issue in USD; needed to issue debt
         uint amountUSD = _amount.mul(price.price).div(10**price.decimals);
         // issue synth and debt
-        SyntheXPool(_tradingPool).mint(_synth, msg.sender, msg.sender, _amount, amountUSD);
+        _amount = SyntheXPool(_tradingPool).mint(_synth, msg.sender, msg.sender, _amount, amountUSD);
 
         // ensure [after debt] health factor is positive
         require(healthFactor(msg.sender) > safeCRatio, "Health factor below safeCRatio");
@@ -246,18 +246,13 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         distributeAccountReward(address(syn), _tradingPool, msg.sender);
 
         // get synth price
-        IPriceOracle.Price memory price = oracle().getAssetPrice(_synth);
+        IPriceOracle _oracle = IPriceOracle(addressStorage.getAddress(PRICE_ORACLE));
+        IPriceOracle.Price memory price = _oracle.getAssetPrice(_synth);
 
         // amount in USD for debt calculation
-        // TODO: Performs a multiplication on the result of a division. Check SECURITY.md for details
         uint amountUSD = _amount.mul(price.price).div(10**price.decimals);
 
-        uint burnablePerc = getUserPoolDebtUSD(msg.sender, _tradingPool).min(amountUSD).mul(1e18).div(amountUSD);
-
-        // ensure user has enough debt to burn
-        if(burnablePerc == 0) return;
-
-        SyntheXPool(_tradingPool).burn(_synth, msg.sender, msg.sender, _amount.mul(burnablePerc).div(1e18), amountUSD.mul(burnablePerc).div(1e18));
+        _amount = SyntheXPool(_tradingPool).burn(_synth, msg.sender, msg.sender, _amount, amountUSD);
 
         emit Burn(msg.sender, _tradingPool, _synth, _amount);
     }
@@ -285,7 +280,7 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         uint amountUSD = _amount.mul(prices[0].price).div(10**prices[0].decimals);
         uint amountDst = _amount.mul(prices[0].price).mul(10**prices[1].decimals).div(prices[1].price).div(10**prices[0].decimals);
 
-        // Burn fromSynth from user
+        // Burn fromSynth from users
         SyntheXPool(_tradingPool).burnSynth(_synthFrom, msg.sender, _amount);
         // Mint toSynth to user
         SyntheXPool(_tradingPool).mintSynth(_synthTo, msg.sender, amountDst, amountUSD);
@@ -333,6 +328,7 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         // get collateral balance
         uint collateralBalance = accountCollateralBalance[_account][_outAsset];
 
+        // inAssetAmount (synth) => collateralAmount (collateral)
         // collateral to sieze = incentive * (inAmount * inAmountPrice) / outAssetPrice
         uint collateralToSieze = _inAmount
             .mul(prices[0].price)           // in asset price
@@ -347,9 +343,6 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
             collateralToSieze = collateralBalance;
         }
 
-        // sieze collateral
-        accountCollateralBalance[_account][_outAsset] = collateralBalance.sub(collateralToSieze);
-
         uint amountUSD = collateralToSieze
             .mul(prices[1].price)
             .mul(1e18)
@@ -357,7 +350,8 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
             .div(10**prices[1].decimals);
 
         // burn synth & debt
-        SyntheXPool(_tradingPool).burn(
+        // TODO: recalcuate collateralToSieze after checking actual synth burned 
+        uint synthBurned = SyntheXPool(_tradingPool).burn(
             _inAsset, 
             msg.sender,
             _account, 
@@ -366,6 +360,9 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
             .div(prices[0].price),
             amountUSD
         );
+
+        // sieze collateral
+        accountCollateralBalance[_account][_outAsset] = collateralBalance.sub(collateralToSieze);
 
         // add collateral to liquidator
         accountCollateralBalance[msg.sender][_outAsset] = accountCollateralBalance[msg.sender][_outAsset].add(collateralToSieze);
@@ -739,7 +736,7 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         // Iterate over all the trading pools of the account
         for(uint i = 0; i < _accountPools.length; i++){
             // Add the debt amount in USD
-            totalDebt = totalDebt.add(getUserPoolDebtUSD(_account, _accountPools[i]));
+            totalDebt = totalDebt.add(SyntheXPool(_accountPools[i]).getUserDebtUSD(_account));
         }
         return totalDebt;
     }
@@ -758,31 +755,12 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         for(uint i = 0; i < _accountPools.length; i++){
             // Add the adjusted debt amount in USD
             adjustedTotalDebt = adjustedTotalDebt.add(
-                getUserPoolDebtUSD(_account, _accountPools[i])
+                SyntheXPool(_accountPools[i]).getUserDebtUSD(_account)
                 .mul(1e18)
                 .div(tradingPools[_accountPools[i]].volatilityRatio)
             );
         }
         return adjustedTotalDebt;
-    }
-
-    /**
-     * @dev Get the debt of an account in a trading pool
-     * @param _account The address of the account
-     * @param _tradingPool The address of the trading pool
-     * @return The debt of the account in the trading pool
-     */
-    function getUserPoolDebtUSD(address _account, address _tradingPool) virtual override public view returns(uint){
-        // Get the total debt shares (supply) of the trading pool
-        uint totalDebtShare = IERC20(_tradingPool).totalSupply();
-        // If totalShares == 0, there's no debt
-        if(totalDebtShare == 0){
-            return 0;
-        }
-        // Get the total debt of the trading pool in USD
-        uint poolDebt = SyntheXPool(_tradingPool).getTotalDebtUSD();
-        // Get the debt of the account in the trading pool, based on its debt share balance
-        return IERC20(_tradingPool).balanceOf(_account).mul(poolDebt).div(totalDebtShare); 
     }
 
     /**

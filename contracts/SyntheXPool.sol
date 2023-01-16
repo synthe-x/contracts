@@ -173,6 +173,22 @@ contract SyntheXPool is ISyntheXPool, ERC20Upgradeable {
         return totalDebt;
     }
 
+    /**
+     * @dev Get the debt of an account in this trading pool
+     * @param _account The address of the account
+     * @return The debt of the account in this trading pool
+     */
+    function getUserDebtUSD(address _account) virtual override public view returns(uint){
+        // Get the total debt shares (supply) of the trading pool
+        uint totalDebtShare = totalSupply();
+        // If totalShares == 0, there's no debt
+        if(totalDebtShare == 0){
+            return 0;
+        }
+        // Get the debt of the account in the trading pool, based on its debt share balance
+        return balanceOf(_account).mul(getTotalDebtUSD()).div(totalDebtShare); 
+    }
+
     /* -------------------------------------------------------------------------- */
     /*                                  Override                                  */
     /* -------------------------------------------------------------------------- */
@@ -214,7 +230,7 @@ contract SyntheXPool is ISyntheXPool, ERC20Upgradeable {
      * @param _amountUSD The amount of USD to issue
      * @notice Only SyntheX can call this function
      */
-    function mint(address _synth, address _borrower, address _account, uint _amount, uint _amountUSD) virtual override public onlyInternal {
+    function mint(address _synth, address _borrower, address _account, uint _amount, uint _amountUSD) virtual override public onlyInternal returns(uint) {
         if(totalSupply() == 0){
             _mint(_borrower, _amountUSD);
         } else {
@@ -227,7 +243,7 @@ contract SyntheXPool is ISyntheXPool, ERC20Upgradeable {
             // Mint the debt tokens
             _mint(_borrower, mintAmount);
         }
-        mintSynth(_synth, _account, _amount, _amountUSD);
+        return mintSynth(_synth, _account, _amount, _amountUSD);
     }
 
     /**
@@ -236,7 +252,7 @@ contract SyntheXPool is ISyntheXPool, ERC20Upgradeable {
      * @param _user The address of the user
      * @param _amount The amount of synths to issue
      */
-    function mintSynth(address _synth, address _user, uint _amount, uint amountUSD) virtual override public onlyInternal {
+    function mintSynth(address _synth, address _user, uint _amount, uint amountUSD) virtual override public onlyInternal returns(uint) {
         // Fetch the fee and cache it
         uint _fee = fee;
         // Mint (amount - fee) toSynth to user
@@ -265,18 +281,32 @@ contract SyntheXPool is ISyntheXPool, ERC20Upgradeable {
     }
 
     /**
-     * @notice Burn synths from the user
+     * @notice Burn synths from the user 
+     * @param _synth The address of the synth to burn
      * @param _repayer User that is repaying the debt; the user that is burning the synth
      * @param _borrower User whose debt is being burned
-     * @param _amountUSD The amount of USD to burn
+     * @param _amount The amount of synths to burn
+     * @param amountUSD The amount of USD debt to burn
+     * @return The amount of synth burned
+     * @notice Only SyntheX can call this function
+     * @notice The amount of synths to burn is calculated based on the amount of debt tokens burned
      */
-    function burn(address _synth, address _repayer, address _borrower, uint _amount, uint _amountUSD) virtual override public onlyInternal {
+    function burn(address _synth, address _repayer, address _borrower, uint _amount, uint amountUSD) virtual override public onlyInternal returns(uint) {
+
+        uint burnablePerc = getUserDebtUSD(_borrower).min(amountUSD).mul(1e18).div(amountUSD);
+
+        // ensure user has enough debt to burn
+        if(burnablePerc == 0) return 0;
+
+        _amount = _amount.mul(burnablePerc).div(1e18);
+        amountUSD = amountUSD.mul(burnablePerc).div(1e18);
+
         uint _totalDebt = getTotalDebtUSD();
         uint totalSupply = totalSupply();
-        uint burnAmount = totalSupply * _amountUSD / _totalDebt;
+        uint burnAmount = totalSupply * amountUSD / _totalDebt;
         _burn(_borrower, burnAmount);
 
-        burnSynth(_synth, _repayer, _amount);
+        return burnSynth(_synth, _repayer, _amount);
     }
 
     /**
@@ -285,8 +315,10 @@ contract SyntheXPool is ISyntheXPool, ERC20Upgradeable {
      * @param _user The address of the user
      * @param _amount The amount of synths to burn
      */
-    function burnSynth(address _synth, address _user, uint _amount) virtual override public onlyInternal {
+    function burnSynth(address _synth, address _user, uint _amount) virtual override public onlyInternal returns(uint) {
         // Burn amount
         ERC20X(_synth).burn(_user, _amount);
+
+        return _amount;
     }
 }

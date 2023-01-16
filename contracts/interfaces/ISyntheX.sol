@@ -48,7 +48,6 @@ interface ISyntheX {
     function getAdjustedUserTotalCollateralUSD(address _account) external view returns(uint);
     function getUserTotalDebtUSD(address _account) external view returns(uint);
     function getAdjustedUserTotalDebtUSD(address _account) external view returns(uint) ;
-    function getUserPoolDebtUSD(address _account, address _tradingPool) external view returns(uint);
     function oracle() external view returns(IPriceOracle);
 
 
