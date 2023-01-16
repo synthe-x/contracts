@@ -84,6 +84,7 @@ export default async function main(deployerAddress: string) {
 	await susdPriceFeed.deployed();
 	await oracle.setFeed(susd.address, susdPriceFeed.address);
 	await pool.enableSynth(susd.address);
+	await pool.updateFeeToken(susd.address);
 
 	// sbtc
 	const sbtc = await ERC20X.deploy("SyntheX BTC", "BTCx", pool.address, addressManager.address);

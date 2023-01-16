@@ -24,8 +24,6 @@ describe("Testing Fee", function () {
 		susd = deployments.susd;
 		sbtc = deployments.sbtc;
 		seth = deployments.seth;
-        sethPriceFeed = deployments.ethPriceFeed;
-        sbtcPriceFeed = deployments.sbtcPriceFeed;
 	});
 
     it("update fee to 1%", async function () {
@@ -48,6 +46,8 @@ describe("Testing Fee", function () {
         await synthex.connect(user1).issue(cryptoPool.address, seth.address, ethers.utils.parseEther("10")); // $ 10000
         // 10000 - (50 (1% * 0.5) burned)
         expect(await synthex.getUserTotalDebtUSD(user1.address)).to.be.equal(ethers.utils.parseEther("9950.00"));
+        // vault balance should be 50
+        expect(await susd.balanceOf(vault.address)).to.be.equal(ethers.utils.parseEther("50"));
         // After issuing 10 ETH, balance should be 9.9 ETH
         // 10 - 0.1 (1%) fee
         expect(await seth.balanceOf(user1.address)).to.be.equal(ethers.utils.parseEther("9.9")); 
@@ -56,8 +56,10 @@ describe("Testing Fee", function () {
     it("user1 exchanges 1 seth to sbtc", async function () {
         // user1 exchanges 1 seth to sbtc
         await synthex.connect(user1).exchange(cryptoPool.address, seth.address, sbtc.address, ethers.utils.parseEther("1")); 
-        // 9950 - (5 (1% * 0.5) burned) = 9945
+        // 995 - (5 (1% * 0.5) burned) = 9945
         expect(await synthex.getUserTotalDebtUSD(user1.address)).to.be.equal(ethers.utils.parseEther("9945"));
+        // vault balance should be 55
+        expect(await susd.balanceOf(vault.address)).to.be.equal(ethers.utils.parseEther("55"));
         // After exchanging 1 seth to sbtc, user should get 0.1 sbtc
         // 0.1 - 0.01 (1%) fee
         expect(await sbtc.balanceOf(user1.address)).to.be.equal(ethers.utils.parseEther("0.099")); 

@@ -10,20 +10,23 @@ interface ISyntheXPool {
     function enableSynth(address _synth) external;
     function updateFee(uint _fee, uint _alloc) external;
     function disableSynth(address _synth) external;
-    function removeSynth(address _synth) external ;
+    function removeSynth(address _synth) external;
+    function updateFeeToken(address _feeToken) external;
+
     /* -------------------------------------------------------------------------- */
     /*                               View Functions                               */
     /* -------------------------------------------------------------------------- */
     function getSynths() external view returns (address[] memory);
     function getTotalDebtUSD() external view returns(uint);
+
     /* -------------------------------------------------------------------------- */
     /*                              Internal Functions                            */
     /* -------------------------------------------------------------------------- */
-    function mint(address _user, uint _amountUSD) external;
-    function mintSynth(address _synth, address _user, uint _amount) external;
-    function burn(address _user, uint _amountUSD) external;
+    function mint(address _synth, address _borrower, address _account, uint _amount, uint _amountUSD) external;
+    function mintSynth(address _synth, address _user, uint _amount, uint amountUSD) external;
+    function burn(address _synth, address _repayer, address _borrower, uint _amount, uint _amountUSD) external;
     function burnSynth(address _synth, address _user, uint _amount) external;
-    function exchange(address _fromSynth, address _toSynth, address _user, uint _fromAmount, uint _toAmount) external;
+
     /* -------------------------------------------------------------------------- */
     /*                               Events                                       */
     /* -------------------------------------------------------------------------- */
@@ -31,4 +34,5 @@ interface ISyntheXPool {
     event SynthDisabled(address indexed synth);
     event SynthRemoved(address indexed synth);
     event FeesUpdated(uint fee, uint issuerAlloc);
+    event FeeTokenUpdated(address feeToken);
 }

@@ -44,6 +44,11 @@ contract SyntheXPool is ISyntheXPool, ERC20Upgradeable {
     uint private constant BASIS_POINTS = 10000;
 
     /**
+     * @dev The synth token used to pass on to vault as fee
+     */
+    address public feeToken;
+
+    /**
      * @dev The list of synths in the pool to calculate total debt
      */
     address[] private _synthsList;
@@ -96,6 +101,15 @@ contract SyntheXPool is ISyntheXPool, ERC20Upgradeable {
         issuerAlloc = _alloc;
         // Emit event on fee updated
         emit FeesUpdated(_fee, _alloc);
+    }
+
+    /**
+     * @dev Update the address of the primary token
+     */
+    function updateFeeToken(address _feeToken) virtual override public onlyAdmin {
+        feeToken = _feeToken;
+        // Emit event on primary token updated
+        emit FeeTokenUpdated(_feeToken);
     }
 
     /**
@@ -195,27 +209,25 @@ contract SyntheXPool is ISyntheXPool, ERC20Upgradeable {
     /* -------------------------------------------------------------------------- */
     /**
      * @notice Issue synths to the user
-     * @param _user The address of the user
+     * @param _borrower The address that is issuing the debt
+     * @param _account The address of the user to issue synths to
      * @param _amountUSD The amount of USD to issue
      * @notice Only SyntheX can call this function
      */
-    function mint(address _user, uint _amountUSD) virtual override public onlyInternal {
+    function mint(address _synth, address _borrower, address _account, uint _amount, uint _amountUSD) virtual override public onlyInternal {
         if(totalSupply() == 0){
-            _mint(_user, _amountUSD);
+            _mint(_borrower, _amountUSD);
         } else {
             /**
-             * @dev Calculate the amount of debt tokens to mint
-             * @dev debtSharePrice = totalDebt / totalSupply
-             * @dev mintAmount = amountUSD / debtSharePrice
-             * @dev 1e18 is used to avoid decimal issues
+             * Calculate the amount of debt tokens to mint
+             * debtSharePrice = totalDebt / totalSupply
+             * mintAmount = amountUSD / debtSharePrice
              */
-            uint _totalDebt = getTotalDebtUSD();
-            uint totalSupply = totalSupply();
-            uint debtSharePrice = _totalDebt * 1e18 / totalSupply;
-            uint mintAmount = _amountUSD * 1e18 / debtSharePrice;
+            uint mintAmount = _amountUSD.mul(totalSupply()).div(getTotalDebtUSD());
             // Mint the debt tokens
-            _mint(_user, mintAmount);
+            _mint(_borrower, mintAmount);
         }
+        mintSynth(_synth, _account, _amount, _amountUSD);
     }
 
     /**
@@ -224,32 +236,47 @@ contract SyntheXPool is ISyntheXPool, ERC20Upgradeable {
      * @param _user The address of the user
      * @param _amount The amount of synths to issue
      */
-    function mintSynth(address _synth, address _user, uint _amount) virtual override public onlyInternal {
+    function mintSynth(address _synth, address _user, uint _amount, uint amountUSD) virtual override public onlyInternal {
         // Fetch the fee and cache it
         uint _fee = fee;
         // Mint (amount - fee) toSynth to user
         ERC20X(_synth).mint(_user, _amount.mul(uint(1e18).mul(BASIS_POINTS).sub(_fee)).div(1e18).div(BASIS_POINTS));
-        // (issuerAlloc * fee) is burned
+        // (issuerAlloc * fee) is burned permanently
+
         // Mint ((1 - issuerAlloc) * fee) to staking rewards
-        ERC20X(_synth).mint(
-            addressStorage.getAddress(VAULT), 
-            _amount.mul(_fee)
+
+        IPriceOracle _oracle = IPriceOracle(addressStorage.getAddress(PRICE_ORACLE));
+        IPriceOracle.Price memory feeTokenPrice = _oracle.getAssetPrice(feeToken);
+
+        // NOTE - Here performing all multiplications before all division causes overflow. So moved one multiplication after division
+        uint toAmount = amountUSD
+            .mul(_fee)
             .mul(uint(1e18).mul(BASIS_POINTS).sub(issuerAlloc))
-            .div(BASIS_POINTS).div(1e18)                    // for multiplying _fee
-            .div(BASIS_POINTS).div(1e18)                    // for multiplying issuerAlloc
+            .div(BASIS_POINTS).div(1e18)            // for multiplying _fee
+            .div(BASIS_POINTS).div(1e18)           // for multiplying issuerAlloc
+            .mul(10**feeTokenPrice.decimals)        // for dividing with feeToken price
+            .div(feeTokenPrice.price);
+        
+        // Mint fee
+        ERC20X(feeToken).mint(
+            addressStorage.getAddress(VAULT), 
+            toAmount
         );
     }
 
     /**
      * @notice Burn synths from the user
-     * @param _user The address of the user
+     * @param _repayer User that is repaying the debt; the user that is burning the synth
+     * @param _borrower User whose debt is being burned
      * @param _amountUSD The amount of USD to burn
      */
-    function burn(address _user, uint _amountUSD) virtual override public onlyInternal {
+    function burn(address _synth, address _repayer, address _borrower, uint _amount, uint _amountUSD) virtual override public onlyInternal {
         uint _totalDebt = getTotalDebtUSD();
         uint totalSupply = totalSupply();
         uint burnAmount = totalSupply * _amountUSD / _totalDebt;
-        _burn(_user, burnAmount);
+        _burn(_borrower, burnAmount);
+
+        burnSynth(_synth, _repayer, _amount);
     }
 
     /**
@@ -261,21 +288,5 @@ contract SyntheXPool is ISyntheXPool, ERC20Upgradeable {
     function burnSynth(address _synth, address _user, uint _amount) virtual override public onlyInternal {
         // Burn amount
         ERC20X(_synth).burn(_user, _amount);
-    }
-
-    /**
-     * @notice Exchange synths
-     * @param _fromSynth The address of the synth to exchange from
-     * @param _toSynth The address of the synth to exchange to
-     * @param _user The address of the user
-     * @param _fromAmount The amount of synths to exchange from
-     * @param _toAmount The amount of synths to exchange to
-     */
-    function exchange(address _fromSynth, address _toSynth, address _user, uint _fromAmount, uint _toAmount) virtual override public onlyInternal {
-        require(synths[_toSynth], "Synth not enabled");
-        // Burn fromSynth from user
-        ERC20X(_fromSynth).burn(_user, _fromAmount);
-        // Mint toSynth to user
-        mintSynth(_toSynth, _user, _toAmount);
     }
 }

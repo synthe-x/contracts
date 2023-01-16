@@ -220,10 +220,8 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
 
         // amoount to issue in USD; needed to issue debt
         uint amountUSD = _amount.mul(price.price).div(10**price.decimals);
-        // issue debt
-        SyntheXPool(_tradingPool).mint(msg.sender, amountUSD);
-        // issue synth
-        SyntheXPool(_tradingPool).mintSynth(_synth, msg.sender, _amount);
+        // issue synth and debt
+        SyntheXPool(_tradingPool).mint(_synth, msg.sender, msg.sender, _amount, amountUSD);
 
         // ensure [after debt] health factor is positive
         require(healthFactor(msg.sender) > safeCRatio, "Health factor below safeCRatio");
@@ -259,8 +257,7 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         // ensure user has enough debt to burn
         if(burnablePerc == 0) return;
 
-        SyntheXPool(_tradingPool).burn(msg.sender, amountUSD.mul(burnablePerc).div(1e18));
-        SyntheXPool(_tradingPool).burnSynth(_synth, msg.sender, _amount.mul(burnablePerc).div(1e18));
+        SyntheXPool(_tradingPool).burn(_synth, msg.sender, msg.sender, _amount.mul(burnablePerc).div(1e18), amountUSD.mul(burnablePerc).div(1e18));
 
         emit Burn(msg.sender, _tradingPool, _synth, _amount);
     }
@@ -285,10 +282,13 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         prices = oracle().getAssetPrices(t);
 
         // _amount in terms of _synthTo
+        uint amountUSD = _amount.mul(prices[0].price).div(10**prices[0].decimals);
         uint amountDst = _amount.mul(prices[0].price).mul(10**prices[1].decimals).div(prices[1].price).div(10**prices[0].decimals);
 
-        // actual through trading pool
-        SyntheXPool(_tradingPool).exchange(_synthFrom, _synthTo, msg.sender, _amount, amountDst);
+        // Burn fromSynth from user
+        SyntheXPool(_tradingPool).burnSynth(_synthFrom, msg.sender, _amount);
+        // Mint toSynth to user
+        SyntheXPool(_tradingPool).mintSynth(_synthTo, msg.sender, amountDst, amountUSD);
 
         // emit successful exchange event
         emit Exchange(msg.sender, _tradingPool, _synthFrom, _synthTo, _amount, amountDst);
@@ -350,15 +350,21 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         // sieze collateral
         accountCollateralBalance[_account][_outAsset] = collateralBalance.sub(collateralToSieze);
 
-        // burn synth & debt
-        SyntheXPool(_tradingPool).burn(_account, collateralToSieze.mul(prices[1].price).mul(1e18).div(incentive).div(10**prices[1].decimals));
-        SyntheXPool(_tradingPool).burnSynth(_inAsset, msg.sender, collateralToSieze
+        uint amountUSD = collateralToSieze
             .mul(prices[1].price)
-            .mul(10**prices[0].decimals)
             .mul(1e18)
             .div(incentive)
-            .div(prices[0].price)
-            .div(10**prices[1].decimals)
+            .div(10**prices[1].decimals);
+
+        // burn synth & debt
+        SyntheXPool(_tradingPool).burn(
+            _inAsset, 
+            msg.sender,
+            _account, 
+            amountUSD
+            .mul(10**prices[0].decimals)
+            .div(prices[0].price),
+            amountUSD
         );
 
         // add collateral to liquidator
@@ -531,7 +537,6 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         }
 
         // Calculate change in the cumulative sum of the SYN per debt token accrued
-        // console.log("accountIndex %s borrowIndex", accountIndex/1e18, borrowIndex/1e18);
         uint deltaIndex = borrowIndex - accountIndex;
 
         uint accountDebtTokens = SyntheXPool(_tradingPool).balanceOf(_account);
