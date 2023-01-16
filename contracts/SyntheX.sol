@@ -14,11 +14,14 @@ import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol"
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
-import "./utils/Vault.sol";
+import "./utils/FeeVault.sol";
 import "./interfaces/ISyntheX.sol";
 
-
-/// @custom:security-contact prasad@chainscore.finance
+/**
+ * @title SyntheX
+ * @author SyntheX <prasad@chainscore.finance>
+ * @notice SyntheX is a decentralized synthetic asset protocol that allows users to mint synthetic assets backed by collateral assets.
+ */
 contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgradeable, SyntheXStorage {
     using SafeMathUpgradeable for uint256;
     using MathUpgradeable for uint256;
@@ -194,6 +197,8 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
      * @param _amount The amount of synthetic asset to issue
      */
     function issue(address _tradingPool, address _synth, uint _amount) virtual override public whenNotPaused nonReentrant {
+        // ensure amount is greater than 0
+        require(_amount > 0, "Amount must be greater than 0");
         // get trading pool market
         Market storage pool = tradingPools[_tradingPool];
         // ensure the pool is enabled
@@ -205,10 +210,8 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         // ensure the synth to issue is enabled from the trading pool
         require(SyntheXPool(_tradingPool).synths(_synth), "Synth not enabled");
         
-        // update reward index for the pool
-        updateSYNIndex(_tradingPool);
-        // distribute pending $syn to user
-        distributeAccountSYN(_tradingPool, msg.sender);
+        // update reward index for the pool && distribute pending $syn to user
+        updateReward(_tradingPool, msg.sender);
 
         // get price from oracle
         IPriceOracle.Price memory price = oracle().getAssetPrice(_synth);
@@ -234,18 +237,24 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
      * @param _amount The amount of synthetic asset to redeem
      */
     function burn(address _tradingPool, address _synth, uint _amount) virtual override public whenNotPaused nonReentrant {
-        // update reward index for the pool
-        updateSYNIndex(_tradingPool);
-        // distribute pending $syn to user
-        distributeAccountSYN(_tradingPool, msg.sender);
+        // ensure amount is greater than 0
+        require(_amount > 0, "Amount must be greater than 0");
+
+        // update reward index for the pool && distribute pending $syn to user
+        updateReward(_tradingPool, msg.sender);
 
         // get synth price
         IPriceOracle.Price memory price = oracle().getAssetPrice(_synth);
 
         // amount in USD for debt calculation
+        // TODO: Performs a multiplication on the result of a division. Check SECURITY.md for details
         uint amountUSD = _amount.mul(price.price).div(10**price.decimals);
 
         uint burnablePerc = getUserPoolDebtUSD(msg.sender, _tradingPool).min(amountUSD).mul(1e18).div(amountUSD);
+
+        // ensure user has enough debt to burn
+        if(burnablePerc == 0) return;
+
         SyntheXPool(_tradingPool).burn(msg.sender, amountUSD.mul(burnablePerc).div(1e18));
         SyntheXPool(_tradingPool).burnSynth(_synth, msg.sender, _amount.mul(burnablePerc).div(1e18));
 
@@ -282,24 +291,6 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
     }
 
     /**
-     * @dev Set the reward speed for a trading pool
-     * @param _tradingPool The address of the trading pool
-     * @param _speed The reward speed
-     */
-    function setPoolSpeed(address _tradingPool, uint _speed) virtual override public onlyAdmin(POOL_MANAGER) {
-        // get pool
-        Market storage pool = tradingPools[_tradingPool];
-        // ensure pool is enabled
-        require(pool.isEnabled, "Trading pool not enabled");
-        // update existing rewards
-        updateSYNIndex(_tradingPool);
-        // set speed
-        synRewardSpeeds[_tradingPool] = _speed;
-        // emit successful event
-        emit SetPoolRewardSpeed(_tradingPool, _speed);
-    }
-
-    /**
      * @dev Liquidate an account
      * @param _account The address of the account to liquidate
      * @param _tradingPool The address of the trading pool
@@ -319,6 +310,9 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
 
         // liquidation incentive is the account loan to value ratio
         uint incentive = getLTV(_account);
+        // ensure incentive is greater than 0
+        require(incentive > 0, "Account has zero LTV");
+
         IPriceOracle.Price[] memory prices;
         address[] memory t = new address[](2);
         t[0] = _inAsset;
@@ -391,11 +385,8 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
      * @param _volatilityRatio The volatility ratio of the trading pool
      */
     function enableTradingPool(address _tradingPool, uint _volatilityRatio) virtual override public onlyAdmin(POOL_MANAGER) {
+        require(_volatilityRatio > 0, "Volatility ratio must be greater than 0");
         Market storage pool = tradingPools[_tradingPool];
-        // if already enabled, return
-        if(pool.isEnabled){
-           return; 
-        }
         // enable pool
         pool.isEnabled = true;
         // set pool's volatility ratio
@@ -425,10 +416,6 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
      */
     function enableCollateral(address _collateral, uint _volatilityRatio) virtual override public onlyAdmin(ADMIN) {
         Market storage collateral = collaterals[_collateral];
-        // if already enabled, return
-        if(collateral.isEnabled){
-            return;
-        }
         // enable collateral
         collateral.isEnabled = true;
         // set collateral's volatility ratio
@@ -465,15 +452,54 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         safeCRatio = _safeCRatio;
     }
     /* -------------------------------------------------------------------------- */
-    /*                          $SYN Reward Distribution                          */
+    /*                             Reward Distribution                            */
     /* -------------------------------------------------------------------------- */
+
+    function addRewardToken(address _rewardToken) virtual public onlyAdmin(ADMIN) {
+        // check if already added
+        for(uint i = 0; i < rewardTokens.length; i++){
+            require(rewardTokens[i] != _rewardToken, "Reward token already added");
+        }
+        rewardTokens.push(_rewardToken);
+        emit RewardTokenAdded(_rewardToken);
+    }
+    
     /**
-     * @notice Accrue COMP to the market by updating the supply index
-     * @param _tradingPool The market whose supply index to update
+     * @dev Set the reward speed for a trading pool
+     * @param _tradingPool The address of the trading pool
+     * @param _speed The reward speed
      */
-    function updateSYNIndex(address _tradingPool) internal {
-        SynMarketState storage poolRewardState = synRewardState[_tradingPool];
-        uint rewardSpeed = synRewardSpeeds[_tradingPool];
+    function setPoolSpeed(address _rewardToken, address _tradingPool, uint _speed) virtual override public onlyAdmin(POOL_MANAGER) {
+        // get pool from storage
+        Market storage pool = tradingPools[_tradingPool];
+        // ensure pool is enabled
+        require(pool.isEnabled, "Trading pool not enabled");
+        // update existing rewards
+        updatePoolRewardIndex(_rewardToken, _tradingPool);
+        // set speed
+        rewardSpeeds[_rewardToken][_tradingPool] = _speed;
+        // emit successful event
+        emit SetPoolRewardSpeed(_tradingPool, _speed);
+    }
+    
+    /**
+     * @notice Distribute all rewards to the user
+     * @param _account The address of the user to distribute rewards to
+     */
+    function updateReward(address _account, address _tradingPool) internal {
+        for(uint i = 0; i < rewardTokens.length; i++){
+            updatePoolRewardIndex(rewardTokens[i], _tradingPool);
+            distributeAccountReward(rewardTokens[i], _tradingPool, _account);
+        }
+    }
+
+    /**
+     * @notice Accrue rewards to the market
+     * @param _tradingPool The market whose reward index to update
+     */
+    function updatePoolRewardIndex(address _rewardToken, address _tradingPool) internal {
+        PoolRewardState storage poolRewardState = rewardState[_rewardToken][_tradingPool];
+        uint rewardSpeed = rewardSpeeds[_rewardToken][_tradingPool];
         uint deltaTimestamp = block.timestamp - poolRewardState.timestamp;
         if(deltaTimestamp == 0) return;
         if (rewardSpeed > 0) {
@@ -485,23 +511,23 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         } else {
             poolRewardState.timestamp = uint32(block.timestamp);
         }
-    }
+    } 
 
     /**
      * @notice Calculate COMP accrued by a supplier and possibly transfer it to them
      * @param _tradingPool The market in which the supplier is interacting
      * @param _account The address of the supplier to distribute COMP to
      */
-    function distributeAccountSYN(address _tradingPool, address _account) internal {
+    function distributeAccountReward(address _rewardToken, address _tradingPool, address _account) internal {
         // This check should be as gas efficient as possible as distributeSupplierComp is called in many places.
         // - We really don't want to call an external contract as that's quite expensive.
 
-        SynMarketState storage poolRewardState = synRewardState[_tradingPool];
+        PoolRewardState storage poolRewardState = rewardState[_rewardToken][_tradingPool];
         uint borrowIndex = poolRewardState.index;
-        uint accountIndex = synBorrowerIndex[_tradingPool][_account];
+        uint accountIndex = rewardIndex[_rewardToken][_tradingPool][_account];
 
         // Update supplier's index to the current index since we are distributing accrued COMP
-        synBorrowerIndex[_tradingPool][_account] = borrowIndex;
+        rewardIndex[_rewardToken][_tradingPool][_account] = borrowIndex;
 
         if (accountIndex == 0 && borrowIndex >= compInitialIndex) {
             // Covers the case where users supplied tokens before the market's supply state index was set.
@@ -519,8 +545,8 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         // Calculate COMP accrued: cTokenAmount * accruedPerCToken
         uint accountDelta = accountDebtTokens * deltaIndex / 1e36;
 
-        uint accountAccrued = synAccrued[_account].add(accountDelta);
-        synAccrued[_account] = accountAccrued;
+        uint accountAccrued = rewardAccrued[_rewardToken][_account].add(accountDelta);
+        rewardAccrued[_rewardToken][_account] = accountAccrued;
 
         emit DistributedSYN(_tradingPool, _account, accountDelta, borrowIndex);
     }
@@ -547,24 +573,30 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         for (uint i = 0; i < _tradingPools.length; i++) {
             address pool = _tradingPools[i];
             require(tradingPools[pool].isEnabled, "Market must be enabled");
-            updateSYNIndex(pool);
-            for (uint j = 0; j < holders.length; j++) {
-                distributeAccountSYN(pool, holders[j]);
+            // Iterate thru all reward tokens
+            for (uint j = 0; j < rewardTokens.length; j++) {
+                updatePoolRewardIndex(rewardTokens[j], pool);
+                for (uint k = 0; k < holders.length; k++) {
+                    distributeAccountReward(rewardTokens[j], pool, holders[k]);
+                }
             }
         }
-        for (uint j = 0; j < holders.length; j++) {
-            synAccrued[holders[j]] = grantSYNInternal(holders[j], synAccrued[holders[j]]);
+        for (uint i = 0; i < rewardTokens.length; i++) {
+            for (uint j = 0; j < holders.length; j++) {
+                rewardAccrued[rewardTokens[i]][holders[j]] = grantRewardInternal(rewardTokens[i], holders[j], rewardAccrued[rewardTokens[i]][holders[j]]);
+            }
         }
     }
 
-    /**
+    /** 
+     * TODO: Add a function to claim all rewards for a user
      * @notice Transfer SYN to the user
      * @dev Note: If there is not enough SYN, we do not perform the transfer all.
      * @param user The address of the user to transfer SYN to
      * @param amount The amount of SYN to (possibly) transfer
      * @return The amount of SYN which was NOT transferred to the user
      */
-    function grantSYNInternal(address user, uint amount) internal whenNotPaused nonReentrant returns (uint) {
+    function grantRewardInternal(address reward, address user, uint amount) internal whenNotPaused nonReentrant returns (uint) {
         // check if there is enough SYN
         uint synRemaining = syn.balanceOf(address(this));
         if (amount > 0 && amount <= synRemaining) {
@@ -578,17 +610,19 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
      * @dev Get total $SYN accrued by an account
      * @dev Only for getting dynamic reward amount in frontend. To be statically called
      */
-    function getSYNAccrued(address _account, address[] memory tradingPoolsList) virtual override public returns(uint){
+    function getRewardsAccrued(address _account, address[] memory tradingPoolsList) virtual override public returns(uint[] memory rewards){
         // Iterate over all the trading pools and update the reward index and account's reward amount
         for (uint i = 0; i < tradingPoolsList.length; i++) {
             SyntheXPool pool = SyntheXPool(tradingPoolsList[i]);
             require(tradingPools[address(pool)].isEnabled, "Market must be listed");
-            // Update the market's reward index
-            updateSYNIndex(address(pool));
-            // Update the account's reward amount
-            distributeAccountSYN(address(pool), _account);
+            // Update the rewards
+            updateReward(_account, address(pool));
         }
-        return synAccrued[_account];
+        // Get the rewards
+        rewards = new uint[](rewardTokens.length);
+        for (uint i = 0; i < rewardTokens.length; i++) {
+            rewards[i] = rewardAccrued[rewardTokens[i]][_account];
+        }
     }
 
     /* -------------------------------------------------------------------------- */

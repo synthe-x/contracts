@@ -11,6 +11,9 @@ contract SyntheXStorage {
     uint256 public safeCRatio;
     uint256 public compInitialIndex;
 
+    /// @notice Address manager contract address
+    AddressStorage public addressStorage;
+
     /**
      * @dev Pools the user has entered into
      */
@@ -57,7 +60,7 @@ contract SyntheXStorage {
      */
     mapping(address => CollateralSupply) public collateralSupplies;
 
-    struct SynMarketState {
+    struct PoolRewardState {
         // The market's last updated compBorrowIndex or compSupplyIndex
         uint224 index;
 
@@ -65,20 +68,20 @@ contract SyntheXStorage {
         uint32 timestamp;
     }
     
+    /// @notice The reward tokens
+    address[] public rewardTokens;
+
     /// @notice The speed at which SYN is distributed to the corresponding market (per second)
-    mapping(address => uint) public synRewardSpeeds;
+    mapping(address => mapping(address => uint)) public rewardSpeeds;
 
-    /// @notice The SYN market borrow state for each market
-    mapping(address => SynMarketState) public synRewardState;
+    /// @notice The reward market borrow state for each market
+    mapping(address => mapping(address => PoolRewardState)) public rewardState;
     
-    /// @notice The COMP borrow index for each market for each borrower as of the last time they accrued COMP
-    mapping(address => mapping(address => uint)) public synBorrowerIndex;
+    /// @notice The reward borrow index for each market for each borrower as of the last time they accrued COMP
+    mapping(address => mapping(address => mapping(address => uint))) public rewardIndex;
     
-    /// @notice The COMP accrued but not yet transferred to each user
-    mapping(address => uint) public synAccrued;
-
-    /// @notice Address manager contract address
-    AddressStorage public addressStorage;
+    /// @notice The reward accrued but not yet transferred to each user
+    mapping(address => mapping(address => uint)) public rewardAccrued;
 
     uint256[99] private __gap;
 }

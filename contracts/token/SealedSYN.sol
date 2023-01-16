@@ -1,15 +1,22 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "./ERC20Sealed.sol";
 
-/// @custom:security-contact prasad@chainscore.finance
-contract SealedSYN is ERC20, ERC20Burnable, Ownable {
+/**
+ * @title Sealed SYN
+ * @author SyntheX
+ * @custom:security-contact prasad@chainscore.finance
+ * @notice Sealed tokens cannot be transferred
+ * @notice Sealed tokens can only be minted and burned
+ */
+contract SealedSYN is ERC20, ERC20Sealed {
     constructor() ERC20("Sealed SYN", "sSYN") {}
 
-    function mint(address to, uint256 amount) public onlyOwner {
-        _mint(to, amount);
+    function _beforeTokenTransfer(address from, address to, uint256 amount)
+        internal
+        override(ERC20, ERC20Sealed)
+    {
+        super._beforeTokenTransfer(from, to, amount);
     }
 }
