@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.0;
 import "./IPriceOracle.sol";
 
 interface IDebtPool {
@@ -29,7 +29,7 @@ interface IDebtPool {
     function burnSynth(address _synth, address _user, uint _amount) external returns(uint);
 
     /* -------------------------------------------------------------------------- */
-    /*                               Events                                       */
+    /*                                 Events                                     */
     /* -------------------------------------------------------------------------- */
     event SynthEnabled(address indexed synth);
     event SynthDisabled(address indexed synth);

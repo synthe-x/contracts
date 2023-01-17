@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.0;
 
 import "./interfaces/IPriceOracle.sol";
 import "./System.sol";
@@ -64,7 +64,6 @@ contract PriceOracle is IPriceOracle {
         uint8 decimals = _feed.decimals();
 
         require(price > 0, "PriceOracle: Price is <= 0");
-        require(decimals >= 0, "PriceOracle: Decimals is <= 0");
 
         return Price({
             price: uint256(price),

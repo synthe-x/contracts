@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.0;
 
 import "./ERC20Sealed.sol";
 import "../System.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 /**
  * @title TokenUnlocker
@@ -17,6 +18,8 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 contract TokenUnlocker is Pausable {
     /// @notice SafeMath library is used for uint operations
     using SafeMath for uint;
+    /// @notice SafeERC20 library is used for ERC20 operations
+    using SafeERC20 for IERC20;
     
     /// @notice Emitted when user requests to unlock their SYN tokens
     event UnlockRequested(address indexed user, bytes32 requestId, uint amount);

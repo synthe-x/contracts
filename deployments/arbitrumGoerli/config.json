@@ -2,13 +2,20 @@
   "name": "synthex",
   "version": "0.4.0",
   "latest": "0.4.0",
-  "admin": "0x084cD22eA15E4C262408e561a5AFa8431Bd7fa5d",
-  "poolManager": "0x46c18c6d5526E17B34a3deB43e5E9Ba2A659c23a",
+  "l0Admin": "0x084cD22eA15E4C262408e561a5AFa8431Bd7fa5d",
+  "l1Admin": "0x2646306d3191AEE905bf9065bD1B7cC71c9036D0",
+  "l2Admin": "0x46c18c6d5526E17B34a3deB43e5E9Ba2A659c23a",
+  "governanceModule": "0x780580fd8AEa47b93414Fa6693123049EC7aED55",
   "safeCRatio": "2",
   "debtRewardAlloc": "1000000",
   "stakingRewards": {
     "reward": "6000",
     "days": "30"
+  },
+  "unlocker": {
+    "lockupPeriod": "15552000",
+    "unlockPeriod": "15552000",
+    "percReleaseAtUnlock": "500"
   },
   "collaterals": [
     {
@@ -41,6 +48,7 @@
       "volatilityRatio": "0.8",
       "rewardSpeed": "2.5",
       "fee": "15",
+      "issuerAlloc": "7000",
       "synths": [
         {
           "name": "Bitcoin X",
@@ -100,6 +108,7 @@
       "volatilityRatio": "0.9",
       "rewardSpeed": "1.1",
       "fee": "10",
+      "issuerAlloc": "6000",
       "synths": [
         {
           "name": "Apple X",
@@ -164,6 +173,7 @@
       "volatilityRatio": "0.95",
       "rewardSpeed": "0.85",
       "fee": "5",
+      "issuerAlloc": "5000",
       "synths": [
         {
           "name": "US Dollar FX",

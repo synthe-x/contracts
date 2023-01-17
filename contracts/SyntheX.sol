@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.0;
 
 // import "hardhat/console.sol";
 import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
@@ -42,6 +42,11 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
      */
     bytes32 public constant PRICE_ORACLE = keccak256("PRICE_ORACLE");
 
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+    
     /**
      * @notice Initialize the contract
      * @param _syn The address of the SyntheX token
@@ -214,7 +219,7 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
      * @param _synth The address of the synthetic asset
      * @param _amount The amount of synthetic asset to issue
      */
-    function issue(address _debtPool, address _synth, uint _amount) virtual override public whenNotPaused nonReentrant {
+    function issue(address _debtPool, address _synth, uint _amount) virtual override public whenNotPaused {
         // ensure amount is greater than 0
         require(_amount > 0, "Amount must be greater than 0");
         // get trading pool market
@@ -254,7 +259,7 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
      * @param _synth The address of the synthetic asset
      * @param _amount The amount of synthetic asset to redeem
      */
-    function burn(address _debtPool, address _synth, uint _amount) virtual override public whenNotPaused nonReentrant {
+    function burn(address _debtPool, address _synth, uint _amount) virtual override public whenNotPaused {
         // ensure amount is greater than 0
         require(_amount > 0, "Amount must be greater than 0");
 

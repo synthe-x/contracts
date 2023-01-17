@@ -18,11 +18,11 @@ export async function deploy(deployments: any, config: any, deployerAddress: str
 
   // deploy SYN
   const syn = await _deploy("SyntheXToken", [system.address], deployments);
-  _deployDefender("SyntheXToken_"+versionSuffix, syn);
+  // _deployDefender("SyntheXToken_"+versionSuffix, syn);
 
   // deploy Sealed SYN
   const sealedSYN = await _deploy("SealedSYN", [system.address], deployments);
-  _deployDefender("SealedSYN_"+versionSuffix, sealedSYN);
+  // _deployDefender("SealedSYN_"+versionSuffix, sealedSYN);
   
   // deploy synthex
   const synthex = await _deploy("SyntheX", [sealedSYN.address, system.address, ethers.utils.parseEther(config.safeCRatio)], deployments, {upgradable: true});
@@ -32,13 +32,13 @@ export async function deploy(deployments: any, config: any, deployerAddress: str
 
   // deploy staking rewards : get xSYN on staking xSYN
   const stakingRewards = await _deploy("StakingRewards", [sealedSYN.address, sealedSYN.address, system.address], deployments)
-  _deployDefender("StakingRewards_"+versionSuffix, stakingRewards);
+  // _deployDefender("StakingRewards_"+versionSuffix, stakingRewards);
   await sealedSYN.grantMinterRole(stakingRewards.address);
 
   // deploy price oracle
   const oracle = await _deploy("PriceOracle", [system.address], deployments);
   await system.setAddress(PRICE_ORACLE, oracle.address);
-  _deployDefender("PriceOracle_"+versionSuffix, oracle);
+  // _deployDefender("PriceOracle_"+versionSuffix, oracle);
 
   // deploy unlocker
   const unlocker = await _deploy(

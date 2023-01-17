@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.9;
+pragma solidity ^0.8.0;
 
 import './ERC20Sealed.sol';
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
