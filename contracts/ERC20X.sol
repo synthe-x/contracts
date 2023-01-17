@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20FlashMint.sol";
 
-import "./utils/AddressStorage.sol";
+import "./System.sol";
 
 /**
  * @title ERC20X
@@ -19,8 +19,8 @@ contract ERC20X is ERC20, ERC20FlashMint {
 
     // TradingPool that owns this token
     address public pool;
-    // AddressStorage contract
-    AddressStorage public addressStorage;
+    // System contract
+    System public system;
     /// @notice Fee charged for flash loan % in BASIS_POINTS
     uint public flashLoanFee;
     /// @notice Basis points: 1e4 * 1e18 = 100%
@@ -28,9 +28,9 @@ contract ERC20X is ERC20, ERC20FlashMint {
     /// @notice Emitted when flash fee is updated
     event FlashFeeUpdated(uint _flashLoanFee);
 
-    constructor(string memory name, string memory symbol, address _pool, address _addressStorage) ERC20(name, symbol) {
+    constructor(string memory name, string memory symbol, address _pool, address _system) ERC20(name, symbol) {
         pool = _pool;
-        addressStorage = AddressStorage(_addressStorage);
+        system = System(_system);
     }
 
     /**
@@ -38,7 +38,7 @@ contract ERC20X is ERC20, ERC20FlashMint {
      * @param _flashLoanFee New flash fee
      */
     function updateFlashFee(uint _flashLoanFee) public {
-        require(addressStorage.hasRole(addressStorage.L2_ADMIN_ROLE(), msg.sender), "ERC20X: Only L2_ADMIN_ROLE can update flash fee");
+        require(system.hasRole(system.L2_ADMIN_ROLE(), msg.sender), "ERC20X: Only L2_ADMIN_ROLE can update flash fee");
         flashLoanFee = _flashLoanFee;
         emit FlashFeeUpdated(_flashLoanFee);
     }

@@ -2,7 +2,7 @@
 pragma solidity ^0.8.9;
 
 import "./ERC20Sealed.sol";
-import "../utils/AddressStorage.sol";
+import "../System.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
@@ -42,24 +42,24 @@ contract TokenUnlocker is Pausable {
     uint public lockPeriod;
     /// @notice Unlock period is the time (in sec) over which tokens are unlocked
     uint public unlockPeriod;
-    /// @notice PercUnlockAtRelease is the percentage of tokens that are unlocked at release
+    /// @notice PercUnlockAtRelease is the percentage of tokens that are unlocked at release. In Basis Points
     uint public percUnlockAtRelease;
+    uint private constant BASIS_POINTS = 10000;
     /// @notice Request ID to Unlock struct mapping
     /// @notice Request ID is a hash of user address and request index
     mapping(bytes32 => UnlockData) public unlockRequests;
     /// @notice User address to request count mapping
     mapping(address => uint) public unlockRequestCount;
-    /// @notice AddressStorage contract
-    AddressStorage public addressStorage;
-    /// @notice Store the admin role hash to save gas
-    bytes32 public constant L2_ADMIN_ROLE = keccak256("L2_ADMIN_ROLE");
+    /// @notice System contract
+    System public system;
 
     /**
      * @notice Constructor
      * @param _SEALED_TOKEN Address of SEALED_SYN
      * @param _TOKEN Address of SYN
      */
-    constructor(address _SEALED_TOKEN, address _TOKEN, uint _lockPeriod, uint _unlockPeriod, uint _percUnlockAtRelease) {
+    constructor(address _system, address _SEALED_TOKEN, address _TOKEN, uint _lockPeriod, uint _unlockPeriod, uint _percUnlockAtRelease) {
+        system = System(_system);
         SEALED_TOKEN = ERC20Sealed(_SEALED_TOKEN);
         TOKEN = IERC20(_TOKEN);
         lockPeriod = _lockPeriod;
@@ -82,7 +82,7 @@ contract TokenUnlocker is Pausable {
     /* -------------------------------------------------------------------------- */
 
     modifier onlyAdmin() {
-        require(addressStorage.hasRole(L2_ADMIN_ROLE, msg.sender), "Caller is not an admin");
+        require(system.hasRole(system.L2_ADMIN_ROLE(), msg.sender), "Caller is not an admin");
         _;
     }
     /**
@@ -171,12 +171,22 @@ contract TokenUnlocker is Pausable {
         // Time since unlock date will give: percentage of total to unlock
         uint timeSinceUnlock = block.timestamp.sub(unlockRequest.requestTime.add(lockPeriod));
         uint percentUnlock = timeSinceUnlock.mul(1e18).div(unlockPeriod);
+            
         // If unlock period has passed, unlock 100% of tokens
         if(percentUnlock > 1e18){
             percentUnlock = 1e18;
         }
-        // If unlock period has not passed, unlock 0% of tokens
-        uint amountToUnlock = unlockRequest.amount.mul(percentUnlock).div(1e18).sub(unlockRequest.claimed);
+
+        percentUnlock = percentUnlock.mul(BASIS_POINTS);
+
+        // Calculate amount to unlock
+        // Amount to unlock = (percentUnlock - (percentUnlock * percUnlockAtRelease) + percUnlockAtRelease) * unlockRequest.amount
+        uint amountToUnlock = unlockRequest.amount
+        .mul(
+            percentUnlock.add(percUnlockAtRelease).sub(percentUnlock.mul(percUnlockAtRelease).div(BASIS_POINTS).div(1e18))
+        ).div(1e18).div(BASIS_POINTS)
+        .sub(unlockRequest.claimed);
+        
         // If total amount to unlock is 0, return
         if(amountToUnlock == 0){
             return;

@@ -24,8 +24,11 @@ import "./interfaces/ISyntheX.sol";
  * @notice SyntheX is a decentralized synthetic asset protocol that allows users to mint synthetic assets backed by collateral assets.
  */
 contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgradeable, SyntheXStorage {
+    /// @notice Using SafeMath for uint256 to avoid overflow/underflow
     using SafeMathUpgradeable for uint256;
+    /// @notice Using Math for uint256 to use min/max
     using MathUpgradeable for uint256;
+    /// @notice Using SafeERC20 for ERC20 to avoid reverts
     using SafeERC20Upgradeable for ERC20Upgradeable;
 
     /**
@@ -35,45 +38,41 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
     uint public constant VERSION = 0;
 
     /**
-     * @notice Address storage keys
+     * @notice Address storage keys // To avoid cross contract call to get role hash, we hardcode the hash here to save gas
      */
     bytes32 public constant PRICE_ORACLE = keccak256("PRICE_ORACLE");
-    // To avoid cross contract call to get role hash, we hardcode the hash here
-    bytes32 public constant L1_ADMIN_ROLE = keccak256("L1_ADMIN_ROLE");
-    // To avoid cross contract call to get role hash, we hardcode the hash here
-    bytes32 public constant L2_ADMIN_ROLE = keccak256("L2_ADMIN_ROLE");
 
     /**
      * @notice Initialize the contract
      * @param _syn The address of the SyntheX token
-     * @param _addressStorage The address of the address storage contract
+     * @param _system The address of the system contract
      */
-    function initialize(address _syn, address _addressStorage, uint _safeCRatio) public initializer {
+    function initialize(address _syn, address _system, uint _safeCRatio) public initializer {
         __ReentrancyGuard_init();
         __Pausable_init();
         
         syn = SyntheXToken(_syn);
-        addressStorage = AddressStorage(_addressStorage);
+        system = System(_system);
         safeCRatio = _safeCRatio;
     }
 
     modifier onlyL1Admin() {
-        require(addressStorage.hasRole(addressStorage.L2_ADMIN_ROLE(), msg.sender), "SyntheX: Not authorized");
+        require(system.hasRole(system.L2_ADMIN_ROLE(), msg.sender), "SyntheX: Not authorized");
         _;
     }
 
     modifier onlyL2Admin() {
-        require(addressStorage.hasRole(addressStorage.L2_ADMIN_ROLE(), msg.sender), "SyntheX: Not authorized");
+        require(system.hasRole(system.L2_ADMIN_ROLE(), msg.sender), "SyntheX: Not authorized");
         _;
     }
 
     modifier onlyGov() {
-        require(addressStorage.hasRole(addressStorage.GOVERNANCE_MODULE_ROLE(), msg.sender), "SyntheX: Not authorized");
+        require(system.hasRole(system.GOVERNANCE_MODULE_ROLE(), msg.sender), "SyntheX: Not authorized");
         _;
     }
 
     modifier onlyGovOrL2() {
-        require(addressStorage.hasRole(addressStorage.L2_ADMIN_ROLE(), msg.sender) || addressStorage.hasRole(addressStorage.GOVERNANCE_MODULE_ROLE(), msg.sender), "SyntheX: Not authorized");
+        require(system.hasRole(system.L2_ADMIN_ROLE(), msg.sender) || system.hasRole(system.GOVERNANCE_MODULE_ROLE(), msg.sender), "SyntheX: Not authorized");
         _;
     }
 
@@ -265,7 +264,7 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         distributeAccountReward(address(syn), _debtPool, msg.sender);
 
         // get synth price
-        IPriceOracle _oracle = IPriceOracle(addressStorage.getAddress(PRICE_ORACLE));
+        IPriceOracle _oracle = IPriceOracle(system.getAddress(PRICE_ORACLE));
         IPriceOracle.Price memory price = _oracle.getAssetPrice(_synth);
 
         // amount in USD for debt calculation
@@ -477,7 +476,8 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
      */
     function setCollateralCap(address _collateral, uint _maxDeposit) virtual override public onlyGovOrL2 {
         CollateralSupply storage supply = collateralSupplies[_collateral];
-        if(_maxDeposit > supply.totalDeposits){
+        // if max deposit is less than total deposits, set max deposit to total deposits
+        if(_maxDeposit < supply.totalDeposits){
             _maxDeposit = supply.totalDeposits;
         }
         supply.maxDeposits = _maxDeposit;
@@ -793,11 +793,11 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         }
         return adjustedTotalDebt;
     }
-
+    
     /**
      * @dev Get price oracle
      */
     function oracle() virtual override public view returns(IPriceOracle){
-        return IPriceOracle(addressStorage.getAddress(PRICE_ORACLE));
+        return IPriceOracle(system.getAddress(PRICE_ORACLE));
     }
 }

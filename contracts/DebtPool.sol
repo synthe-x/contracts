@@ -9,7 +9,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "./ERC20X.sol";
 import "./PriceOracle.sol";
 import "./SyntheX.sol";
-import "./utils/AddressStorage.sol";
+import "./System.sol";
 import "./interfaces/IDebtPool.sol";
 
 /**
@@ -27,9 +27,6 @@ contract DebtPool is IDebtPool, ERC20Upgradeable {
     /**
      * @dev Address storage keys
      */
-    bytes32 public constant L1_ADMIN_ROLE = keccak256("L1_ADMIN_ROLE");
-    bytes32 public constant L2_ADMIN_ROLE = keccak256("L2_ADMIN_ROLE");
-    bytes32 public constant GOVERNANCE_MODULE_ROLE = keccak256("GOVERNANCE_MODULE_ROLE");
     bytes32 public constant PRICE_ORACLE = keccak256("PRICE_ORACLE");
     bytes32 public constant VAULT = keccak256("VAULT");
     bytes32 public constant SYNTHEX = keccak256("SYNTHEX");
@@ -47,14 +44,14 @@ contract DebtPool is IDebtPool, ERC20Upgradeable {
     /// @notice The list of synths in the pool. Needed to calculate total debt
     address[] private _synthsList;
     /// @notice The address of the address storage contract
-    AddressStorage public addressStorage;
+    System public system;
 
     /**
      * @dev Initialize the contract
      */
-    function initialize(string memory name, string memory symbol, address _addressStorage) public initializer {
+    function initialize(string memory name, string memory symbol, address _system) public initializer {
         __ERC20_init(name, symbol);
-        addressStorage = AddressStorage(_addressStorage);
+        system = System(_system);
     }
 
     /* -------------------------------------------------------------------------- */
@@ -154,7 +151,7 @@ contract DebtPool is IDebtPool, ERC20Upgradeable {
         // Total debt in USD
         uint totalDebt = 0;
         // Fetch and cache oracle address
-        IPriceOracle _oracle = IPriceOracle(addressStorage.getAddress(PRICE_ORACLE));
+        IPriceOracle _oracle = IPriceOracle(system.getAddress(PRICE_ORACLE));
         // Iterate through the list of synths and add each synth's total supply in USD to the total debt
         for(uint i = 0; i < _synths.length; i++){
             address synth = _synths[i];
@@ -200,7 +197,7 @@ contract DebtPool is IDebtPool, ERC20Upgradeable {
      * @notice Only L2_ADMIN_ROLE can call admin functions
      */
     modifier onlyL2Admin(){
-        require(addressStorage.hasRole(L2_ADMIN_ROLE, msg.sender), "SyntheXPool: Only L2_ADMIN_ROLE can call");
+        require(system.hasRole(system.L2_ADMIN_ROLE(), msg.sender), "SyntheXPool: Only L2_ADMIN_ROLE can call");
         _;
     }
 
@@ -208,7 +205,7 @@ contract DebtPool is IDebtPool, ERC20Upgradeable {
      * @notice Only GOVERNANCE_MODULE_ROLE can call function
      */
     modifier onlyGov(){
-        require(addressStorage.hasRole(GOVERNANCE_MODULE_ROLE, msg.sender), "SyntheXPool: Only GOVERNANCE_MODULE_ROLE can call");
+        require(system.hasRole(system.GOVERNANCE_MODULE_ROLE(), msg.sender), "SyntheXPool: Only GOVERNANCE_MODULE_ROLE can call");
         _;
     }
 
@@ -216,7 +213,7 @@ contract DebtPool is IDebtPool, ERC20Upgradeable {
      * @notice Only GOVERNANCE_MODULE_ROLE or L2_ADMIN_ROLE can call function
      */
     modifier onlyGovOrL2Admin(){
-        require(addressStorage.hasRole(GOVERNANCE_MODULE_ROLE, msg.sender) || addressStorage.hasRole(L2_ADMIN_ROLE, msg.sender), "SyntheXPool: Only GOVERNANCE_MODULE_ROLE or L2_ADMIN_ROLE can call");
+        require(system.hasRole(system.GOVERNANCE_MODULE_ROLE(), msg.sender) || system.hasRole(system.L2_ADMIN_ROLE(), msg.sender), "SyntheXPool: Only GOVERNANCE_MODULE_ROLE or L2_ADMIN_ROLE can call");
         _;
     }
 
@@ -224,7 +221,7 @@ contract DebtPool is IDebtPool, ERC20Upgradeable {
      * @notice Only synthex can call
      */
     modifier onlyInternal(){
-        require(AddressStorage(addressStorage).getAddress(SYNTHEX) == msg.sender, "SyntheXPool: Only SyntheX can call this function");
+        require(system.getAddress(SYNTHEX) == msg.sender, "SyntheXPool: Only SyntheX can call this function");
         _;
     }
 
@@ -268,7 +265,7 @@ contract DebtPool is IDebtPool, ERC20Upgradeable {
         // (issuerAlloc * fee) is burned permanently
 
         // Mint ((1 - issuerAlloc) * fee) to staking rewards
-        IPriceOracle _oracle = IPriceOracle(addressStorage.getAddress(PRICE_ORACLE));
+        IPriceOracle _oracle = IPriceOracle(system.getAddress(PRICE_ORACLE));
         IPriceOracle.Price memory feeTokenPrice = _oracle.getAssetPrice(feeToken);
 
         // Fee amount in feeToken
@@ -283,7 +280,7 @@ contract DebtPool is IDebtPool, ERC20Upgradeable {
         
         // Mint fee
         ERC20X(feeToken).mint(
-            addressStorage.getAddress(VAULT), 
+            system.getAddress(VAULT), 
             feeAmount
         );
 

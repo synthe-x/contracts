@@ -21,8 +21,8 @@ contract SyntheXStorage {
     /// @notice RewardToken initial index
     uint256 public constant rewardInitialIndex = 1e36;
 
-    /// @notice Address manager contract address
-    AddressStorage public addressStorage;
+    /// @notice System contract address
+    System public system;
 
     /// @notice Pools the user has entered into
     mapping(address => address[]) public accountPools;

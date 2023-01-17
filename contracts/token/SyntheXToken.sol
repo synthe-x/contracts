@@ -8,17 +8,17 @@ import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20FlashMint.sol";
 
-import "../utils/AddressStorage.sol";
+import "../System.sol";
 
 contract SyntheXToken is ERC20, ERC20Burnable, Pausable, ERC20Permit, ERC20Votes {
     /// @notice AddressStorage contract
-    AddressStorage public addressStorage;
+    System public system;
     /// @notice Storing admin role hash here to save gas
     bytes32 public constant L1_ADMIN_ROLE = keccak256("L1_ADMIN_ROLE");
     bytes32 public constant L2_ADMIN_ROLE = keccak256("L2_ADMIN_ROLE");
 
-    constructor(address _addressStorage) ERC20("SyntheX Token", "SYN") ERC20Permit("SyntheX Token") {
-        addressStorage = AddressStorage(_addressStorage);
+    constructor(address _system) ERC20("SyntheX Token", "SYN") ERC20Permit("SyntheX Token") {
+        system = System(_system);
     }
 
     /**
@@ -26,7 +26,7 @@ contract SyntheXToken is ERC20, ERC20Burnable, Pausable, ERC20Permit, ERC20Votes
      * @dev Only L2_ADMIN can pause
      */
     function pause() public {
-        require(addressStorage.hasRole(L2_ADMIN_ROLE, msg.sender));
+        require(system.hasRole(system.L2_ADMIN_ROLE(), msg.sender));
         _pause();
     }
 
@@ -35,7 +35,7 @@ contract SyntheXToken is ERC20, ERC20Burnable, Pausable, ERC20Permit, ERC20Votes
      * @dev Only L2_ADMIN can unpause
      */
     function unpause() public {
-        require(addressStorage.hasRole(L2_ADMIN_ROLE, msg.sender));
+        require(system.hasRole(system.L2_ADMIN_ROLE(), msg.sender));
         _unpause();
     }
 
@@ -46,7 +46,7 @@ contract SyntheXToken is ERC20, ERC20Burnable, Pausable, ERC20Permit, ERC20Votes
      * @param amount Amount to mint
      */
     function mint(address to, uint256 amount) public {
-        require(addressStorage.hasRole(L1_ADMIN_ROLE, msg.sender));
+        require(system.hasRole(system.L1_ADMIN_ROLE(), msg.sender));
         _mint(to, amount);
     }
 

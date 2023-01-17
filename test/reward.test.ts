@@ -1,7 +1,7 @@
 // import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import initiate from "../scripts/test";
+import deploy from "../scripts/test";
 import { time } from "@nomicfoundation/hardhat-network-helpers";
 import { ETH_ADDRESS } from "../scripts/utils/const";
 
@@ -14,7 +14,7 @@ describe("Rewards", function () {
 		// Contracts are deployed using the first signer/account by default
         [owner, user1, user2] = await ethers.getSigners();
 
-		const deployments = await initiate(owner.address);
+		const deployments = await deploy(owner);
 		synthex = deployments.synthex;
         sealedSyn = deployments.sealedSYN;
 		oracle = deployments.oracle;

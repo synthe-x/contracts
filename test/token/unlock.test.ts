@@ -13,15 +13,17 @@ describe("Testing unlocker", function () {
 		// Contracts are deployed using the first signer/account by default
         [owner, user1, user2] = await ethers.getSigners();
 
+        const deployments = await initiate(owner);
+
 		const TokenUnlocker = await ethers.getContractFactory("TokenUnlocker");
         const erc20 = await ethers.getContractFactory("MockToken");
         const erc20Sealed = await ethers.getContractFactory("SealedSYN");
-        token = await erc20.deploy("Token", "TOKEN");
-        sealed = await erc20Sealed.deploy(owner.address);
-        unlockerContract = await TokenUnlocker.deploy(sealed.address, token.address, 86400 * 30, 86400 * 60, 0);
+        token = deployments.syn;
+        sealed = deployments.sealedSYN;
+        unlockerContract = deployments.unlocker;
 
         // grant MINTER_ROLE to owner
-        await sealed.grantRole(await sealed.MINTER_ROLE(), owner.address);
+        await sealed.grantMinterRole(owner.address);
         // give sealed tokens to user1
         await sealed.mint(user1.address, ethers.utils.parseEther('1000'));
 	});
@@ -65,9 +67,10 @@ describe("Testing unlocker", function () {
     })
 
     it("index0: unlock after lockPeriod, 0th of unlockPeriod", async function () {
-        // NOTE: past 30 days
-        await time.increase(86400 * 23);
-        const expectedToUnlock = ethers.utils.parseEther('0');
+        // NOTE: past 6 months
+        await time.increase(86400 * 173);
+        // 5% of 100 tokens
+        const expectedToUnlock = ethers.utils.parseEther('5');
         // keccak256(abi.encodePacked(address, uint256))
         const requestId = await unlockerContract.getRequestId(user1.address, '0');
         await unlockerContract.connect(user1).unlock([requestId]);
@@ -80,10 +83,11 @@ describe("Testing unlocker", function () {
         await expect(unlockerContract.connect(user1).unlock([requestId])).to.be.revertedWith("Unlock period has not passed");
     })
 
-    it("index0: unlock after lockPeriod, 1/3rd of unlockPeriod", async function () {
-        // NOTE: past 50 days (20 past first unlock)
-        await time.increase(86400 * 20);
-        const expectedToUnlock = ethers.utils.parseEther((100 * 20/60).toFixed(10));
+    it("index0: unlock after lockPeriod, 60/180 of unlockPeriod", async function () {
+        // NOTE: past 8 months (2 months past first unlock)
+        await time.increase(86400 * 60);
+        // 5% of 100 tokens + 95% of 100 tokens * 1/3
+        const expectedToUnlock = ethers.utils.parseEther('5').add(ethers.utils.parseEther((0.95 * 100 * 60/180).toFixed(18)));
         // keccak256(abi.encodePacked(address, uint256))
         const requestId = await unlockerContract.getRequestId(user1.address, '0');
         await unlockerContract.connect(user1).unlock([requestId]);
@@ -96,10 +100,11 @@ describe("Testing unlocker", function () {
         expect(await token.balanceOf(user1.address)).to.be.closeTo(expectedToUnlock, ethers.utils.parseEther('0.001'));
     })
 
-    it("index1: unlock after lockPeriod, 14/60th of unlockPeriod", async function () {
+    it("index1: unlock after lockPeriod, 53/180th of unlockPeriod", async function () {
         const initialBalance = await token.balanceOf(user1.address);
-        const expectedToUnlock = ethers.utils.parseEther((250 * 13/60).toFixed(10));
-        // keccak256(abi.encodePacked(address, uint256))
+        // 5 % of 250 tokens + 95% of 250 tokens * 53/180
+        const expectedToUnlock = ethers.utils.parseEther((0.05 * 250).toFixed(18)).add(ethers.utils.parseEther((0.95 * 250 * 53/180).toFixed(18)));
+
         const requestId = await unlockerContract.getRequestId(user1.address, '1');
         await unlockerContract.connect(user1).unlock([requestId]);
 

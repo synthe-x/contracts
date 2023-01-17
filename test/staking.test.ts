@@ -5,23 +5,24 @@ import { ethers } from "hardhat";
 import deploy from "../scripts/test";
 import { ETH_ADDRESS } from "../scripts/utils/const";
 
-describe("Testing Fee", function () {
-	let stakedSyn: any, syn: any, stakingRewards: any;
+describe("Testing Staking", function () {
+	let sealedSyn: any, syn: any, stakingRewards: any;
 	let owner: any, user1: any, user2: any, user3: any;
 
 	before(async () => {
 		// Contracts are deployed using the first signer/account by default
 		[owner, user1, user2, user3] = await ethers.getSigners();
 
-		const deployments = await deploy(owner.address);
+		const deployments = await deploy(owner);
 		syn = deployments.syn;
-		stakedSyn = deployments.sealedSYN;
+		sealedSyn = deployments.sealedSYN;
 		stakingRewards = deployments.stakingRewards;
 
+		await sealedSyn.grantMinterRole(owner.address);
 		// for user1 to stake
-		await stakedSyn.mint(user1.address, ethers.utils.parseEther("10000"));
+		await sealedSyn.mint(user1.address, ethers.utils.parseEther("10000"));
         // for user2 to stake
-		await stakedSyn.mint(user2.address, ethers.utils.parseEther("10000"));
+		await sealedSyn.mint(user2.address, ethers.utils.parseEther("10000"));
 		// for owner to add reward
 		await syn.mint(owner.address, ethers.utils.parseEther("10000"));
 	});
@@ -35,7 +36,7 @@ describe("Testing Fee", function () {
 			.setRewardsDuration(ethers.BigNumber.from("31536000"));
 		await stakingRewards
 			.connect(owner)
-			.addReward(ethers.utils.parseEther("1000"));
+			.notifyReward(ethers.utils.parseEther("1000"));
 		expect(await stakingRewards.rewardRate()).to.equal(
 			ethers.utils
 				.parseEther("1000")
@@ -44,7 +45,7 @@ describe("Testing Fee", function () {
 	});
 
 	it("user1 should stake 1000 syn", async function () {
-		await stakedSyn
+		await sealedSyn
 			.connect(user1)
 			.approve(stakingRewards.address, ethers.utils.parseEther("1000"));
 		await stakingRewards
@@ -70,7 +71,7 @@ describe("Testing Fee", function () {
 	});
 
     it("user2 should stake 500 syn", async function () {
-		await stakedSyn
+		await sealedSyn
 			.connect(user2)
 			.approve(stakingRewards.address, ethers.utils.parseEther("500"));
 		await stakingRewards

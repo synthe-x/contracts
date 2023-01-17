@@ -15,7 +15,7 @@ describe("Testing Fee", function () {
 		// Contracts are deployed using the first signer/account by default
         [owner, user1, user2, user3] = await ethers.getSigners();
 
-		const deployments = await deploy(owner.address);
+		const deployments = await deploy(owner);
         vault = deployments.vault;
 		synthex = deployments.synthex;
         syn = deployments.syn;

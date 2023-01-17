@@ -30,19 +30,19 @@ async function main() {
 	// deploy main contracts
 	const contracts = await deploy(deployments, config, deployer.address);
 	// initiate the contracts
-	await initiate(contracts.synthex, contracts.oracle, deployments, config, contracts.addressStorage, contracts.sealedSYN);
+	await initiate(contracts.synthex, contracts.oracle, deployments, config, contracts.system, contracts.sealedSYN);
 
 	// set admins
 	console.log("Setting admins... 💬")
-	await contracts.addressStorage.grantRole(DEFAULT_ADMIN_ROLE, config.l0Admin);
-	await contracts.addressStorage.grantRole(L1_ADMIN_ROLE, config.l1Admin);
-	await contracts.addressStorage.grantRole(L2_ADMIN_ROLE, config.l2Admin);
-	await contracts.addressStorage.grantRole(GOVERNANCE_MODULE_ROLE, config.governanceModule);
+	await contracts.system.grantRole(DEFAULT_ADMIN_ROLE, config.l0Admin);
+	await contracts.system.grantRole(L1_ADMIN_ROLE, config.l1Admin);
+	await contracts.system.grantRole(L2_ADMIN_ROLE, config.l2Admin);
+	await contracts.system.grantRole(GOVERNANCE_MODULE_ROLE, config.governanceModule);
 
-	await contracts.addressStorage.renounceRole(DEFAULT_ADMIN_ROLE, deployer.address);
-	await contracts.addressStorage.renounceRole(L1_ADMIN_ROLE, deployer.address);
-	await contracts.addressStorage.renounceRole(L2_ADMIN_ROLE, deployer.address);
-	await contracts.addressStorage.renounceRole(GOVERNANCE_MODULE_ROLE, deployer.address);
+	await contracts.system.renounceRole(DEFAULT_ADMIN_ROLE, deployer.address);
+	await contracts.system.renounceRole(L1_ADMIN_ROLE, deployer.address);
+	await contracts.system.renounceRole(L2_ADMIN_ROLE, deployer.address);
+	await contracts.system.renounceRole(GOVERNANCE_MODULE_ROLE, deployer.address);
 	console.log("Admins set! 🎉")
 
 	// save deployments

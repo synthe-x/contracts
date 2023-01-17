@@ -5,7 +5,7 @@ import './ERC20Sealed.sol';
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "../interfaces/IStaking.sol";
-import "../utils/AddressStorage.sol";
+import "../System.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 
 /**
@@ -18,10 +18,8 @@ contract StakingRewards is IStaking, ReentrancyGuard, Pausable {
     /// @notice SafeMath library for uint256 to avoid overflow and underflow
     using SafeMath for uint256;
 
-    /// @notice Instead of cross-contract calls, we stored the admin-role hash here to save gas
-    bytes32 constant public L2_ADMIN_ROLE = keccak256("L2_ADMIN_ROLE");
-    // AddressStorage contract
-    AddressStorage public addressStorage;
+    // System contract
+    System public system;
     /// @notice Address of the rewards token
     address public rewardsToken;
     /// @notice Address of the staking token
@@ -41,23 +39,23 @@ contract StakingRewards is IStaking, ReentrancyGuard, Pausable {
     /// @notice Rewards that are not yet claimed
     mapping(address => uint256) public rewards;
     /// @notice Total token supply (staked tokens)
-    uint256 public _totalSupply;
+    uint256 public totalSupply;
     /// @notice Staked token balance of account
-    mapping(address => uint256) private _balances;
+    mapping(address => uint256) public balanceOf;
     
     /**
      * @notice Initializes the contract
      * @param _rewardsToken Address of the rewards token
      * @param _stakingToken Address of the staking token
      */
-    constructor(address _rewardsToken, address _stakingToken, address _addressStorage) {
+    constructor(address _rewardsToken, address _stakingToken, address _system) {
         rewardsToken = _rewardsToken;
         stakingToken = _stakingToken;
         periodFinish = 0;
         rewardRate = 0;
         rewardsDuration = 7 days;
-        // Initialize the addressStorage contract
-        addressStorage = AddressStorage(_addressStorage);
+        // Initialize the system contract
+        system = System(_system);
     }
 
     /**
@@ -90,12 +88,12 @@ contract StakingRewards is IStaking, ReentrancyGuard, Pausable {
      * @notice Returns the reward per token
      */
     function rewardPerToken() public override view returns (uint256) {
-        if (_totalSupply == 0) {
+        if (totalSupply == 0) {
             return rewardPerTokenStored;
         }
         return
             rewardPerTokenStored.add(
-                lastTimeRewardApplicable().sub(lastUpdateTime).mul(rewardRate).mul(1e18).div(_totalSupply)
+                lastTimeRewardApplicable().sub(lastUpdateTime).mul(rewardRate).mul(1e18).div(totalSupply)
             );
     }
 
@@ -103,7 +101,7 @@ contract StakingRewards is IStaking, ReentrancyGuard, Pausable {
      * @notice Returns the earned rewards for the given account
      */
     function earned(address account) public override view returns (uint256) {
-        return _balances[account].mul(rewardPerToken().sub(userRewardPerTokenPaid[account])).div(1e18).add(rewards[account]);
+        return balanceOf[account].mul(rewardPerToken().sub(userRewardPerTokenPaid[account])).div(1e18).add(rewards[account]);
     }
 
     /**
@@ -122,8 +120,8 @@ contract StakingRewards is IStaking, ReentrancyGuard, Pausable {
      */
     function stake(uint256 amount) external override nonReentrant whenNotPaused updateReward(msg.sender) {
         require(amount > 0, "Cannot stake 0");
-        _totalSupply = _totalSupply.add(amount);
-        _balances[msg.sender] = _balances[msg.sender].add(amount);
+        totalSupply = totalSupply.add(amount);
+        balanceOf[msg.sender] = balanceOf[msg.sender].add(amount);
         ERC20Sealed(stakingToken).burnFrom(msg.sender, amount);
         emit Staked(msg.sender, amount);
     }
@@ -134,8 +132,8 @@ contract StakingRewards is IStaking, ReentrancyGuard, Pausable {
      */
     function withdraw(uint256 amount) public override nonReentrant updateReward(msg.sender) {
         require(amount > 0, "Cannot withdraw 0");
-        _totalSupply = _totalSupply.sub(amount);
-        _balances[msg.sender] = _balances[msg.sender].sub(amount);
+        totalSupply = totalSupply.sub(amount);
+        balanceOf[msg.sender] = balanceOf[msg.sender].sub(amount);
         ERC20Sealed(stakingToken).mint(msg.sender, amount);
         emit Withdrawn(msg.sender, amount);
     }
@@ -158,7 +156,7 @@ contract StakingRewards is IStaking, ReentrancyGuard, Pausable {
      * @notice Withdraws staked token and reward tokens
      */
     function exit() override external {
-        withdraw(_balances[msg.sender]);
+        withdraw(balanceOf[msg.sender]);
         getReward();
     }
 
@@ -169,7 +167,7 @@ contract StakingRewards is IStaking, ReentrancyGuard, Pausable {
      * @notice Adds rewards to staking contract
      */
     function notifyReward(uint256 reward) external updateReward(address(0)) {
-        require(addressStorage.hasRole(L2_ADMIN_ROLE, msg.sender), "Caller is not an admin");
+        require(system.hasRole(system.L2_ADMIN_ROLE(), msg.sender), "Caller is not an admin");
         if (block.timestamp >= periodFinish) {
           rewardRate = reward.div(rewardsDuration);
         }
@@ -188,7 +186,7 @@ contract StakingRewards is IStaking, ReentrancyGuard, Pausable {
      * @notice Adds reward duration once previous duration is completed
      */
     function setRewardsDuration(uint256 _rewardsDuration) external {
-        require(addressStorage.hasRole(L2_ADMIN_ROLE, msg.sender), "Caller is not an admin");
+        require(system.hasRole(system.L2_ADMIN_ROLE(), msg.sender), "Caller is not an admin");
         require(
             block.timestamp > periodFinish,
             "Previous rewards period must be complete before changing the duration for the new period"

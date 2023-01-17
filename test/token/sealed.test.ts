@@ -4,17 +4,16 @@ import { ethers } from "hardhat";
 import initiate from "../../scripts/test";
 import { time } from "@nomicfoundation/hardhat-network-helpers";
 
-describe("Testing staking", function () {
+describe("Testing sealed erc20", function () {
 
 	let token: any, sealed: any, unlockerContract: any;
 	let deployer: any, owner: any, user1: any, user2: any, user3: any;
 
 	before(async () => {
 		// Contracts are deployed using the first signer/account by default
-        [deployer, owner, user1, user2] = await ethers.getSigners();
-
-        const erc20Sealed = await ethers.getContractFactory("SealedSYN");
-        sealed = await erc20Sealed.deploy(deployer.address);
+        [owner, user1, user2] = await ethers.getSigners();
+        const deployments = await initiate(owner);
+        sealed = deployments.sealedSYN;
 	});
 
     it("should not be able to mint without MINTER_ROLE", async function () {
@@ -25,7 +24,7 @@ describe("Testing staking", function () {
     })
 
     it("admin should be able to grant role", async function () {
-        await sealed.grantRole(await sealed.MINTER_ROLE(), owner.address);
+        await sealed.connect(owner).grantMinterRole(owner.address);
         expect(await sealed.hasRole(await sealed.MINTER_ROLE(), owner.address)).to.equal(true);
     })
 

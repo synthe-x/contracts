@@ -2,7 +2,7 @@
 pragma solidity ^0.8.9;
 
 import "./interfaces/IPriceOracle.sol";
-import "./utils/AddressStorage.sol";
+import "./System.sol";
 import "./interfaces/IChainlinkAggregator.sol";
 
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -15,10 +15,10 @@ contract PriceOracle is IPriceOracle {
     /// @notice Mapping to store price feed for an asset
     mapping(address => IChainlinkAggregator) public feeds;
     /// @notice AddressStorage contract
-    AddressStorage public addressStorage;
+    System public system;
 
-    constructor(address _addressStorage) {
-        addressStorage = AddressStorage(_addressStorage);
+    constructor(address _system) {
+        system = System(_system);
     }
 
     /**
@@ -29,8 +29,8 @@ contract PriceOracle is IPriceOracle {
     function setFeed(address _token, address _feed) public {
         // only L1_ADMIN or Governance can set price feed
         require(
-            addressStorage.hasRole(addressStorage.L1_ADMIN_ROLE(), msg.sender) ||
-            addressStorage.hasRole(addressStorage.GOVERNANCE_MODULE_ROLE(), msg.sender), 
+            system.hasRole(system.L1_ADMIN_ROLE(), msg.sender) ||
+            system.hasRole(system.GOVERNANCE_MODULE_ROLE(), msg.sender), 
             "PriceOracle: Only L1_ADMIN can set price feed"
         );
 
