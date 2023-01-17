@@ -2,11 +2,10 @@
 pragma solidity ^0.8.9;
 
 import "./ERC20Sealed.sol";
+import "../utils/AddressStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-
-import "hardhat/console.sol";
 
 /**
  * @title TokenUnlocker
@@ -15,7 +14,7 @@ import "hardhat/console.sol";
  * @notice Users can request to unlock their SYN tokens after a lock period
  * @notice Tokens are released linearly over a period of time (unlock period)
  */
-contract TokenUnlocker is Ownable, Pausable {
+contract TokenUnlocker is Pausable {
     /// @notice SafeMath library is used for uint operations
     using SafeMath for uint;
     
@@ -50,6 +49,10 @@ contract TokenUnlocker is Ownable, Pausable {
     mapping(bytes32 => UnlockData) public unlockRequests;
     /// @notice User address to request count mapping
     mapping(address => uint) public unlockRequestCount;
+    /// @notice AddressStorage contract
+    AddressStorage public addressStorage;
+    /// @notice Store the admin role hash to save gas
+    bytes32 public constant L2_ADMIN_ROLE = keccak256("L2_ADMIN_ROLE");
 
     /**
      * @notice Constructor
@@ -77,13 +80,18 @@ contract TokenUnlocker is Ownable, Pausable {
     /* -------------------------------------------------------------------------- */
     /*                               Admin Functions                              */
     /* -------------------------------------------------------------------------- */
+
+    modifier onlyAdmin() {
+        require(addressStorage.hasRole(L2_ADMIN_ROLE, msg.sender), "Caller is not an admin");
+        _;
+    }
     /**
      * @notice Admin can update the lock period
      * @notice Lock period is the time that user must wait before they can claim their unlocked SYN
      * @notice Default lock period is 30 days. This function can be used to change the lock period in case delay/early is needed
      * @param _lockPeriod New lock period
      */
-    function setLockPeriod(uint _lockPeriod) external onlyOwner {
+    function setLockPeriod(uint _lockPeriod) external onlyAdmin {
         lockPeriod = _lockPeriod;
         emit SetLockPeriod(_lockPeriod);
     }
@@ -94,7 +102,7 @@ contract TokenUnlocker is Ownable, Pausable {
      * @dev This function is only used to withdraw extra SYN from the contract
      * @dev Reserved amount for unlock will not be withdrawn
      */
-    function withdraw(uint _amount) external onlyOwner {
+    function withdraw(uint _amount) external onlyAdmin {
         require(_amount <= remainingQuota(), "Not enough SYN to withdraw");
         TOKEN.transfer(msg.sender, _amount);
     }
@@ -103,7 +111,7 @@ contract TokenUnlocker is Ownable, Pausable {
      * @notice Pause the contract
      * @dev This function is used to pause the contract in case of emergency
      */
-    function pause() external onlyOwner {
+    function pause() external onlyAdmin {
         _pause();
     }
 
@@ -111,7 +119,7 @@ contract TokenUnlocker is Ownable, Pausable {
      * @notice Unpause the contract
      * @dev This function is used to unpause the contract in case of emergency
      */
-    function unpause() external onlyOwner {
+    function unpause() external onlyAdmin {
         _unpause();
     }
 

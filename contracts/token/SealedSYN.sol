@@ -12,10 +12,8 @@ import "./ERC20Sealed.sol";
  */
 contract SealedSYN is ERC20Sealed {
     
-    constructor(address _admin) ERC20("Sealed SYN", "sSYN") {
+    constructor(address _admin) ERC20("Sealed SYN", "xSYN") {
         _setupRole(DEFAULT_ADMIN_ROLE, _admin);
-        // TEMP setting minter role to deployer. Should be renounced at the end of deployment
-        _setupRole(MINTER_ROLE, msg.sender);
     }
 
     function _beforeTokenTransfer(address from, address to, uint256 amount)

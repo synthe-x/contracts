@@ -2,7 +2,7 @@ import hre, { ethers, upgrades } from "hardhat";
 import { Contract } from 'ethers';
 import { _deploy } from "./utils/helper";
 
-export async function initiate(synthex: Contract, oracle: Contract, deployments: any, config: any, addressManager: Contract) {
+export async function initiate(synthex: Contract, oracle: Contract, deployments: any, config: any, addressManager: Contract, rewardToken: Contract) {
 
   console.log("\nDeploying Collaterals... 💬");
 
@@ -26,15 +26,15 @@ export async function initiate(synthex: Contract, oracle: Contract, deployments:
   }
   console.log("Collaterals deployed successfully 🎉 \n");
 
-  console.log("Deploying Trading Pools... 💬");
+  console.log("Deploying Debt Pools... 💬");
   for(let i in config.tradingPools){
     // deploy pools
-    const pool = await _deploy('SyntheXPool', [config.tradingPools[i].name, config.tradingPools[i].symbol, addressManager.address], deployments, {name: config.tradingPools[i].symbol, upgradable: true});
+    const pool = await _deploy('DebtPool', [config.tradingPools[i].name, config.tradingPools[i].symbol, addressManager.address], deployments, {name: config.tradingPools[i].symbol, upgradable: true});
 
     // enable trading pool
     await synthex.enableTradingPool(pool.address, ethers.utils.parseEther(config.tradingPools[i].volatilityRatio))
     // set reward speed
-    await synthex.setPoolSpeed(pool.address, ethers.utils.parseEther(config.tradingPools[i].rewardSpeed));
+    await synthex.setPoolSpeed(rewardToken.address, pool.address, ethers.utils.parseEther(config.tradingPools[i].rewardSpeed));
     // set fee
     await pool.updateFee(ethers.utils.parseEther(config.tradingPools[i].fee), ethers.utils.parseEther(config.tradingPools[i].issuerAlloc));
 

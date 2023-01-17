@@ -2,7 +2,7 @@
 pragma solidity ^0.8.9;
 import "./IPriceOracle.sol";
 
-interface ISyntheXPool {
+interface IDebtPool {
 
     /* -------------------------------------------------------------------------- */
     /*                               Admin Functions                              */

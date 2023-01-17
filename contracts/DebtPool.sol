@@ -10,51 +10,43 @@ import "./ERC20X.sol";
 import "./PriceOracle.sol";
 import "./SyntheX.sol";
 import "./utils/AddressStorage.sol";
-import "./interfaces/ISyntheXPool.sol";
+import "./interfaces/IDebtPool.sol";
 
-// Uncomment this line to use console.log
-import "hardhat/console.sol";
-
-contract SyntheXPool is ISyntheXPool, ERC20Upgradeable {
+/**
+ * @title DebtPool
+ * @notice DebtPool contract to manage synths and debt
+ * @author SyntheX
+ * @custom:security-contact prasad@chainscore.finance
+ */
+contract DebtPool is IDebtPool, ERC20Upgradeable {
+    /// @notice Using SafeMath for uint256 to prevent overflows and underflows
     using SafeMathUpgradeable for uint256;
-    using MathUpgradeable for uint256;
+    /// @notice Using Math for uint256 to calculate minimum and maximum
+    using MathUpgradeable for uint256; 
 
     /**
      * @dev Address storage keys
      */
-    bytes32 public constant ADMIN = keccak256("ADMIN");
-    bytes32 public constant POOL_MANAGER = keccak256("POOL_MANAGER");
+    bytes32 public constant L1_ADMIN_ROLE = keccak256("L1_ADMIN_ROLE");
+    bytes32 public constant L2_ADMIN_ROLE = keccak256("L2_ADMIN_ROLE");
+    bytes32 public constant GOVERNANCE_MODULE_ROLE = keccak256("GOVERNANCE_MODULE_ROLE");
     bytes32 public constant PRICE_ORACLE = keccak256("PRICE_ORACLE");
     bytes32 public constant VAULT = keccak256("VAULT");
     bytes32 public constant SYNTHEX = keccak256("SYNTHEX");
 
-    /**
-     * @dev Check if synth is enabled
-     */
+    /// @notice Check if synth is enabled
     mapping(address => bool) public synths;
-    /**
-     * @dev The fee for actions in the pool
-     * @notice The fee is in basis points
-     * @notice 10000 basis points * 1e18 = 100%
-     */
+    /// @notice The fee for minting synths in the pool in basis points
     uint public fee;
     /// @notice Issuer allocation (of fee) in basis points
     uint public issuerAlloc;
-    /// @notice Basis points constant
+    /// @notice Basis points constant. 10000 basis points * 1e18 = 100%
     uint private constant BASIS_POINTS = 10000;
-
-    /**
-     * @dev The synth token used to pass on to vault as fee
-     */
+    /// @notice The synth token used to pass on to vault as fee
     address public feeToken;
-
-    /**
-     * @dev The list of synths in the pool to calculate total debt
-     */
+    /// @notice The list of synths in the pool. Needed to calculate total debt
     address[] private _synthsList;
-    /**
-     * @dev The address of the address storage contract
-     */
+    /// @notice The address of the address storage contract
     AddressStorage public addressStorage;
 
     /**
@@ -74,7 +66,7 @@ contract SyntheXPool is ISyntheXPool, ERC20Upgradeable {
      * @notice Only the owner can call this function
      * @notice The synth contract must have pool (this contract) as owner
      */
-    function enableSynth(address _synth) virtual override public onlyAdmin {
+    function enableSynth(address _synth) virtual override public onlyGov {
         // Ensure _synth is not already enabled in pool
         require(!synths[_synth], "Synth already exists in pool");
         // Enable synth
@@ -96,7 +88,7 @@ contract SyntheXPool is ISyntheXPool, ERC20Upgradeable {
      * @param _fee The new fee
      * @param _alloc The new issuer allocation
      */
-    function updateFee(uint _fee, uint _alloc) virtual override public onlyAdmin {
+    function updateFee(uint _fee, uint _alloc) virtual override public onlyGov {
         fee = _fee;
         issuerAlloc = _alloc;
         // Emit event on fee updated
@@ -106,7 +98,7 @@ contract SyntheXPool is ISyntheXPool, ERC20Upgradeable {
     /**
      * @dev Update the address of the primary token
      */
-    function updateFeeToken(address _feeToken) virtual override public onlyAdmin {
+    function updateFeeToken(address _feeToken) virtual override public onlyL2Admin {
         feeToken = _feeToken;
         // Emit event on primary token updated
         emit FeeTokenUpdated(_feeToken);
@@ -117,7 +109,7 @@ contract SyntheXPool is ISyntheXPool, ERC20Upgradeable {
      * @param _synth The address of the synth to disable
      * @notice Only the owner can call this function
      */
-    function disableSynth(address _synth) virtual override public onlyAdmin {
+    function disableSynth(address _synth) virtual override public onlyGovOrL2Admin {
         require(synths[_synth], "Synth is not enabled in pool");
         // Disable synth
         // Not removing from _synthsList => would still contribute to pool debt
@@ -130,7 +122,7 @@ contract SyntheXPool is ISyntheXPool, ERC20Upgradeable {
      * @param _synth The address of the synth to remove
      * @notice Removes from synthList => would not contribute to pool debt
      */
-    function removeSynth(address _synth) virtual override public onlyAdmin {
+    function removeSynth(address _synth) virtual override public onlyGov {
         synths[_synth] = false;
         for (uint i = 0; i < _synthsList.length; i++) {
             if (_synthsList[i] == _synth) {
@@ -205,10 +197,26 @@ contract SyntheXPool is ISyntheXPool, ERC20Upgradeable {
     }
 
     /**
-     * @notice Only synthex owner can call admin functions
+     * @notice Only L2_ADMIN_ROLE can call admin functions
      */
-    modifier onlyAdmin(){
-        require(addressStorage.getAddress(POOL_MANAGER) == msg.sender, "SyntheXPool: Only PoolManager can call");
+    modifier onlyL2Admin(){
+        require(addressStorage.hasRole(L2_ADMIN_ROLE, msg.sender), "SyntheXPool: Only L2_ADMIN_ROLE can call");
+        _;
+    }
+
+    /**
+     * @notice Only GOVERNANCE_MODULE_ROLE can call function
+     */
+    modifier onlyGov(){
+        require(addressStorage.hasRole(GOVERNANCE_MODULE_ROLE, msg.sender), "SyntheXPool: Only GOVERNANCE_MODULE_ROLE can call");
+        _;
+    }
+
+    /**
+     * @notice Only GOVERNANCE_MODULE_ROLE or L2_ADMIN_ROLE can call function
+     */
+    modifier onlyGovOrL2Admin(){
+        require(addressStorage.hasRole(GOVERNANCE_MODULE_ROLE, msg.sender) || addressStorage.hasRole(L2_ADMIN_ROLE, msg.sender), "SyntheXPool: Only GOVERNANCE_MODULE_ROLE or L2_ADMIN_ROLE can call");
         _;
     }
 
@@ -260,24 +268,26 @@ contract SyntheXPool is ISyntheXPool, ERC20Upgradeable {
         // (issuerAlloc * fee) is burned permanently
 
         // Mint ((1 - issuerAlloc) * fee) to staking rewards
-
         IPriceOracle _oracle = IPriceOracle(addressStorage.getAddress(PRICE_ORACLE));
         IPriceOracle.Price memory feeTokenPrice = _oracle.getAssetPrice(feeToken);
 
+        // Fee amount in feeToken
         // NOTE - Here performing all multiplications before all division causes overflow. So moved one multiplication after division
-        uint toAmount = amountUSD
+        uint feeAmount = amountUSD
             .mul(_fee)
             .mul(uint(1e18).mul(BASIS_POINTS).sub(issuerAlloc))
             .div(BASIS_POINTS).div(1e18)            // for multiplying _fee
-            .div(BASIS_POINTS).div(1e18)           // for multiplying issuerAlloc
+            .div(BASIS_POINTS).div(1e18)            // for multiplying issuerAlloc
             .mul(10**feeTokenPrice.decimals)        // for dividing with feeToken price
             .div(feeTokenPrice.price);
         
         // Mint fee
         ERC20X(feeToken).mint(
             addressStorage.getAddress(VAULT), 
-            toAmount
+            feeAmount
         );
+
+        return _amount;
     }
 
     /**

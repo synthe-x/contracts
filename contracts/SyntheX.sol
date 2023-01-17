@@ -6,7 +6,7 @@ import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
-import "./SyntheXPool.sol";
+import "./DebtPool.sol";
 import "./SyntheXStorage.sol";
 import "./token/SyntheXToken.sol";
 import "./interfaces/IPriceOracle.sol";
@@ -19,7 +19,8 @@ import "./interfaces/ISyntheX.sol";
 
 /**
  * @title SyntheX
- * @author SyntheX <prasad@chainscore.finance>
+ * @author SyntheX
+ * @custom:security-contact prasad@chainscore.finance
  * @notice SyntheX is a decentralized synthetic asset protocol that allows users to mint synthetic assets backed by collateral assets.
  */
 contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgradeable, SyntheXStorage {
@@ -28,45 +29,63 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
     using SafeERC20Upgradeable for ERC20Upgradeable;
 
     /**
-     * @dev Contract name and version
+     * @notice Contract name and version
      */
     string public constant NAME = "SyntheX";
-    string public constant VERSION = "0";
+    uint public constant VERSION = 0;
 
     /**
-     * @dev Address storage keys
+     * @notice Address storage keys
      */
-    bytes32 public constant ADMIN = keccak256("ADMIN");
-    bytes32 public constant POOL_MANAGER = keccak256("POOL_MANAGER");
     bytes32 public constant PRICE_ORACLE = keccak256("PRICE_ORACLE");
+    // To avoid cross contract call to get role hash, we hardcode the hash here
+    bytes32 public constant L1_ADMIN_ROLE = keccak256("L1_ADMIN_ROLE");
+    // To avoid cross contract call to get role hash, we hardcode the hash here
+    bytes32 public constant L2_ADMIN_ROLE = keccak256("L2_ADMIN_ROLE");
 
     /**
-     * @dev Initialize the contract
+     * @notice Initialize the contract
      * @param _syn The address of the SyntheX token
      * @param _addressStorage The address of the address storage contract
      */
-    function initialize(address _syn, address _addressStorage) public initializer {
+    function initialize(address _syn, address _addressStorage, uint _safeCRatio) public initializer {
         __ReentrancyGuard_init();
         __Pausable_init();
         
         syn = SyntheXToken(_syn);
-        compInitialIndex = 1e36;
         addressStorage = AddressStorage(_addressStorage);
+        safeCRatio = _safeCRatio;
     }
 
-    modifier onlyAdmin(bytes32 role) {
-        require(addressStorage.getAddress(role) == msg.sender, "SyntheX: Not authorized");
+    modifier onlyL1Admin() {
+        require(addressStorage.hasRole(addressStorage.L2_ADMIN_ROLE(), msg.sender), "SyntheX: Not authorized");
         _;
     }
 
-    ///@dev required by the OZ UUPS module
-    function _authorizeUpgrade(address) internal override onlyAdmin(ADMIN) {}
+    modifier onlyL2Admin() {
+        require(addressStorage.hasRole(addressStorage.L2_ADMIN_ROLE(), msg.sender), "SyntheX: Not authorized");
+        _;
+    }
+
+    modifier onlyGov() {
+        require(addressStorage.hasRole(addressStorage.GOVERNANCE_MODULE_ROLE(), msg.sender), "SyntheX: Not authorized");
+        _;
+    }
+
+    modifier onlyGovOrL2() {
+        require(addressStorage.hasRole(addressStorage.L2_ADMIN_ROLE(), msg.sender) || addressStorage.hasRole(addressStorage.GOVERNANCE_MODULE_ROLE(), msg.sender), "SyntheX: Not authorized");
+        _;
+    }
+
+
+    ///@notice required by the OZ UUPS module
+    function _authorizeUpgrade(address) internal override onlyL1Admin {}
 
     /* -------------------------------------------------------------------------- */
     /*                              Public Functions                              */
     /* -------------------------------------------------------------------------- */
     /**
-     * @dev Enable a pool
+     * @notice Enable a pool for trading
      * @param _tradingPool The address of the trading pool
      */
     function enterPool(address _tradingPool) virtual override public {
@@ -75,11 +94,11 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
     }
 
     /**
-     * @dev Exit a pool
+     * @notice Exit a pool
      * @param _tradingPool The address of the trading pool
      */
     function exitPool(address _tradingPool) virtual override public {
-        require(SyntheXPool(_tradingPool).getUserDebtUSD(msg.sender) == 0, "SyntheX: Pool debt must be zero");
+        require(DebtPool(_tradingPool).getUserDebtUSD(msg.sender) == 0, "SyntheX: Pool debt must be zero");
         tradingPools[_tradingPool].accountMembership[msg.sender] = false;
         address[] storage pools = accountPools[msg.sender];
         // remove from list
@@ -93,7 +112,7 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
     }
 
     /**
-     * @dev Enable a collateral
+     * @notice Enable a collateral
      * @param _collateral The address of the collateral
      */
     function enterCollateral(address _collateral) virtual override public {
@@ -102,7 +121,7 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
     }
 
     /**
-     * @dev Exit a collateral
+     * @notice Exit a collateral
      * @param _collateral The address of the collateral
      */
     function exitCollateral(address _collateral) virtual override public {
@@ -118,7 +137,7 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
     }
 
     /**
-     * @dev Deposit collateral
+     * @notice Deposit collateral
      * @param _collateral The address of the erc20 collateral; for ETH
      * @param _amount The amount of collateral to deposit
      */
@@ -156,7 +175,7 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
     }
 
     /**
-     * @dev Withdraw collateral
+     * @notice Withdraw collateral
      * @param _collateral The address of the collateral
      * @dev if eth withdraw; _collateral should be set address(0)
      * @dev if erc20 withdraw; _collateral should be set to asset address
@@ -191,29 +210,29 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
     }
 
     /**
-     * @dev Issue a synthetic asset
-     * @param _tradingPool The address of the trading pool
+     * @notice Issue a synthetic asset
+     * @param _debtPool The address of the trading pool
      * @param _synth The address of the synthetic asset
      * @param _amount The amount of synthetic asset to issue
      */
-    function issue(address _tradingPool, address _synth, uint _amount) virtual override public whenNotPaused nonReentrant {
+    function issue(address _debtPool, address _synth, uint _amount) virtual override public whenNotPaused nonReentrant {
         // ensure amount is greater than 0
         require(_amount > 0, "Amount must be greater than 0");
         // get trading pool market
-        Market storage pool = tradingPools[_tradingPool];
+        Market storage pool = tradingPools[_debtPool];
         // ensure the pool is enabled
         require(pool.isEnabled, "Trading pool not enabled");
         // ensure the account is in the pool
         if(!pool.accountMembership[msg.sender]){
-            enterPool(_tradingPool);
+            enterPool(_debtPool);
         }
         // ensure the synth to issue is enabled from the trading pool
-        require(SyntheXPool(_tradingPool).synths(_synth), "Synth not enabled");
+        require(DebtPool(_debtPool).synths(_synth), "Synth not enabled");
         
         // update reward index for the pool 
-        updatePoolRewardIndex(address(syn), _tradingPool);
+        updatePoolRewardIndex(address(syn), _debtPool);
         // distribute pending reward tokens to user
-        distributeAccountReward(address(syn), _tradingPool, msg.sender);
+        distributeAccountReward(address(syn), _debtPool, msg.sender);
 
         // get price from oracle
         IPriceOracle.Price memory price = oracle().getAssetPrice(_synth);
@@ -221,29 +240,29 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         // amoount to issue in USD; needed to issue debt
         uint amountUSD = _amount.mul(price.price).div(10**price.decimals);
         // issue synth and debt
-        _amount = SyntheXPool(_tradingPool).mint(_synth, msg.sender, msg.sender, _amount, amountUSD);
+        _amount = DebtPool(_debtPool).mint(_synth, msg.sender, msg.sender, _amount, amountUSD);
 
         // ensure [after debt] health factor is positive
         require(healthFactor(msg.sender) > safeCRatio, "Health factor below safeCRatio");
 
         // emit event
-        emit Issue(msg.sender, _tradingPool, _synth, _amount);
+        emit Issue(msg.sender, _debtPool, _synth, _amount);
     }
 
     /**
-     * @dev Redeem a synthetic asset
-     * @param _tradingPool The address of the trading pool
+     * @notice Redeem a synthetic asset
+     * @param _debtPool The address of the trading pool
      * @param _synth The address of the synthetic asset
      * @param _amount The amount of synthetic asset to redeem
      */
-    function burn(address _tradingPool, address _synth, uint _amount) virtual override public whenNotPaused nonReentrant {
+    function burn(address _debtPool, address _synth, uint _amount) virtual override public whenNotPaused nonReentrant {
         // ensure amount is greater than 0
         require(_amount > 0, "Amount must be greater than 0");
 
         // update reward index for the pool 
-        updatePoolRewardIndex(address(syn), _tradingPool);
+        updatePoolRewardIndex(address(syn), _debtPool);
         // distribute pending reward tokens to user
-        distributeAccountReward(address(syn), _tradingPool, msg.sender);
+        distributeAccountReward(address(syn), _debtPool, msg.sender);
 
         // get synth price
         IPriceOracle _oracle = IPriceOracle(addressStorage.getAddress(PRICE_ORACLE));
@@ -252,19 +271,19 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         // amount in USD for debt calculation
         uint amountUSD = _amount.mul(price.price).div(10**price.decimals);
 
-        _amount = SyntheXPool(_tradingPool).burn(_synth, msg.sender, msg.sender, _amount, amountUSD);
+        _amount = DebtPool(_debtPool).burn(_synth, msg.sender, msg.sender, _amount, amountUSD);
 
-        emit Burn(msg.sender, _tradingPool, _synth, _amount);
+        emit Burn(msg.sender, _debtPool, _synth, _amount);
     }
 
     /**
-     * @dev Exchange a synthetic asset for another
-     * @param _tradingPool The address of the trading pool
+     * @notice Exchange a synthetic asset for another
+     * @param _debtPool The address of the trading pool
      * @param _synthFrom The address of the synthetic asset to exchange
      * @param _synthTo The address of the synthetic asset to receive
      * @param _amount The amount of synthetic asset to exchange
      */
-    function exchange(address _tradingPool, address _synthFrom, address _synthTo, uint _amount) virtual override public whenNotPaused nonReentrant {
+    function exchange(address _debtPool, address _synthFrom, address _synthTo, uint _amount) virtual override public whenNotPaused nonReentrant {
         // ensure exchange is not to same synth
         require(_synthFrom != _synthTo, "Synths are the same");
         // ensure amount > 0
@@ -281,23 +300,23 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         uint amountDst = _amount.mul(prices[0].price).mul(10**prices[1].decimals).div(prices[1].price).div(10**prices[0].decimals);
 
         // Burn fromSynth from users
-        SyntheXPool(_tradingPool).burnSynth(_synthFrom, msg.sender, _amount);
+        DebtPool(_debtPool).burnSynth(_synthFrom, msg.sender, _amount);
         // Mint toSynth to user
-        SyntheXPool(_tradingPool).mintSynth(_synthTo, msg.sender, amountDst, amountUSD);
+        DebtPool(_debtPool).mintSynth(_synthTo, msg.sender, amountDst, amountUSD);
 
         // emit successful exchange event
-        emit Exchange(msg.sender, _tradingPool, _synthFrom, _synthTo, _amount, amountDst);
+        emit Exchange(msg.sender, _debtPool, _synthFrom, _synthTo, _amount, amountDst);
     }
 
     /**
-     * @dev Liquidate an account
+     * @notice Liquidate an account
      * @param _account The address of the account to liquidate
-     * @param _tradingPool The address of the trading pool
+     * @param _debtPool The address of the trading pool
      * @param _inAsset The address of the asset to liquidate
      * @param _inAmount The amount of asset to liquidate
      * @param _outAsset The address of the collateral to receive
      */
-    function liquidate(address _account, address _tradingPool, address _inAsset, uint _inAmount, address _outAsset) virtual override external whenNotPaused nonReentrant {
+    function liquidate(address _account, address _debtPool, address _inAsset, uint _inAmount, address _outAsset) virtual override external whenNotPaused nonReentrant {
         uint _healthFactor = healthFactor(_account);
         // ensure account is below liquidation threshold
         require(_healthFactor < 1e18, "Health factor above 1");
@@ -350,16 +369,19 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
             .div(10**prices[1].decimals);
 
         // burn synth & debt
-        // TODO: recalcuate collateralToSieze after checking actual synth burned 
-        uint synthBurned = SyntheXPool(_tradingPool).burn(
+        uint synthToBurn = amountUSD
+            .mul(10**prices[0].decimals)
+            .div(prices[0].price);
+        
+        uint synthBurned = DebtPool(_debtPool).burn(
             _inAsset, 
             msg.sender,
             _account, 
-            amountUSD
-            .mul(10**prices[0].decimals)
-            .div(prices[0].price),
+            synthToBurn,
             amountUSD
         );
+
+        collateralToSieze = collateralToSieze.mul(synthBurned).div(synthToBurn);        
 
         // sieze collateral
         accountCollateralBalance[_account][_outAsset] = collateralBalance.sub(collateralToSieze);
@@ -373,25 +395,27 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
     /* -------------------------------------------------------------------------- */
 
     /**
-     * @dev Pause the contract
+     * @notice Pause the contract
+     * @dev Only callable by L2 admin
      */
-    function pause() public onlyAdmin(ADMIN) {
+    function pause() public onlyL2Admin() {
         _pause();
     }
 
     /**
-     * @dev Unpause the contract
+     * @notice Unpause the contract
+     * @dev Only callable by L2 admin
      */
-    function unpause() public onlyAdmin(ADMIN) {
+    function unpause() public onlyL2Admin() {
         _unpause();
     }
 
     /**
-     * @dev Add a new trading pool
+     * @notice Add a new trading pool
      * @param _tradingPool The address of the trading pool
      * @param _volatilityRatio The volatility ratio of the trading pool
      */
-    function enableTradingPool(address _tradingPool, uint _volatilityRatio) virtual override public onlyAdmin(POOL_MANAGER) {
+    function enableTradingPool(address _tradingPool, uint _volatilityRatio) virtual override public onlyGov {
         require(_volatilityRatio > 0, "Volatility ratio must be greater than 0");
         Market storage pool = tradingPools[_tradingPool];
         // enable pool
@@ -403,13 +427,14 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
     }
     
     /**
-     * @dev Disable a trading pool
+     * @notice Disable a trading pool
      * @dev Synths will not be issued from the pool anymore
      * @dev Will still be calculated for debt
      * @dev Can be re-enabled
+     * @dev Trading pool can be disabled only by governance module or l2Admin (only in case of emergency)
      * @param _tradingPool The address of the trading pool
      */
-    function disableTradingPool(address _tradingPool) virtual override public onlyAdmin(POOL_MANAGER) {
+    function disableTradingPool(address _tradingPool) virtual override public onlyGovOrL2 {
         if(tradingPools[_tradingPool].isEnabled){
             tradingPools[_tradingPool].isEnabled = false;
             emit TradingPoolDisabled(_tradingPool);
@@ -417,11 +442,12 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
     }
 
     /**
-     * @dev Add a new collateral
+     * @notice Add a new collateral
+     * @dev Collateral can be only added thru the governance module.
      * @param _collateral The address of the collateral
      * @param _volatilityRatio The volatility ratio of the collateral
      */
-    function enableCollateral(address _collateral, uint _volatilityRatio) virtual override public onlyAdmin(ADMIN) {
+    function enableCollateral(address _collateral, uint _volatilityRatio) virtual override public onlyGov {
         Market storage collateral = collaterals[_collateral];
         // enable collateral
         collateral.isEnabled = true;
@@ -432,13 +458,13 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
     }
 
     /**
-     * @dev Disables a collateral, does not remove it from the system
+     * @notice Disables a collateral, does not remove it from the system
      * @notice Collateral can be re-enabled
      * @notice Collateral can be withdrawn by users
      * @notice Will still be considered for calculation as collateral against debt
      * @param _collateral The address of the collateral
      */
-    function disableCollateral(address _collateral) virtual override public onlyAdmin(ADMIN) {
+    function disableCollateral(address _collateral) virtual override public onlyGovOrL2 {
         if(collaterals[_collateral].isEnabled){
             collaterals[_collateral].isEnabled = false;
             emit CollateralDisabled(_collateral);
@@ -446,23 +472,30 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
     }
 
     /**
-     * @dev Update collateral max deposits
+     * @notice Update collateral max deposits
+     * @notice Only governance module or l2Admin (in case of emergency) can update collateral cap
      */
-    function setCollateralCap(address _collateral, uint _maxDeposit) virtual override public onlyAdmin(ADMIN) {
+    function setCollateralCap(address _collateral, uint _maxDeposit) virtual override public onlyGovOrL2 {
         CollateralSupply storage supply = collateralSupplies[_collateral];
-        require(_maxDeposit > supply.totalDeposits, "Max deposit must be greater than current deposits");
+        if(_maxDeposit > supply.totalDeposits){
+            _maxDeposit = supply.totalDeposits;
+        }
         supply.maxDeposits = _maxDeposit;
         emit CollateralCapUpdated(_collateral, _maxDeposit);
     }
 
-    function setSafeCRatio(uint256 _safeCRatio) public virtual override onlyAdmin(ADMIN) {
+    /**
+     * @notice Update safe collateral ratio
+     * @notice Only governance module or l2Admin (in case of emergency) can update safe collateral ratio
+     */
+    function setSafeCRatio(uint256 _safeCRatio) public virtual override onlyGovOrL2 {
         safeCRatio = _safeCRatio;
     }
     /* -------------------------------------------------------------------------- */
     /*                             Reward Distribution                            */
     /* -------------------------------------------------------------------------- */
 
-    function updateRewardToken(address _rewardToken) virtual public onlyAdmin(ADMIN) {
+    function updateRewardToken(address _rewardToken) virtual public onlyGov {
         // update reward token
         syn = SyntheXToken(_rewardToken);
         emit RewardTokenAdded(_rewardToken);
@@ -474,7 +507,7 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
      * @param _tradingPool The address of the trading pool
      * @param _speed The reward speed
      */
-    function setPoolSpeed(address _rewardToken, address _tradingPool, uint _speed) virtual override public onlyAdmin(POOL_MANAGER) {
+    function setPoolSpeed(address _rewardToken, address _tradingPool, uint _speed) virtual override public onlyGov {
         // get pool from storage
         Market storage pool = tradingPools[_tradingPool];
         // ensure pool is enabled
@@ -487,7 +520,6 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         emit SetPoolRewardSpeed(_tradingPool, _speed);
     }
     
-
     /**
      * @notice Accrue rewards to the market
      * @param _rewardToken The reward token
@@ -499,7 +531,7 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         uint deltaTimestamp = block.timestamp - poolRewardState.timestamp;
         if(deltaTimestamp == 0) return;
         if (rewardSpeed > 0) {
-            uint borrowAmount = SyntheXPool(_tradingPool).totalSupply();
+            uint borrowAmount = DebtPool(_tradingPool).totalSupply();
             uint synAccrued = deltaTimestamp * rewardSpeed;
             uint ratio = borrowAmount > 0 ? synAccrued * 1e36 / borrowAmount : 0;
             poolRewardState.index = uint224(poolRewardState.index + ratio);
@@ -512,31 +544,31 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
     /**
      * @notice Calculate COMP accrued by a supplier and possibly transfer it to them
      * @param _rewardToken The reward token
-     * @param _tradingPool The market in which the supplier is interacting
+     * @param _debtPool The market in which the supplier is interacting
      * @param _account The address of the supplier to distribute COMP to
      */
-    function distributeAccountReward(address _rewardToken, address _tradingPool, address _account) internal {
+    function distributeAccountReward(address _rewardToken, address _debtPool, address _account) internal {
         // This check should be as gas efficient as possible as distributeSupplierComp is called in many places.
         // - We really don't want to call an external contract as that's quite expensive.
 
-        PoolRewardState storage poolRewardState = rewardState[_rewardToken][_tradingPool];
+        PoolRewardState storage poolRewardState = rewardState[_rewardToken][_debtPool];
         uint borrowIndex = poolRewardState.index;
-        uint accountIndex = rewardIndex[_rewardToken][_tradingPool][_account];
+        uint accountIndex = rewardIndex[_rewardToken][_debtPool][_account];
 
         // Update supplier's index to the current index since we are distributing accrued COMP
-        rewardIndex[_rewardToken][_tradingPool][_account] = borrowIndex;
+        rewardIndex[_rewardToken][_debtPool][_account] = borrowIndex;
 
-        if (accountIndex == 0 && borrowIndex >= compInitialIndex) {
+        if (accountIndex == 0 && borrowIndex >= rewardInitialIndex) {
             // Covers the case where users supplied tokens before the market's supply state index was set.
             // Rewards the user with COMP accrued from the start of when supplier rewards were first
             // set for the market.
-            accountIndex = compInitialIndex; // 1e36
+            accountIndex = rewardInitialIndex; // 1e36
         }
 
         // Calculate change in the cumulative sum of the SYN per debt token accrued
         uint deltaIndex = borrowIndex - accountIndex;
 
-        uint accountDebtTokens = SyntheXPool(_tradingPool).balanceOf(_account);
+        uint accountDebtTokens = DebtPool(_debtPool).balanceOf(_account);
 
         // Calculate COMP accrued: cTokenAmount * accruedPerCToken
         uint accountDelta = accountDebtTokens * deltaIndex / 1e36;
@@ -544,7 +576,7 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         uint accountAccrued = rewardAccrued[_rewardToken][_account].add(accountDelta);
         rewardAccrued[_rewardToken][_account] = accountAccrued;
 
-        emit DistributedSYN(_tradingPool, _account, accountDelta, borrowIndex);
+        emit DistributedSYN(_debtPool, _account, accountDelta, borrowIndex);
     }
 
     /**
@@ -601,14 +633,13 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
      * @dev Get total $SYN accrued by an account
      * @dev Only for getting dynamic reward amount in frontend. To be statically called
      */
-    function getRewardsAccrued(address _rewardToken, address _account, address[] memory _tradingPoolsList) virtual override public returns(uint){
+    function getRewardsAccrued(address _rewardToken, address _account, address[] memory _tradingPoolsList) virtual override public returns(uint) {
         // Iterate over all the trading pools and update the reward index and account's reward amount
         for (uint i = 0; i < _tradingPoolsList.length; i++) {
-            SyntheXPool pool = SyntheXPool(_tradingPoolsList[i]);
-            require(tradingPools[address(pool)].isEnabled, "Market must be listed");
+            require(tradingPools[_tradingPoolsList[i]].isEnabled, "Market must be listed");
             // Iterate thru all reward tokens
-            updatePoolRewardIndex(_rewardToken, address(pool));
-            distributeAccountReward(_rewardToken, address(pool), _account);
+            updatePoolRewardIndex(_rewardToken, _tradingPoolsList[i]);
+            distributeAccountReward(_rewardToken, _tradingPoolsList[i], _account);
         }
         // Get the rewards accrued
         return rewardAccrued[_rewardToken][_account];
@@ -736,7 +767,7 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         // Iterate over all the trading pools of the account
         for(uint i = 0; i < _accountPools.length; i++){
             // Add the debt amount in USD
-            totalDebt = totalDebt.add(SyntheXPool(_accountPools[i]).getUserDebtUSD(_account));
+            totalDebt = totalDebt.add(DebtPool(_accountPools[i]).getUserDebtUSD(_account));
         }
         return totalDebt;
     }
@@ -755,7 +786,7 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         for(uint i = 0; i < _accountPools.length; i++){
             // Add the adjusted debt amount in USD
             adjustedTotalDebt = adjustedTotalDebt.add(
-                SyntheXPool(_accountPools[i]).getUserDebtUSD(_account)
+                DebtPool(_accountPools[i]).getUserDebtUSD(_account)
                 .mul(1e18)
                 .div(tradingPools[_accountPools[i]].volatilityRatio)
             );

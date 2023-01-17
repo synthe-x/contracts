@@ -5,35 +5,35 @@ import "./PriceOracle.sol";
 import "./token/SyntheXToken.sol";
 import "./utils/AddressStorage.sol";
 
+/**
+ * @title SyntheX Storage Contract
+ * @notice Stores all the data for SyntheX main contract
+ * @dev This contract is used to store all the data for SyntheX main contract
+ * @dev SyntheX is upgradable
+ */
 contract SyntheXStorage {
+    /// @notice Reward token contract address
     SyntheXToken public syn;
 
+    /// @notice Safe-Minimum collateral ratio. Debt cannot be issued if collateral ratio is below this value
     uint256 public safeCRatio;
-    uint256 public compInitialIndex;
+
+    /// @notice RewardToken initial index
+    uint256 public constant rewardInitialIndex = 1e36;
 
     /// @notice Address manager contract address
     AddressStorage public addressStorage;
 
-    /**
-     * @dev Pools the user has entered into
-     */
+    /// @notice Pools the user has entered into
     mapping(address => address[]) public accountPools;
 
-    /**
-     * @dev Collaterals the user has deposited
-     */
+    /// @notice Collaterals the user has deposited
     mapping(address => address[]) public accountCollaterals;
 
-    /**
-     * @dev Collateral asset addresses
-     * User => Collateral => Balance
-     */
+    /// @notice Collateral asset addresses. User => Collateral => Balance
     mapping(address => mapping(address => uint256)) public accountCollateralBalance;
 
-    /**
-     * @dev Market data structure
-     * Compatible with both collateral market and trading pool
-     */
+    /// @notice Market data structure. Compatible with both collateral market and trading pool
     struct Market {
         bool isEnabled;
         uint256 volatilityRatio;
@@ -45,26 +45,21 @@ contract SyntheXStorage {
         uint256 totalDeposits;
     }
 
-    /**
-     * @dev Mapping from pool address to pool data
-     */
+    /// @notice Mapping from pool address to pool data
     mapping(address => Market) public tradingPools;
 
-    /**
-     * @dev Mapping from collateral asset address to collateral data
-     */
+    /// @notice Mapping from collateral asset address to collateral data
     mapping(address => Market) public collaterals;
 
-    /**
-     * @dev Mapping from collateral asset address to collateral supply and cap data
-     */
+    /// @notice Mapping from collateral asset address to collateral supply and cap data
     mapping(address => CollateralSupply) public collateralSupplies;
 
+    /// @notice Reward state for each pool
     struct PoolRewardState {
-        // The market's last updated compBorrowIndex or compSupplyIndex
+        // The market's last updated rewardIndex
         uint224 index;
 
-        // The block number the index was last updated at
+        // The timestamp the index was last updated at
         uint32 timestamp;
     }
 
