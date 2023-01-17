@@ -1,4 +1,5 @@
-import { ethers } from "hardhat";
+import { DeployProxyOptions } from "@openzeppelin/hardhat-upgrades/dist/utils";
+import { ethers, OpenzeppelinDefender } from "hardhat";
 import { upgrades } from "hardhat";
 
 export const _deploy = async (
@@ -11,7 +12,10 @@ export const _deploy = async (
 	const Contract = await ethers.getContractFactory(contractName);
 	let contract;
 	if (upgradable) {
-		contract = await upgrades.deployProxy(Contract, args, { type: 'uups' });
+		// wrap it
+		const deployProxyParams: DeployProxyOptions = { type: 'uups' } as DeployProxyOptions;
+		// deploy
+		contract = await upgrades.deployProxy(Contract, args, deployProxyParams);
 		args = [];
 	} else {
 		contract = await Contract.deploy(...args);
@@ -43,3 +47,4 @@ export const _deploy = async (
 	}
 	return contract;
 };
+

@@ -16,9 +16,8 @@ interface ISyntheX {
     function issue(address _tradingPool, address _synth, uint _amount) external;
     function burn(address _tradingPool, address _synth, uint _amount) external;
     function exchange(address _tradingPool, address _synthFrom, address _synthTo, uint _amount) external;
-    function setPoolSpeed(address _tradingPool, uint _speed) external ;
+    function setPoolSpeed(address _rewardToken, address _tradingPool, uint _speed) external ;
     function liquidate(address _account, address _tradingPool, address _inAsset, uint _inAmount, address _outAsset) external;
-    
     
     /* -------------------------------------------------------------------------- */
     /*                               Admin Functions                              */
@@ -28,14 +27,14 @@ interface ISyntheX {
     function enableCollateral(address _collateral, uint _volatilityRatio) external;
     function disableCollateral(address _collateral) external;
     function setSafeCRatio(uint256 _safeCRatio) external;
-    
+    function setCollateralCap(address _collateral, uint _maxDeposit) external;
     
     /* -------------------------------------------------------------------------- */
     /*                          $SYN Reward Distribution                          */
     /* -------------------------------------------------------------------------- */
-    function claimSYN(address holder, address[] memory tradingPoolsList) external ;
-    function claimSYN(address[] memory holders, address[] memory _tradingPools) external;
-    function getSYNAccrued(address _account, address[] memory tradingPoolsList) external returns(uint);
+    function claimReward(address _rewardToken, address holder, address[] memory tradingPoolsList) external;
+    function claimReward(address _rewardToken, address[] memory holders, address[] memory tradingPoolsList) external;
+    function getRewardsAccrued(address _rewardToken, address _account, address[] memory tradingPoolsList) external returns(uint);
 
 
     /* -------------------------------------------------------------------------- */
@@ -49,7 +48,6 @@ interface ISyntheX {
     function getAdjustedUserTotalCollateralUSD(address _account) external view returns(uint);
     function getUserTotalDebtUSD(address _account) external view returns(uint);
     function getAdjustedUserTotalDebtUSD(address _account) external view returns(uint) ;
-    function getUserPoolDebtUSD(address _account, address _tradingPool) external view returns(uint);
     function oracle() external view returns(IPriceOracle);
 
 
@@ -67,4 +65,6 @@ interface ISyntheX {
     event Exchange(address indexed user, address indexed tradingPool, address indexed fromAsset, address toAsset, uint256 fromAmount, uint256 toAmount);
     event SetPoolRewardSpeed(address indexed pool, uint256 rewardSpeed);
     event DistributedSYN(address indexed pool, address _account, uint256 accountDelta, uint rewardIndex);
+    event CollateralCapUpdated(address indexed asset, uint256 newCap);
+    event RewardTokenAdded(address indexed rewardToken);
 }

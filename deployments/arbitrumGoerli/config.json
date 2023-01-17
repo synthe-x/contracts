@@ -6,26 +6,32 @@
   "poolManager": "0x46c18c6d5526E17B34a3deB43e5E9Ba2A659c23a",
   "safeCRatio": "2",
   "debtRewardAlloc": "1000000",
-  "stakingRewards": [
-    {
-      "reward": "1000",
-      "days": "7"
-    },
-    {
-      "reward": "6000",
-      "days": "30"
-    },
-    {
-      "rewardSpeed": "20000",
-      "days": "90"
-    }
-  ],
+  "stakingRewards": {
+    "reward": "6000",
+    "days": "30"
+  },
   "collaterals": [
     {
-      "name": "Wrapped Ethereum",
-      "symbol": "wETH",
+      "name": "Wrapped ETH",
+      "symbol": "WETH",
       "volatilityRatio": "0.8",
-      "feed": "0x62CAe0FA2da220f43a51F86Db2EDb36DcA9A5A08"
+      "feed": "0x62CAe0FA2da220f43a51F86Db2EDb36DcA9A5A08",
+      "cap": "1000000000000000000000"
+    },
+    {
+      "name": "USD Coin",
+      "symbol": "USDC",
+      "volatilityRatio": "0.7",
+      "feed": "0x1692Bdd32F31b831caAc1b0c9fAF68613682813b",
+      "cap": "10000000000000000000000000"
+    },
+    {
+      "name": "Ethereum",
+      "symbol": "ETH",
+      "volatilityRatio": "0.8",
+      "feed": "0x62CAe0FA2da220f43a51F86Db2EDb36DcA9A5A08",
+      "address": "0x0000000000000000000000000000000000000000",
+      "cap": "100000000000000000000000"
     }
   ],
   "tradingPools": [
@@ -35,7 +41,6 @@
       "volatilityRatio": "0.8",
       "rewardSpeed": "2.5",
       "fee": "15",
-      "latest": "",
       "synths": [
         {
           "name": "Bitcoin X",
