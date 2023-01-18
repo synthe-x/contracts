@@ -93,7 +93,13 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
      * @param _tradingPool The address of the trading pool
      */
     function enterPool(address _tradingPool) virtual override public {
-        tradingPools[_tradingPool].accountMembership[msg.sender] = true;
+        // get pool
+        Market storage market = tradingPools[_tradingPool];
+        // ensure that the user is not already in the pool
+        require(!market.accountMembership[msg.sender], "SyntheX: Already in pool");
+        // enable account's pool membership
+        market.accountMembership[msg.sender] = true;
+        // add to account's pool list
         accountPools[msg.sender].push(_tradingPool);
     }
 
@@ -102,10 +108,12 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
      * @param _tradingPool The address of the trading pool
      */
     function exitPool(address _tradingPool) virtual override public {
+        // ensure that the user has no debt in the pool
         require(DebtPool(_tradingPool).getUserDebtUSD(msg.sender) == 0, "SyntheX: Pool debt must be zero");
+        // disable account's pool membership
         tradingPools[_tradingPool].accountMembership[msg.sender] = false;
+        // remove from list of account's pools
         address[] storage pools = accountPools[msg.sender];
-        // remove from list
         for (uint i = 0; i < pools.length; i++) {
             if (pools[i] == _tradingPool) {
                 pools[i] = pools[pools.length - 1];
@@ -120,7 +128,13 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
      * @param _collateral The address of the collateral
      */
     function enterCollateral(address _collateral) virtual override public {
-        collaterals[_collateral].accountMembership[msg.sender] = true;
+        // get collateral pool
+        Market storage collateral = collaterals[_collateral];
+        // ensure that the user is not already in the pool
+        require(!collateral.accountMembership[msg.sender], "SyntheX: Already in collateral");
+        // enable account's collateral membership
+        collateral.accountMembership[msg.sender] = true;
+        // add to account's collateral list
         accountCollaterals[msg.sender].push(_collateral);
     }
 
@@ -522,7 +536,7 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         // set speed
         rewardSpeeds[_rewardToken][_tradingPool] = _speed;
         // emit successful event
-        emit SetPoolRewardSpeed(_tradingPool, _speed);
+        emit SetPoolRewardSpeed(_rewardToken, _tradingPool, _speed);
     }
     
     /**
@@ -547,13 +561,13 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
     } 
 
     /**
-     * @notice Calculate COMP accrued by a supplier and possibly transfer it to them
+     * @notice Calculate reward accrued by a supplier and possibly transfer it to them
      * @param _rewardToken The reward token
      * @param _debtPool The market in which the supplier is interacting
-     * @param _account The address of the supplier to distribute COMP to
+     * @param _account The address of the supplier to distribute reward to
      */
     function distributeAccountReward(address _rewardToken, address _debtPool, address _account) internal {
-        // This check should be as gas efficient as possible as distributeSupplierComp is called in many places.
+        // This check should be as gas efficient as possible as distributeAccountReward is called in many places.
         // - We really don't want to call an external contract as that's quite expensive.
 
         PoolRewardState storage poolRewardState = rewardState[_rewardToken][_debtPool];
@@ -565,7 +579,7 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
 
         if (accountIndex == 0 && borrowIndex >= rewardInitialIndex) {
             // Covers the case where users supplied tokens before the market's supply state index was set.
-            // Rewards the user with COMP accrued from the start of when supplier rewards were first
+            // Rewards the user with reward accrued from the start of when supplier rewards were first
             // set for the market.
             accountIndex = rewardInitialIndex; // 1e36
         }
@@ -575,13 +589,13 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
 
         uint accountDebtTokens = DebtPool(_debtPool).balanceOf(_account);
 
-        // Calculate COMP accrued: cTokenAmount * accruedPerCToken
+        // Calculate reward accrued: cTokenAmount * accruedPerCToken
         uint accountDelta = accountDebtTokens * deltaIndex / 1e36;
 
         uint accountAccrued = rewardAccrued[_rewardToken][_account].add(accountDelta);
         rewardAccrued[_rewardToken][_account] = accountAccrued;
 
-        emit DistributedSYN(_debtPool, _account, accountDelta, borrowIndex);
+        emit DistributedReward(_rewardToken, _debtPool, _account, accountDelta, borrowIndex);
     }
 
     /**

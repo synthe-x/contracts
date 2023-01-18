@@ -63,8 +63,8 @@ interface ISyntheX {
     event Issue(address indexed user, address indexed tradingPool, address indexed asset, uint256 amount);
     event Burn(address indexed user, address indexed tradingPool, address indexed asset, uint256 amount);
     event Exchange(address indexed user, address indexed tradingPool, address indexed fromAsset, address toAsset, uint256 fromAmount, uint256 toAmount);
-    event SetPoolRewardSpeed(address indexed pool, uint256 rewardSpeed);
-    event DistributedSYN(address indexed pool, address _account, uint256 accountDelta, uint rewardIndex);
+    event SetPoolRewardSpeed(address indexed rewardToken, address indexed pool, uint256 rewardSpeed);
+    event DistributedReward(address indexed rewardToken, address indexed pool, address _account, uint256 accountDelta, uint rewardIndex);
     event CollateralCapUpdated(address indexed asset, uint256 newCap);
     event RewardTokenAdded(address indexed rewardToken);
 }
