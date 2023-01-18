@@ -1,26 +1,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "./SyntheXToken.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "./SealedSYN.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "./TokenUnlocker.sol";
 
 
 // Crowdsale contract that allows users to buy SYN tokens with ETH
-// Issued tokens are released after 180 days
-contract Crowdsale is Ownable,ReentrancyGuard {
-    using SafeMath for uint256;
+contract Crowdsale is ReentrancyGuard, TokenUnlocker{
+
+   using SafeMath for uint256;
 
     // start and end timestamps 
     uint256 public startTime;
-
     uint256 public endTime;
-
-    // address where funds are collected
-    address payable wallet;
 
     // how many token units a buyer gets per wei
     uint256 public rate;
@@ -30,57 +23,62 @@ contract Crowdsale is Ownable,ReentrancyGuard {
 
     // amount of tokens purchased
     uint256  totalTokensPurchased ;
- 
+
     // Duration for which tokens will be locked
     uint256 lockInDuration;
 
-    // no of token unlock intervals 
-    uint256 unlockIntervals;
 
-      struct BuyRequest {
-        uint amount;
-        uint requestTime;
-    }
-    // mapping(address => uint) public buyRequestCount;
-
-
-
-    // IERC20 token;
-    // IERC20 sealedToken;
-    // mapping(address=> uint256) public tokenMapping;
-    // mapping(address=> uint256) public tokenBal;
-    IERC20 token;
-    IERC20 sealedToken;
     mapping(bytes32 => uint256) public tokenMapping;  // mapping of request with amount and time
-    // mapping(bytes32 => mapping(uint256 => BuyRequest)) public tokenMapping;  // mapping of requesr with amount and time
     mapping(bytes32 => uint256) public tokenBal; // token balance 
     mapping(address => uint256) public timeDuration; //   
     mapping(address => uint) public noOfRequests;  // mapping of request Id and no of requests 
 
-    // mapping(uint256 => BuyRequest) public buyRequests;  // mapping of request Id and no of requests 
-
-
-
     // Events
     event TokenPurchase(address purchaser, uint256 ethValue, uint256 tokenAmount);
-    event TokenUnlocked(address purchaser, uint256 tokenAmount);
+    event RateUpdated(address updatedBy, uint256 newRate);
+
     // Errors 
     error InvalidTime(uint256 startTime, uint256 endTime);
 
 
-    constructor(address _token, address payable _adminWallet, uint256 _rate, uint256 _startTime,uint256  _endTime, uint256 _duration, uint256 _intervals) {
-     token = IERC20(_token);
-     wallet = _adminWallet;
+    constructor(
+     uint256 _rate, 
+     uint256 _startTime,
+     uint256 _endTime, 
+     uint256 _duration,
+     address _SEALED_TOKEN,
+     address _TOKEN,
+     address _system
+     )TokenUnlocker(_system, _SEALED_TOKEN, _TOKEN, lockPeriod, unlockPeriod, percUnlockAtRelease){
      rate = _rate;
      startTime= _startTime;
      endTime = _endTime;
      lockInDuration = _duration;
-     unlockIntervals = _intervals;
     }
 
 
-     // token purchase function
-    function buyTokens() public payable {
+    modifier onlyL1Admin() {
+        require(system.hasRole(system.L1_ADMIN_ROLE(), msg.sender), "Caller is not an admin");
+        _;
+    }
+
+      modifier onlyL2Admin() {
+        require(system.hasRole(system.L2_ADMIN_ROLE(), msg.sender), "Caller is not an admin");
+        _;
+    }
+
+    // withdraw L2 role
+    function withdrawFunds(address payable _adminWallet) external onlyL1Admin nonReentrant{
+     require(address(this).balance > 0, "Zero Balance");
+     _adminWallet.transfer(address(this).balance);
+    }
+
+    // This fallback function 
+    receive() external payable {
+      buyTokens();
+    }
+  
+    function buyTokens() public payable nonReentrant {
 
         require(msg.sender != address(0) && msg.value != 0);
      
@@ -95,15 +93,17 @@ contract Crowdsale is Ownable,ReentrancyGuard {
         weiRaised = weiRaised.add(weiAmount);
 
         totalTokensPurchased = totalTokensPurchased.add(tokens);
-        require(totalTokensPurchased < token.balanceOf(wallet), "low token balance" );
+        // require(totalTokensPurchased < remainingQuota(), "low token balance" );
         uint requestCount = uint(noOfRequests[msg.sender]).add(1);
         bytes32 requestId = keccak256(abi.encodePacked(msg.sender, requestCount));
 
+         // mint sealed tokens
+         SEALED_TOKEN.mint(msg.sender, tokens);
+
         // keeps total amount of tokens bought in a perticular request
          tokenMapping[requestId]  = tokens; 
-        // tokenMapping[requestId][requestCount].amount  =tokens; 
-        // tokenMapping[requestId][requestCount].requestTime  = block.timestamp; 
 
+        
         // keeps total amount of tokens left against a perticular request
         tokenBal[requestId] = tokens;
 
@@ -112,49 +112,22 @@ contract Crowdsale is Ownable,ReentrancyGuard {
        // keeps total buy request executed by a user
         noOfRequests[msg.sender] = requestCount;
 
-        wallet.transfer(msg.value);
+        // wallet.transfer(msg.value);
         emit TokenPurchase(msg.sender, msg.value, tokens);
     }
-
   
-    function updateRate(uint256 _rate) public onlyOwner {
+    function updateRate(uint256 _rate) external onlyL2Admin {
         rate = _rate;
+        emit RateUpdated(msg.sender, rate);
     }
 
-    function closeSale() external onlyOwner {
+    function closeSale() external onlyL2Admin {
       require(block.timestamp < endTime);
       endTime = block.timestamp;
     }
 
-  // TODO: intervals and duration logic  4 intervals duration 4 months
-
-   function unlockTokens(bytes32 _requestId) public  nonReentrant{
-     require(tokenMapping[_requestId] != 0 );
-     require((timeDuration[msg.sender] - block.timestamp) > (lockInDuration/unlockIntervals), "cannot unlock before lockInPeriod");
-     // 3.5 months  
-    //   3.5/6 = 0.58 
-    //   (6/3)= 2  
-    //  total interval   
-    
-
-     uint totalRewardsForIntervalPassed = uint(timeDuration[msg.sender] - block.timestamp).div(lockInDuration);   // 3.5/ 6 = 0.58 
-     uint calculatedUnlockAmt = uint(tokenMapping[_requestId]).mul(totalRewardsForIntervalPassed);  // 3.5/ 6 = 0.58 * 100 tokens = 58 
-   
-     require(calculatedUnlockAmt > 0 && tokenBal[_requestId] != 0 );
-
-     token.transferFrom(wallet, msg.sender, calculatedUnlockAmt);
-     timeDuration[msg.sender] = block.timestamp;
-     tokenBal[_requestId] = tokenBal[_requestId] - calculatedUnlockAmt;
-
-     emit TokenUnlocked(msg.sender, calculatedUnlockAmt);
-
-   }
-
-
-   function getRate() public view returns(uint256){
-         return rate;
-     }
-
-
+    function getRate() public view returns(uint256){
+        return rate;
+    }
 
 }

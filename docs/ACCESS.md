@@ -22,6 +22,7 @@ Top admininistrator: Not needed during usual functioning of the protocol, Only t
 - SYN: Can mint tokens
 - PriceOracle: Update price feed
 - Fee Vault: Can collect fees
+- Crowdsale: withdraw funds
 
 ### Level-2 Admin (L2_ADMIN_ROLE)
 
@@ -31,6 +32,7 @@ Contract level admin
 - All: Can Pause/Unpause contracts
 - Staking rewards: Can update amount, speed, reward period
 - Unlocker: Withdraw extra tokens, set lock period
+- Crowdsale - update rate and close sale
 
 ### Governance (GOVERNANCE_MODULE_ROLE)
 

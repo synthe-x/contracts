@@ -130,7 +130,7 @@ contract TokenUnlocker is Pausable {
      * @notice Start unlocking of SYN tokens
      * @param _amount Amount of SYN to unlock
      */
-    function startUnlock(uint _amount) external whenNotPaused {
+    function _startUnlock(uint _amount) internal {
         // check if user has enough SYN to unlock
         require(remainingQuota() >= _amount, "Not enough SYN to unlock");
         require(_amount > 0, "Amount must be greater than 0");
@@ -216,6 +216,11 @@ contract TokenUnlocker is Pausable {
             _unlockInternal(_requestIds[i]);
         }
     }
+
+      function startUnlock(uint _amount) external whenNotPaused {
+          _startUnlock(_amount) ;
+       }
+
 
     /**
      * @notice Get request ID
