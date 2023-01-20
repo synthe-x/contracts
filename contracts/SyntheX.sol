@@ -49,14 +49,16 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
     
     /**
      * @notice Initialize the contract
-     * @param _syn The address of the SyntheX token
+     * @param _sealedSyn The address of the Sealed SyntheX token
      * @param _system The address of the system contract
      */
-    function initialize(address _syn, address _system, uint _safeCRatio) public initializer {
+    function initialize(address _sealedSyn, address _system, uint _safeCRatio) public initializer {
         __ReentrancyGuard_init();
         __Pausable_init();
         
-        syn = SyntheXToken(_syn);
+        rewardToken = SyntheXToken(_sealedSyn);
+        isRewardTokenSealed = true;
+
         system = System(_system);
         safeCRatio = _safeCRatio;
     }
@@ -248,9 +250,9 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         require(DebtPool(_debtPool).synths(_synth), "Synth not enabled");
         
         // update reward index for the pool 
-        updatePoolRewardIndex(address(syn), _debtPool);
+        updatePoolRewardIndex(address(rewardToken), _debtPool);
         // distribute pending reward tokens to user
-        distributeAccountReward(address(syn), _debtPool, msg.sender);
+        distributeAccountReward(address(rewardToken), _debtPool, msg.sender);
 
         // get price from oracle
         IPriceOracle.Price memory price = oracle().getAssetPrice(_synth);
@@ -278,9 +280,9 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         require(_amount > 0, "Amount must be greater than 0");
 
         // update reward index for the pool 
-        updatePoolRewardIndex(address(syn), _debtPool);
+        updatePoolRewardIndex(address(rewardToken), _debtPool);
         // distribute pending reward tokens to user
-        distributeAccountReward(address(syn), _debtPool, msg.sender);
+        distributeAccountReward(address(rewardToken), _debtPool, msg.sender);
 
         // get synth price
         IPriceOracle _oracle = IPriceOracle(system.getAddress(PRICE_ORACLE));
@@ -514,10 +516,13 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
     /*                             Reward Distribution                            */
     /* -------------------------------------------------------------------------- */
 
-    function updateRewardToken(address _rewardToken) virtual public onlyGov {
+    function updateRewardToken(address _rewardToken, bool isSealed) virtual public onlyGov {
         // update reward token
-        syn = SyntheXToken(_rewardToken);
-        emit RewardTokenAdded(_rewardToken);
+        rewardToken = SyntheXToken(_rewardToken);
+        // update reward token sealed status
+        isRewardTokenSealed = isSealed;
+        // emit successful event
+        emit RewardTokenAdded(_rewardToken, isSealed);
     }
     
     /**
@@ -627,25 +632,39 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
             for (uint k = 0; k < holders.length; k++) {
                 distributeAccountReward(_rewardToken, pool, holders[k]);
             }
-            
         }
         for (uint j = 0; j < holders.length; j++) {
-            rewardAccrued[_rewardToken][holders[j]] = grantRewardInternal(_rewardToken, holders[j], rewardAccrued[_rewardToken][holders[j]]);
+            grantRewardInternal(_rewardToken, holders[j], rewardAccrued[_rewardToken][holders[j]]);
+            rewardAccrued[_rewardToken][holders[j]] = 0;
         }
     }
 
     /** 
-     * @notice Transfer SYN to the user
-     * @dev Note: If there is not enough SYN, we do not perform the transfer all.
+     * @notice Mint/Transfer SYN to the user
      * @param _reward The address of the reward token
      * @param _user The address of the user to transfer SYN to
-     * @param _amount The amount of SYN to (possibly) transfer
-     * @return The amount of SYN which was NOT transferred to the user
+     * @param _amount The amount of SYN to (possibly) mint
+     * @return The amount of COMP SYN was NOT transferred to the user
      */
     function grantRewardInternal(address _reward, address _user, uint _amount) internal whenNotPaused nonReentrant returns (uint) {
-        // check if there is enough SYN
-        SyntheXToken(_reward).mint(_user, _amount);   
-        return _amount;
+        SyntheXToken _rewardToken = SyntheXToken(_reward);
+        // Check if the reward token is sealed
+        // if sealed: mint it, else: transfer it
+        if(isRewardTokenSealed){
+            SyntheXToken(_reward).mint(_user, _amount);
+            return 0;
+        } else {
+            // check if there is enough SYN
+            uint rewardRemaining = _rewardToken.balanceOf(address(this));
+
+            if (_amount > 0 && _amount <= rewardRemaining) {
+                _rewardToken.transfer(_user, _amount);
+                return 0;
+            }
+
+            return _amount;
+        }
+
     }
 
     /**

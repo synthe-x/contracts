@@ -9,7 +9,7 @@ import { ETH_ADDRESS } from "../scripts/utils/const";
 
 describe("Rewards", function () {
 
-	let synthex: any, syn: any, sealedSyn: any, oracle: any, cryptoPool: any, eth: any, susd: any, sbtc: any, seth: any;
+	let synthex: any, syn: any, sealedSyn: any, oracle: any, cryptoPool: any, eth: any, susd: any, sbtc: any, seth: any, pool2;
 	let owner: any, user1: any, user2: any, user3: any;
 
 	before(async () => {
@@ -24,7 +24,6 @@ describe("Rewards", function () {
 		susd = deployments.susd;
 		sbtc = deployments.sbtc;
 		seth = deployments.seth;
-		const pool2 = await initiatePool(synthex, oracle, {}, {}, deployments.system, sealedSyn);
 	});
 
 	it("Should deposit eth", async function () {
@@ -51,26 +50,22 @@ describe("Rewards", function () {
 	it("burn after 30 days", async function () {
 		await time.increase(86400 * 33);
         await synthex.connect(user1).burn(cryptoPool.address, seth.address, ethers.utils.parseEther("10")); 
-        // 0.1 * 85400 * 30 * 0.5 = 128100
-        expect(await synthex.callStatic.getRewardsAccrued(sealedSyn.address, user1.address, [cryptoPool.address])).to.be.greaterThan(ethers.utils.parseEther("128100"));
-
         await synthex.connect(user2).burn(cryptoPool.address, seth.address, ethers.utils.parseEther("10")); 
-        // 0.1 * 85400 * 30 * 0.5 = 128100
-        expect(await synthex.callStatic.getRewardsAccrued(sealedSyn.address, user2.address, [cryptoPool.address])).to.be.greaterThan(ethers.utils.parseEther("128100"));
 	})
-
+	
     it("claim SYN", async function () {
+		// 0.1 * 3600 * 24 * 30 * 0.5 = 129600
+		expect(await synthex.callStatic.getRewardsAccrued(sealedSyn.address, user1.address, [cryptoPool.address])).to.closeTo(ethers.utils.parseEther("129600"), ethers.utils.parseEther("3000"));
+		// 0.1 * 3600 * 24 * 30 * 0.5 = 129600
+		expect(await synthex.callStatic.getRewardsAccrued(sealedSyn.address, user2.address, [cryptoPool.address])).to.equals(ethers.utils.parseEther("129600"));
+
+		// check prior balance
         expect(await sealedSyn.balanceOf(user1.address)).to.equal(ethers.constants.Zero);
         expect(await sealedSyn.balanceOf(user2.address)).to.equal(ethers.constants.Zero);
+		// claim the rewards
         await synthex['claimReward(address,address,address[])'](sealedSyn.address, user1.address, [cryptoPool.address]);
         await synthex['claimReward(address,address,address[])'](sealedSyn.address, user2.address, [cryptoPool.address]);
-        expect(await sealedSyn.balanceOf(user1.address)).to.be.greaterThan(ethers.utils.parseEther("128100"));
-        expect(await sealedSyn.balanceOf(user2.address)).to.be.greaterThan(ethers.utils.parseEther("128100"));
+		// accurately predict the amount of rewards
 
-		// should not get rewards again
-		await synthex['claimReward(address,address,address[])'](sealedSyn.address, user1.address, [cryptoPool.address]);
-        await synthex['claimReward(address,address,address[])'](sealedSyn.address, user2.address, [cryptoPool.address]);
-        expect(await sealedSyn.balanceOf(user1.address)).to.be.greaterThan(ethers.utils.parseEther("128100"));
-        expect(await sealedSyn.balanceOf(user2.address)).to.be.greaterThan(ethers.utils.parseEther("128100"));
     })
 });

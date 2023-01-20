@@ -1,7 +1,7 @@
 {
   "contracts": {
     "System": {
-      "address": "0x3BF384F4cFF7F86157a107D502fF7432057c2886",
+      "address": "0x1ed65522fEddc9a3643B9D2900339b5661FDC80E",
       "abi": "System",
       "constructorArguments": [
         "0x0eD6a1F7a99E8Bc1c752E4515f7AB3aFe20BdBF7",
@@ -9,72 +9,73 @@
         "0x0eD6a1F7a99E8Bc1c752E4515f7AB3aFe20BdBF7",
         "0x0eD6a1F7a99E8Bc1c752E4515f7AB3aFe20BdBF7"
       ],
-      "block": "4973350"
+      "block": "4981887"
     },
     "Vault": {
-      "address": "0xb2072516896f4Eb3625aBeaa851D4062c16D4008",
+      "address": "0x2CD566EEA9A36f842A8E70c584b1Eb75E7142432",
       "abi": "Vault",
       "constructorArguments": [
-        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
+        "0x1ed65522fEddc9a3643B9D2900339b5661FDC80E"
       ],
-      "block": "4973355"
+      "block": "4981890"
     },
     "SyntheXToken": {
-      "address": "0x78B79eB9C8445A9372CDE13FbD75d232Ca22A276",
+      "address": "0xdE54f770ab04c733Fce6bb98bb5e7f0F3A07BD6a",
       "abi": "SyntheXToken",
       "constructorArguments": [
-        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
+        "0x1ed65522fEddc9a3643B9D2900339b5661FDC80E"
       ],
-      "block": "4973368"
+      "block": "4981893"
     },
     "SealedSYN": {
-      "address": "0x90E0F8e2090dcEc3F59C03F18634aF00ACaF24fe",
+      "address": "0xaCF2a73Dbe55F4F69D9Ea18c140FdC7D01038478",
       "abi": "SealedSYN",
       "constructorArguments": [
-        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
+        "0x1ed65522fEddc9a3643B9D2900339b5661FDC80E"
       ],
-      "block": "4973375"
+      "block": "4981894"
     },
     "SyntheX": {
-      "address": "0x75e07C03da5c380FF92270B9bd74F8D486F5a7DC",
+      "address": "0x0D0d150F05cD1AD859BaA7c864d46A5CFD077d2E",
       "abi": "SyntheX",
       "constructorArguments": [],
-      "block": "4973379",
+      "block": "4981901",
       "implementations": {
         "undefined": {
-          "address": "0x6F17d98Ea3A78B263509A914588480D45916C51c",
+          "address": "0xFa0583401E973cA43699a13fb9EdE45173a609E7",
           "source": "SyntheX_undefined",
           "constructorArguments": [],
-          "block": "4973379"
+          "block": "4981901"
         }
       },
-      "latest": "0x6F17d98Ea3A78B263509A914588480D45916C51c"
+      "latest": "0xFa0583401E973cA43699a13fb9EdE45173a609E7"
     },
     "StakingRewards": {
-      "address": "0x9370693C877eE931C6D8D834020343CC587bb1FA",
+      "address": "0x66c8C0d417A5220cB7b04Bcf38a4fb6de04510c1",
       "abi": "StakingRewards",
       "constructorArguments": [
-        "0x90E0F8e2090dcEc3F59C03F18634aF00ACaF24fe",
-        "0x90E0F8e2090dcEc3F59C03F18634aF00ACaF24fe",
-        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
+        "0xaCF2a73Dbe55F4F69D9Ea18c140FdC7D01038478",
+        "0xaCF2a73Dbe55F4F69D9Ea18c140FdC7D01038478",
+        "0x1ed65522fEddc9a3643B9D2900339b5661FDC80E",
+        2592000
       ],
-      "block": "4973382"
+      "block": "4981912"
     },
     "PriceOracle": {
-      "address": "0x78CD57B120cb590Ccc8397fa6Fe4fc75dae230E4",
+      "address": "0x1d8e9cF0D72D6bA0D95bE013042003A20A84F4E6",
       "abi": "PriceOracle",
       "constructorArguments": [
-        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
+        "0x1ed65522fEddc9a3643B9D2900339b5661FDC80E"
       ],
-      "block": "4973386"
+      "block": "4981915"
     },
     "TokenUnlocker": {
-      "address": "0x2aeCaB47c99FC2e11e56159dE41d6a96Ad28C07D",
+      "address": "0xF788e1C2804cb7BA9A9442C2CeA5B92D43B52377",
       "abi": "TokenUnlocker",
       "constructorArguments": [
-        "0x3BF384F4cFF7F86157a107D502fF7432057c2886",
-        "0x90E0F8e2090dcEc3F59C03F18634aF00ACaF24fe",
-        "0x78B79eB9C8445A9372CDE13FbD75d232Ca22A276",
+        "0x1ed65522fEddc9a3643B9D2900339b5661FDC80E",
+        "0xaCF2a73Dbe55F4F69D9Ea18c140FdC7D01038478",
+        "0xdE54f770ab04c733Fce6bb98bb5e7f0F3A07BD6a",
         "15552000",
         "15552000",
         {
@@ -82,82 +83,82 @@
           "hex": "0x1b1ae4d6e2ef500000"
         }
       ],
-      "block": "4973391"
+      "block": "4981919"
     },
     "Multicall2": {
-      "address": "0x99e29f455E2826FCB9d3A5B7a610019039413C2B",
+      "address": "0xbfE698979CA57A3D28fEe7fE5C26270A4Bb79597",
       "abi": "Multicall2",
       "constructorArguments": [],
-      "block": "4973393"
+      "block": "4981927"
     },
     "WETH": {
-      "address": "0xB3488EaaF11E76bE67A8a09C77965Acf7A9d76b1",
+      "address": "0xDfE46e2565909338c7E89D22Ba4fAC05Cc58C2ee",
       "abi": "MockToken",
       "constructorArguments": [
         "Wrapped ETH",
         "WETH"
       ],
-      "block": "4973394"
+      "block": "4981930"
     },
     "USDC": {
-      "address": "0x0cE6Be443DD8fD6c15b9f14F0e5347b0253a92D4",
+      "address": "0xdE34B289d1F5307119235280ce56Cd8F5583129d",
       "abi": "MockToken",
       "constructorArguments": [
         "USD Coin",
         "USDC"
       ],
-      "block": "4973399"
+      "block": "4981939"
     },
     "CRY": {
-      "address": "0x10bba7733a47DB2b795734D47B8A28D94b6613B6",
+      "address": "0x69ED7D410d31348686E9299a479F02BbDd48543C",
       "abi": "DebtPool",
       "constructorArguments": [],
-      "block": "4973408",
+      "block": "4981982",
       "implementations": {
         "undefined": {
           "address": "0x1e23eA2309982fDBa8F93E0Abc6e89b217109273",
           "source": "CRY_undefined",
           "constructorArguments": [],
-          "block": "4973408"
+          "block": "4981982"
         }
       },
       "latest": "0x1e23eA2309982fDBa8F93E0Abc6e89b217109273"
     },
     "BTCx": {
-      "address": "0x75ddBA79aD0a252295150BCa8aC2863db60DCc87",
+      "address": "0x451F3F3144ADE2fbB786EdaA87dAE2e78dABcb07",
       "abi": "ERC20X",
       "constructorArguments": [
         "Bitcoin X",
         "BTCx",
-        "0x10bba7733a47DB2b795734D47B8A28D94b6613B6",
-        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
+        "0x69ED7D410d31348686E9299a479F02BbDd48543C",
+        "0x1ed65522fEddc9a3643B9D2900339b5661FDC80E"
       ],
-      "block": "4973418"
+      "block": "4981991"
     },
     "ETHx": {
-      "address": "0x8a439482E123E02984eC42F627Aa3B0d6acE859C",
+      "address": "0x11d4455775ef284FCF71CaD76451C15e85B025f8",
       "abi": "ERC20X",
       "constructorArguments": [
         "Ethereum X",
         "ETHx",
-        "0x10bba7733a47DB2b795734D47B8A28D94b6613B6",
-        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
+        "0x69ED7D410d31348686E9299a479F02BbDd48543C",
+        "0x1ed65522fEddc9a3643B9D2900339b5661FDC80E"
       ],
-      "block": "4973423"
+      "block": "4981998"
     },
     "BNBx": {
-      "address": "0x3a9A4E41a599afe262F0B59ba2b19DA7fa527A61",
+      "address": "0x9041fb622c453f3c15AE6E3783186127Dd89E7e6",
       "abi": "ERC20X",
       "constructorArguments": [
         "Binance Coin X",
         "BNBx",
-        "0x10bba7733a47DB2b795734D47B8A28D94b6613B6",
-        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
+        "0x69ED7D410d31348686E9299a479F02BbDd48543C",
+        "0x1ed65522fEddc9a3643B9D2900339b5661FDC80E"
       ],
-      "block": "4973437"
+      "block": "4982003"
     },
     "BNBx_PriceFeed": {
-      "address": "0x72aF7eaeb9B9770fcD72Aa163A38929cAcC9A66c",
+      "address": "0xbaE310f7Cbe3D9Bc7DF420c0a4beF0F16e35e225",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -166,21 +167,21 @@
         },
         8
       ],
-      "block": "4973441"
+      "block": "4982007"
     },
     "USDcx": {
-      "address": "0xeC9AFeC8D045117976d913d25Ad53f7D554daAB5",
+      "address": "0xAF59f56FE0C3554D335D87479aA73a3C8E4caaB1",
       "abi": "ERC20X",
       "constructorArguments": [
         "US Dollar CX",
         "USDcx",
-        "0x10bba7733a47DB2b795734D47B8A28D94b6613B6",
-        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
+        "0x69ED7D410d31348686E9299a479F02BbDd48543C",
+        "0x1ed65522fEddc9a3643B9D2900339b5661FDC80E"
       ],
-      "block": "4973457"
+      "block": "4982010"
     },
     "USDcx_PriceFeed": {
-      "address": "0x2C7c1853fBBB3EFBfcC08533a71489CdC90c0333",
+      "address": "0xC47CD580d7D80D98B8B7712155FEB5405D2c9a43",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -189,21 +190,21 @@
         },
         8
       ],
-      "block": "4973464"
+      "block": "4982013"
     },
     "ADAx": {
-      "address": "0xF16Ff7Ac932A43157Eb365FF388dEA56dC466467",
+      "address": "0xEFe76601611D1393CeA021bD1171bcFEcCe8A3B2",
       "abi": "ERC20X",
       "constructorArguments": [
         "Cardano X",
         "ADAx",
-        "0x10bba7733a47DB2b795734D47B8A28D94b6613B6",
-        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
+        "0x69ED7D410d31348686E9299a479F02BbDd48543C",
+        "0x1ed65522fEddc9a3643B9D2900339b5661FDC80E"
       ],
-      "block": "4973468"
+      "block": "4982021"
     },
     "ADAx_PriceFeed": {
-      "address": "0xeeFc8393D001231611A9B6d50DDEb4adF6690247",
+      "address": "0x921D8ebD7B91cffF18DF58fBBF39831aa2d1A25c",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -212,21 +213,21 @@
         },
         8
       ],
-      "block": "4973470"
+      "block": "4982024"
     },
     "AAVEx": {
-      "address": "0xEf65cC4B73af6D0656ABED086D219B988e3B78D1",
+      "address": "0x0129ffC928C86e16f31f04f11fafe5Bda2675f69",
       "abi": "ERC20X",
       "constructorArguments": [
         "Aave X",
         "AAVEx",
-        "0x10bba7733a47DB2b795734D47B8A28D94b6613B6",
-        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
+        "0x69ED7D410d31348686E9299a479F02BbDd48543C",
+        "0x1ed65522fEddc9a3643B9D2900339b5661FDC80E"
       ],
-      "block": "4973474"
+      "block": "4982032"
     },
     "AAVEx_PriceFeed": {
-      "address": "0x0dBB2157d2AC118Fe2B75D7e968cd0764c09B8a1",
+      "address": "0xc91ce0899664715aE9FeB1dcA12501972785Eb9A",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -235,32 +236,32 @@
         },
         8
       ],
-      "block": "4973477"
+      "block": "4982037"
     },
     "LINKx": {
-      "address": "0x25bf64399348519957d439960f44b15f75Fb43b9",
+      "address": "0xCb28021e2Df897429cE4814DA9b8Dd35bac0F5ad",
       "abi": "ERC20X",
       "constructorArguments": [
         "Chainlink X",
         "LINKx",
-        "0x10bba7733a47DB2b795734D47B8A28D94b6613B6",
-        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
+        "0x69ED7D410d31348686E9299a479F02BbDd48543C",
+        "0x1ed65522fEddc9a3643B9D2900339b5661FDC80E"
       ],
-      "block": "4973482"
+      "block": "4982051"
     },
     "UNIx": {
-      "address": "0xdD139Aa9FC962ae5F4e82FDE330E497ee29D4818",
+      "address": "0x2D306dA4dDEc737eBDB924C812857284d373C5e8",
       "abi": "ERC20X",
       "constructorArguments": [
         "Uniswap X",
         "UNIx",
-        "0x10bba7733a47DB2b795734D47B8A28D94b6613B6",
-        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
+        "0x69ED7D410d31348686E9299a479F02BbDd48543C",
+        "0x1ed65522fEddc9a3643B9D2900339b5661FDC80E"
       ],
-      "block": "4973487"
+      "block": "4982068"
     },
     "UNIx_PriceFeed": {
-      "address": "0xF1552e6c18786c4090204F4B064f16D5Bfa5a6a7",
+      "address": "0x3650F840d6d01945ca5C20e7c8985365392dc971",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -269,21 +270,21 @@
         },
         8
       ],
-      "block": "4973488"
+      "block": "4982072"
     },
     "DOGEx": {
-      "address": "0xd2cfff5C25A694DB05A41E6dd3692700679FD832",
+      "address": "0xf16f600823CbC1252012E8Ea8238DB77780F405D",
       "abi": "ERC20X",
       "constructorArguments": [
         "Dogecoin X",
         "DOGEx",
-        "0x10bba7733a47DB2b795734D47B8A28D94b6613B6",
-        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
+        "0x69ED7D410d31348686E9299a479F02BbDd48543C",
+        "0x1ed65522fEddc9a3643B9D2900339b5661FDC80E"
       ],
-      "block": "4973494"
+      "block": "4982077"
     },
     "DOGEx_PriceFeed": {
-      "address": "0xf7aA55DF3bC7DC6B09900e21dadDf46f789231b0",
+      "address": "0x310c9EF88d64F3aF08AB594B2d9E34F396510CDb",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -292,21 +293,21 @@
         },
         8
       ],
-      "block": "4973495"
+      "block": "4982078"
     },
     "DOTx": {
-      "address": "0x52290221C1Fd62877A4a425eC5d0126879272fb8",
+      "address": "0x4d808D7bCB67A0292684A8d79837eac2f58f120e",
       "abi": "ERC20X",
       "constructorArguments": [
         "Polkadot X",
         "DOTx",
-        "0x10bba7733a47DB2b795734D47B8A28D94b6613B6",
-        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
+        "0x69ED7D410d31348686E9299a479F02BbDd48543C",
+        "0x1ed65522fEddc9a3643B9D2900339b5661FDC80E"
       ],
-      "block": "4973498"
+      "block": "4982083"
     },
     "DOTx_PriceFeed": {
-      "address": "0x62E6f77dE7d589a5eC4Fa90819592156181F19A7",
+      "address": "0xaFa02e78030bDEec00A0A4a9081bF2250335b8F2",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -315,36 +316,36 @@
         },
         8
       ],
-      "block": "4973501"
+      "block": "4982085"
     },
     "USST": {
-      "address": "0xD692aF94072B86DE792f63e21952944AcC54f9DC",
+      "address": "0x0EdE003E16D9f76b8dcf7030B163cd2971585053",
       "abi": "DebtPool",
       "constructorArguments": [],
-      "block": "4973508",
+      "block": "4982097",
       "implementations": {
         "undefined": {
           "address": "0x1e23eA2309982fDBa8F93E0Abc6e89b217109273",
           "source": "USST_undefined",
           "constructorArguments": [],
-          "block": "4973508"
+          "block": "4982097"
         }
       },
       "latest": "0x1e23eA2309982fDBa8F93E0Abc6e89b217109273"
     },
     "AAPLx": {
-      "address": "0xb991492f2d84fA6Bf8815480584C2b332a9FFF07",
+      "address": "0xD0BE4e25b3c21f2E7ba06cb7514534f4c0fe0a99",
       "abi": "ERC20X",
       "constructorArguments": [
         "Apple X",
         "AAPLx",
-        "0xD692aF94072B86DE792f63e21952944AcC54f9DC",
-        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
+        "0x0EdE003E16D9f76b8dcf7030B163cd2971585053",
+        "0x1ed65522fEddc9a3643B9D2900339b5661FDC80E"
       ],
-      "block": "4973522"
+      "block": "4982105"
     },
     "AAPLx_PriceFeed": {
-      "address": "0x327Ce204EDd3fF531454fFd617603fE9d29D059d",
+      "address": "0xFf359DFC684fB7D7130bbF486D5807934c03F2fF",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -353,21 +354,21 @@
         },
         8
       ],
-      "block": "4973529"
+      "block": "4982108"
     },
     "TSLAx": {
-      "address": "0x0B3605D73105213845986f6D574BEA0944754126",
+      "address": "0x7550df13d9481b2dc2584B58f1a69b1cd1A77959",
       "abi": "ERC20X",
       "constructorArguments": [
         "Tesla X",
         "TSLAx",
-        "0xD692aF94072B86DE792f63e21952944AcC54f9DC",
-        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
+        "0x0EdE003E16D9f76b8dcf7030B163cd2971585053",
+        "0x1ed65522fEddc9a3643B9D2900339b5661FDC80E"
       ],
-      "block": "4973548"
+      "block": "4982114"
     },
     "TSLAx_PriceFeed": {
-      "address": "0x7B12a8611367FA4bE461DE1F9c1967056d23c7ca",
+      "address": "0x0B1fb1DAf2186BA64744a58C04213c28A198093F",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -376,21 +377,21 @@
         },
         8
       ],
-      "block": "4973551"
+      "block": "4982118"
     },
     "AMZNx": {
-      "address": "0xd3a5835c92032209aa59B53c9004dF12647677d4",
+      "address": "0x78E05253B7218983EcFF0F4B7E1b562C15956F7C",
       "abi": "ERC20X",
       "constructorArguments": [
         "Amazon X",
         "AMZNx",
-        "0xD692aF94072B86DE792f63e21952944AcC54f9DC",
-        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
+        "0x0EdE003E16D9f76b8dcf7030B163cd2971585053",
+        "0x1ed65522fEddc9a3643B9D2900339b5661FDC80E"
       ],
-      "block": "4973557"
+      "block": "4982128"
     },
     "AMZNx_PriceFeed": {
-      "address": "0x49124AE5a15ffD6ce0b08a25150cAceEb598b76A",
+      "address": "0x9d83747ff8E17657831E47959cF85788b2A1678d",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -399,21 +400,21 @@
         },
         8
       ],
-      "block": "4973559"
+      "block": "4982130"
     },
     "FBx": {
-      "address": "0x9563C4aA18Fb122b0D57396b3F6037c3ac70a725",
+      "address": "0xe70Fa0B81537bc77C38e901E3cF4492a07f7d92B",
       "abi": "ERC20X",
       "constructorArguments": [
         "Facebook X",
         "FBx",
-        "0xD692aF94072B86DE792f63e21952944AcC54f9DC",
-        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
+        "0x0EdE003E16D9f76b8dcf7030B163cd2971585053",
+        "0x1ed65522fEddc9a3643B9D2900339b5661FDC80E"
       ],
-      "block": "4973565"
+      "block": "4982142"
     },
     "FBx_PriceFeed": {
-      "address": "0x303059196C4fDE32fC3c5da4412B81103954494a",
+      "address": "0xa3A331A80d2760404E804322D07DD1bFA1D5F5E0",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -422,21 +423,21 @@
         },
         8
       ],
-      "block": "4973567"
+      "block": "4982148"
     },
     "MSFTx": {
-      "address": "0x174Fabfe46e5CB19ac6B7D09120B39DBBb33073F",
+      "address": "0x4529a8ed7d51A816370E4A23E4D91a5784936c68",
       "abi": "ERC20X",
       "constructorArguments": [
         "Microsoft X",
         "MSFTx",
-        "0xD692aF94072B86DE792f63e21952944AcC54f9DC",
-        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
+        "0x0EdE003E16D9f76b8dcf7030B163cd2971585053",
+        "0x1ed65522fEddc9a3643B9D2900339b5661FDC80E"
       ],
-      "block": "4973572"
+      "block": "4982165"
     },
     "MSFTx_PriceFeed": {
-      "address": "0x52152CE8D7d85bB7be199a018a34c4d49453F7C1",
+      "address": "0x528A6540EB6B727d51Fb265604B4600a1C661725",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -445,21 +446,21 @@
         },
         8
       ],
-      "block": "4973575"
+      "block": "4982170"
     },
     "^GSPCx": {
-      "address": "0xDCF69d73EBBA68B92dCE6C463848a27a58D90dCc",
+      "address": "0x02E1CF7549d748Ec4Da6E9D5a2BA6fD6bbB09916",
       "abi": "ERC20X",
       "constructorArguments": [
         "S&P 500 X",
         "^GSPCx",
-        "0xD692aF94072B86DE792f63e21952944AcC54f9DC",
-        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
+        "0x0EdE003E16D9f76b8dcf7030B163cd2971585053",
+        "0x1ed65522fEddc9a3643B9D2900339b5661FDC80E"
       ],
-      "block": "4973580"
+      "block": "4982173"
     },
     "^GSPCx_PriceFeed": {
-      "address": "0xAf829EFd005E51bc5D5eD8cF8D2891BD0C9E2459",
+      "address": "0xF2FC1835EC5ad3f68fd649d27E6e2B85c7134686",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -468,21 +469,21 @@
         },
         8
       ],
-      "block": "4973582"
+      "block": "4982174"
     },
     "NFLXx": {
-      "address": "0x5b7AdCf07d93Da5207A7223daEe5F708bF95a378",
+      "address": "0x2429570Cf4a4Dbb959B525D1f6C54B653D7cA0C3",
       "abi": "ERC20X",
       "constructorArguments": [
         "Netflix X",
         "NFLXx",
-        "0xD692aF94072B86DE792f63e21952944AcC54f9DC",
-        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
+        "0x0EdE003E16D9f76b8dcf7030B163cd2971585053",
+        "0x1ed65522fEddc9a3643B9D2900339b5661FDC80E"
       ],
-      "block": "4973588"
+      "block": "4982179"
     },
     "NFLXx_PriceFeed": {
-      "address": "0x2CA6a03DB211aC3ac0324365A9809AC31A2c878a",
+      "address": "0x708C9D7F6315827324c72e3163636483CB2b7C54",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -491,21 +492,21 @@
         },
         8
       ],
-      "block": "4973591"
+      "block": "4982181"
     },
     "GOOGLx": {
-      "address": "0xB8Dd9F6EA0EBF2DdFde319Fe73B732F6C4d43fe3",
+      "address": "0xcD67B7489832a5419aeB47f3016a04e1d2C58f9a",
       "abi": "ERC20X",
       "constructorArguments": [
         "Alphabet X",
         "GOOGLx",
-        "0xD692aF94072B86DE792f63e21952944AcC54f9DC",
-        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
+        "0x0EdE003E16D9f76b8dcf7030B163cd2971585053",
+        "0x1ed65522fEddc9a3643B9D2900339b5661FDC80E"
       ],
-      "block": "4973597"
+      "block": "4982185"
     },
     "GOOGLx_PriceFeed": {
-      "address": "0x06118c74b19959923750eb40B24Da1C5De18a068",
+      "address": "0xB0632fdF58540c1525eBD2f9A95ce0A940Cf3103",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -514,21 +515,21 @@
         },
         8
       ],
-      "block": "4973598"
+      "block": "4982188"
     },
     "NVDAx": {
-      "address": "0xCcba23B2e82251a7305915C7d565cE06a042c738",
+      "address": "0xEBa12e37F4A7C5Dd5e4DeF3043423cD29a4CDa89",
       "abi": "ERC20X",
       "constructorArguments": [
         "Nvidia X",
         "NVDAx",
-        "0xD692aF94072B86DE792f63e21952944AcC54f9DC",
-        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
+        "0x0EdE003E16D9f76b8dcf7030B163cd2971585053",
+        "0x1ed65522fEddc9a3643B9D2900339b5661FDC80E"
       ],
-      "block": "4973601"
+      "block": "4982197"
     },
     "NVDAx_PriceFeed": {
-      "address": "0x349e5ec2d7F331fCD0a4902bfBf367663bE43692",
+      "address": "0x0d7CebD1591086498c3862A208Aef951aB1693dC",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -537,21 +538,21 @@
         },
         8
       ],
-      "block": "4973604"
+      "block": "4982199"
     },
     "AMDx": {
-      "address": "0x48CBe88c829f29cd3E5e48BEA67136f09aD1817C",
+      "address": "0x73D051F66C84a3675220B488454E7477b9fe7D56",
       "abi": "ERC20X",
       "constructorArguments": [
         "AMD X",
         "AMDx",
-        "0xD692aF94072B86DE792f63e21952944AcC54f9DC",
-        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
+        "0x0EdE003E16D9f76b8dcf7030B163cd2971585053",
+        "0x1ed65522fEddc9a3643B9D2900339b5661FDC80E"
       ],
-      "block": "4973623"
+      "block": "4982204"
     },
     "AMDx_PriceFeed": {
-      "address": "0xdf10eE574a7AC71510f8A5Ef2d7af5E76FBE4189",
+      "address": "0x1080F3284a9A32863288210337db4D4Cf7965ded",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -560,21 +561,21 @@
         },
         8
       ],
-      "block": "4973628"
+      "block": "4982205"
     },
     "USDsx": {
-      "address": "0xF796F82086193E706E08cAdE796aE425Cce15C41",
+      "address": "0xD51935521A3b13567eA0b64096c58b83f5F4F4d4",
       "abi": "ERC20X",
       "constructorArguments": [
         "US Dollar SX",
         "USDsx",
-        "0xD692aF94072B86DE792f63e21952944AcC54f9DC",
-        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
+        "0x0EdE003E16D9f76b8dcf7030B163cd2971585053",
+        "0x1ed65522fEddc9a3643B9D2900339b5661FDC80E"
       ],
-      "block": "4973642"
+      "block": "4982209"
     },
     "USDsx_PriceFeed": {
-      "address": "0x9ff14E25Da7f78d5B62718d3bDE52fe988b6F335",
+      "address": "0xbc2F12CB7E64b5ed7370022ad7304158C5C77F45",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -583,36 +584,36 @@
         },
         8
       ],
-      "block": "4973644"
+      "block": "4982210"
     },
     "FX": {
-      "address": "0x07b148BB6Ad3Fd94134D6c812E88245dAca17fFA",
+      "address": "0x9088B5D940905332C7CDA919EBAEf6296edAcAC5",
       "abi": "DebtPool",
       "constructorArguments": [],
-      "block": "4973651",
+      "block": "4982220",
       "implementations": {
         "undefined": {
           "address": "0x1e23eA2309982fDBa8F93E0Abc6e89b217109273",
           "source": "FX_undefined",
           "constructorArguments": [],
-          "block": "4973651"
+          "block": "4982220"
         }
       },
       "latest": "0x1e23eA2309982fDBa8F93E0Abc6e89b217109273"
     },
     "USDfx": {
-      "address": "0x5C3a7E217812C282BC85D7d3068B91fF5A2096cb",
+      "address": "0xce02a735bC72D9e197592Eba40018b4eD0Aa7208",
       "abi": "ERC20X",
       "constructorArguments": [
         "US Dollar FX",
         "USDfx",
-        "0x07b148BB6Ad3Fd94134D6c812E88245dAca17fFA",
-        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
+        "0x9088B5D940905332C7CDA919EBAEf6296edAcAC5",
+        "0x1ed65522fEddc9a3643B9D2900339b5661FDC80E"
       ],
-      "block": "4973658"
+      "block": "4982242"
     },
     "USDfx_PriceFeed": {
-      "address": "0xf1b4307B26C010B1Db935f32b365Bbb4EdFb765d",
+      "address": "0xf3B66e96c257c9974F5B1265d033a16b0a79075f",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -621,21 +622,21 @@
         },
         8
       ],
-      "block": "4973659"
+      "block": "4982249"
     },
     "EURx": {
-      "address": "0x99E8B5c4eafC167C39C9366dfb88f108f09121B0",
+      "address": "0x5ED6BbbAb49c1d89d55A660FfC481B5B13a16F50",
       "abi": "ERC20X",
       "constructorArguments": [
         "Euro X",
         "EURx",
-        "0x07b148BB6Ad3Fd94134D6c812E88245dAca17fFA",
-        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
+        "0x9088B5D940905332C7CDA919EBAEf6296edAcAC5",
+        "0x1ed65522fEddc9a3643B9D2900339b5661FDC80E"
       ],
-      "block": "4973666"
+      "block": "4982260"
     },
     "EURx_PriceFeed": {
-      "address": "0x93E508708B662C78B60Ca8Cf378aA8E5D7F99330",
+      "address": "0xd9a85397B0405FEa057b0634F2140779a6a5e047",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -644,21 +645,21 @@
         },
         8
       ],
-      "block": "4973669"
+      "block": "4982261"
     },
     "JPYx": {
-      "address": "0x68dDCc82EeD0770eaF80d85fd511771CedBaB9ac",
+      "address": "0x7C744604f4a1BCA6BA594bFB0F4256Bdf874E179",
       "abi": "ERC20X",
       "constructorArguments": [
         "Japanese Yen X",
         "JPYx",
-        "0x07b148BB6Ad3Fd94134D6c812E88245dAca17fFA",
-        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
+        "0x9088B5D940905332C7CDA919EBAEf6296edAcAC5",
+        "0x1ed65522fEddc9a3643B9D2900339b5661FDC80E"
       ],
-      "block": "4973673"
+      "block": "4982267"
     },
     "JPYx_PriceFeed": {
-      "address": "0x2aF0F22b00F6E05E605DB91c1434A78fd6959015",
+      "address": "0xF009332F0D6f6a8290C36A2b6b8Bc9150E4cFbfc",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -667,21 +668,21 @@
         },
         8
       ],
-      "block": "4973674"
+      "block": "4982269"
     },
     "GBPx": {
-      "address": "0x538fb6E585ED16aABad497433C02C9E59358F26C",
+      "address": "0x4D7225DBe5c6a29AbC64428c8972d97Ab8f36DFF",
       "abi": "ERC20X",
       "constructorArguments": [
         "British Pound X",
         "GBPx",
-        "0x07b148BB6Ad3Fd94134D6c812E88245dAca17fFA",
-        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
+        "0x9088B5D940905332C7CDA919EBAEf6296edAcAC5",
+        "0x1ed65522fEddc9a3643B9D2900339b5661FDC80E"
       ],
-      "block": "4973680"
+      "block": "4982274"
     },
     "GBPx_PriceFeed": {
-      "address": "0x91AC2F03b55CBD723eB1394ed0f0A1b7B69baEb1",
+      "address": "0xCa7968B5E936537885ea8D75829B2fae60F27310",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -690,21 +691,21 @@
         },
         8
       ],
-      "block": "4973683"
+      "block": "4982277"
     },
     "CHFx": {
-      "address": "0x4Da85614d0b0552dc7F6E43ad2D2538c442F1773",
+      "address": "0xD52B2F38E67E85509B76397e417a99D2D2627C17",
       "abi": "ERC20X",
       "constructorArguments": [
         "Swiss Franc X",
         "CHFx",
-        "0x07b148BB6Ad3Fd94134D6c812E88245dAca17fFA",
-        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
+        "0x9088B5D940905332C7CDA919EBAEf6296edAcAC5",
+        "0x1ed65522fEddc9a3643B9D2900339b5661FDC80E"
       ],
-      "block": "4973687"
+      "block": "4982284"
     },
     "CHFx_PriceFeed": {
-      "address": "0xB43A92020E56c0364B004268e4B509db7788295F",
+      "address": "0x2050cB6CeEA3a9DdAc349EB96bf09ca761F5e4eB",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -713,21 +714,21 @@
         },
         8
       ],
-      "block": "4973691"
+      "block": "4982285"
     },
     "CADx": {
-      "address": "0xE9eacf4d874ca7B00553114FE5F11F14e99774Fe",
+      "address": "0x2D6b1c9c7B7A7CA611815869F6358EF592797b38",
       "abi": "ERC20X",
       "constructorArguments": [
         "Canadian Dollar X",
         "CADx",
-        "0x07b148BB6Ad3Fd94134D6c812E88245dAca17fFA",
-        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
+        "0x9088B5D940905332C7CDA919EBAEf6296edAcAC5",
+        "0x1ed65522fEddc9a3643B9D2900339b5661FDC80E"
       ],
-      "block": "4973698"
+      "block": "4982291"
     },
     "CADx_PriceFeed": {
-      "address": "0xa56849488649a1d7018B9F4360b3Ec287498Afc6",
+      "address": "0x1A5e2B285965F54436D53036b071e8F15756F874",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -736,21 +737,21 @@
         },
         8
       ],
-      "block": "4973706"
+      "block": "4982294"
     },
     "AUDx": {
-      "address": "0x25e49A084e325fAc0FDacF3960c3726094D36bB3",
+      "address": "0x689fBB204bF49F65D2a9509c12aB46ef622629B7",
       "abi": "ERC20X",
       "constructorArguments": [
         "Australian Dollar X",
         "AUDx",
-        "0x07b148BB6Ad3Fd94134D6c812E88245dAca17fFA",
-        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
+        "0x9088B5D940905332C7CDA919EBAEf6296edAcAC5",
+        "0x1ed65522fEddc9a3643B9D2900339b5661FDC80E"
       ],
-      "block": "4973723"
+      "block": "4982300"
     },
     "AUDx_PriceFeed": {
-      "address": "0x563379cB774f823a2FC7689CCe267fDB3a70B949",
+      "address": "0xE93E7A583A2426A4082AA6E039C3BE12BAd99fE4",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -759,21 +760,21 @@
         },
         8
       ],
-      "block": "4973730"
+      "block": "4982304"
     },
     "WONx": {
-      "address": "0x26269E659aDb9Dda671699beFD93E7cf579c8166",
+      "address": "0x5F72a8181cf50Ed0Eb56234DC2940EFe1fca5147",
       "abi": "ERC20X",
       "constructorArguments": [
         "Korean Republic won X",
         "WONx",
-        "0x07b148BB6Ad3Fd94134D6c812E88245dAca17fFA",
-        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
+        "0x9088B5D940905332C7CDA919EBAEf6296edAcAC5",
+        "0x1ed65522fEddc9a3643B9D2900339b5661FDC80E"
       ],
-      "block": "4973738"
+      "block": "4982313"
     },
     "WONx_PriceFeed": {
-      "address": "0xde7df9b46cacA9642C55B61f8e0a475AB0E3Ce5f",
+      "address": "0xB635482a012C8145D968F499ab783E568e62fBAE",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -782,21 +783,21 @@
         },
         8
       ],
-      "block": "4973742"
+      "block": "4982314"
     },
     "AEDx": {
-      "address": "0x9cc88151ea2c95201eBF8691a7D30d66C0c14D00",
+      "address": "0xd189BB3417f5766a34f73535baf0Fe3947169751",
       "abi": "ERC20X",
       "constructorArguments": [
         "UAE Dirham X",
         "AEDx",
-        "0x07b148BB6Ad3Fd94134D6c812E88245dAca17fFA",
-        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
+        "0x9088B5D940905332C7CDA919EBAEf6296edAcAC5",
+        "0x1ed65522fEddc9a3643B9D2900339b5661FDC80E"
       ],
-      "block": "4973755"
+      "block": "4982326"
     },
     "AEDx_PriceFeed": {
-      "address": "0x977e4dd3CDDC6206D2fEab7914980184eB550638",
+      "address": "0xcfBD4e19b9a0acA91a444Fe252A3eD8241ADd042",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -805,21 +806,21 @@
         },
         8
       ],
-      "block": "4973756"
+      "block": "4982328"
     },
     "INRx": {
-      "address": "0x911F4Be4e61f5b6345d90A87E09F33422B2B4EbC",
+      "address": "0x9484Dc28f7Ab64Ed2dDE88bbD47346767f279A98",
       "abi": "ERC20X",
       "constructorArguments": [
         "Indian Rupee X",
         "INRx",
-        "0x07b148BB6Ad3Fd94134D6c812E88245dAca17fFA",
-        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
+        "0x9088B5D940905332C7CDA919EBAEf6296edAcAC5",
+        "0x1ed65522fEddc9a3643B9D2900339b5661FDC80E"
       ],
-      "block": "4973761"
+      "block": "4982348"
     },
     "INRx_PriceFeed": {
-      "address": "0x7B5C0220f2a39C252Daa0eA483EbEeBAA22240fc",
+      "address": "0x10Ee415E6c93Cb1d5574e62633B192D471e46755",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -828,7 +829,7 @@
         },
         8
       ],
-      "block": "4973762"
+      "block": "4982354"
     }
   },
   "sources": {
@@ -2672,6 +2673,11 @@
             "type": "address",
             "name": "rewardToken",
             "indexed": true
+          },
+          {
+            "type": "bool",
+            "name": "isSealed",
+            "indexed": false
           }
         ]
       },
@@ -3296,7 +3302,7 @@
         "inputs": [
           {
             "type": "address",
-            "name": "_syn"
+            "name": "_sealedSyn"
           },
           {
             "type": "address",
@@ -3308,6 +3314,19 @@
           }
         ],
         "outputs": []
+      },
+      {
+        "type": "function",
+        "name": "isRewardTokenSealed",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "bool"
+          }
+        ]
       },
       {
         "type": "function",
@@ -3509,6 +3528,19 @@
       },
       {
         "type": "function",
+        "name": "rewardToken",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "address"
+          }
+        ]
+      },
+      {
+        "type": "function",
         "name": "safeCRatio",
         "constant": true,
         "stateMutability": "view",
@@ -3570,19 +3602,6 @@
           }
         ],
         "outputs": []
-      },
-      {
-        "type": "function",
-        "name": "syn",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
-        "outputs": [
-          {
-            "type": "address"
-          }
-        ]
       },
       {
         "type": "function",
@@ -3658,6 +3677,10 @@
           {
             "type": "address",
             "name": "_rewardToken"
+          },
+          {
+            "type": "bool",
+            "name": "isSealed"
           }
         ],
         "outputs": []
@@ -3711,7 +3734,7 @@
         "outputs": []
       }
     ],
-    "SyntheX_undefined": "[{\"type\":\"constructor\",\"payable\":false,\"inputs\":[]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"AdminChanged\",\"inputs\":[{\"type\":\"address\",\"name\":\"previousAdmin\",\"indexed\":false},{\"type\":\"address\",\"name\":\"newAdmin\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"BeaconUpgraded\",\"inputs\":[{\"type\":\"address\",\"name\":\"beacon\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Burn\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"tradingPool\",\"indexed\":true},{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"amount\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"CollateralCapUpdated\",\"inputs\":[{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"newCap\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"CollateralDisabled\",\"inputs\":[{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"CollateralEnabled\",\"inputs\":[{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"volatilityRatio\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Deposit\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"amount\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"DistributedReward\",\"inputs\":[{\"type\":\"address\",\"name\":\"rewardToken\",\"indexed\":true},{\"type\":\"address\",\"name\":\"pool\",\"indexed\":true},{\"type\":\"address\",\"name\":\"_account\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"accountDelta\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"rewardIndex\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Exchange\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"tradingPool\",\"indexed\":true},{\"type\":\"address\",\"name\":\"fromAsset\",\"indexed\":true},{\"type\":\"address\",\"name\":\"toAsset\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"fromAmount\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"toAmount\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Initialized\",\"inputs\":[{\"type\":\"uint8\",\"name\":\"version\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Issue\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"tradingPool\",\"indexed\":true},{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"amount\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Paused\",\"inputs\":[{\"type\":\"address\",\"name\":\"account\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"RewardTokenAdded\",\"inputs\":[{\"type\":\"address\",\"name\":\"rewardToken\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"SetPoolRewardSpeed\",\"inputs\":[{\"type\":\"address\",\"name\":\"rewardToken\",\"indexed\":true},{\"type\":\"address\",\"name\":\"pool\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"rewardSpeed\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"TradingPoolDisabled\",\"inputs\":[{\"type\":\"address\",\"name\":\"pool\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"TradingPoolEnabled\",\"inputs\":[{\"type\":\"address\",\"name\":\"pool\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"volatilityRatio\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Unpaused\",\"inputs\":[{\"type\":\"address\",\"name\":\"account\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Upgraded\",\"inputs\":[{\"type\":\"address\",\"name\":\"implementation\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Withdraw\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"amount\",\"indexed\":false}]},{\"type\":\"function\",\"name\":\"NAME\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"string\"}]},{\"type\":\"function\",\"name\":\"PRICE_ORACLE\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"bytes32\"}]},{\"type\":\"function\",\"name\":\"VERSION\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"accountCollateralBalance\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\"},{\"type\":\"address\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"accountCollaterals\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\"},{\"type\":\"uint256\"}],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"accountPools\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\"},{\"type\":\"uint256\"}],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"burn\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_debtPool\"},{\"type\":\"address\",\"name\":\"_synth\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"claimReward\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_rewardToken\"},{\"type\":\"address[]\",\"name\":\"holders\"},{\"type\":\"address[]\",\"name\":\"_tradingPools\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"claimReward\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_rewardToken\"},{\"type\":\"address\",\"name\":\"holder\"},{\"type\":\"address[]\",\"name\":\"tradingPoolsList\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"collateralMembership\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"market\"},{\"type\":\"address\",\"name\":\"account\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"collateralSupplies\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\"}],\"outputs\":[{\"type\":\"uint256\",\"name\":\"maxDeposits\"},{\"type\":\"uint256\",\"name\":\"totalDeposits\"}]},{\"type\":\"function\",\"name\":\"collaterals\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\"}],\"outputs\":[{\"type\":\"bool\",\"name\":\"isEnabled\"},{\"type\":\"uint256\",\"name\":\"volatilityRatio\"}]},{\"type\":\"function\",\"name\":\"deposit\",\"constant\":false,\"stateMutability\":\"payable\",\"payable\":true,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"disableCollateral\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"disableTradingPool\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"enableCollateral\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"},{\"type\":\"uint256\",\"name\":\"_volatilityRatio\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"enableTradingPool\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"},{\"type\":\"uint256\",\"name\":\"_volatilityRatio\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"enterCollateral\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"enterPool\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"exchange\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_debtPool\"},{\"type\":\"address\",\"name\":\"_synthFrom\"},{\"type\":\"address\",\"name\":\"_synthTo\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"exitCollateral\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"exitPool\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"getAdjustedUserTotalCollateralUSD\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"getAdjustedUserTotalDebtUSD\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"getLTV\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"getRewardsAccrued\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_rewardToken\"},{\"type\":\"address\",\"name\":\"_account\"},{\"type\":\"address[]\",\"name\":\"_tradingPoolsList\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"getUserTotalCollateralUSD\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"getUserTotalDebtUSD\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"healthFactor\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"initialize\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_syn\"},{\"type\":\"address\",\"name\":\"_system\"},{\"type\":\"uint256\",\"name\":\"_safeCRatio\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"issue\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_debtPool\"},{\"type\":\"address\",\"name\":\"_synth\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"liquidate\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"},{\"type\":\"address\",\"name\":\"_debtPool\"},{\"type\":\"address\",\"name\":\"_inAsset\"},{\"type\":\"uint256\",\"name\":\"_inAmount\"},{\"type\":\"address\",\"name\":\"_outAsset\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"oracle\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"pause\",\"constant\":false,\"payable\":false,\"inputs\":[],\"outputs\":[]},{\"type\":\"function\",\"name\":\"paused\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"proxiableUUID\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"bytes32\"}]},{\"type\":\"function\",\"name\":\"rewardAccrued\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\"},{\"type\":\"address\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"rewardIndex\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\"},{\"type\":\"address\"},{\"type\":\"address\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"rewardInitialIndex\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"rewardSpeeds\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\"},{\"type\":\"address\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"rewardState\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\"},{\"type\":\"address\"}],\"outputs\":[{\"type\":\"uint224\",\"name\":\"index\"},{\"type\":\"uint32\",\"name\":\"timestamp\"}]},{\"type\":\"function\",\"name\":\"safeCRatio\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"setCollateralCap\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"},{\"type\":\"uint256\",\"name\":\"_maxDeposit\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"setPoolSpeed\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_rewardToken\"},{\"type\":\"address\",\"name\":\"_tradingPool\"},{\"type\":\"uint256\",\"name\":\"_speed\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"setSafeCRatio\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"uint256\",\"name\":\"_safeCRatio\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"syn\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"system\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"tradingPoolMembership\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"market\"},{\"type\":\"address\",\"name\":\"account\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"tradingPools\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\"}],\"outputs\":[{\"type\":\"bool\",\"name\":\"isEnabled\"},{\"type\":\"uint256\",\"name\":\"volatilityRatio\"}]},{\"type\":\"function\",\"name\":\"unpause\",\"constant\":false,\"payable\":false,\"inputs\":[],\"outputs\":[]},{\"type\":\"function\",\"name\":\"updateRewardToken\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_rewardToken\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"upgradeTo\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"newImplementation\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"upgradeToAndCall\",\"constant\":false,\"stateMutability\":\"payable\",\"payable\":true,\"inputs\":[{\"type\":\"address\",\"name\":\"newImplementation\"},{\"type\":\"bytes\",\"name\":\"data\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"withdraw\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]}]",
+    "SyntheX_undefined": "[{\"type\":\"constructor\",\"payable\":false,\"inputs\":[]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"AdminChanged\",\"inputs\":[{\"type\":\"address\",\"name\":\"previousAdmin\",\"indexed\":false},{\"type\":\"address\",\"name\":\"newAdmin\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"BeaconUpgraded\",\"inputs\":[{\"type\":\"address\",\"name\":\"beacon\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Burn\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"tradingPool\",\"indexed\":true},{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"amount\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"CollateralCapUpdated\",\"inputs\":[{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"newCap\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"CollateralDisabled\",\"inputs\":[{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"CollateralEnabled\",\"inputs\":[{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"volatilityRatio\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Deposit\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"amount\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"DistributedReward\",\"inputs\":[{\"type\":\"address\",\"name\":\"rewardToken\",\"indexed\":true},{\"type\":\"address\",\"name\":\"pool\",\"indexed\":true},{\"type\":\"address\",\"name\":\"_account\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"accountDelta\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"rewardIndex\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Exchange\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"tradingPool\",\"indexed\":true},{\"type\":\"address\",\"name\":\"fromAsset\",\"indexed\":true},{\"type\":\"address\",\"name\":\"toAsset\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"fromAmount\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"toAmount\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Initialized\",\"inputs\":[{\"type\":\"uint8\",\"name\":\"version\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Issue\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"tradingPool\",\"indexed\":true},{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"amount\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Paused\",\"inputs\":[{\"type\":\"address\",\"name\":\"account\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"RewardTokenAdded\",\"inputs\":[{\"type\":\"address\",\"name\":\"rewardToken\",\"indexed\":true},{\"type\":\"bool\",\"name\":\"isSealed\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"SetPoolRewardSpeed\",\"inputs\":[{\"type\":\"address\",\"name\":\"rewardToken\",\"indexed\":true},{\"type\":\"address\",\"name\":\"pool\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"rewardSpeed\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"TradingPoolDisabled\",\"inputs\":[{\"type\":\"address\",\"name\":\"pool\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"TradingPoolEnabled\",\"inputs\":[{\"type\":\"address\",\"name\":\"pool\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"volatilityRatio\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Unpaused\",\"inputs\":[{\"type\":\"address\",\"name\":\"account\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Upgraded\",\"inputs\":[{\"type\":\"address\",\"name\":\"implementation\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Withdraw\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"amount\",\"indexed\":false}]},{\"type\":\"function\",\"name\":\"NAME\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"string\"}]},{\"type\":\"function\",\"name\":\"PRICE_ORACLE\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"bytes32\"}]},{\"type\":\"function\",\"name\":\"VERSION\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"accountCollateralBalance\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\"},{\"type\":\"address\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"accountCollaterals\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\"},{\"type\":\"uint256\"}],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"accountPools\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\"},{\"type\":\"uint256\"}],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"burn\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_debtPool\"},{\"type\":\"address\",\"name\":\"_synth\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"claimReward\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_rewardToken\"},{\"type\":\"address[]\",\"name\":\"holders\"},{\"type\":\"address[]\",\"name\":\"_tradingPools\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"claimReward\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_rewardToken\"},{\"type\":\"address\",\"name\":\"holder\"},{\"type\":\"address[]\",\"name\":\"tradingPoolsList\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"collateralMembership\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"market\"},{\"type\":\"address\",\"name\":\"account\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"collateralSupplies\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\"}],\"outputs\":[{\"type\":\"uint256\",\"name\":\"maxDeposits\"},{\"type\":\"uint256\",\"name\":\"totalDeposits\"}]},{\"type\":\"function\",\"name\":\"collaterals\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\"}],\"outputs\":[{\"type\":\"bool\",\"name\":\"isEnabled\"},{\"type\":\"uint256\",\"name\":\"volatilityRatio\"}]},{\"type\":\"function\",\"name\":\"deposit\",\"constant\":false,\"stateMutability\":\"payable\",\"payable\":true,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"disableCollateral\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"disableTradingPool\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"enableCollateral\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"},{\"type\":\"uint256\",\"name\":\"_volatilityRatio\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"enableTradingPool\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"},{\"type\":\"uint256\",\"name\":\"_volatilityRatio\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"enterCollateral\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"enterPool\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"exchange\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_debtPool\"},{\"type\":\"address\",\"name\":\"_synthFrom\"},{\"type\":\"address\",\"name\":\"_synthTo\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"exitCollateral\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"exitPool\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_tradingPool\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"getAdjustedUserTotalCollateralUSD\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"getAdjustedUserTotalDebtUSD\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"getLTV\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"getRewardsAccrued\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_rewardToken\"},{\"type\":\"address\",\"name\":\"_account\"},{\"type\":\"address[]\",\"name\":\"_tradingPoolsList\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"getUserTotalCollateralUSD\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"getUserTotalDebtUSD\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"healthFactor\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"initialize\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_sealedSyn\"},{\"type\":\"address\",\"name\":\"_system\"},{\"type\":\"uint256\",\"name\":\"_safeCRatio\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"isRewardTokenSealed\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"issue\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_debtPool\"},{\"type\":\"address\",\"name\":\"_synth\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"liquidate\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"},{\"type\":\"address\",\"name\":\"_debtPool\"},{\"type\":\"address\",\"name\":\"_inAsset\"},{\"type\":\"uint256\",\"name\":\"_inAmount\"},{\"type\":\"address\",\"name\":\"_outAsset\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"oracle\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"pause\",\"constant\":false,\"payable\":false,\"inputs\":[],\"outputs\":[]},{\"type\":\"function\",\"name\":\"paused\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"proxiableUUID\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"bytes32\"}]},{\"type\":\"function\",\"name\":\"rewardAccrued\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\"},{\"type\":\"address\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"rewardIndex\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\"},{\"type\":\"address\"},{\"type\":\"address\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"rewardInitialIndex\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"rewardSpeeds\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\"},{\"type\":\"address\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"rewardState\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\"},{\"type\":\"address\"}],\"outputs\":[{\"type\":\"uint224\",\"name\":\"index\"},{\"type\":\"uint32\",\"name\":\"timestamp\"}]},{\"type\":\"function\",\"name\":\"rewardToken\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"safeCRatio\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"setCollateralCap\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"},{\"type\":\"uint256\",\"name\":\"_maxDeposit\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"setPoolSpeed\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_rewardToken\"},{\"type\":\"address\",\"name\":\"_tradingPool\"},{\"type\":\"uint256\",\"name\":\"_speed\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"setSafeCRatio\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"uint256\",\"name\":\"_safeCRatio\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"system\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"tradingPoolMembership\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"market\"},{\"type\":\"address\",\"name\":\"account\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"tradingPools\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\"}],\"outputs\":[{\"type\":\"bool\",\"name\":\"isEnabled\"},{\"type\":\"uint256\",\"name\":\"volatilityRatio\"}]},{\"type\":\"function\",\"name\":\"unpause\",\"constant\":false,\"payable\":false,\"inputs\":[],\"outputs\":[]},{\"type\":\"function\",\"name\":\"updateRewardToken\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_rewardToken\"},{\"type\":\"bool\",\"name\":\"isSealed\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"upgradeTo\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"newImplementation\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"upgradeToAndCall\",\"constant\":false,\"stateMutability\":\"payable\",\"payable\":true,\"inputs\":[{\"type\":\"address\",\"name\":\"newImplementation\"},{\"type\":\"bytes\",\"name\":\"data\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"withdraw\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]}]",
     "StakingRewards": [
       {
         "type": "constructor",
@@ -3728,6 +3751,10 @@
           {
             "type": "address",
             "name": "_system"
+          },
+          {
+            "type": "uint256",
+            "name": "initialRewardsDuration"
           }
         ]
       },

@@ -34,6 +34,10 @@ async function main() {
 
 	// set admins
 	console.log("Setting admins... 💬")
+
+	// renounce sealed syn minter role
+	await contracts.sealedSYN.renounceRole(await contracts.sealedSYN.MINTER_ROLE(), deployer.address);
+
 	await contracts.system.grantRole(DEFAULT_ADMIN_ROLE, config.l0Admin);
 	await contracts.system.grantRole(L1_ADMIN_ROLE, config.l1Admin);
 	await contracts.system.grantRole(L2_ADMIN_ROLE, config.l2Admin);

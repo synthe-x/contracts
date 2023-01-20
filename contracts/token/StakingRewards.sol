@@ -48,13 +48,19 @@ contract StakingRewards is IStaking, ReentrancyGuard, Pausable {
      * @param _rewardsToken Address of the rewards token
      * @param _stakingToken Address of the staking token
      */
-    constructor(address _rewardsToken, address _stakingToken, address _system) {
+    constructor(
+        address _rewardsToken, 
+        address _stakingToken, 
+        address _system,
+        uint initialRewardsDuration
+    ) {
         rewardsToken = _rewardsToken;
         stakingToken = _stakingToken;
         periodFinish = 0;
         rewardRate = 0;
-        rewardsDuration = 7 days;
-        // Initialize the system contract
+        rewardsDuration = initialRewardsDuration;
+        
+        // Store the system contract
         system = System(_system);
     }
 

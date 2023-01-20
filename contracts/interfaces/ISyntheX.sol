@@ -66,5 +66,5 @@ interface ISyntheX {
     event SetPoolRewardSpeed(address indexed rewardToken, address indexed pool, uint256 rewardSpeed);
     event DistributedReward(address indexed rewardToken, address indexed pool, address _account, uint256 accountDelta, uint rewardIndex);
     event CollateralCapUpdated(address indexed asset, uint256 newCap);
-    event RewardTokenAdded(address indexed rewardToken);
+    event RewardTokenAdded(address indexed rewardToken, bool isSealed);
 }

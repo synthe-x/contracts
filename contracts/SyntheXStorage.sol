@@ -13,7 +13,10 @@ import "./utils/AddressStorage.sol";
  */
 contract SyntheXStorage {
     /// @notice Reward token contract address
-    SyntheXToken public syn;
+    SyntheXToken public rewardToken;
+
+    /// @notice If reward token is sealed; if true, reward token cannot be transferred so we mint it
+    bool public isRewardTokenSealed;
 
     /// @notice Safe-Minimum collateral ratio. Debt cannot be issued if collateral ratio is below this value
     uint256 public safeCRatio;

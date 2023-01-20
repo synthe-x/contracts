@@ -32,9 +32,10 @@ export async function deploy(deployments: any, config: any, deployerAddress: str
   await sealedSYN.grantMinterRole(synthex.address);
 
   // deploy staking rewards : get xSYN on staking xSYN
-  const stakingRewards = await _deploy("StakingRewards", [sealedSYN.address, sealedSYN.address, system.address], deployments)
+  const stakingRewards = await _deploy("StakingRewards", [sealedSYN.address, sealedSYN.address, system.address, config.stakingRewards.days * 24 * 60 * 60], deployments)
   // _deployDefender("StakingRewards_"+versionSuffix, stakingRewards);
   await sealedSYN.grantMinterRole(stakingRewards.address);
+  await stakingRewards.notifyReward(ethers.utils.parseEther(config.stakingRewards.reward));
 
   // deploy price oracle
   const oracle = await _deploy("PriceOracle", [system.address], deployments);
@@ -47,6 +48,9 @@ export async function deploy(deployments: any, config: any, deployerAddress: str
     [system.address, sealedSYN.address, syn.address, config.unlocker.lockupPeriod, config.unlocker.unlockPeriod, ethers.utils.parseEther(config.unlocker.percReleaseAtUnlock)], 
     deployments
   );
+  await sealedSYN.grantMinterRole(deployerAddress);
+  // mint tokens to unlocker
+  await sealedSYN.mint(unlocker.address, ethers.utils.parseEther(config.unlocker.quota));
 
   // deploy multicall
   await _deploy("Multicall2", [], deployments);
