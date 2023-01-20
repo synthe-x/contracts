@@ -19,7 +19,7 @@ export async function deploy(deployments: any, config: any, deployerAddress: str
 
   // deploy SYN
   const syn = await _deploy("SyntheXToken", [system.address], deployments);
-  // _deployDefender("SyntheXToken_"+versionSuffix, syn);
+  _deployDefender("SyntheXToken_"+versionSuffix, syn);
 
   // deploy Sealed SYN
   const sealedSYN = await _deploy("SealedSYN", [system.address], deployments);

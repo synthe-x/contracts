@@ -126,6 +126,41 @@ contract TokenUnlocker is Pausable {
         _unpause();
     }
 
+    /**
+     * @notice Returns the amount of tokens that can be claimed by user
+     * @dev Calculates the amount based on request data and current time
+     * @param _requestId Request ID
+     */
+    function unlocked(bytes32 _requestId) public view returns (uint) {
+        // Check if unlock request exists
+        UnlockData memory unlockRequest = unlockRequests[_requestId];
+        require(unlockRequest.amount > 0, "Unlock request does not exist");
+        // Check if unlock period has passed
+        require(block.timestamp >= unlockRequest.requestTime.add(lockPeriod), "Unlock period has not passed");
+
+        // Calculate amount to unlock
+        // Time since unlock date will give: percentage of total to unlock
+        uint timeSinceUnlock = block.timestamp.sub(unlockRequest.requestTime.add(lockPeriod));
+        uint percentUnlock = timeSinceUnlock.mul(1e18).div(unlockPeriod);
+            
+        // If unlock period has passed, unlock 100% of tokens
+        if(percentUnlock > 1e18){
+            percentUnlock = 1e18;
+        }
+
+        percentUnlock = percentUnlock.mul(BASIS_POINTS);
+
+        // Calculate amount to unlock
+        // Amount to unlock = (percentUnlock - (percentUnlock * percUnlockAtRelease) + percUnlockAtRelease) * unlockRequest.amount
+        uint amountToUnlock = unlockRequest.amount
+        .mul(
+            percentUnlock.add(percUnlockAtRelease).sub(percentUnlock.mul(percUnlockAtRelease).div(BASIS_POINTS).div(1e18))
+        ).div(1e18).div(BASIS_POINTS)
+        .sub(unlockRequest.claimed);
+
+        return amountToUnlock;
+    }
+
     /* -------------------------------------------------------------------------- */
     /*                              Public Functions                              */
     /* -------------------------------------------------------------------------- */
@@ -164,32 +199,9 @@ contract TokenUnlocker is Pausable {
      * @param _requestId Request ID of unlock request
      */
     function _unlockInternal(bytes32 _requestId) internal whenNotPaused {
-        // Check if unlock request exists
-        UnlockData memory unlockRequest = unlockRequests[_requestId];
-        require(unlockRequest.amount > 0, "Unlock request does not exist");
-        // Check if unlock period has passed
-        require(block.timestamp >= unlockRequest.requestTime.add(lockPeriod), "Unlock period has not passed");
+        // Get amount to unlock
+        uint amountToUnlock = unlocked(_requestId);
 
-        // Calculate amount to unlock
-        // Time since unlock date will give: percentage of total to unlock
-        uint timeSinceUnlock = block.timestamp.sub(unlockRequest.requestTime.add(lockPeriod));
-        uint percentUnlock = timeSinceUnlock.mul(1e18).div(unlockPeriod);
-            
-        // If unlock period has passed, unlock 100% of tokens
-        if(percentUnlock > 1e18){
-            percentUnlock = 1e18;
-        }
-
-        percentUnlock = percentUnlock.mul(BASIS_POINTS);
-
-        // Calculate amount to unlock
-        // Amount to unlock = (percentUnlock - (percentUnlock * percUnlockAtRelease) + percUnlockAtRelease) * unlockRequest.amount
-        uint amountToUnlock = unlockRequest.amount
-        .mul(
-            percentUnlock.add(percUnlockAtRelease).sub(percentUnlock.mul(percUnlockAtRelease).div(BASIS_POINTS).div(1e18))
-        ).div(1e18).div(BASIS_POINTS)
-        .sub(unlockRequest.claimed);
-        
         // If total amount to unlock is 0, return
         if(amountToUnlock == 0){
             return;
