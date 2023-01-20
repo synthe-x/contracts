@@ -1,16 +1,45 @@
 {
   "name": "synthex",
-  "version": "0.3.0",
-  "latest": "0.3.0",
-  "admin": "0x084cD22eA15E4C262408e561a5AFa8431Bd7fa5d",
-  "poolManager": "0x46c18c6d5526E17B34a3deB43e5E9Ba2A659c23a",
+  "version": "0.8.0",
+  "latest": "0.8.0",
+  "l0Admin": "0x084cD22eA15E4C262408e561a5AFa8431Bd7fa5d",
+  "l1Admin": "0x2646306d3191AEE905bf9065bD1B7cC71c9036D0",
+  "l2Admin": "0x46c18c6d5526E17B34a3deB43e5E9Ba2A659c23a",
+  "governanceModule": "0x780580fd8AEa47b93414Fa6693123049EC7aED55",
   "safeCRatio": "2",
+  "debtRewardAlloc": "1000000",
+  "stakingRewards": {
+    "reward": "6000",
+    "days": "30"
+  },
+  "unlocker": {
+    "lockupPeriod": "15552000",
+    "unlockPeriod": "15552000",
+    "percReleaseAtUnlock": "500",
+    "quota": "1000000"
+  },
   "collaterals": [
     {
-      "name": "Wrapped Ethereum",
-      "symbol": "wETH",
+      "name": "Wrapped ETH",
+      "symbol": "WETH",
       "volatilityRatio": "0.8",
-      "feed": "0x62CAe0FA2da220f43a51F86Db2EDb36DcA9A5A08"
+      "feed": "0x62CAe0FA2da220f43a51F86Db2EDb36DcA9A5A08",
+      "cap": "10000"
+    },
+    {
+      "name": "USD Coin",
+      "symbol": "USDC",
+      "volatilityRatio": "0.7",
+      "feed": "0x1692Bdd32F31b831caAc1b0c9fAF68613682813b",
+      "cap": "1000000"
+    },
+    {
+      "name": "Ethereum",
+      "symbol": "ETH",
+      "volatilityRatio": "0.8",
+      "feed": "0x62CAe0FA2da220f43a51F86Db2EDb36DcA9A5A08",
+      "address": "0x0000000000000000000000000000000000000000",
+      "cap": "10"
     }
   ],
   "tradingPools": [
@@ -19,7 +48,8 @@
       "symbol": "CRY",
       "volatilityRatio": "0.8",
       "rewardSpeed": "2.5",
-      "fee": "0.0015",
+      "fee": "15",
+      "issuerAlloc": "7000",
       "synths": [
         {
           "name": "Bitcoin X",
@@ -39,7 +69,8 @@
         {
           "name": "US Dollar CX",
           "symbol": "USDcx",
-          "price": "1.00"
+          "price": "1.00",
+          "isFeeToken": true
         },
         {
           "name": "Cardano X",
@@ -78,7 +109,8 @@
       "symbol": "USST",
       "volatilityRatio": "0.9",
       "rewardSpeed": "1.1",
-      "fee": "0.001",
+      "fee": "10",
+      "issuerAlloc": "6000",
       "synths": [
         {
           "name": "Apple X",
@@ -133,7 +165,8 @@
         {
           "name": "US Dollar SX",
           "symbol": "USDsx",
-          "price": "1.00"
+          "price": "1.00",
+          "isFeeToken": true
         }
       ]
     },
@@ -142,12 +175,14 @@
       "symbol": "FX",
       "volatilityRatio": "0.95",
       "rewardSpeed": "0.85",
-      "fee": "0.0005",
+      "fee": "5",
+      "issuerAlloc": "5000",
       "synths": [
         {
           "name": "US Dollar FX",
           "symbol": "USDfx",
-          "price": "1.00"
+          "price": "1.00",
+          "isFeeToken": true
         },
         {
           "name": "Euro X",

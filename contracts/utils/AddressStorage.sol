@@ -1,46 +1,44 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.9;
-pragma abicoder v2;
-
-
-import "hardhat/console.sol";
+pragma solidity ^0.8.0;
 
 /**
- * @dev Contract to store addresses
- * @dev This contract is used to store addresses of other contracts
- * Vaild keys are:
- * ADMIN: Admin address
- * VAULT: Vault address
- * PRICE_ORACLE: Price oracle address
- * POOL_MANAGER: Pool manager address
- * SYNTHEX: Main Synthex contract address
+ * @title Address Storage
+ * @author SyntheX (prasad@chainscore.finance)
+ * 
+ * @notice Contract to store addresses
+ * @notice This contract is used to store addresses of other contracts
+ * @dev Vaild keys are:
+ * VAULT - Vault address
+ * PRICE_ORACLE - Price oracle address
+ * SYNTHEX - Main Synthex contract address
+ * 
  */
-contract AddressStorage {
-    
+abstract contract AddressStorage {
+    /// @notice Event to be emitted when address is updated
     event AddressUpdated(bytes32 indexed key, address indexed value);
 
+    /// @notice Mapping to store addresses (hashedKey => address)
     mapping(bytes32 => address) private addresses;
-    bytes32 constant ADMIN = keccak256("ADMIN");
 
-    constructor(address _admin) {
-        _setAddress(ADMIN, _admin);
-    }
-
-    modifier onlyAdmin() {
-        require(msg.sender == getAddress(ADMIN), "AddressStorage: Only admin can call this function");
-        _;
-    }
-    
+    /**
+     * @notice Function to get address of a contract
+     * @param _key Key of the address
+     * @return Address of the contract
+     */
     function getAddress(bytes32 _key) public view returns (address) {
         return addresses[_key];
     }
 
-    function setAddress(bytes32 _key, address _value) public onlyAdmin {
+    /**
+     * @notice Function to set address of a contract
+     * @param _key Key of the address
+     * @param _value Address of the contract
+     */
+    function _setAddress(bytes32 _key, address _value) internal {
         addresses[_key] = _value;
         emit AddressUpdated(_key, _value);
     }
 
-    function _setAddress(bytes32 _key, address _value) internal {
-        addresses[_key] = _value;
-    }
+    /// @notice gap
+    uint256[49] private __gap;
 }

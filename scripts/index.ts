@@ -3,7 +3,7 @@ import { deploy } from "./deploy";
 import { initiate } from "./initiate";
 import fs from "fs";
 
-import { PRICE_ORACLE, SYNTHEX, VAULT, ADMIN, POOL_MANAGER } from "./utils/const";
+import { PRICE_ORACLE, SYNTHEX, VAULT, DEFAULT_ADMIN_ROLE, L1_ADMIN_ROLE, L2_ADMIN_ROLE, GOVERNANCE_MODULE_ROLE } from "./utils/const";
 
 async function main() {
 	// read deployments and config
@@ -29,46 +29,25 @@ async function main() {
 
 	// deploy main contracts
 	const contracts = await deploy(deployments, config, deployer.address);
-	await contracts.addressManager.setAddress(ADMIN, deployer.address);
-	await contracts.addressManager.setAddress(POOL_MANAGER, deployer.address);
-
-	const synthex = contracts.synthex;
-
 	// initiate the contracts
-	await initiate(contracts.synthex, contracts.oracle, deployments, config, contracts.addressManager);
+	await initiate(contracts.synthex, contracts.oracle, deployments, config, contracts.system, contracts.sealedSYN);
 
 	// set admins
-	await contracts.addressManager.setAddress(POOL_MANAGER, config.poolManager);
-	await contracts.addressManager.setAddress(ADMIN, config.admin);
+	console.log("Setting admins... 💬")
 
-	if (hre.network.name !== "hardhat") {
-		// Add contract to openzeppelin defender
-		console.log("Adding contract to openzeppelin defender... 💬");
-		// get the abi in json string using the contract interface
-		const AbiJsonString = OpenzeppelinDefender.Utils.AbiJsonString(
-			synthex.interface
-		);
+	// renounce sealed syn minter role
+	await contracts.sealedSYN.renounceRole(await contracts.sealedSYN.MINTER_ROLE(), deployer.address);
 
-		//Obtaining the name of the network through the chainId of the network
-		const networkName = OpenzeppelinDefender.Utils.fromChainId(
-			Number(hre.network.config.chainId!)
-		);
+	await contracts.system.grantRole(DEFAULT_ADMIN_ROLE, config.l0Admin);
+	await contracts.system.grantRole(L1_ADMIN_ROLE, config.l1Admin);
+	await contracts.system.grantRole(L2_ADMIN_ROLE, config.l2Admin);
+	await contracts.system.grantRole(GOVERNANCE_MODULE_ROLE, config.governanceModule);
 
-		//add the contract to the admin
-		const option = {
-			network: networkName!,
-			address: synthex.address,
-			name: `SyntheX ${config.version.split(".")[0]}.${
-				config.version.split(".")[1]
-			}.x`,
-			abi: AbiJsonString as string,
-		};
-
-		await OpenzeppelinDefender.AdminClient.addContract(option);
-		console.log(
-			`SyntheX ${config.version} added to openzeppelin defender! 🎉`
-		);
-	}
+	await contracts.system.renounceRole(DEFAULT_ADMIN_ROLE, deployer.address);
+	await contracts.system.renounceRole(L1_ADMIN_ROLE, deployer.address);
+	await contracts.system.renounceRole(L2_ADMIN_ROLE, deployer.address);
+	await contracts.system.renounceRole(GOVERNANCE_MODULE_ROLE, deployer.address);
+	console.log("Admins set! 🎉")
 
 	// save deployments
 	fs.writeFileSync(
@@ -79,6 +58,8 @@ async function main() {
 		process.cwd() + `/deployments/${hre.network.name}/deployments.json`,
 		JSON.stringify(deployments, null, 2)
 	);
+
+	console.log("Deployment complete! 🎉")
 }
 
 // We recommend this pattern to be able to use async/await everywhere
