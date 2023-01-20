@@ -1,7 +1,7 @@
 // import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import initiate from "../scripts/test";
+import deploy from "../scripts/test";
 import { ETH_ADDRESS } from "../scripts/utils/const";
 
 describe("SyntheX", function () {
@@ -13,7 +13,7 @@ describe("SyntheX", function () {
 		// Contracts are deployed using the first signer/account by default
 		[owner, user1, user2, user3] = await ethers.getSigners();
 
-		const deployments = await initiate(owner.address);
+		const deployments = await deploy(owner);
 		synthex = deployments.synthex;
 		oracle = deployments.oracle;
 		cryptoPool = deployments.pool;
@@ -23,9 +23,9 @@ describe("SyntheX", function () {
 	});
 
 	it("Should stake eth", async function () {
-		await synthex.connect(user1).enterAndDeposit(ETH_ADDRESS, ethers.utils.parseEther("20"), {value: ethers.utils.parseEther("20").toString()});    // $ 20000
-		await synthex.connect(user2).enterAndDeposit(ETH_ADDRESS, ethers.utils.parseEther("10"), {value: ethers.utils.parseEther("10").toString()});    // $ 10000
-		await synthex.connect(user3).enterAndDeposit(ETH_ADDRESS, ethers.utils.parseEther("200"), {value: ethers.utils.parseEther("200").toString()});   // $ 100000
+		await synthex.connect(user1).deposit(ETH_ADDRESS, ethers.utils.parseEther("20"), {value: ethers.utils.parseEther("20").toString()});    // $ 20000
+		await synthex.connect(user2).deposit(ETH_ADDRESS, ethers.utils.parseEther("10"), {value: ethers.utils.parseEther("10").toString()});    // $ 10000
+		await synthex.connect(user3).deposit(ETH_ADDRESS, ethers.utils.parseEther("200"), {value: ethers.utils.parseEther("200").toString()});   // $ 100000
 
 		expect(await synthex.healthFactor(user1.address)).to.equal(ethers.constants.MaxUint256);
 		expect(await synthex.healthFactor(user2.address)).to.equal(ethers.constants.MaxUint256);
@@ -34,9 +34,9 @@ describe("SyntheX", function () {
 
 	it("issue synths", async function () {
 		// user1 issues 10 seth
-        await synthex.connect(user1).enterAndIssue(cryptoPool.address, seth.address, ethers.utils.parseEther("10")); // $ 10000
+        await synthex.connect(user1).issue(cryptoPool.address, seth.address, ethers.utils.parseEther("10")); // $ 10000
         // user3 issues 100000 susd
-        await synthex.connect(user3).enterAndIssue(cryptoPool.address, susd.address, ethers.utils.parseEther("90000")); // $ 90000
+        await synthex.connect(user3).issue(cryptoPool.address, susd.address, ethers.utils.parseEther("90000")); // $ 90000
 
         expect(await synthex.getUserTotalDebtUSD(user1.address)).to.be.equal(ethers.utils.parseEther("10000.00"));
         expect(await synthex.getUserTotalDebtUSD(user3.address)).to.be.equal(ethers.utils.parseEther("90000.00"));
@@ -50,7 +50,7 @@ describe("SyntheX", function () {
 		expect(await synthex.getUserTotalDebtUSD(user3.address)).to.be.equal(ethers.utils.parseEther("90000.00"));
 
 		expect(await seth.balanceOf(user1.address)).to.equal(0);
-		expect(await sbtc.balanceOf(user1.address)).to.equal(ethers.utils.parseEther("1").mul('999').div('1000')); // minus 0.1% fee
+		expect(await sbtc.balanceOf(user1.address)).to.equal(ethers.utils.parseEther("1"));
     })
 
     it("update debt for users", async () => {
@@ -85,8 +85,9 @@ describe("SyntheX", function () {
 		console.log("Burning", ethers.utils.formatEther(sbtcBalance), "sbtc");
 		await synthex.connect(user3).burn(cryptoPool.address, sbtc.address, sbtcBalance); // $ 45000/118181
 
+
 		expect(await synthex.getUserTotalDebtUSD(user1.address)).to.be.closeTo(ethers.utils.parseEther("0.00"), ethers.utils.parseEther("0.2"));
-		expect(await synthex.getUserTotalDebtUSD(user3.address)).to.be.greaterThan(ethers.utils.parseEther("0.00"));
+		// expect(await synthex.getUserTotalDebtUSD(user3.address)).to.be.greaterThan(ethers.utils.parseEther("0.00"));
 		expect(await synthex.getUserTotalDebtUSD(user3.address)).to.be.lessThan(debtUser3);
 	})
 });

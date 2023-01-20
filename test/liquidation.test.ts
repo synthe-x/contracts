@@ -15,7 +15,7 @@ describe("Testing liquidation", function () {
 		// Contracts are deployed using the first signer/account by default
         [owner, user1, user2, user3] = await ethers.getSigners();
 
-		const deployments = await deploy(owner.address, user1, user2, user3);
+		const deployments = await deploy(owner, user1, user2, user3);
 		synthex = deployments.synthex;
         syn = deployments.syn;
 		oracle = deployments.oracle;
