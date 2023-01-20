@@ -2,10 +2,10 @@
 import { expect } from "chai";
 import { BigNumber } from "ethers";
 import { ethers } from "hardhat";
-import deploy from "../scripts/test";
-import { ETH_ADDRESS } from "../scripts/utils/const";
+import deploy from "../../scripts/test";
+import { ETH_ADDRESS } from "../../scripts/utils/const";
 
-describe("Testing Staking", function () {
+describe("Testing Staking Rewards", function () {
 	let sealedSyn: any, syn: any, stakingRewards: any;
 	let owner: any, user1: any, user2: any, user3: any;
 

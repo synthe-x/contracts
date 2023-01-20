@@ -1,8 +1,11 @@
 import hre, { ethers, upgrades } from "hardhat";
 import { Contract } from 'ethers';
 import { _deploy } from "./utils/helper";
+import { _deploy as _deployDefender } from "./utils/defender";
+
 
 export async function initiate(synthex: Contract, oracle: Contract, deployments: any, config: any, system: Contract, rewardToken: Contract) {
+  const versionSuffix = `${config.version.split(".")[0]}.${config.version.split(".")[1]}.x`
 
   console.log("\nDeploying Collaterals... 💬");
 
@@ -37,11 +40,19 @@ export async function initiate(synthex: Contract, oracle: Contract, deployments:
     await synthex.setPoolSpeed(rewardToken.address, pool.address, ethers.utils.parseEther(config.tradingPools[i].rewardSpeed));
     // set fee
     await pool.updateFee(ethers.utils.parseEther(config.tradingPools[i].fee), ethers.utils.parseEther(config.tradingPools[i].issuerAlloc));
-
+    
     console.log(`\t Trading Pool ${config.tradingPools[i].symbol} deployed successfully ✅`);
 
+    if(config.tradingPools[i].synths.length == 0){
+      console.log(`\t\t No Synths added to ${config.tradingPools[i].symbol} 🤷‍♂️`);
+      continue;
+    }
+    _deployDefender(config.tradingPools[i].symbol+'_'+versionSuffix, pool);
+
+    let feeToken = '';
     for(let j in config.tradingPools[i].synths){
       let synth = config.tradingPools[i].synths[j].address;
+      
       if(!synth){
         // deploy token
         const token = await _deploy('ERC20X', [config.tradingPools[i].synths[j].name, config.tradingPools[i].synths[j].symbol, pool.address, system.address], deployments, { name: config.tradingPools[i].synths[j].symbol });
@@ -56,7 +67,16 @@ export async function initiate(synthex: Contract, oracle: Contract, deployments:
       await oracle.setFeed(synth, feed);
       await pool.enableSynth(synth);
       console.log(`\t\t Synth ${config.tradingPools[i].synths[j].symbol} added to ${config.tradingPools[i].symbol} ✨`);
+
+      if(!feeToken){
+        feeToken = synth;
+      }
+      if(config.tradingPools[i].synths[j].isFeeToken){
+        feeToken = synth;
+      }
     }
+
+    await pool.updateFeeToken(feeToken);
   }
   
   console.log("Trading Pools deployed successfully 🎉\n");

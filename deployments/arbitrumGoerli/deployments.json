@@ -1,7 +1,7 @@
 {
   "contracts": {
     "System": {
-      "address": "0x91d0E8484020ed62Efd3F693D37Cb141033B2163",
+      "address": "0x3BF384F4cFF7F86157a107D502fF7432057c2886",
       "abi": "System",
       "constructorArguments": [
         "0x0eD6a1F7a99E8Bc1c752E4515f7AB3aFe20BdBF7",
@@ -9,72 +9,72 @@
         "0x0eD6a1F7a99E8Bc1c752E4515f7AB3aFe20BdBF7",
         "0x0eD6a1F7a99E8Bc1c752E4515f7AB3aFe20BdBF7"
       ],
-      "block": "4755754"
+      "block": "4973350"
     },
     "Vault": {
-      "address": "0xb7e09b6FF9B3D370fa518523cc20C7457E8a1CCd",
+      "address": "0xb2072516896f4Eb3625aBeaa851D4062c16D4008",
       "abi": "Vault",
       "constructorArguments": [
-        "0x91d0E8484020ed62Efd3F693D37Cb141033B2163"
+        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
       ],
-      "block": "4755756"
+      "block": "4973355"
     },
     "SyntheXToken": {
-      "address": "0x8e8E7721Bb4498149Fe173285196C71c7d1924c6",
+      "address": "0x78B79eB9C8445A9372CDE13FbD75d232Ca22A276",
       "abi": "SyntheXToken",
       "constructorArguments": [
-        "0x91d0E8484020ed62Efd3F693D37Cb141033B2163"
+        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
       ],
-      "block": "4755758"
+      "block": "4973368"
     },
     "SealedSYN": {
-      "address": "0x6165388127dB56bBEf4e7b6Ce0734eEe8381C1B1",
+      "address": "0x90E0F8e2090dcEc3F59C03F18634aF00ACaF24fe",
       "abi": "SealedSYN",
       "constructorArguments": [
-        "0x91d0E8484020ed62Efd3F693D37Cb141033B2163"
+        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
       ],
-      "block": "4755760"
+      "block": "4973375"
     },
     "SyntheX": {
-      "address": "0x77ccb4Facc847e15B35dab419375c0F3C2cF729a",
+      "address": "0x75e07C03da5c380FF92270B9bd74F8D486F5a7DC",
       "abi": "SyntheX",
       "constructorArguments": [],
-      "block": "4755764",
+      "block": "4973379",
       "implementations": {
         "undefined": {
           "address": "0x6F17d98Ea3A78B263509A914588480D45916C51c",
           "source": "SyntheX_undefined",
           "constructorArguments": [],
-          "block": "4755764"
+          "block": "4973379"
         }
       },
       "latest": "0x6F17d98Ea3A78B263509A914588480D45916C51c"
     },
     "StakingRewards": {
-      "address": "0xB6bc1e8F0e1AE58f1d23e5a34b195d887851bdBA",
+      "address": "0x9370693C877eE931C6D8D834020343CC587bb1FA",
       "abi": "StakingRewards",
       "constructorArguments": [
-        "0x6165388127dB56bBEf4e7b6Ce0734eEe8381C1B1",
-        "0x6165388127dB56bBEf4e7b6Ce0734eEe8381C1B1",
-        "0x91d0E8484020ed62Efd3F693D37Cb141033B2163"
+        "0x90E0F8e2090dcEc3F59C03F18634aF00ACaF24fe",
+        "0x90E0F8e2090dcEc3F59C03F18634aF00ACaF24fe",
+        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
       ],
-      "block": "4755767"
+      "block": "4973382"
     },
     "PriceOracle": {
-      "address": "0x8F31dA78DE9824aBF86adf5fDB0fF64F5AdCB8eB",
+      "address": "0x78CD57B120cb590Ccc8397fa6Fe4fc75dae230E4",
       "abi": "PriceOracle",
       "constructorArguments": [
-        "0x91d0E8484020ed62Efd3F693D37Cb141033B2163"
+        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
       ],
-      "block": "4755770"
+      "block": "4973386"
     },
     "TokenUnlocker": {
-      "address": "0xDACe8ad7DB4756621b75C7Fc4B141C29420ed245",
+      "address": "0x2aeCaB47c99FC2e11e56159dE41d6a96Ad28C07D",
       "abi": "TokenUnlocker",
       "constructorArguments": [
-        "0x91d0E8484020ed62Efd3F693D37Cb141033B2163",
-        "0x6165388127dB56bBEf4e7b6Ce0734eEe8381C1B1",
-        "0x8e8E7721Bb4498149Fe173285196C71c7d1924c6",
+        "0x3BF384F4cFF7F86157a107D502fF7432057c2886",
+        "0x90E0F8e2090dcEc3F59C03F18634aF00ACaF24fe",
+        "0x78B79eB9C8445A9372CDE13FbD75d232Ca22A276",
         "15552000",
         "15552000",
         {
@@ -82,82 +82,82 @@
           "hex": "0x1b1ae4d6e2ef500000"
         }
       ],
-      "block": "4755775"
+      "block": "4973391"
     },
     "Multicall2": {
-      "address": "0x252e1B64ffed655198d362674543EE0A597a525A",
+      "address": "0x99e29f455E2826FCB9d3A5B7a610019039413C2B",
       "abi": "Multicall2",
       "constructorArguments": [],
-      "block": "4755778"
+      "block": "4973393"
     },
     "WETH": {
-      "address": "0x73Afa6d1C7e2E63C5c17cEcFa01E07FCFf83a9f1",
+      "address": "0xB3488EaaF11E76bE67A8a09C77965Acf7A9d76b1",
       "abi": "MockToken",
       "constructorArguments": [
         "Wrapped ETH",
         "WETH"
       ],
-      "block": "4755784"
+      "block": "4973394"
     },
     "USDC": {
-      "address": "0xC96D2C6EB4904d621e3cC8EF83E5434e0717D2dE",
+      "address": "0x0cE6Be443DD8fD6c15b9f14F0e5347b0253a92D4",
       "abi": "MockToken",
       "constructorArguments": [
         "USD Coin",
         "USDC"
       ],
-      "block": "4755804"
+      "block": "4973399"
     },
     "CRY": {
-      "address": "0xe694Ad98BBA1E1ca75D4AC3C805571E0Fb8A86c5",
+      "address": "0x10bba7733a47DB2b795734D47B8A28D94b6613B6",
       "abi": "DebtPool",
       "constructorArguments": [],
-      "block": "4755822",
+      "block": "4973408",
       "implementations": {
         "undefined": {
           "address": "0x1e23eA2309982fDBa8F93E0Abc6e89b217109273",
           "source": "CRY_undefined",
           "constructorArguments": [],
-          "block": "4755822"
+          "block": "4973408"
         }
       },
       "latest": "0x1e23eA2309982fDBa8F93E0Abc6e89b217109273"
     },
     "BTCx": {
-      "address": "0x6e2D153f36213ebc04D25BeFA15B4D956BB45431",
+      "address": "0x75ddBA79aD0a252295150BCa8aC2863db60DCc87",
       "abi": "ERC20X",
       "constructorArguments": [
         "Bitcoin X",
         "BTCx",
-        "0xe694Ad98BBA1E1ca75D4AC3C805571E0Fb8A86c5",
-        "0x91d0E8484020ed62Efd3F693D37Cb141033B2163"
+        "0x10bba7733a47DB2b795734D47B8A28D94b6613B6",
+        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
       ],
-      "block": "4755826"
+      "block": "4973418"
     },
     "ETHx": {
-      "address": "0xFe98e81e0269BEa023DBb4664FEB6f639825b932",
+      "address": "0x8a439482E123E02984eC42F627Aa3B0d6acE859C",
       "abi": "ERC20X",
       "constructorArguments": [
         "Ethereum X",
         "ETHx",
-        "0xe694Ad98BBA1E1ca75D4AC3C805571E0Fb8A86c5",
-        "0x91d0E8484020ed62Efd3F693D37Cb141033B2163"
+        "0x10bba7733a47DB2b795734D47B8A28D94b6613B6",
+        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
       ],
-      "block": "4755833"
+      "block": "4973423"
     },
     "BNBx": {
-      "address": "0x4Bbb5C29Cfe2DFBb2B84Be0898fC177426603e93",
+      "address": "0x3a9A4E41a599afe262F0B59ba2b19DA7fa527A61",
       "abi": "ERC20X",
       "constructorArguments": [
         "Binance Coin X",
         "BNBx",
-        "0xe694Ad98BBA1E1ca75D4AC3C805571E0Fb8A86c5",
-        "0x91d0E8484020ed62Efd3F693D37Cb141033B2163"
+        "0x10bba7733a47DB2b795734D47B8A28D94b6613B6",
+        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
       ],
-      "block": "4755839"
+      "block": "4973437"
     },
     "BNBx_PriceFeed": {
-      "address": "0x0CcE9dFdDEeeE41a2ae5fc3aA1c5CE08e616ca74",
+      "address": "0x72aF7eaeb9B9770fcD72Aa163A38929cAcC9A66c",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -166,21 +166,21 @@
         },
         8
       ],
-      "block": "4755840"
+      "block": "4973441"
     },
     "USDcx": {
-      "address": "0xeD0075489723a0ccB17ea0A568e386a74ee0B21f",
+      "address": "0xeC9AFeC8D045117976d913d25Ad53f7D554daAB5",
       "abi": "ERC20X",
       "constructorArguments": [
         "US Dollar CX",
         "USDcx",
-        "0xe694Ad98BBA1E1ca75D4AC3C805571E0Fb8A86c5",
-        "0x91d0E8484020ed62Efd3F693D37Cb141033B2163"
+        "0x10bba7733a47DB2b795734D47B8A28D94b6613B6",
+        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
       ],
-      "block": "4755847"
+      "block": "4973457"
     },
     "USDcx_PriceFeed": {
-      "address": "0x7EfA570C271ADdE778bD292D894986B19D202009",
+      "address": "0x2C7c1853fBBB3EFBfcC08533a71489CdC90c0333",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -189,21 +189,21 @@
         },
         8
       ],
-      "block": "4755850"
+      "block": "4973464"
     },
     "ADAx": {
-      "address": "0x9c22f663fcf7eaB3f97F34d1B2b3543d1Bc99bD0",
+      "address": "0xF16Ff7Ac932A43157Eb365FF388dEA56dC466467",
       "abi": "ERC20X",
       "constructorArguments": [
         "Cardano X",
         "ADAx",
-        "0xe694Ad98BBA1E1ca75D4AC3C805571E0Fb8A86c5",
-        "0x91d0E8484020ed62Efd3F693D37Cb141033B2163"
+        "0x10bba7733a47DB2b795734D47B8A28D94b6613B6",
+        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
       ],
-      "block": "4755855"
+      "block": "4973468"
     },
     "ADAx_PriceFeed": {
-      "address": "0x75618533100E77e13ce1A7395a71765326781D43",
+      "address": "0xeeFc8393D001231611A9B6d50DDEb4adF6690247",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -212,21 +212,21 @@
         },
         8
       ],
-      "block": "4755856"
+      "block": "4973470"
     },
     "AAVEx": {
-      "address": "0x1618B1452429c52Eb17410742A14D82a94877EA7",
+      "address": "0xEf65cC4B73af6D0656ABED086D219B988e3B78D1",
       "abi": "ERC20X",
       "constructorArguments": [
         "Aave X",
         "AAVEx",
-        "0xe694Ad98BBA1E1ca75D4AC3C805571E0Fb8A86c5",
-        "0x91d0E8484020ed62Efd3F693D37Cb141033B2163"
+        "0x10bba7733a47DB2b795734D47B8A28D94b6613B6",
+        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
       ],
-      "block": "4755860"
+      "block": "4973474"
     },
     "AAVEx_PriceFeed": {
-      "address": "0x4479AB19e6869BCa4558e76025AF9825538eA01e",
+      "address": "0x0dBB2157d2AC118Fe2B75D7e968cd0764c09B8a1",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -235,32 +235,32 @@
         },
         8
       ],
-      "block": "4755862"
+      "block": "4973477"
     },
     "LINKx": {
-      "address": "0xe9A4120AA6F6eD9599f0D5aF6B6C9A95a45057A2",
+      "address": "0x25bf64399348519957d439960f44b15f75Fb43b9",
       "abi": "ERC20X",
       "constructorArguments": [
         "Chainlink X",
         "LINKx",
-        "0xe694Ad98BBA1E1ca75D4AC3C805571E0Fb8A86c5",
-        "0x91d0E8484020ed62Efd3F693D37Cb141033B2163"
+        "0x10bba7733a47DB2b795734D47B8A28D94b6613B6",
+        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
       ],
-      "block": "4755870"
+      "block": "4973482"
     },
     "UNIx": {
-      "address": "0xB7031e139f3D7b5A2EE9015876FB0D7a2448C442",
+      "address": "0xdD139Aa9FC962ae5F4e82FDE330E497ee29D4818",
       "abi": "ERC20X",
       "constructorArguments": [
         "Uniswap X",
         "UNIx",
-        "0xe694Ad98BBA1E1ca75D4AC3C805571E0Fb8A86c5",
-        "0x91d0E8484020ed62Efd3F693D37Cb141033B2163"
+        "0x10bba7733a47DB2b795734D47B8A28D94b6613B6",
+        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
       ],
-      "block": "4755883"
+      "block": "4973487"
     },
     "UNIx_PriceFeed": {
-      "address": "0xa3DEe6E89267C074F68F3A7A56429Afe19DB6a37",
+      "address": "0xF1552e6c18786c4090204F4B064f16D5Bfa5a6a7",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -269,21 +269,21 @@
         },
         8
       ],
-      "block": "4755890"
+      "block": "4973488"
     },
     "DOGEx": {
-      "address": "0xaA6b7626Ab978f2ef43b2A002B59E8f148f31CdC",
+      "address": "0xd2cfff5C25A694DB05A41E6dd3692700679FD832",
       "abi": "ERC20X",
       "constructorArguments": [
         "Dogecoin X",
         "DOGEx",
-        "0xe694Ad98BBA1E1ca75D4AC3C805571E0Fb8A86c5",
-        "0x91d0E8484020ed62Efd3F693D37Cb141033B2163"
+        "0x10bba7733a47DB2b795734D47B8A28D94b6613B6",
+        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
       ],
-      "block": "4755907"
+      "block": "4973494"
     },
     "DOGEx_PriceFeed": {
-      "address": "0x5aAe4a2aB14c46706Dbeb2eCA77eC7A6dd8fCd77",
+      "address": "0xf7aA55DF3bC7DC6B09900e21dadDf46f789231b0",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -292,21 +292,21 @@
         },
         8
       ],
-      "block": "4755912"
+      "block": "4973495"
     },
     "DOTx": {
-      "address": "0x1f4F854993F8419F4733a6C36f11e77b78ecc97E",
+      "address": "0x52290221C1Fd62877A4a425eC5d0126879272fb8",
       "abi": "ERC20X",
       "constructorArguments": [
         "Polkadot X",
         "DOTx",
-        "0xe694Ad98BBA1E1ca75D4AC3C805571E0Fb8A86c5",
-        "0x91d0E8484020ed62Efd3F693D37Cb141033B2163"
+        "0x10bba7733a47DB2b795734D47B8A28D94b6613B6",
+        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
       ],
-      "block": "4755916"
+      "block": "4973498"
     },
     "DOTx_PriceFeed": {
-      "address": "0xC8d7B2738cDCb37ca6D66d95010C44105a3CFAd6",
+      "address": "0x62E6f77dE7d589a5eC4Fa90819592156181F19A7",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -315,36 +315,36 @@
         },
         8
       ],
-      "block": "4755917"
+      "block": "4973501"
     },
     "USST": {
-      "address": "0xd240ba02F263767380eB3E70e212472D43872268",
+      "address": "0xD692aF94072B86DE792f63e21952944AcC54f9DC",
       "abi": "DebtPool",
       "constructorArguments": [],
-      "block": "4755921",
+      "block": "4973508",
       "implementations": {
         "undefined": {
           "address": "0x1e23eA2309982fDBa8F93E0Abc6e89b217109273",
           "source": "USST_undefined",
           "constructorArguments": [],
-          "block": "4755921"
+          "block": "4973508"
         }
       },
       "latest": "0x1e23eA2309982fDBa8F93E0Abc6e89b217109273"
     },
     "AAPLx": {
-      "address": "0x9BC185cAeAE45dcE6f198a9E690220e31E961fCB",
+      "address": "0xb991492f2d84fA6Bf8815480584C2b332a9FFF07",
       "abi": "ERC20X",
       "constructorArguments": [
         "Apple X",
         "AAPLx",
-        "0xd240ba02F263767380eB3E70e212472D43872268",
-        "0x91d0E8484020ed62Efd3F693D37Cb141033B2163"
+        "0xD692aF94072B86DE792f63e21952944AcC54f9DC",
+        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
       ],
-      "block": "4755932"
+      "block": "4973522"
     },
     "AAPLx_PriceFeed": {
-      "address": "0x0c1c11D7EA2111126021DadA9F8f2dc8BfC7F132",
+      "address": "0x327Ce204EDd3fF531454fFd617603fE9d29D059d",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -353,21 +353,21 @@
         },
         8
       ],
-      "block": "4755934"
+      "block": "4973529"
     },
     "TSLAx": {
-      "address": "0x90e183Fe0b0Be8aBcC4eC3E208384d306d25d21f",
+      "address": "0x0B3605D73105213845986f6D574BEA0944754126",
       "abi": "ERC20X",
       "constructorArguments": [
         "Tesla X",
         "TSLAx",
-        "0xd240ba02F263767380eB3E70e212472D43872268",
-        "0x91d0E8484020ed62Efd3F693D37Cb141033B2163"
+        "0xD692aF94072B86DE792f63e21952944AcC54f9DC",
+        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
       ],
-      "block": "4755937"
+      "block": "4973548"
     },
     "TSLAx_PriceFeed": {
-      "address": "0xbe6D155F4BA817c748367dD5502Fe47AC2a0418a",
+      "address": "0x7B12a8611367FA4bE461DE1F9c1967056d23c7ca",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -376,21 +376,21 @@
         },
         8
       ],
-      "block": "4755940"
+      "block": "4973551"
     },
     "AMZNx": {
-      "address": "0xbB424651764Ae871B01c2FF8908119755aD71f57",
+      "address": "0xd3a5835c92032209aa59B53c9004dF12647677d4",
       "abi": "ERC20X",
       "constructorArguments": [
         "Amazon X",
         "AMZNx",
-        "0xd240ba02F263767380eB3E70e212472D43872268",
-        "0x91d0E8484020ed62Efd3F693D37Cb141033B2163"
+        "0xD692aF94072B86DE792f63e21952944AcC54f9DC",
+        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
       ],
-      "block": "4755943"
+      "block": "4973557"
     },
     "AMZNx_PriceFeed": {
-      "address": "0x3eCEE40F6135f0d7e9a3d25B4cf251F5bAF60428",
+      "address": "0x49124AE5a15ffD6ce0b08a25150cAceEb598b76A",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -399,21 +399,21 @@
         },
         8
       ],
-      "block": "4755947"
+      "block": "4973559"
     },
     "FBx": {
-      "address": "0x50c1E830412899a448D963E40544Bc683C906139",
+      "address": "0x9563C4aA18Fb122b0D57396b3F6037c3ac70a725",
       "abi": "ERC20X",
       "constructorArguments": [
         "Facebook X",
         "FBx",
-        "0xd240ba02F263767380eB3E70e212472D43872268",
-        "0x91d0E8484020ed62Efd3F693D37Cb141033B2163"
+        "0xD692aF94072B86DE792f63e21952944AcC54f9DC",
+        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
       ],
-      "block": "4755952"
+      "block": "4973565"
     },
     "FBx_PriceFeed": {
-      "address": "0x735E3007d7DA978230587dc526874694003E293e",
+      "address": "0x303059196C4fDE32fC3c5da4412B81103954494a",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -422,21 +422,21 @@
         },
         8
       ],
-      "block": "4755954"
+      "block": "4973567"
     },
     "MSFTx": {
-      "address": "0xd5140A31785A59364ef612855aFCCF2d65146CE8",
+      "address": "0x174Fabfe46e5CB19ac6B7D09120B39DBBb33073F",
       "abi": "ERC20X",
       "constructorArguments": [
         "Microsoft X",
         "MSFTx",
-        "0xd240ba02F263767380eB3E70e212472D43872268",
-        "0x91d0E8484020ed62Efd3F693D37Cb141033B2163"
+        "0xD692aF94072B86DE792f63e21952944AcC54f9DC",
+        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
       ],
-      "block": "4755958"
+      "block": "4973572"
     },
     "MSFTx_PriceFeed": {
-      "address": "0x9095873A5A00b2BbE01bB69dD2367b7c51abDaCB",
+      "address": "0x52152CE8D7d85bB7be199a018a34c4d49453F7C1",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -445,21 +445,21 @@
         },
         8
       ],
-      "block": "4755959"
+      "block": "4973575"
     },
     "^GSPCx": {
-      "address": "0x895910b934f58651Dbc79C1c61A02415401F7B95",
+      "address": "0xDCF69d73EBBA68B92dCE6C463848a27a58D90dCc",
       "abi": "ERC20X",
       "constructorArguments": [
         "S&P 500 X",
         "^GSPCx",
-        "0xd240ba02F263767380eB3E70e212472D43872268",
-        "0x91d0E8484020ed62Efd3F693D37Cb141033B2163"
+        "0xD692aF94072B86DE792f63e21952944AcC54f9DC",
+        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
       ],
-      "block": "4755963"
+      "block": "4973580"
     },
     "^GSPCx_PriceFeed": {
-      "address": "0xbf7e6FCD0b1a1878AF154db17d05E1bc388DEa7F",
+      "address": "0xAf829EFd005E51bc5D5eD8cF8D2891BD0C9E2459",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -468,21 +468,21 @@
         },
         8
       ],
-      "block": "4755969"
+      "block": "4973582"
     },
     "NFLXx": {
-      "address": "0xaB374706a03cA1983794F92951E4d10a8054A6Ba",
+      "address": "0x5b7AdCf07d93Da5207A7223daEe5F708bF95a378",
       "abi": "ERC20X",
       "constructorArguments": [
         "Netflix X",
         "NFLXx",
-        "0xd240ba02F263767380eB3E70e212472D43872268",
-        "0x91d0E8484020ed62Efd3F693D37Cb141033B2163"
+        "0xD692aF94072B86DE792f63e21952944AcC54f9DC",
+        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
       ],
-      "block": "4755985"
+      "block": "4973588"
     },
     "NFLXx_PriceFeed": {
-      "address": "0x839cf988f0fBA2125b2bdAdF090FDbe69e758Ab3",
+      "address": "0x2CA6a03DB211aC3ac0324365A9809AC31A2c878a",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -491,21 +491,21 @@
         },
         8
       ],
-      "block": "4755990"
+      "block": "4973591"
     },
     "GOOGLx": {
-      "address": "0xf8D10995F623d8EeFD5B654aCe2D8835Ec78000e",
+      "address": "0xB8Dd9F6EA0EBF2DdFde319Fe73B732F6C4d43fe3",
       "abi": "ERC20X",
       "constructorArguments": [
         "Alphabet X",
         "GOOGLx",
-        "0xd240ba02F263767380eB3E70e212472D43872268",
-        "0x91d0E8484020ed62Efd3F693D37Cb141033B2163"
+        "0xD692aF94072B86DE792f63e21952944AcC54f9DC",
+        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
       ],
-      "block": "4756001"
+      "block": "4973597"
     },
     "GOOGLx_PriceFeed": {
-      "address": "0x202116F6A7cDFAcFb8f470A88C657BBcbD488de2",
+      "address": "0x06118c74b19959923750eb40B24Da1C5De18a068",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -514,21 +514,21 @@
         },
         8
       ],
-      "block": "4756006"
+      "block": "4973598"
     },
     "NVDAx": {
-      "address": "0x8Af44c239caf81fa5B35Eb2d6CCD7c7bcEd36a4D",
+      "address": "0xCcba23B2e82251a7305915C7d565cE06a042c738",
       "abi": "ERC20X",
       "constructorArguments": [
         "Nvidia X",
         "NVDAx",
-        "0xd240ba02F263767380eB3E70e212472D43872268",
-        "0x91d0E8484020ed62Efd3F693D37Cb141033B2163"
+        "0xD692aF94072B86DE792f63e21952944AcC54f9DC",
+        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
       ],
-      "block": "4756010"
+      "block": "4973601"
     },
     "NVDAx_PriceFeed": {
-      "address": "0x9e56E3fcD672931d0ac85bF318F89dB3b1714525",
+      "address": "0x349e5ec2d7F331fCD0a4902bfBf367663bE43692",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -537,21 +537,21 @@
         },
         8
       ],
-      "block": "4756012"
+      "block": "4973604"
     },
     "AMDx": {
-      "address": "0xAa85e9adfB561b5E10d6aE37AC3BCC5ecE1C2d32",
+      "address": "0x48CBe88c829f29cd3E5e48BEA67136f09aD1817C",
       "abi": "ERC20X",
       "constructorArguments": [
         "AMD X",
         "AMDx",
-        "0xd240ba02F263767380eB3E70e212472D43872268",
-        "0x91d0E8484020ed62Efd3F693D37Cb141033B2163"
+        "0xD692aF94072B86DE792f63e21952944AcC54f9DC",
+        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
       ],
-      "block": "4756016"
+      "block": "4973623"
     },
     "AMDx_PriceFeed": {
-      "address": "0x2B1e7F0139DcC951eD5c8c27f0E09F6fAfd7c1C8",
+      "address": "0xdf10eE574a7AC71510f8A5Ef2d7af5E76FBE4189",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -560,21 +560,21 @@
         },
         8
       ],
-      "block": "4756018"
+      "block": "4973628"
     },
     "USDsx": {
-      "address": "0x56dDFDC3A3D88d3d58Af80c8a35F2ab8fe8a684c",
+      "address": "0xF796F82086193E706E08cAdE796aE425Cce15C41",
       "abi": "ERC20X",
       "constructorArguments": [
         "US Dollar SX",
         "USDsx",
-        "0xd240ba02F263767380eB3E70e212472D43872268",
-        "0x91d0E8484020ed62Efd3F693D37Cb141033B2163"
+        "0xD692aF94072B86DE792f63e21952944AcC54f9DC",
+        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
       ],
-      "block": "4756023"
+      "block": "4973642"
     },
     "USDsx_PriceFeed": {
-      "address": "0x171dAEDce14d349d5200c3e018e5c4A3A220b67b",
+      "address": "0x9ff14E25Da7f78d5B62718d3bDE52fe988b6F335",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -583,36 +583,36 @@
         },
         8
       ],
-      "block": "4756024"
+      "block": "4973644"
     },
     "FX": {
-      "address": "0xc778D0298cabA45A3E1836416698E905eb4689E4",
+      "address": "0x07b148BB6Ad3Fd94134D6c812E88245dAca17fFA",
       "abi": "DebtPool",
       "constructorArguments": [],
-      "block": "4756030",
+      "block": "4973651",
       "implementations": {
         "undefined": {
           "address": "0x1e23eA2309982fDBa8F93E0Abc6e89b217109273",
           "source": "FX_undefined",
           "constructorArguments": [],
-          "block": "4756030"
+          "block": "4973651"
         }
       },
       "latest": "0x1e23eA2309982fDBa8F93E0Abc6e89b217109273"
     },
     "USDfx": {
-      "address": "0x33ad5b64b8246A728fA8AF81394FE6bDC560C796",
+      "address": "0x5C3a7E217812C282BC85D7d3068B91fF5A2096cb",
       "abi": "ERC20X",
       "constructorArguments": [
         "US Dollar FX",
         "USDfx",
-        "0xc778D0298cabA45A3E1836416698E905eb4689E4",
-        "0x91d0E8484020ed62Efd3F693D37Cb141033B2163"
+        "0x07b148BB6Ad3Fd94134D6c812E88245dAca17fFA",
+        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
       ],
-      "block": "4756038"
+      "block": "4973658"
     },
     "USDfx_PriceFeed": {
-      "address": "0xf9449d0E4622da122DF62b0106Dc7854d624B4D3",
+      "address": "0xf1b4307B26C010B1Db935f32b365Bbb4EdFb765d",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -621,21 +621,21 @@
         },
         8
       ],
-      "block": "4756039"
+      "block": "4973659"
     },
     "EURx": {
-      "address": "0x1A2e806aD4bDcD3d7B57f5DAdBEd2c58830c37C5",
+      "address": "0x99E8B5c4eafC167C39C9366dfb88f108f09121B0",
       "abi": "ERC20X",
       "constructorArguments": [
         "Euro X",
         "EURx",
-        "0xc778D0298cabA45A3E1836416698E905eb4689E4",
-        "0x91d0E8484020ed62Efd3F693D37Cb141033B2163"
+        "0x07b148BB6Ad3Fd94134D6c812E88245dAca17fFA",
+        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
       ],
-      "block": "4756044"
+      "block": "4973666"
     },
     "EURx_PriceFeed": {
-      "address": "0x7f68E28C1078249530Fd018aB3a94Bf553247292",
+      "address": "0x93E508708B662C78B60Ca8Cf378aA8E5D7F99330",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -644,21 +644,21 @@
         },
         8
       ],
-      "block": "4756046"
+      "block": "4973669"
     },
     "JPYx": {
-      "address": "0xBea25400c2b77b2749Ee262937fa230999eff344",
+      "address": "0x68dDCc82EeD0770eaF80d85fd511771CedBaB9ac",
       "abi": "ERC20X",
       "constructorArguments": [
         "Japanese Yen X",
         "JPYx",
-        "0xc778D0298cabA45A3E1836416698E905eb4689E4",
-        "0x91d0E8484020ed62Efd3F693D37Cb141033B2163"
+        "0x07b148BB6Ad3Fd94134D6c812E88245dAca17fFA",
+        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
       ],
-      "block": "4756050"
+      "block": "4973673"
     },
     "JPYx_PriceFeed": {
-      "address": "0x197D1d50E2c53FEAF6E2cBFFb660b579a8701947",
+      "address": "0x2aF0F22b00F6E05E605DB91c1434A78fd6959015",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -667,21 +667,21 @@
         },
         8
       ],
-      "block": "4756052"
+      "block": "4973674"
     },
     "GBPx": {
-      "address": "0xCfBd1b904baD7f893c611cf96F5AB13B7Ea7ca01",
+      "address": "0x538fb6E585ED16aABad497433C02C9E59358F26C",
       "abi": "ERC20X",
       "constructorArguments": [
         "British Pound X",
         "GBPx",
-        "0xc778D0298cabA45A3E1836416698E905eb4689E4",
-        "0x91d0E8484020ed62Efd3F693D37Cb141033B2163"
+        "0x07b148BB6Ad3Fd94134D6c812E88245dAca17fFA",
+        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
       ],
-      "block": "4756064"
+      "block": "4973680"
     },
     "GBPx_PriceFeed": {
-      "address": "0x3F4D29b99CAaAd141f29802B851C971cA2505e82",
+      "address": "0x91AC2F03b55CBD723eB1394ed0f0A1b7B69baEb1",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -690,21 +690,21 @@
         },
         8
       ],
-      "block": "4756070"
+      "block": "4973683"
     },
     "CHFx": {
-      "address": "0xAA716522dD5262E24C05c0Da8F38BA8A9453F10A",
+      "address": "0x4Da85614d0b0552dc7F6E43ad2D2538c442F1773",
       "abi": "ERC20X",
       "constructorArguments": [
         "Swiss Franc X",
         "CHFx",
-        "0xc778D0298cabA45A3E1836416698E905eb4689E4",
-        "0x91d0E8484020ed62Efd3F693D37Cb141033B2163"
+        "0x07b148BB6Ad3Fd94134D6c812E88245dAca17fFA",
+        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
       ],
-      "block": "4756085"
+      "block": "4973687"
     },
     "CHFx_PriceFeed": {
-      "address": "0xC5Fc1dF73F099cB2356675f1d8290D2b0f34dBeA",
+      "address": "0xB43A92020E56c0364B004268e4B509db7788295F",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -713,21 +713,21 @@
         },
         8
       ],
-      "block": "4756090"
+      "block": "4973691"
     },
     "CADx": {
-      "address": "0x1490E7D90Ce0d59e0868BEE86b83F6c18e3630B4",
+      "address": "0xE9eacf4d874ca7B00553114FE5F11F14e99774Fe",
       "abi": "ERC20X",
       "constructorArguments": [
         "Canadian Dollar X",
         "CADx",
-        "0xc778D0298cabA45A3E1836416698E905eb4689E4",
-        "0x91d0E8484020ed62Efd3F693D37Cb141033B2163"
+        "0x07b148BB6Ad3Fd94134D6c812E88245dAca17fFA",
+        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
       ],
-      "block": "4756095"
+      "block": "4973698"
     },
     "CADx_PriceFeed": {
-      "address": "0x7f01cff2a620eAfa0c81D23A89D748dFcbE6CFb1",
+      "address": "0xa56849488649a1d7018B9F4360b3Ec287498Afc6",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -736,21 +736,21 @@
         },
         8
       ],
-      "block": "4756097"
+      "block": "4973706"
     },
     "AUDx": {
-      "address": "0x1B0044efaB23dC24933c467C089Fbc8052814d29",
+      "address": "0x25e49A084e325fAc0FDacF3960c3726094D36bB3",
       "abi": "ERC20X",
       "constructorArguments": [
         "Australian Dollar X",
         "AUDx",
-        "0xc778D0298cabA45A3E1836416698E905eb4689E4",
-        "0x91d0E8484020ed62Efd3F693D37Cb141033B2163"
+        "0x07b148BB6Ad3Fd94134D6c812E88245dAca17fFA",
+        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
       ],
-      "block": "4756103"
+      "block": "4973723"
     },
     "AUDx_PriceFeed": {
-      "address": "0xd6A36ec54bcD8B3D0C6Aab383f27E13E1eB7cDaF",
+      "address": "0x563379cB774f823a2FC7689CCe267fDB3a70B949",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -759,21 +759,21 @@
         },
         8
       ],
-      "block": "4756104"
+      "block": "4973730"
     },
     "WONx": {
-      "address": "0xB96b92ac6EB2be0E8dA7A350747cb63B9bDe97CF",
+      "address": "0x26269E659aDb9Dda671699beFD93E7cf579c8166",
       "abi": "ERC20X",
       "constructorArguments": [
         "Korean Republic won X",
         "WONx",
-        "0xc778D0298cabA45A3E1836416698E905eb4689E4",
-        "0x91d0E8484020ed62Efd3F693D37Cb141033B2163"
+        "0x07b148BB6Ad3Fd94134D6c812E88245dAca17fFA",
+        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
       ],
-      "block": "4756107"
+      "block": "4973738"
     },
     "WONx_PriceFeed": {
-      "address": "0xE2f608F6F37133cC99b356721d915a8C448fe2B3",
+      "address": "0xde7df9b46cacA9642C55B61f8e0a475AB0E3Ce5f",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -782,21 +782,21 @@
         },
         8
       ],
-      "block": "4756110"
+      "block": "4973742"
     },
     "AEDx": {
-      "address": "0xFFf876345Cfe306Df746bAd4ACCdAb7fc6089bc8",
+      "address": "0x9cc88151ea2c95201eBF8691a7D30d66C0c14D00",
       "abi": "ERC20X",
       "constructorArguments": [
         "UAE Dirham X",
         "AEDx",
-        "0xc778D0298cabA45A3E1836416698E905eb4689E4",
-        "0x91d0E8484020ed62Efd3F693D37Cb141033B2163"
+        "0x07b148BB6Ad3Fd94134D6c812E88245dAca17fFA",
+        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
       ],
-      "block": "4756117"
+      "block": "4973755"
     },
     "AEDx_PriceFeed": {
-      "address": "0xEB1eCeca5D98c3F8388d539f4DC3197A766fE467",
+      "address": "0x977e4dd3CDDC6206D2fEab7914980184eB550638",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -805,21 +805,21 @@
         },
         8
       ],
-      "block": "4756118"
+      "block": "4973756"
     },
     "INRx": {
-      "address": "0x6E48f017938bEed9A90bb4C3ba9B4912606046Dc",
+      "address": "0x911F4Be4e61f5b6345d90A87E09F33422B2B4EbC",
       "abi": "ERC20X",
       "constructorArguments": [
         "Indian Rupee X",
         "INRx",
-        "0xc778D0298cabA45A3E1836416698E905eb4689E4",
-        "0x91d0E8484020ed62Efd3F693D37Cb141033B2163"
+        "0x07b148BB6Ad3Fd94134D6c812E88245dAca17fFA",
+        "0x3BF384F4cFF7F86157a107D502fF7432057c2886"
       ],
-      "block": "4756123"
+      "block": "4973761"
     },
     "INRx_PriceFeed": {
-      "address": "0xd6a05a37249C48f13DB7482B3EcdB74C9521cD73",
+      "address": "0x7B5C0220f2a39C252Daa0eA483EbEeBAA22240fc",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -828,7 +828,7 @@
         },
         8
       ],
-      "block": "4756124"
+      "block": "4973762"
     }
   },
   "sources": {

@@ -79,7 +79,7 @@ describe("Testing unlocker", function () {
     })
 
     it("index1: should not able to unlock", async function () {
-        const requestId = await unlockerContract.getRequestId(user1.address, '1');
+        const requestId = ethers.utils.solidityKeccak256(['address', 'uint256'], [user1.address, '1']);
         await expect(unlockerContract.connect(user1).unlock([requestId])).to.be.revertedWith("Unlock period has not passed");
     })
 

@@ -2,6 +2,8 @@
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import deploy from "../scripts/test";
+import initiatePool from "../scripts/test/initiate";
+
 import { time } from "@nomicfoundation/hardhat-network-helpers";
 import { ETH_ADDRESS } from "../scripts/utils/const";
 
@@ -22,6 +24,7 @@ describe("Rewards", function () {
 		susd = deployments.susd;
 		sbtc = deployments.sbtc;
 		seth = deployments.seth;
+		const pool2 = await initiatePool(synthex, oracle, {}, {}, deployments.system, sealedSyn);
 	});
 
 	it("Should deposit eth", async function () {
@@ -60,6 +63,12 @@ describe("Rewards", function () {
         expect(await sealedSyn.balanceOf(user1.address)).to.equal(ethers.constants.Zero);
         expect(await sealedSyn.balanceOf(user2.address)).to.equal(ethers.constants.Zero);
         await synthex['claimReward(address,address,address[])'](sealedSyn.address, user1.address, [cryptoPool.address]);
+        await synthex['claimReward(address,address,address[])'](sealedSyn.address, user2.address, [cryptoPool.address]);
+        expect(await sealedSyn.balanceOf(user1.address)).to.be.greaterThan(ethers.utils.parseEther("128100"));
+        expect(await sealedSyn.balanceOf(user2.address)).to.be.greaterThan(ethers.utils.parseEther("128100"));
+
+		// should not get rewards again
+		await synthex['claimReward(address,address,address[])'](sealedSyn.address, user1.address, [cryptoPool.address]);
         await synthex['claimReward(address,address,address[])'](sealedSyn.address, user2.address, [cryptoPool.address]);
         expect(await sealedSyn.balanceOf(user1.address)).to.be.greaterThan(ethers.utils.parseEther("128100"));
         expect(await sealedSyn.balanceOf(user2.address)).to.be.greaterThan(ethers.utils.parseEther("128100"));

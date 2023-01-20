@@ -1,7 +1,7 @@
 {
   "name": "synthex",
-  "version": "0.14.0",
-  "latest": "0.14.0",
+  "version": "0.15.0",
+  "latest": "0.15.0",
   "l0Admin": "0xf916784C4374e3C8919bA64c51877A0A3EB78341",
   "l1Admin": "0x4ac97E172A28c363206D12C04da0ca5F2CcF6781",
   "l2Admin": "0x0eD6a1F7a99E8Bc1c752E4515f7AB3aFe20BdBF7",
@@ -68,7 +68,8 @@
         {
           "name": "US Dollar CX",
           "symbol": "USDcx",
-          "price": "1.00"
+          "price": "1.00",
+          "isFeeToken": true
         },
         {
           "name": "Cardano X",
@@ -163,7 +164,8 @@
         {
           "name": "US Dollar SX",
           "symbol": "USDsx",
-          "price": "1.00"
+          "price": "1.00",
+          "isFeeToken": true
         }
       ]
     },
@@ -178,7 +180,8 @@
         {
           "name": "US Dollar FX",
           "symbol": "USDfx",
-          "price": "1.00"
+          "price": "1.00",
+          "isFeeToken": true
         },
         {
           "name": "Euro X",

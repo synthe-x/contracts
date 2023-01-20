@@ -3,7 +3,7 @@ import { Contract } from "ethers";
 import { ETH_ADDRESS } from '../utils/const';
 const { upgrades } = require("hardhat");
 
-export default async function initiate(synthex: Contract, oracle: Contract, deployments: any, config: any, addressStorage: Contract, sealedSYN: Contract) {
+export default async function initiatePool(synthex: Contract, oracle: Contract, deployments: any, config: any, addressStorage: Contract, sealedSYN: Contract) {
 
 	// create pool
 	const SyntheXPool = await ethers.getContractFactory("DebtPool");
@@ -54,6 +54,7 @@ export default async function initiate(synthex: Contract, oracle: Contract, depl
 	await seth.deployed();
 	await oracle.setFeed(seth.address, ethPriceFeed.address);
 	await pool.enableSynth(seth.address);
+
 
 	return { ethPriceFeed, sbtcPriceFeed, pool, susd, sbtc, seth };
 }

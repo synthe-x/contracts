@@ -8,6 +8,7 @@ const { upgrades } = require("hardhat");
 
 export async function deploy(deployments: any, config: any, deployerAddress: string) {
   const versionSuffix = `${config.version.split(".")[0]}.${config.version.split(".")[1]}.x`
+  console.log("Deploying ", versionSuffix, "🚀");
 
   // deploy storage contract
   const system = await _deploy("System", [deployerAddress, deployerAddress, deployerAddress, deployerAddress], deployments)

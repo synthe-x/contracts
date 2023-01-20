@@ -1,7 +1,7 @@
 {
   "name": "synthex",
-  "version": "0.5.0",
-  "latest": "0.5.0",
+  "version": "0.6.0",
+  "latest": "0.6.0",
   "l0Admin": "0x084cD22eA15E4C262408e561a5AFa8431Bd7fa5d",
   "l1Admin": "0x2646306d3191AEE905bf9065bD1B7cC71c9036D0",
   "l2Admin": "0x46c18c6d5526E17B34a3deB43e5E9Ba2A659c23a",
@@ -23,14 +23,14 @@
       "symbol": "WETH",
       "volatilityRatio": "0.8",
       "feed": "0x62CAe0FA2da220f43a51F86Db2EDb36DcA9A5A08",
-      "cap": "1000000000000000000000"
+      "cap": "10000"
     },
     {
       "name": "USD Coin",
       "symbol": "USDC",
       "volatilityRatio": "0.7",
       "feed": "0x1692Bdd32F31b831caAc1b0c9fAF68613682813b",
-      "cap": "10000000000000000000000000"
+      "cap": "1000000"
     },
     {
       "name": "Ethereum",
@@ -38,7 +38,7 @@
       "volatilityRatio": "0.8",
       "feed": "0x62CAe0FA2da220f43a51F86Db2EDb36DcA9A5A08",
       "address": "0x0000000000000000000000000000000000000000",
-      "cap": "100000000000000000000000"
+      "cap": "10"
     }
   ],
   "tradingPools": [
@@ -68,7 +68,8 @@
         {
           "name": "US Dollar CX",
           "symbol": "USDcx",
-          "price": "1.00"
+          "price": "1.00",
+          "isFeeToken": true
         },
         {
           "name": "Cardano X",
@@ -163,7 +164,8 @@
         {
           "name": "US Dollar SX",
           "symbol": "USDsx",
-          "price": "1.00"
+          "price": "1.00",
+          "isFeeToken": true
         }
       ]
     },
@@ -178,7 +180,8 @@
         {
           "name": "US Dollar FX",
           "symbol": "USDfx",
-          "price": "1.00"
+          "price": "1.00",
+          "isFeeToken": true
         },
         {
           "name": "Euro X",
