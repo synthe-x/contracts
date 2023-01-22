@@ -17,6 +17,15 @@
     "unlockPeriod": "15552000",
     "percReleaseAtUnlock": "500"
   },
+  "crowdsale": {
+    "rate": "15552000",
+    "startTime": "15552000",
+    "endTime": "500",
+    "percReleaseAtUnlock": "500",
+    "lockPeriod": "200000",
+    "unlockPeriod": "200000",
+    "lockedTill": "200000"
+  },
   "collaterals": [
     {
       "name": "Wrapped ETH",

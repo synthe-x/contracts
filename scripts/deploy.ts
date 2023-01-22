@@ -47,8 +47,14 @@ export async function deploy(deployments: any, config: any, deployerAddress: str
     deployments
   );
 
+   // deploy crowdsale
+   const crowdsale = await _deploy(
+    "Crowdsale",[config.crowdsale.rate, config.crowdsale.startTime, config.crowdsale.endTime, config.crowdsale.lockPeriod, config.crowdsale.unlockPeriod, config.crowdsale.lockedTill, ethers.utils.parseEther(config.crowdsale.percReleaseAtUnlock), sealedSYN.address, syn.address, system.address], 
+    deployments
+  );
+
   // deploy multicall
   await _deploy("Multicall2", [], deployments);
 
-  return { synthex, oracle, system, syn, sealedSYN, stakingRewards, vault, unlocker };
+  return { synthex, oracle, system, syn, sealedSYN, stakingRewards, vault, unlocker, crowdsale };
 }
