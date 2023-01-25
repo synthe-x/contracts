@@ -9,13 +9,14 @@
   "safeCRatio": "1.3",
   "debtRewardAlloc": "1000000",
   "stakingRewards": {
-    "reward": "6000",
-    "days": "30"
+    "reward": "0",
+    "days": "0"
   },
   "unlocker": {
     "lockupPeriod": "15552000",
     "unlockPeriod": "15552000",
-    "percReleaseAtUnlock": "500"
+    "percReleaseAtUnlock": "500",
+    "quota": "1000000"
   },
   "collaterals": [
     {

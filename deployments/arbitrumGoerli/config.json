@@ -22,23 +22,39 @@
     {
       "name": "Wrapped ETH",
       "symbol": "WETH",
-      "volatilityRatio": "0.8",
+      "volatilityRatio": "0.85",
       "feed": "0x62CAe0FA2da220f43a51F86Db2EDb36DcA9A5A08",
       "cap": "10000"
     },
     {
       "name": "USD Coin",
       "symbol": "USDC",
-      "volatilityRatio": "0.7",
+      "volatilityRatio": "0.95",
       "feed": "0x1692Bdd32F31b831caAc1b0c9fAF68613682813b",
       "cap": "1000000"
     },
     {
       "name": "Ethereum",
       "symbol": "ETH",
-      "volatilityRatio": "0.8",
+      "volatilityRatio": "0.85",
       "feed": "0x62CAe0FA2da220f43a51F86Db2EDb36DcA9A5A08",
       "address": "0x0000000000000000000000000000000000000000",
+      "cap": "10"
+    },
+    {
+      "name": "Aave Arbitrum USDC",
+      "symbol": "aArbUSDC",
+      "volatilityRatio": "0.95",
+      "feed": "0x1692Bdd32F31b831caAc1b0c9fAF68613682813b",
+      "address": "0xd9933e10d6d9453FFaCF1236aF7ea1a61EA4D2c5",
+      "cap": "100000"
+    },
+    {
+      "name": "Aave Arbitrum BTC",
+      "symbol": "aArbWBTC",
+      "volatilityRatio": "0.8",
+      "feed": "0x6550bc2301936011c1334555e62A87705A81C12C",
+      "address": "0xa6133BaA380826F716cAa419240a353B58d545A2",
       "cap": "10"
     }
   ],

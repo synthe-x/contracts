@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./SyntheXToken.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "./SealedSYN.sol";
+import "./LockedSYN.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
@@ -151,9 +151,9 @@ contract Crowdsale is Ownable,ReentrancyGuard {
    }
 
 
-   function getRate() public view returns(uint256){
+  function getRate() public view returns(uint256){
          return rate;
-     }
+  }
 
 
 

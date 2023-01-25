@@ -258,6 +258,8 @@ contract DebtPool is IDebtPool, ERC20Upgradeable {
      * @param _amount The amount of synths to issue
      */
     function mintSynth(address _synth, address _user, uint _amount, uint amountUSD) virtual override public onlyInternal returns(uint) {
+        // check if synth is enabled
+        require(synths[_synth], "SyntheXPool: Synth not enabled");
         // Fetch the fee and cache it
         uint _fee = fee;
         // Mint (amount - fee) toSynth to user

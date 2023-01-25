@@ -49,7 +49,7 @@ interface ISyntheX {
     function getUserTotalDebtUSD(address _account) external view returns(uint);
     function getAdjustedUserTotalDebtUSD(address _account) external view returns(uint) ;
     function oracle() external view returns(IPriceOracle);
-
+    function getBorrowCapacity(address _account) external view returns(uint);
 
     /* -------------------------------------------------------------------------- */
     /*                               Events                                       */

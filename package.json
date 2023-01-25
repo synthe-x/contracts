@@ -6,7 +6,7 @@
     "console": "hardhat console",
     "node": "hardhat node",
     "deploy": "hardhat run scripts --network hardhat",
-    "slither": "slither . --checklist --markdown-root --codex docs/SECURITY.md"
+    "slither": "slither . --checklist docs/SECURITY.md"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^2.0.0",

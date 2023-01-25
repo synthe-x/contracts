@@ -22,7 +22,7 @@ export async function deploy(deployments: any, config: any, deployerAddress: str
   _deployDefender("SyntheXToken_"+versionSuffix, syn);
 
   // deploy Sealed SYN
-  const sealedSYN = await _deploy("SealedSYN", [system.address], deployments);
+  const sealedSYN = await _deploy("LockedSYN", [system.address], deployments);
   // _deployDefender("SealedSYN_"+versionSuffix, sealedSYN);
   
   // deploy synthex
@@ -35,7 +35,7 @@ export async function deploy(deployments: any, config: any, deployerAddress: str
   const stakingRewards = await _deploy("StakingRewards", [sealedSYN.address, sealedSYN.address, system.address, config.stakingRewards.days * 24 * 60 * 60], deployments)
   // _deployDefender("StakingRewards_"+versionSuffix, stakingRewards);
   await sealedSYN.grantMinterRole(stakingRewards.address);
-  await stakingRewards.notifyReward(ethers.utils.parseEther(config.stakingRewards.reward));
+  if(Number(config.stakingRewards.reward) > 0) await stakingRewards.notifyReward(ethers.utils.parseEther(config.stakingRewards.reward));
 
   // deploy price oracle
   const oracle = await _deploy("PriceOracle", [system.address], deployments);

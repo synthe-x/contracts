@@ -5,17 +5,17 @@ import "./ERC20Sealed.sol";
 import "../System.sol";
 
 /**
- * @title Sealed SYN
+ * @title Locked SYN
  * @author SyntheX
  * @custom:security-contact prasad@chainscore.finance
  * @notice Sealed tokens cannot be transferred
  * @notice Sealed tokens can only be minted and burned
  */
-contract SealedSYN is ERC20Sealed {
+contract LockedSYN is ERC20Sealed {
     /// @notice AddressStorage contract
     System public system;
     
-    constructor(address _system) ERC20("Sealed SYN", "xSYN") {
+    constructor(address _system) ERC20("Locked SYN", "xSYN") {
         system = System(_system);
     }
 

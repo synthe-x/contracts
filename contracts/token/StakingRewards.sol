@@ -81,7 +81,6 @@ contract StakingRewards is IStaking, ReentrancyGuard, Pausable {
     /*                               View Functions                               */
     /* -------------------------------------------------------------------------- */
 
-    // 
     /**
      * @notice Returns the last timestamp when reward distribution occured
      * @dev Returns current timestamp if its less than PeriodFinish value otherwise PeriodFinish value

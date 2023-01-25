@@ -17,7 +17,7 @@ describe("Testing unlocker", function () {
 
 		const TokenUnlocker = await ethers.getContractFactory("TokenUnlocker");
         const erc20 = await ethers.getContractFactory("MockToken");
-        const erc20Sealed = await ethers.getContractFactory("SealedSYN");
+        const erc20Sealed = await ethers.getContractFactory("LockedSYN");
         token = deployments.syn;
         sealed = deployments.sealedSYN;
         unlockerContract = deployments.unlocker;

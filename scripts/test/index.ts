@@ -22,6 +22,8 @@ export default async function main(deployer: SignerWithAddress, l0Admin = deploy
 	const otherContracts =  await initiate(contracts.synthex, contracts.oracle, deployments, config, contracts.system, contracts.sealedSYN);
 
 	// set admins
+	await contracts.sealedSYN.renounceRole(await contracts.sealedSYN.MINTER_ROLE(), deployer.address);
+
 	await contracts.system.grantRole(DEFAULT_ADMIN_ROLE, l0Admin.address);
 	await contracts.system.renounceRole(L1_ADMIN_ROLE, deployer.address);
 	await contracts.system.renounceRole(L2_ADMIN_ROLE, deployer.address);
