@@ -33,10 +33,14 @@ const config: HardhatUserConfig = {
       url: "https://nd-389-970-162.p2pify.com/17b0fbe8312c9ff963057d537b9c7864",
       accounts: [`0x${PRIVATE_KEY}`],
       chainId: 421613,
-    }
+    },
+    localhost: {
+      url: "http://localhost:8545",
+      chainId: 1337
+    },
   },
   gasReporter: {
-    enabled: true,
+    enabled: false,
     currency: 'USD',
     gasPrice: 13,
     coinmarketcap: '54e57674-6e99-404b-8528-cbf6a9f1e471'

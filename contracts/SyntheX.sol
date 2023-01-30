@@ -262,7 +262,7 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         // issue synth and debt
         _amount = DebtPool(_debtPool).mint(_synth, msg.sender, msg.sender, _amount, amountUSD);
 
-        // ensure [after debt] health factor is positive
+        // ensure that [after issuing debt] health factor is positive
         require(healthFactor(msg.sender) >= safeCRatio, "Health factor below safeCRatio");
 
         // emit event

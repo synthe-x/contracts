@@ -1,7 +1,7 @@
-// import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
+import { time, loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import deploy from "../scripts/test";
+import main from "../scripts/main";
 import { ETH_ADDRESS } from "../scripts/utils/const";
 
 describe("SyntheX", function () {
@@ -13,13 +13,13 @@ describe("SyntheX", function () {
 		// Contracts are deployed using the first signer/account by default
 		[owner, user1, user2, user3] = await ethers.getSigners();
 
-		const deployments = await deploy(owner);
+		const deployments = await loadFixture(main);
 		synthex = deployments.synthex;
 		oracle = deployments.oracle;
-		cryptoPool = deployments.pool;
-		susd = deployments.susd;
-		sbtc = deployments.sbtc;
-		seth = deployments.seth;
+		cryptoPool = deployments.pools[0];
+		sbtc = deployments.poolSynths[0][0];
+		seth = deployments.poolSynths[0][1];
+		susd = deployments.poolSynths[0][2];
 	});
 
 	it("Should stake eth", async function () {

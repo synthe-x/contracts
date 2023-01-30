@@ -1,9 +1,7 @@
-// import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
+import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
-import { BigNumber } from "ethers";
 import { ethers } from "hardhat";
-import deploy from "../../scripts/test";
-import { ETH_ADDRESS } from "../../scripts/utils/const";
+import main from "../../scripts/main";
 
 describe("Testing Staking Rewards", function () {
 	let sealedSyn: any, syn: any, stakingRewards: any;
@@ -13,7 +11,7 @@ describe("Testing Staking Rewards", function () {
 		// Contracts are deployed using the first signer/account by default
 		[owner, user1, user2, user3] = await ethers.getSigners();
 
-		const deployments = await deploy(owner);
+		const deployments = await loadFixture(main);
 		syn = deployments.syn;
 		sealedSyn = deployments.sealedSYN;
 		stakingRewards = deployments.stakingRewards;

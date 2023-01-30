@@ -2,7 +2,8 @@
   "name": "hardhat-project",
   "scripts": {
     "compile": "hardhat compile",
-    "test": "hardhat test --network hardhat",
+    "test": "hardhat test --network localhost",
+    "test:fork": "hardhat --config hardhat-fork.config.ts test --network hardhat",
     "console": "hardhat console",
     "node": "hardhat node",
     "deploy": "hardhat run scripts --network hardhat",
@@ -25,6 +26,7 @@
     "typescript": "^4.9.3"
   },
   "dependencies": {
+    "@aave/core-v3": "^1.17.1",
     "@nomicfoundation/hardhat-chai-matchers": "^1.0.5",
     "@nomicfoundation/hardhat-network-helpers": "^1.0.7",
     "@openzeppelin/contracts": "^4.7.3",

@@ -1,8 +1,7 @@
-// import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
+import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import initiate from "../../scripts/test";
-import { time } from "@nomicfoundation/hardhat-network-helpers";
+import main from "../../scripts/main";
 
 describe("Testing unlocker", function () {
 
@@ -13,11 +12,7 @@ describe("Testing unlocker", function () {
 		// Contracts are deployed using the first signer/account by default
         [owner, user1, user2] = await ethers.getSigners();
 
-        const deployments = await initiate(owner);
-
-		const TokenUnlocker = await ethers.getContractFactory("TokenUnlocker");
-        const erc20 = await ethers.getContractFactory("MockToken");
-        const erc20Sealed = await ethers.getContractFactory("LockedSYN");
+		const deployments = await loadFixture(main);
         token = deployments.syn;
         sealed = deployments.sealedSYN;
         unlockerContract = deployments.unlocker;

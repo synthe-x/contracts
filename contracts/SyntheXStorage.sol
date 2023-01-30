@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./PriceOracle.sol";
+import "./oracle/PriceOracle.sol";
 import "./token/SyntheXToken.sol";
 import "./utils/AddressStorage.sol";
 

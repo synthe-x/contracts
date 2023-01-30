@@ -8,7 +8,6 @@ import "./LockedSYN.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-
 // Crowdsale contract that allows users to buy SYN tokens with ETH
 // Issued tokens are released after 180 days
 contract Crowdsale is Ownable,ReentrancyGuard {

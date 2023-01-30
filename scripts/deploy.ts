@@ -2,16 +2,16 @@ import hre, { ethers } from "hardhat";
 import { PRICE_ORACLE, SYNTHEX, VAULT } from "./utils/const";
 import { _deploy } from './utils/helper';
 import { _deploy as _deployDefender, _propose as _proposeDefender } from './utils/defender';
+import { Contract } from 'ethers';
+import { SyntheX } from '../typechain-types/contracts/SyntheX';
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
-import { BigNumber } from 'ethers';
-const { upgrades } = require("hardhat");
-
-export async function deploy(deployments: any, config: any, deployerAddress: string) {
+export async function deploy(deployments: any, config: any, deployer: SignerWithAddress): Promise<IDeploymentResult> {
   const versionSuffix = `${config.version.split(".")[0]}.${config.version.split(".")[1]}.x`
   console.log("Deploying ", versionSuffix, "🚀");
 
   // deploy storage contract
-  const system = await _deploy("System", [deployerAddress, deployerAddress, deployerAddress, deployerAddress], deployments)
+  const system = await _deploy("System", [deployer.address, deployer.address, deployer.address, deployer.address], deployments)
   
   // vault
   const vault = await _deploy("Vault", [system.address], deployments);
@@ -48,7 +48,7 @@ export async function deploy(deployments: any, config: any, deployerAddress: str
     [system.address, sealedSYN.address, syn.address, config.unlocker.lockupPeriod, config.unlocker.unlockPeriod, ethers.utils.parseEther(config.unlocker.percReleaseAtUnlock)], 
     deployments
   );
-  await sealedSYN.grantMinterRole(deployerAddress);
+  await sealedSYN.grantMinterRole(deployer.address);
   // mint tokens to unlocker
   await sealedSYN.mint(unlocker.address, ethers.utils.parseEther(config.unlocker.quota));
 
@@ -56,4 +56,15 @@ export async function deploy(deployments: any, config: any, deployerAddress: str
   await _deploy("Multicall2", [], deployments);
 
   return { synthex, oracle, system, syn, sealedSYN, stakingRewards, vault, unlocker };
+}
+
+export interface IDeploymentResult {
+  synthex: Contract;
+  oracle: Contract;
+  system: Contract;
+  syn: Contract;
+  sealedSYN: Contract;
+  stakingRewards: Contract;
+  vault: Contract;
+  unlocker: Contract;
 }

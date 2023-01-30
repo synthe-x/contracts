@@ -1,11 +1,11 @@
 {
   "name": "synthex",
-  "version": "0.17.0",
-  "latest": "0.17.0",
-  "l0Admin": "0xf916784C4374e3C8919bA64c51877A0A3EB78341",
-  "l1Admin": "0x4ac97E172A28c363206D12C04da0ca5F2CcF6781",
-  "l2Admin": "0x0eD6a1F7a99E8Bc1c752E4515f7AB3aFe20BdBF7",
-  "governanceModule": "0x46c18c6d5526E17B34a3deB43e5E9Ba2A659c23a",
+  "version": "0.8.0",
+  "latest": "0.8.0",
+  "l0Admin": "0x084cD22eA15E4C262408e561a5AFa8431Bd7fa5d",
+  "l1Admin": "0x2646306d3191AEE905bf9065bD1B7cC71c9036D0",
+  "l2Admin": "0x46c18c6d5526E17B34a3deB43e5E9Ba2A659c23a",
+  "governanceModule": "0x780580fd8AEa47b93414Fa6693123049EC7aED55",
   "safeCRatio": "2",
   "debtRewardAlloc": "1000000",
   "stakingRewards": {
@@ -22,24 +22,24 @@
     {
       "name": "Wrapped ETH",
       "symbol": "WETH",
-      "volatilityRatio": "0.8",
-      "price": "1000",
-      "cap": "1000000000000000000000"
+      "volatilityRatio": "0.85",
+      "feed": "0x62CAe0FA2da220f43a51F86Db2EDb36DcA9A5A08",
+      "cap": "10000"
     },
     {
       "name": "USD Coin",
       "symbol": "USDC",
-      "volatilityRatio": "0.7",
-      "price": "1",
-      "cap": "10000000000000000000000000"
+      "volatilityRatio": "0.95",
+      "feed": "0x1692Bdd32F31b831caAc1b0c9fAF68613682813b",
+      "cap": "1000000"
     },
     {
       "name": "Ethereum",
       "symbol": "ETH",
-      "volatilityRatio": "0.8",
-      "price": "1000",
+      "volatilityRatio": "0.85",
+      "feed": "0x62CAe0FA2da220f43a51F86Db2EDb36DcA9A5A08",
       "address": "0x0000000000000000000000000000000000000000",
-      "cap": "100000000000000000000000"
+      "cap": "100"
     }
   ],
   "tradingPools": [
@@ -54,12 +54,12 @@
         {
           "name": "Bitcoin X",
           "symbol": "BTCx",
-          "price": "20000"
+          "feed": "0x6550bc2301936011c1334555e62A87705A81C12C"
         },
         {
           "name": "Ethereum X",
           "symbol": "ETHx",
-          "price": "1000"
+          "feed": "0x62CAe0FA2da220f43a51F86Db2EDb36DcA9A5A08"
         },
         {
           "name": "Binance Coin X",
@@ -85,7 +85,7 @@
         {
           "name": "Chainlink X",
           "symbol": "LINKx",
-          "price": "4"
+          "feed": "0xd28Ba6CA3bB72bF371b80a2a0a33cBcf9073C954"
         },
         {
           "name": "Uniswap X",
