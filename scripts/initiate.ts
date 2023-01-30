@@ -36,13 +36,24 @@ export async function initiate(
     let feed: string|Contract = config.collaterals[i].feed as string;
 
     // handle compound based collateral (cTokens)
-    let compound = config.collaterals[i].compound;
-    if(compound){
-      feed = compound.market;
-      feed = await _deploy('CompoundOracle', [compound.comptroller, compound.market, config.collaterals[i].decimals], deployments, {name: `${config.collaterals[i].symbol}_PriceFeed`});
+    
+    if(config.collaterals[i].isCToken){
+      const cToken = await ethers.getContractAt('CTokenInterface', collateral);
+      const comptroller = await cToken.comptroller();
+      feed = await _deploy('CompoundOracle', [comptroller, cToken.address, config.collaterals[i].decimals], deployments, {name: `${config.collaterals[i].symbol}_PriceFeed`});
       console.log(`Price of ${config.collaterals[i].symbol} is ${ethers.utils.formatUnits(await feed.latestAnswer(), (await feed.decimals()) + 18)}`);
       feed = feed.address;
     }
+
+    if(config.collaterals[i].isAToken){
+      const aToken = await ethers.getContractAt('IAToken', collateral);
+      const underlying = await aToken.UNDERLYING_ASSET_ADDRESS();
+      feed = await _deploy('AAVEOracle', [underlying, config.collaterals[i].poolAddressesProvider, config.collaterals[i].decimals], deployments, {name: `${config.collaterals[i].symbol}_PriceFeed`});
+      console.log(`Price of ${config.collaterals[i].symbol} is ${ethers.utils.formatUnits(await feed.latestAnswer(), (await feed.decimals()) + 8)}`);
+      feed = feed.address;
+    }
+
+
     if(!collateral){
       // deploy collateral token
       collateral = await _deploy('MockToken', [config.collaterals[i].name, config.collaterals[i].symbol, config.collaterals[i].decimals], deployments, {name: config.collaterals[i].symbol});

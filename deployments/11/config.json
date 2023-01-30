@@ -1,7 +1,7 @@
 {
   "name": "synthex",
-  "version": "0.58.0",
-  "latest": "0.58.0",
+  "version": "0.59.0",
+  "latest": "0.59.0",
   "l0Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
   "l1Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
   "l2Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
@@ -26,6 +26,7 @@
       "volatilityRatio": "0.9",
       "price": "1000",
       "address": "0x0000000000000000000000000000000000000000",
+      "feed": "",
       "cap": "100000000000000000000000"
     },
     {
@@ -40,10 +41,8 @@
       "name": "Compound Ether",
       "symbol": "cETH",
       "decimals": 18,
-      "compound": {
-        "comptroller": "0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B",
-        "market": "0x4Ddc2D193948926D02f9B1fE9e1daa0718270ED5"
-      },
+      "address": "0x4Ddc2D193948926D02f9B1fE9e1daa0718270ED5",
+      "isCToken": true,
       "volatilityRatio": "0.9",
       "price": "1",
       "cap": "10000000000000000000000000"
@@ -52,13 +51,33 @@
       "name": "Compound USD Coin",
       "symbol": "cUSDC",
       "decimals": 6,
-      "compound": {
-        "comptroller": "0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B",
-        "market": "0x39AA39c021dfbaE8faC545936693aC917d5E7563"
-      },
+      "address": "0x39AA39c021dfbaE8faC545936693aC917d5E7563",
+      "isCToken": true,
       "volatilityRatio": "0.95",
       "price": "1",
       "cap": "10000000000000000000000000"
+    },
+    {
+      "name": "Aave Ethereum WETH",
+      "symbol": "aEthWETH",
+      "decimals": 18,
+      "address": "0x4d5F47FA6A74757f35C14fD3a6Ef8E3C9BC514E8",
+      "isAToken": true,
+      "poolAddressesProvider": "0x2f39d218133AFaB8F2B819B1066c7E434Ad94E9e",
+      "volatilityRatio": "0.9",
+      "price": "1",
+      "cap": "10000000000000000000000"
+    },
+    {
+      "name": "Aave Ethereum USDC",
+      "symbol": "aEthUSDC",
+      "decimals": 6,
+      "address": "0x98C23E9d8f34FEFb1B7BD6a91B7FF122F4e16F5c",
+      "isAToken": true,
+      "poolAddressesProvider": "0x2f39d218133AFaB8F2B819B1066c7E434Ad94E9e",
+      "volatilityRatio": "0.95",
+      "price": "1",
+      "cap": "10000000000000000000000"
     }
   ],
   "tradingPools": [

@@ -39,6 +39,9 @@ interface CTokenInterface {
      */
     function underlying() external view returns(address);
 
+    function comptroller() external view returns(address);
+
+
     /*** User Interface ***/
 
     function mint(uint mintAmount) external returns (uint);
