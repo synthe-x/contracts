@@ -1,7 +1,7 @@
 {
   "name": "synthex",
-  "version": "0.45.0",
-  "latest": "0.45.0",
+  "version": "0.58.0",
+  "latest": "0.58.0",
   "l0Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
   "l1Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
   "l2Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
@@ -20,26 +20,45 @@
   },
   "collaterals": [
     {
-      "name": "Wrapped ETH",
-      "symbol": "WETH",
+      "name": "Ethereum",
+      "symbol": "ETH",
+      "decimals": 18,
       "volatilityRatio": "0.9",
       "price": "1000",
-      "cap": "1000000000000000000000"
+      "address": "0x0000000000000000000000000000000000000000",
+      "cap": "100000000000000000000000"
     },
     {
       "name": "USD Coin",
       "symbol": "USDC",
+      "decimals": 18,
       "volatilityRatio": "0.95",
       "price": "1",
       "cap": "10000000000000000000000000"
     },
     {
-      "name": "Ethereum",
-      "symbol": "ETH",
+      "name": "Compound Ether",
+      "symbol": "cETH",
+      "decimals": 18,
+      "compound": {
+        "comptroller": "0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B",
+        "market": "0x4Ddc2D193948926D02f9B1fE9e1daa0718270ED5"
+      },
       "volatilityRatio": "0.9",
-      "price": "1000",
-      "address": "0x0000000000000000000000000000000000000000",
-      "cap": "100000000000000000000000"
+      "price": "1",
+      "cap": "10000000000000000000000000"
+    },
+    {
+      "name": "Compound USD Coin",
+      "symbol": "cUSDC",
+      "decimals": 6,
+      "compound": {
+        "comptroller": "0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B",
+        "market": "0x39AA39c021dfbaE8faC545936693aC917d5E7563"
+      },
+      "volatilityRatio": "0.95",
+      "price": "1",
+      "cap": "10000000000000000000000000"
     }
   ],
   "tradingPools": [

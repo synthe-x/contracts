@@ -3,7 +3,6 @@ import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import main from "../scripts/main";
-import deploy from "../scripts/test/user1_user2_deposited_issues";
 import { ETH_ADDRESS } from "../scripts/utils/const";
 
 describe("Testing liquidation", function () {

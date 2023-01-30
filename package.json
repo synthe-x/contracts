@@ -6,7 +6,8 @@
     "test:fork": "hardhat --config hardhat-fork.config.ts test --network hardhat",
     "console": "hardhat console",
     "node": "hardhat node",
-    "deploy": "hardhat run scripts --network hardhat",
+    "deploy": "hardhat run scripts --network localhost",
+    "deploy:fork": "hardhat --config hardhat-fork.config.ts run scripts --network hardhat",
     "slither": "slither . --checklist docs/SECURITY.md"
   },
   "devDependencies": {

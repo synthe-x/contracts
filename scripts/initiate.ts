@@ -1,5 +1,5 @@
 import hre, { ethers, upgrades } from "hardhat";
-import { Contract } from 'ethers';
+import { BigNumber, Contract } from 'ethers';
 import { _deploy } from "./utils/helper";
 import { _deploy as _deployDefender } from "./utils/defender";
 import { IDeploymentResult } from './deploy';
@@ -33,13 +33,23 @@ export async function initiate(
 
   for(let i = 0; i < config.collaterals.length; i++){
     let collateral: string|Contract = config.collaterals[i].address as string;
+    let feed: string|Contract = config.collaterals[i].feed as string;
+
+    // handle compound based collateral (cTokens)
+    let compound = config.collaterals[i].compound;
+    if(compound){
+      feed = compound.market;
+      feed = await _deploy('CompoundOracle', [compound.comptroller, compound.market, config.collaterals[i].decimals], deployments, {name: `${config.collaterals[i].symbol}_PriceFeed`});
+      console.log(`Price of ${config.collaterals[i].symbol} is ${ethers.utils.formatUnits(await feed.latestAnswer(), (await feed.decimals()) + 18)}`);
+      feed = feed.address;
+    }
     if(!collateral){
       // deploy collateral token
-      collateral = await _deploy('MockToken', [config.collaterals[i].name, config.collaterals[i].symbol], deployments, {name: config.collaterals[i].symbol});
+      collateral = await _deploy('MockToken', [config.collaterals[i].name, config.collaterals[i].symbol, config.collaterals[i].decimals], deployments, {name: config.collaterals[i].symbol});
     } else {
       collateral = await ethers.getContractAt('MockToken', collateral);
     }
-    let feed: string|Contract = config.collaterals[i].feed as string;
+
     if(!feed){
       // deploy price feed
       feed = await _deploy('MockPriceFeed', [ethers.utils.parseUnits(config.collaterals[i].price, 8), 8], deployments, {name: `${config.collaterals[i].symbol}_PriceFeed`});
