@@ -24,17 +24,8 @@
       "symbol": "ETH",
       "decimals": 18,
       "volatilityRatio": "0.9",
-      "price": "1000",
+      "feed": "0xD4a33860578De61DBAbDc8BFdb98FD742fA7028e",
       "address": "0x0000000000000000000000000000000000000000",
-      "cap": "100000000000000000000000"
-    },
-    {
-      "name": "Wrapped ETH",
-      "symbol": "WETH",
-      "decimals": 18,
-      "volatilityRatio": "0.9",
-      "feed": "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419",
-      "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
       "cap": "100000000000000000000000"
     },
     {
@@ -42,24 +33,22 @@
       "symbol": "wBTC",
       "decimals": 18,
       "volatilityRatio": "0.8",
-      "feed": "0xfdFD9C85aD200c506Cf9e21F1FD8dd01932FBB23",
-      "cap": "10000000000000000000000000",
-      "isFeedSecondary": true,
-      "secondarySource": "0xF4030086522a5bEEa4988F8cA5B36dbC97BeE88c"
+      "feed": "0xA39434A63A52E749F02807ae27335515BA4b07F7",
+      "cap": "10000000000000000000000000"
     },
     {
       "name": "USD Coin",
       "symbol": "USDC",
       "decimals": 18,
       "volatilityRatio": "0.95",
-      "feed": "0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6",
+      "feed": "0xAb5c49580294Aff77670F839ea425f5b78ab3Ae7",
       "cap": "10000000000000000000000000"
     },
     {
       "name": "Compound Ether",
       "symbol": "cETH",
       "decimals": 18,
-      "address": "0x4Ddc2D193948926D02f9B1fE9e1daa0718270ED5",
+      "address": "0x64078a6189Bf45f80091c6Ff2fCEe1B15Ac8dbde",
       "isCToken": true,
       "volatilityRatio": "0.9",
       "cap": "10000000000000000000000000"
@@ -68,7 +57,7 @@
       "name": "Compound USD Coin",
       "symbol": "cUSDC",
       "decimals": 6,
-      "address": "0x39AA39c021dfbaE8faC545936693aC917d5E7563",
+      "address": "0x73506770799Eb04befb5AaE4734e58C2C624F493",
       "isCToken": true,
       "volatilityRatio": "0.95",
       "cap": "10000000000000000000000000"
@@ -77,9 +66,9 @@
       "name": "Aave Ethereum WETH",
       "symbol": "aEthWETH",
       "decimals": 18,
-      "address": "0x4d5F47FA6A74757f35C14fD3a6Ef8E3C9BC514E8",
+      "address": "0x7649e0d153752c556b8b23DB1f1D3d42993E83a5",
       "isAToken": true,
-      "poolAddressesProvider": "0x2f39d218133AFaB8F2B819B1066c7E434Ad94E9e",
+      "poolAddressesProvider": "0xC911B590248d127aD18546B186cC6B324e99F02c",
       "volatilityRatio": "0.9",
       "cap": "10000000000000000000000"
     },
@@ -87,9 +76,9 @@
       "name": "Aave Ethereum USDC",
       "symbol": "aEthUSDC",
       "decimals": 6,
-      "address": "0x98C23E9d8f34FEFb1B7BD6a91B7FF122F4e16F5c",
+      "address": "0x8Be59D90A7Dc679C5cE5a7963cD1082dAB499918",
       "isAToken": true,
-      "poolAddressesProvider": "0x2f39d218133AFaB8F2B819B1066c7E434Ad94E9e",
+      "poolAddressesProvider": "0xC911B590248d127aD18546B186cC6B324e99F02c",
       "volatilityRatio": "0.95",
       "cap": "10000000000000000000000"
     }
@@ -106,40 +95,12 @@
         {
           "name": "Bitcoin X",
           "symbol": "BTCx",
-          "price": "10000"
+          "feed": "0xA39434A63A52E749F02807ae27335515BA4b07F7"
         },
         {
           "name": "Ethereum X",
           "symbol": "ETHx",
-          "price": "1000"
-        },
-        {
-          "name": "US Dollar CX",
-          "symbol": "USDcx",
-          "price": "1.00",
-          "isFeeToken": true
-        }
-      ]
-    },
-    {
-      "name": "Crypto Market Low Cap",
-      "symbol": "CRYLC",
-      "volatilityRatio": "0.9",
-      "rewardSpeed": "0",
-      "fee": "0",
-      "issuerAlloc": "0",
-      "synths": [
-        {
-          "name": "Numeraire",
-          "symbol": "NMRX",
-          "feed": "0xcC445B35b3636bC7cC7051f4769D8982ED0d449A"
-        },
-        {
-          "name": "Lido DAO",
-          "symbol": "LIDOx",
-          "feed": "0x4e844125952D32AcdF339BE976c98E22F6F318dB",
-          "isFeedSecondary": true,
-          "secondarySource": "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419"
+          "feed": "0x7649e0d153752c556b8b23DB1f1D3d42993E83a5"
         },
         {
           "name": "US Dollar CX",

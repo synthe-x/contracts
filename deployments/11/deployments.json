@@ -9,7 +9,7 @@
         "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
         "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
       ],
-      "block": "16525237"
+      "block": "16525463"
     },
     "Vault": {
       "address": "0xF6a8aD553b265405526030c2102fda2bDcdDC177",
@@ -17,7 +17,7 @@
       "constructorArguments": [
         "0xeC1BB74f5799811c0c1Bff94Ef76Fb40abccbE4a"
       ],
-      "block": "16525238"
+      "block": "16525464"
     },
     "SyntheXToken": {
       "address": "0x3E661784267F128e5f706De17Fac1Fc1c9d56f30",
@@ -25,7 +25,7 @@
       "constructorArguments": [
         "0xeC1BB74f5799811c0c1Bff94Ef76Fb40abccbE4a"
       ],
-      "block": "16525240"
+      "block": "16525466"
     },
     "LockedSYN": {
       "address": "0x6732128F9cc0c4344b2d4DC6285BCd516b7E59E6",
@@ -33,19 +33,19 @@
       "constructorArguments": [
         "0xeC1BB74f5799811c0c1Bff94Ef76Fb40abccbE4a"
       ],
-      "block": "16525241"
+      "block": "16525467"
     },
     "SyntheX": {
       "address": "0xAe9Ed85dE2670e3112590a2BB17b7283ddF44d9c",
       "abi": "SyntheX",
       "constructorArguments": [],
-      "block": "16525243",
+      "block": "16525469",
       "implementations": {
         "undefined": {
           "address": "0x15Ff10fCc8A1a50bFbE07847A22664801eA79E0f",
           "source": "SyntheX_undefined",
           "constructorArguments": [],
-          "block": "16525243"
+          "block": "16525469"
         }
       },
       "latest": "0x15Ff10fCc8A1a50bFbE07847A22664801eA79E0f"
@@ -59,7 +59,7 @@
         "0xeC1BB74f5799811c0c1Bff94Ef76Fb40abccbE4a",
         0
       ],
-      "block": "16525246"
+      "block": "16525472"
     },
     "PriceOracle": {
       "address": "0xDf951d2061b12922BFbF22cb17B17f3b39183570",
@@ -67,7 +67,7 @@
       "constructorArguments": [
         "0xeC1BB74f5799811c0c1Bff94Ef76Fb40abccbE4a"
       ],
-      "block": "16525248"
+      "block": "16525474"
     },
     "TokenUnlocker": {
       "address": "0x8f119cd256a0FfFeed643E830ADCD9767a1d517F",
@@ -83,13 +83,13 @@
           "hex": "0x1b1ae4d6e2ef500000"
         }
       ],
-      "block": "16525250"
+      "block": "16525476"
     },
     "Multicall2": {
       "address": "0xF5b81Fe0B6F378f9E6A3fb6A6cD1921FCeA11799",
       "abi": "Multicall2",
       "constructorArguments": [],
-      "block": "16525253"
+      "block": "16525479"
     },
     "ETH_PriceFeed": {
       "address": "0x67baFF31318638F497f4c4894Cd73918563942c8",
@@ -101,7 +101,7 @@
         },
         8
       ],
-      "block": "16525254"
+      "block": "16525480"
     },
     "wBTC_PriceFeed": {
       "address": "0x7bdd3b028C4796eF0EAf07d11394d0d9d8c24139",
@@ -110,7 +110,7 @@
         "0xfdFD9C85aD200c506Cf9e21F1FD8dd01932FBB23",
         "0xF4030086522a5bEEa4988F8cA5B36dbC97BeE88c"
       ],
-      "block": "16525261"
+      "block": "16525487"
     },
     "wBTC": {
       "address": "0xB468647B04bF657C9ee2de65252037d781eABafD",
@@ -120,7 +120,7 @@
         "wBTC",
         18
       ],
-      "block": "16525262"
+      "block": "16525488"
     },
     "USDC": {
       "address": "0x52173b6ac069619c206b9A0e75609fC92860AB2A",
@@ -130,7 +130,7 @@
         "USDC",
         18
       ],
-      "block": "16525266"
+      "block": "16525492"
     },
     "cETH_PriceFeed": {
       "address": "0xd977422c9eE9B646f64A4C4389a6C98ad356d8C4",
@@ -140,7 +140,7 @@
         "0x4Ddc2D193948926D02f9B1fE9e1daa0718270ED5",
         18
       ],
-      "block": "16525270"
+      "block": "16525496"
     },
     "cUSDC_PriceFeed": {
       "address": "0x6B21b3ae41f818Fc91e322b53f8D0773d31eCB75",
@@ -150,7 +150,7 @@
         "0x39AA39c021dfbaE8faC545936693aC917d5E7563",
         6
       ],
-      "block": "16525274"
+      "block": "16525500"
     },
     "aEthWETH_PriceFeed": {
       "address": "0xb830887eE23d3f9Ed8c27dbF7DcFe63037765475",
@@ -160,7 +160,7 @@
         "0x2f39d218133AFaB8F2B819B1066c7E434Ad94E9e",
         18
       ],
-      "block": "16525278"
+      "block": "16525504"
     },
     "aEthWETH": {
       "address": "0x6f2E42BB4176e9A7352a8bF8886255Be9F3D2d13",
@@ -170,7 +170,7 @@
         "waEthWETH",
         "0x4d5F47FA6A74757f35C14fD3a6Ef8E3C9BC514E8"
       ],
-      "block": "16525279"
+      "block": "16525505"
     },
     "aEthUSDC_PriceFeed": {
       "address": "0xF45B1CdbA9AACE2e9bbE80bf376CE816bb7E73FB",
@@ -180,7 +180,7 @@
         "0x2f39d218133AFaB8F2B819B1066c7E434Ad94E9e",
         6
       ],
-      "block": "16525283"
+      "block": "16525509"
     },
     "aEthUSDC": {
       "address": "0x22b1c5C2C9251622f7eFb76E356104E5aF0e996A",
@@ -190,19 +190,19 @@
         "waEthUSDC",
         "0x98C23E9d8f34FEFb1B7BD6a91B7FF122F4e16F5c"
       ],
-      "block": "16525284"
+      "block": "16525510"
     },
     "CRY": {
       "address": "0x3949c97925e5Aa13e34ddb18EAbf0B70ABB0C7d4",
       "abi": "DebtPool",
       "constructorArguments": [],
-      "block": "16525290",
+      "block": "16525516",
       "implementations": {
         "undefined": {
           "address": "0xeE1eb820BeeCED56657bA74fa8D70748D7A6756C",
           "source": "CRY_undefined",
           "constructorArguments": [],
-          "block": "16525290"
+          "block": "16525516"
         }
       },
       "latest": "0xeE1eb820BeeCED56657bA74fa8D70748D7A6756C"
@@ -216,7 +216,7 @@
         "0x3949c97925e5Aa13e34ddb18EAbf0B70ABB0C7d4",
         "0xeC1BB74f5799811c0c1Bff94Ef76Fb40abccbE4a"
       ],
-      "block": "16525294"
+      "block": "16525520"
     },
     "BTCx_PriceFeed": {
       "address": "0x04F339eC4D75Cf2833069e6e61b60eF56461CD7C",
@@ -228,7 +228,7 @@
         },
         8
       ],
-      "block": "16525295"
+      "block": "16525521"
     },
     "ETHx": {
       "address": "0xB1c05b498Cb58568B2470369FEB98B00702063dA",
@@ -239,7 +239,7 @@
         "0x3949c97925e5Aa13e34ddb18EAbf0B70ABB0C7d4",
         "0xeC1BB74f5799811c0c1Bff94Ef76Fb40abccbE4a"
       ],
-      "block": "16525298"
+      "block": "16525524"
     },
     "ETHx_PriceFeed": {
       "address": "0x92A00fc48Ad3dD4A8b5266a8F467a52Ac784fC83",
@@ -251,7 +251,7 @@
         },
         8
       ],
-      "block": "16525299"
+      "block": "16525525"
     },
     "USDcx": {
       "address": "0x59C4e2c6a6dC27c259D6d067a039c831e1ff4947",
@@ -262,7 +262,7 @@
         "0xa195ACcEB1945163160CD5703Ed43E4f78176a54",
         "0xeC1BB74f5799811c0c1Bff94Ef76Fb40abccbE4a"
       ],
-      "block": "16525318"
+      "block": "16525544"
     },
     "USDcx_PriceFeed": {
       "address": "0x9d136eEa063eDE5418A6BC7bEafF009bBb6CFa70",
@@ -274,19 +274,19 @@
         },
         8
       ],
-      "block": "16525319"
+      "block": "16525545"
     },
     "CRYLC": {
       "address": "0xa195ACcEB1945163160CD5703Ed43E4f78176a54",
       "abi": "DebtPool",
       "constructorArguments": [],
-      "block": "16525307",
+      "block": "16525533",
       "implementations": {
         "undefined": {
           "address": "0xeE1eb820BeeCED56657bA74fa8D70748D7A6756C",
           "source": "CRYLC_undefined",
           "constructorArguments": [],
-          "block": "16525307"
+          "block": "16525533"
         }
       },
       "latest": "0xeE1eb820BeeCED56657bA74fa8D70748D7A6756C"
@@ -300,7 +300,7 @@
         "0xa195ACcEB1945163160CD5703Ed43E4f78176a54",
         "0xeC1BB74f5799811c0c1Bff94Ef76Fb40abccbE4a"
       ],
-      "block": "16525311"
+      "block": "16525537"
     },
     "LIDOx": {
       "address": "0x97fd63D049089cd70D9D139ccf9338c81372DE68",
@@ -311,7 +311,7 @@
         "0xa195ACcEB1945163160CD5703Ed43E4f78176a54",
         "0xeC1BB74f5799811c0c1Bff94Ef76Fb40abccbE4a"
       ],
-      "block": "16525314"
+      "block": "16525540"
     },
     "LIDOx_PriceFeed": {
       "address": "0xC0BF43A4Ca27e0976195E6661b099742f10507e5",
@@ -320,7 +320,7 @@
         "0x4e844125952D32AcdF339BE976c98E22F6F318dB",
         "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419"
       ],
-      "block": "16525315"
+      "block": "16525541"
     }
   },
   "sources": {

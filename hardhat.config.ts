@@ -54,6 +54,12 @@ const config: HardhatUserConfig = {
       accounts: [`0x${PRIVATE_KEY}`],
       chainId: 421613,
     },
+    goerli: {
+      url: "https://rpc.ankr.com/eth_goerli",
+      accounts: [`0x${PRIVATE_KEY}`],
+      chainId: 5,
+      // gasPrice: 1000000000000 // 1000 wei
+    },
     localhost: {
       url: "http://localhost:8545",
       chainId: 1337

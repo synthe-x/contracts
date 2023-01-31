@@ -1,7 +1,7 @@
 {
   "name": "synthex",
-  "version": "0.8.0",
-  "latest": "0.8.0",
+  "version": "0.9.0",
+  "latest": "0.9.0",
   "l0Admin": "0x084cD22eA15E4C262408e561a5AFa8431Bd7fa5d",
   "l1Admin": "0x2646306d3191AEE905bf9065bD1B7cC71c9036D0",
   "l2Admin": "0x46c18c6d5526E17B34a3deB43e5E9Ba2A659c23a",
@@ -20,26 +20,50 @@
   },
   "collaterals": [
     {
-      "name": "Wrapped ETH",
-      "symbol": "WETH",
+      "name": "Ethereum",
+      "symbol": "ETH",
+      "decimals": 18,
       "volatilityRatio": "0.85",
       "feed": "0x62CAe0FA2da220f43a51F86Db2EDb36DcA9A5A08",
-      "cap": "10000"
+      "address": "0x0000000000000000000000000000000000000000",
+      "cap": "100"
     },
     {
       "name": "USD Coin",
       "symbol": "USDC",
+      "decimals": 18,
       "volatilityRatio": "0.95",
       "feed": "0x1692Bdd32F31b831caAc1b0c9fAF68613682813b",
       "cap": "1000000"
     },
     {
-      "name": "Ethereum",
-      "symbol": "ETH",
+      "name": "Lido Staked ETH",
+      "symbol": "stETH",
+      "decimals": 18,
       "volatilityRatio": "0.85",
       "feed": "0x62CAe0FA2da220f43a51F86Db2EDb36DcA9A5A08",
       "address": "0x0000000000000000000000000000000000000000",
       "cap": "100"
+    },
+    {
+      "name": "Aave Ethereum WETH",
+      "symbol": "aEthWETH",
+      "decimals": 18,
+      "address": "0xBA3a852aDB46C8AD31A03397CD22b2E896625548",
+      "isAToken": true,
+      "poolAddressesProvider": "0x4eee0bb72c2717310318f27628b3c8a708e4951c",
+      "volatilityRatio": "0.75",
+      "cap": "10000000000000000000000"
+    },
+    {
+      "name": "Aave Ethereum USDC",
+      "symbol": "aEthUSDC",
+      "decimals": 6,
+      "address": "0xd9933e10d6d9453FFaCF1236aF7ea1a61EA4D2c5",
+      "isAToken": true,
+      "poolAddressesProvider": "0x4eee0bb72c2717310318f27628b3c8a708e4951c",
+      "volatilityRatio": "0.95",
+      "cap": "10000000000000000000000"
     }
   ],
   "tradingPools": [
@@ -67,8 +91,8 @@
           "price": "295.22"
         },
         {
-          "name": "US Dollar CX",
-          "symbol": "USDcx",
+          "name": "US Coin X",
+          "symbol": "USDCx",
           "price": "1.00",
           "isFeeToken": true
         },
