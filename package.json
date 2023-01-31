@@ -2,11 +2,12 @@
   "name": "hardhat-project",
   "scripts": {
     "compile": "hardhat compile",
-    "test": "hardhat test --network localhost",
+    "test": "hardhat test --network hardhat",
     "test:fork": "hardhat --config hardhat-fork.config.ts test --network hardhat",
+    "test:fork:custom": "hardhat --config hardhat-fork.config.ts test test/aave/wrap.test.ts --network hardhat",
     "console": "hardhat console",
     "node": "hardhat node",
-    "deploy": "hardhat run scripts --network localhost",
+    "deploy": "hardhat run scripts --network hardhat",
     "deploy:fork": "hardhat --config hardhat-fork.config.ts run scripts --network hardhat",
     "slither": "slither . --checklist docs/SECURITY.md"
   },

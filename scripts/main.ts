@@ -5,7 +5,7 @@ import fs from "fs";
 
 import { DEFAULT_ADMIN_ROLE, L1_ADMIN_ROLE, L2_ADMIN_ROLE, GOVERNANCE_MODULE_ROLE } from "./utils/const";
 
-export default async function main(isTest: boolean = false) {
+export default async function main(isTest: boolean = true) {
 
 	// read deployments and config
 	const deployments = JSON.parse(fs.readFileSync(process.cwd() + `/deployments/${hre.network.config.chainId}/deployments.json`, "utf8"));
@@ -29,12 +29,12 @@ export default async function main(isTest: boolean = false) {
 	config.latest = version;
 
 	// deploy main contracts
-	const contracts = await deploy(deployments, config, deployer);
+	const contracts = await deploy(deployments, config, deployer, isTest);
 	// initiate the contracts
-	const initiates = await initiate(deployments, config, contracts);
+	const initiates = await initiate(deployments, config, contracts, isTest);
 
 	// set admins
-	console.log("Setting admins... 💬")
+	if(!isTest) console.log("Setting admins... 💬")
 
 	// renounce sealed syn minter role
 	await contracts.sealedSYN.renounceRole(await contracts.sealedSYN.MINTER_ROLE(), deployer.address);
@@ -48,7 +48,7 @@ export default async function main(isTest: boolean = false) {
 	if(deployer.address !== config.l1Admin) await contracts.system.renounceRole(L1_ADMIN_ROLE, deployer.address);
 	if(deployer.address !== config.l2Admin) await contracts.system.renounceRole(L2_ADMIN_ROLE, deployer.address);
 	if(deployer.address !== config.governanceModule) await contracts.system.renounceRole(GOVERNANCE_MODULE_ROLE, deployer.address);
-	console.log("Admins set! 🎉")
+	if(!isTest) console.log("Admins set! 🎉")
 
 	// save deployments
     if(!isTest){
@@ -62,6 +62,6 @@ export default async function main(isTest: boolean = false) {
         );
     }
 
-	console.log("Deployment complete! 🎉")
+	if(!isTest) console.log("Deployment complete! 🎉")
 	return { ...contracts, ...initiates };
 }

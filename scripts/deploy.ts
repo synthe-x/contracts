@@ -6,9 +6,9 @@ import { Contract } from 'ethers';
 import { SyntheX } from '../typechain-types/contracts/SyntheX';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
-export async function deploy(deployments: any, config: any, deployer: SignerWithAddress): Promise<IDeploymentResult> {
+export async function deploy(deployments: any, config: any, deployer: SignerWithAddress, isTest: boolean = false): Promise<IDeploymentResult> {
   const versionSuffix = `${config.version.split(".")[0]}.${config.version.split(".")[1]}.x`
-  console.log("Deploying ", versionSuffix, "🚀");
+  if(!isTest) console.log("Deploying ", versionSuffix, "🚀");
 
   // deploy storage contract
   const system = await _deploy("System", [deployer.address, deployer.address, deployer.address, deployer.address], deployments)

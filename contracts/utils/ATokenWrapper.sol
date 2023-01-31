@@ -2,15 +2,18 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+// safemath
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
 /**
  * @title AAVEWrapper
  * @author SyntheX
  * @custom:security-contact prasad@chainscore.finance
- * @notice This contracts wraps self compounding tokens, as specified for aTokens in Aave protocol
+ * @notice This contracts wraps self compounding tokens (aTokens) into ERC20 tokens that increase in value
  * @notice https://docs.aave.com/developers/tokens/atoken
  */
-contract AAVEWrapper is ERC20 {
+contract ATokenWrapper is ERC20 {
+    using SafeMath for uint256;
     IERC20 public underlying;
 
     constructor(string memory _name, string memory _symbol, IERC20 _underlying) ERC20(_name, _symbol) {
@@ -18,15 +21,15 @@ contract AAVEWrapper is ERC20 {
     }
 
     function exchangeRate() public view returns (uint256) {
-        return totalSupply() == 0 ? 1e18 : underlying.balanceOf(address(this)) * 1e18 / totalSupply();
+        return totalSupply() == 0 ? 1e18 : underlying.balanceOf(address(this)).mul(1e18).div(totalSupply());
     }
 
     function amountToShares(uint256 amount) public view returns (uint256) {
-        return amount * 1e18 / exchangeRate();
+        return amount.mul(1e18).div(exchangeRate());
     }
 
     function sharesToAmount(uint256 shares) public view returns (uint256) {
-        return shares * exchangeRate() / 1e18;
+        return shares.mul(exchangeRate()).div(1e18);
     }
 
     function deposit(uint256 amount) public {

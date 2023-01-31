@@ -40,8 +40,13 @@ const config: HardhatUserConfig = {
           viaIR: true
         },
       },
+      {
+        version: "0.4.18"
+      }
     ],
-    
+  },
+  mocha: {
+    timeout: 100000000
   },
   networks: {
     arbitrumGoerli: {

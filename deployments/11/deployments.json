@@ -9,7 +9,7 @@
         "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
         "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
       ],
-      "block": "16524762"
+      "block": "16525237"
     },
     "Vault": {
       "address": "0xF6a8aD553b265405526030c2102fda2bDcdDC177",
@@ -17,7 +17,7 @@
       "constructorArguments": [
         "0xeC1BB74f5799811c0c1Bff94Ef76Fb40abccbE4a"
       ],
-      "block": "16524763"
+      "block": "16525238"
     },
     "SyntheXToken": {
       "address": "0x3E661784267F128e5f706De17Fac1Fc1c9d56f30",
@@ -25,7 +25,7 @@
       "constructorArguments": [
         "0xeC1BB74f5799811c0c1Bff94Ef76Fb40abccbE4a"
       ],
-      "block": "16524765"
+      "block": "16525240"
     },
     "LockedSYN": {
       "address": "0x6732128F9cc0c4344b2d4DC6285BCd516b7E59E6",
@@ -33,19 +33,19 @@
       "constructorArguments": [
         "0xeC1BB74f5799811c0c1Bff94Ef76Fb40abccbE4a"
       ],
-      "block": "16524766"
+      "block": "16525241"
     },
     "SyntheX": {
       "address": "0xAe9Ed85dE2670e3112590a2BB17b7283ddF44d9c",
       "abi": "SyntheX",
       "constructorArguments": [],
-      "block": "16524768",
+      "block": "16525243",
       "implementations": {
         "undefined": {
           "address": "0x15Ff10fCc8A1a50bFbE07847A22664801eA79E0f",
           "source": "SyntheX_undefined",
           "constructorArguments": [],
-          "block": "16524768"
+          "block": "16525243"
         }
       },
       "latest": "0x15Ff10fCc8A1a50bFbE07847A22664801eA79E0f"
@@ -59,7 +59,7 @@
         "0xeC1BB74f5799811c0c1Bff94Ef76Fb40abccbE4a",
         0
       ],
-      "block": "16524771"
+      "block": "16525246"
     },
     "PriceOracle": {
       "address": "0xDf951d2061b12922BFbF22cb17B17f3b39183570",
@@ -67,7 +67,7 @@
       "constructorArguments": [
         "0xeC1BB74f5799811c0c1Bff94Ef76Fb40abccbE4a"
       ],
-      "block": "16524773"
+      "block": "16525248"
     },
     "TokenUnlocker": {
       "address": "0x8f119cd256a0FfFeed643E830ADCD9767a1d517F",
@@ -83,13 +83,13 @@
           "hex": "0x1b1ae4d6e2ef500000"
         }
       ],
-      "block": "16524775"
+      "block": "16525250"
     },
     "Multicall2": {
       "address": "0xF5b81Fe0B6F378f9E6A3fb6A6cD1921FCeA11799",
       "abi": "Multicall2",
       "constructorArguments": [],
-      "block": "16524778"
+      "block": "16525253"
     },
     "ETH_PriceFeed": {
       "address": "0x67baFF31318638F497f4c4894Cd73918563942c8",
@@ -101,105 +101,125 @@
         },
         8
       ],
-      "block": "16524779"
+      "block": "16525254"
     },
     "wBTC_PriceFeed": {
-      "address": "0x2b639Cc84e1Ad3aA92D4Ee7d2755A6ABEf300D72",
+      "address": "0x7bdd3b028C4796eF0EAf07d11394d0d9d8c24139",
       "abi": "SecondaryOracle",
       "constructorArguments": [
         "0xfdFD9C85aD200c506Cf9e21F1FD8dd01932FBB23",
         "0xF4030086522a5bEEa4988F8cA5B36dbC97BeE88c"
       ],
-      "block": "16524783"
+      "block": "16525261"
     },
     "wBTC": {
-      "address": "0xF85895D097B2C25946BB95C4d11E2F3c035F8f0C",
+      "address": "0xB468647B04bF657C9ee2de65252037d781eABafD",
       "abi": "MockToken",
       "constructorArguments": [
         "Wrapped Bitcoin",
         "wBTC",
         18
       ],
-      "block": "16524784"
+      "block": "16525262"
     },
     "USDC": {
-      "address": "0x47c05BCCA7d57c87083EB4e586007530eE4539e9",
+      "address": "0x52173b6ac069619c206b9A0e75609fC92860AB2A",
       "abi": "MockToken",
       "constructorArguments": [
         "USD Coin",
         "USDC",
         18
       ],
-      "block": "16524788"
+      "block": "16525266"
     },
     "cETH_PriceFeed": {
-      "address": "0x40A633EeF249F21D95C8803b7144f19AAfeEF7ae",
+      "address": "0xd977422c9eE9B646f64A4C4389a6C98ad356d8C4",
       "abi": "CompoundOracle",
       "constructorArguments": [
         "0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B",
         "0x4Ddc2D193948926D02f9B1fE9e1daa0718270ED5",
         18
       ],
-      "block": "16524792"
+      "block": "16525270"
     },
     "cUSDC_PriceFeed": {
-      "address": "0x1eB5C49630E08e95Ba7f139BcF4B9BA171C9a8C7",
+      "address": "0x6B21b3ae41f818Fc91e322b53f8D0773d31eCB75",
       "abi": "CompoundOracle",
       "constructorArguments": [
         "0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B",
         "0x39AA39c021dfbaE8faC545936693aC917d5E7563",
         6
       ],
-      "block": "16524796"
+      "block": "16525274"
     },
     "aEthWETH_PriceFeed": {
-      "address": "0x1f53E116c31F171e59f45f0752AEc5d1F5aA3714",
+      "address": "0xb830887eE23d3f9Ed8c27dbF7DcFe63037765475",
       "abi": "AAVEOracle",
       "constructorArguments": [
         "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
         "0x2f39d218133AFaB8F2B819B1066c7E434Ad94E9e",
         18
       ],
-      "block": "16524800"
+      "block": "16525278"
+    },
+    "aEthWETH": {
+      "address": "0x6f2E42BB4176e9A7352a8bF8886255Be9F3D2d13",
+      "abi": "ATokenWrapper",
+      "constructorArguments": [
+        "Wrapped aEthWETH",
+        "waEthWETH",
+        "0x4d5F47FA6A74757f35C14fD3a6Ef8E3C9BC514E8"
+      ],
+      "block": "16525279"
     },
     "aEthUSDC_PriceFeed": {
-      "address": "0x6f2E42BB4176e9A7352a8bF8886255Be9F3D2d13",
+      "address": "0xF45B1CdbA9AACE2e9bbE80bf376CE816bb7E73FB",
       "abi": "AAVEOracle",
       "constructorArguments": [
         "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
         "0x2f39d218133AFaB8F2B819B1066c7E434Ad94E9e",
         6
       ],
-      "block": "16524804"
+      "block": "16525283"
+    },
+    "aEthUSDC": {
+      "address": "0x22b1c5C2C9251622f7eFb76E356104E5aF0e996A",
+      "abi": "ATokenWrapper",
+      "constructorArguments": [
+        "Wrapped aEthUSDC",
+        "waEthUSDC",
+        "0x98C23E9d8f34FEFb1B7BD6a91B7FF122F4e16F5c"
+      ],
+      "block": "16525284"
     },
     "CRY": {
-      "address": "0x5A569Ad19272Afa97103fD4DbadF33B2FcbaA175",
+      "address": "0x3949c97925e5Aa13e34ddb18EAbf0B70ABB0C7d4",
       "abi": "DebtPool",
       "constructorArguments": [],
-      "block": "16524810",
+      "block": "16525290",
       "implementations": {
         "undefined": {
-          "address": "0xF45B1CdbA9AACE2e9bbE80bf376CE816bb7E73FB",
+          "address": "0xeE1eb820BeeCED56657bA74fa8D70748D7A6756C",
           "source": "CRY_undefined",
           "constructorArguments": [],
-          "block": "16524810"
+          "block": "16525290"
         }
       },
-      "latest": "0xF45B1CdbA9AACE2e9bbE80bf376CE816bb7E73FB"
+      "latest": "0xeE1eb820BeeCED56657bA74fa8D70748D7A6756C"
     },
     "BTCx": {
-      "address": "0x5c932424AcBfab036969b3B9D94bA9eCbae7565D",
+      "address": "0x6D712CB50297b97b79dE784d10F487C00d7f8c2C",
       "abi": "ERC20X",
       "constructorArguments": [
         "Bitcoin X",
         "BTCx",
-        "0x5A569Ad19272Afa97103fD4DbadF33B2FcbaA175",
+        "0x3949c97925e5Aa13e34ddb18EAbf0B70ABB0C7d4",
         "0xeC1BB74f5799811c0c1Bff94Ef76Fb40abccbE4a"
       ],
-      "block": "16524814"
+      "block": "16525294"
     },
     "BTCx_PriceFeed": {
-      "address": "0x3949c97925e5Aa13e34ddb18EAbf0B70ABB0C7d4",
+      "address": "0x04F339eC4D75Cf2833069e6e61b60eF56461CD7C",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -208,21 +228,21 @@
         },
         8
       ],
-      "block": "16524815"
+      "block": "16525295"
     },
     "ETHx": {
-      "address": "0xE7FF84Df24A9a252B6E8A5BB093aC52B1d8bEEdf",
+      "address": "0xB1c05b498Cb58568B2470369FEB98B00702063dA",
       "abi": "ERC20X",
       "constructorArguments": [
         "Ethereum X",
         "ETHx",
-        "0x5A569Ad19272Afa97103fD4DbadF33B2FcbaA175",
+        "0x3949c97925e5Aa13e34ddb18EAbf0B70ABB0C7d4",
         "0xeC1BB74f5799811c0c1Bff94Ef76Fb40abccbE4a"
       ],
-      "block": "16524818"
+      "block": "16525298"
     },
     "ETHx_PriceFeed": {
-      "address": "0x6D712CB50297b97b79dE784d10F487C00d7f8c2C",
+      "address": "0x92A00fc48Ad3dD4A8b5266a8F467a52Ac784fC83",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -231,21 +251,21 @@
         },
         8
       ],
-      "block": "16524819"
+      "block": "16525299"
     },
     "USDcx": {
-      "address": "0x5E5713a0d915701F464DEbb66015adD62B2e6AE9",
+      "address": "0x59C4e2c6a6dC27c259D6d067a039c831e1ff4947",
       "abi": "ERC20X",
       "constructorArguments": [
         "US Dollar CX",
         "USDcx",
-        "0x44863F234b137A395e5c98359d16057A9A1fAc55",
+        "0xa195ACcEB1945163160CD5703Ed43E4f78176a54",
         "0xeC1BB74f5799811c0c1Bff94Ef76Fb40abccbE4a"
       ],
-      "block": "16524838"
+      "block": "16525318"
     },
     "USDcx_PriceFeed": {
-      "address": "0x97fd63D049089cd70D9D139ccf9338c81372DE68",
+      "address": "0x9d136eEa063eDE5418A6BC7bEafF009bBb6CFa70",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -254,53 +274,53 @@
         },
         8
       ],
-      "block": "16524839"
+      "block": "16525319"
     },
     "CRYLC": {
-      "address": "0x44863F234b137A395e5c98359d16057A9A1fAc55",
+      "address": "0xa195ACcEB1945163160CD5703Ed43E4f78176a54",
       "abi": "DebtPool",
       "constructorArguments": [],
-      "block": "16524827",
+      "block": "16525307",
       "implementations": {
         "undefined": {
-          "address": "0xF45B1CdbA9AACE2e9bbE80bf376CE816bb7E73FB",
+          "address": "0xeE1eb820BeeCED56657bA74fa8D70748D7A6756C",
           "source": "CRYLC_undefined",
           "constructorArguments": [],
-          "block": "16524827"
+          "block": "16525307"
         }
       },
-      "latest": "0xF45B1CdbA9AACE2e9bbE80bf376CE816bb7E73FB"
+      "latest": "0xeE1eb820BeeCED56657bA74fa8D70748D7A6756C"
     },
     "NMRX": {
-      "address": "0xc0c5618f0F3Fa66b496F2940f373DC366d765BAe",
+      "address": "0x0bF7dE8d71820840063D4B8653Fd3F0618986faF",
       "abi": "ERC20X",
       "constructorArguments": [
         "Numeraire",
         "NMRX",
-        "0x44863F234b137A395e5c98359d16057A9A1fAc55",
+        "0xa195ACcEB1945163160CD5703Ed43E4f78176a54",
         "0xeC1BB74f5799811c0c1Bff94Ef76Fb40abccbE4a"
       ],
-      "block": "16524831"
+      "block": "16525311"
     },
     "LIDOx": {
-      "address": "0x6F9679BdF5F180a139d01c598839a5df4860431b",
+      "address": "0x97fd63D049089cd70D9D139ccf9338c81372DE68",
       "abi": "ERC20X",
       "constructorArguments": [
         "Lido DAO",
         "LIDOx",
-        "0x44863F234b137A395e5c98359d16057A9A1fAc55",
+        "0xa195ACcEB1945163160CD5703Ed43E4f78176a54",
         "0xeC1BB74f5799811c0c1Bff94Ef76Fb40abccbE4a"
       ],
-      "block": "16524834"
+      "block": "16525314"
     },
     "LIDOx_PriceFeed": {
-      "address": "0xf4AE7E15B1012edceD8103510eeB560a9343AFd3",
+      "address": "0xC0BF43A4Ca27e0976195E6661b099742f10507e5",
       "abi": "SecondaryOracle",
       "constructorArguments": [
         "0x4e844125952D32AcdF339BE976c98E22F6F318dB",
         "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419"
       ],
-      "block": "16524835"
+      "block": "16525315"
     }
   },
   "sources": {
@@ -5272,6 +5292,376 @@
             "type": "address"
           }
         ]
+      }
+    ],
+    "ATokenWrapper": [
+      {
+        "type": "constructor",
+        "payable": false,
+        "inputs": [
+          {
+            "type": "string",
+            "name": "_name"
+          },
+          {
+            "type": "string",
+            "name": "_symbol"
+          },
+          {
+            "type": "address",
+            "name": "_underlying"
+          }
+        ]
+      },
+      {
+        "type": "event",
+        "anonymous": false,
+        "name": "Approval",
+        "inputs": [
+          {
+            "type": "address",
+            "name": "owner",
+            "indexed": true
+          },
+          {
+            "type": "address",
+            "name": "spender",
+            "indexed": true
+          },
+          {
+            "type": "uint256",
+            "name": "value",
+            "indexed": false
+          }
+        ]
+      },
+      {
+        "type": "event",
+        "anonymous": false,
+        "name": "Transfer",
+        "inputs": [
+          {
+            "type": "address",
+            "name": "from",
+            "indexed": true
+          },
+          {
+            "type": "address",
+            "name": "to",
+            "indexed": true
+          },
+          {
+            "type": "uint256",
+            "name": "value",
+            "indexed": false
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "allowance",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "gas": 29000000,
+        "inputs": [
+          {
+            "type": "address",
+            "name": "owner"
+          },
+          {
+            "type": "address",
+            "name": "spender"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "uint256"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "amountToShares",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "gas": 29000000,
+        "inputs": [
+          {
+            "type": "uint256",
+            "name": "amount"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "uint256"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "approve",
+        "constant": false,
+        "payable": false,
+        "gas": 29000000,
+        "inputs": [
+          {
+            "type": "address",
+            "name": "spender"
+          },
+          {
+            "type": "uint256",
+            "name": "amount"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "bool"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "balanceOf",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "gas": 29000000,
+        "inputs": [
+          {
+            "type": "address",
+            "name": "account"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "uint256"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "decimals",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "gas": 29000000,
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "uint8"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "decreaseAllowance",
+        "constant": false,
+        "payable": false,
+        "gas": 29000000,
+        "inputs": [
+          {
+            "type": "address",
+            "name": "spender"
+          },
+          {
+            "type": "uint256",
+            "name": "subtractedValue"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "bool"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "deposit",
+        "constant": false,
+        "payable": false,
+        "gas": 29000000,
+        "inputs": [
+          {
+            "type": "uint256",
+            "name": "amount"
+          }
+        ],
+        "outputs": []
+      },
+      {
+        "type": "function",
+        "name": "exchangeRate",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "gas": 29000000,
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "uint256"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "increaseAllowance",
+        "constant": false,
+        "payable": false,
+        "gas": 29000000,
+        "inputs": [
+          {
+            "type": "address",
+            "name": "spender"
+          },
+          {
+            "type": "uint256",
+            "name": "addedValue"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "bool"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "name",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "gas": 29000000,
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "sharesToAmount",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "gas": 29000000,
+        "inputs": [
+          {
+            "type": "uint256",
+            "name": "shares"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "uint256"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "symbol",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "gas": 29000000,
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "totalSupply",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "gas": 29000000,
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "uint256"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "transfer",
+        "constant": false,
+        "payable": false,
+        "gas": 29000000,
+        "inputs": [
+          {
+            "type": "address",
+            "name": "to"
+          },
+          {
+            "type": "uint256",
+            "name": "amount"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "bool"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "transferFrom",
+        "constant": false,
+        "payable": false,
+        "gas": 29000000,
+        "inputs": [
+          {
+            "type": "address",
+            "name": "from"
+          },
+          {
+            "type": "address",
+            "name": "to"
+          },
+          {
+            "type": "uint256",
+            "name": "amount"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "bool"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "underlying",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "gas": 29000000,
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "address"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "withdraw",
+        "constant": false,
+        "payable": false,
+        "gas": 29000000,
+        "inputs": [
+          {
+            "type": "uint256",
+            "name": "shares"
+          }
+        ],
+        "outputs": []
       }
     ],
     "DebtPool": [

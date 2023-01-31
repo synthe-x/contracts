@@ -1,7 +1,7 @@
 {
   "name": "synthex",
-  "version": "0.5.0",
-  "latest": "0.5.0",
+  "version": "0.12.0",
+  "latest": "0.12.0",
   "l0Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
   "l1Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
   "l2Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
@@ -23,9 +23,18 @@
       "name": "Ethereum",
       "symbol": "ETH",
       "decimals": 18,
-      "volatilityRatio": "0.8",
+      "volatilityRatio": "0.9",
       "price": "1000",
       "address": "0x0000000000000000000000000000000000000000",
+      "cap": "100000000000000000000000"
+    },
+    {
+      "name": "Wrapped ETH",
+      "symbol": "WETH",
+      "decimals": 18,
+      "volatilityRatio": "0.9",
+      "feed": "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419",
+      "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
       "cap": "100000000000000000000000"
     },
     {
