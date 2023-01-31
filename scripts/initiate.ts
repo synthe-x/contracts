@@ -36,24 +36,25 @@ export async function initiate(
     let feed: string|Contract = config.collaterals[i].feed as string;
 
     // handle compound based collateral (cTokens)
-    
     if(config.collaterals[i].isCToken){
       const cToken = await ethers.getContractAt('CTokenInterface', collateral);
       const comptroller = await cToken.comptroller();
       feed = await _deploy('CompoundOracle', [comptroller, cToken.address, config.collaterals[i].decimals], deployments, {name: `${config.collaterals[i].symbol}_PriceFeed`});
-      console.log(`Price of ${config.collaterals[i].symbol} is ${ethers.utils.formatUnits(await feed.latestAnswer(), (await feed.decimals()) + 18)}`);
       feed = feed.address;
     }
-
-    if(config.collaterals[i].isAToken){
+    // handle aave based collateral (aTokens)
+    else if(config.collaterals[i].isAToken){
       const aToken = await ethers.getContractAt('IAToken', collateral);
       const underlying = await aToken.UNDERLYING_ASSET_ADDRESS();
       feed = await _deploy('AAVEOracle', [underlying, config.collaterals[i].poolAddressesProvider, config.collaterals[i].decimals], deployments, {name: `${config.collaterals[i].symbol}_PriceFeed`});
-      console.log(`Price of ${config.collaterals[i].symbol} is ${ethers.utils.formatUnits(await feed.latestAnswer(), (await feed.decimals()) + 8)}`);
       feed = feed.address;
     }
-
-
+    // handle secondary oracle feeds
+    else if(config.collaterals[i].isFeedSecondary){
+      // deploy secondary price feed
+      feed = await _deploy('SecondaryOracle', [feed, config.collaterals[i].secondarySource], deployments, {name: `${config.collaterals[i].symbol}_PriceFeed`});
+      feed = feed.address;
+    }
     if(!collateral){
       // deploy collateral token
       collateral = await _deploy('MockToken', [config.collaterals[i].name, config.collaterals[i].symbol, config.collaterals[i].decimals], deployments, {name: config.collaterals[i].symbol});
@@ -67,15 +68,16 @@ export async function initiate(
     } else {
       feed = await ethers.getContractAt('MockPriceFeed', feed);
     }
+
     await contracts.oracle.setFeed(collateral.address, feed.address);
     await contracts.synthex.enableCollateral(collateral.address, ethers.utils.parseEther(config.collaterals[i].volatilityRatio));
     await contracts.synthex.setCollateralCap(collateral.address, ethers.utils.parseEther(config.collaterals[i].cap));
-    console.log(`\t Collateral ${config.collaterals[i].symbol} deployed successfully ✅`);
+    console.log(`\t Collateral ${config.collaterals[i].symbol} ($${parseFloat(ethers.utils.formatUnits(await feed.latestAnswer(), await feed.decimals())).toFixed(4)}) added successfully ✅`);
 
     result.collateralTokens.push(collateral);
     result.collateralPriceFeeds.push(feed);
   }
-  console.log("Collaterals deployed successfully 🎉 \n");
+  console.log("Collaterals added successfully 🎉 \n");
 
   console.log("Deploying Debt Pools... 💬");
   for(let i = 0; i < config.tradingPools.length; i++){
@@ -111,6 +113,12 @@ export async function initiate(
         synth = await ethers.getContractAt('ERC20X', synth);
       }
       let feed: string|Contract = config.tradingPools[i].synths[j].feed as string;
+
+      if(config.tradingPools[i].synths[j].isFeedSecondary){
+        // deploy secondary price feed
+        feed = await _deploy('SecondaryOracle', [feed, config.tradingPools[i].synths[j].secondarySource], deployments, {name: `${config.tradingPools[i].synths[j].symbol}_PriceFeed`});
+        feed = feed.address;
+      }
       if(!feed){
         // deploy price feed
         feed = await _deploy('MockPriceFeed', [ethers.utils.parseUnits(config.tradingPools[i].synths[j].price, 8), 8], deployments, {name: `${config.tradingPools[i].synths[j].symbol}_PriceFeed`});
@@ -119,7 +127,7 @@ export async function initiate(
       }
       await contracts.oracle.setFeed(synth.address, feed.address);
       await pool.enableSynth(synth.address);
-      console.log(`\t\t Synth ${config.tradingPools[i].synths[j].symbol} added to ${config.tradingPools[i].symbol} ✨`);
+      console.log(`\t\t Synth ${config.tradingPools[i].synths[j].symbol} ($${parseFloat(ethers.utils.formatUnits(await feed.latestAnswer(), await feed.decimals())).toFixed(4)}) added  ✨`);
       result.poolSynths[i].push(synth);
       result.poolSynthPriceFeeds[i].push(feed);
 

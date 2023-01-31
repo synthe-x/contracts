@@ -28,7 +28,7 @@ contract CompoundOracle is IChainlinkAggregator {
 
     function decimals() external view override returns (uint8) {
         // 18 decimals for underlying + 10 decimals for exchange rate
-        return 18 + 10;
+        return 18 + 10 + 18;
     }
 
     function latestTimestamp() external view returns (uint256){

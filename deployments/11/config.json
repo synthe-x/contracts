@@ -1,7 +1,7 @@
 {
   "name": "synthex",
-  "version": "0.59.0",
-  "latest": "0.59.0",
+  "version": "0.5.0",
+  "latest": "0.5.0",
   "l0Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
   "l1Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
   "l2Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
@@ -23,18 +23,27 @@
       "name": "Ethereum",
       "symbol": "ETH",
       "decimals": 18,
-      "volatilityRatio": "0.9",
+      "volatilityRatio": "0.8",
       "price": "1000",
       "address": "0x0000000000000000000000000000000000000000",
-      "feed": "",
       "cap": "100000000000000000000000"
+    },
+    {
+      "name": "Wrapped Bitcoin",
+      "symbol": "wBTC",
+      "decimals": 18,
+      "volatilityRatio": "0.8",
+      "feed": "0xfdFD9C85aD200c506Cf9e21F1FD8dd01932FBB23",
+      "cap": "10000000000000000000000000",
+      "isFeedSecondary": true,
+      "secondarySource": "0xF4030086522a5bEEa4988F8cA5B36dbC97BeE88c"
     },
     {
       "name": "USD Coin",
       "symbol": "USDC",
       "decimals": 18,
       "volatilityRatio": "0.95",
-      "price": "1",
+      "feed": "0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6",
       "cap": "10000000000000000000000000"
     },
     {
@@ -44,7 +53,6 @@
       "address": "0x4Ddc2D193948926D02f9B1fE9e1daa0718270ED5",
       "isCToken": true,
       "volatilityRatio": "0.9",
-      "price": "1",
       "cap": "10000000000000000000000000"
     },
     {
@@ -54,7 +62,6 @@
       "address": "0x39AA39c021dfbaE8faC545936693aC917d5E7563",
       "isCToken": true,
       "volatilityRatio": "0.95",
-      "price": "1",
       "cap": "10000000000000000000000000"
     },
     {
@@ -65,7 +72,6 @@
       "isAToken": true,
       "poolAddressesProvider": "0x2f39d218133AFaB8F2B819B1066c7E434Ad94E9e",
       "volatilityRatio": "0.9",
-      "price": "1",
       "cap": "10000000000000000000000"
     },
     {
@@ -76,7 +82,6 @@
       "isAToken": true,
       "poolAddressesProvider": "0x2f39d218133AFaB8F2B819B1066c7E434Ad94E9e",
       "volatilityRatio": "0.95",
-      "price": "1",
       "cap": "10000000000000000000000"
     }
   ],
@@ -98,6 +103,34 @@
           "name": "Ethereum X",
           "symbol": "ETHx",
           "price": "1000"
+        },
+        {
+          "name": "US Dollar CX",
+          "symbol": "USDcx",
+          "price": "1.00",
+          "isFeeToken": true
+        }
+      ]
+    },
+    {
+      "name": "Crypto Market Low Cap",
+      "symbol": "CRYLC",
+      "volatilityRatio": "0.9",
+      "rewardSpeed": "0",
+      "fee": "0",
+      "issuerAlloc": "0",
+      "synths": [
+        {
+          "name": "Numeraire",
+          "symbol": "NMRX",
+          "feed": "0xcC445B35b3636bC7cC7051f4769D8982ED0d449A"
+        },
+        {
+          "name": "Lido DAO",
+          "symbol": "LIDOx",
+          "feed": "0x4e844125952D32AcdF339BE976c98E22F6F318dB",
+          "isFeedSecondary": true,
+          "secondarySource": "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419"
         },
         {
           "name": "US Dollar CX",

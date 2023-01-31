@@ -5,7 +5,7 @@ import fs from "fs";
 
 import { DEFAULT_ADMIN_ROLE, L1_ADMIN_ROLE, L2_ADMIN_ROLE, GOVERNANCE_MODULE_ROLE } from "./utils/const";
 
-export default async function main() {
+export default async function main(isTest: boolean = false) {
 
 	// read deployments and config
 	const deployments = JSON.parse(fs.readFileSync(process.cwd() + `/deployments/${hre.network.config.chainId}/deployments.json`, "utf8"));
@@ -51,14 +51,16 @@ export default async function main() {
 	console.log("Admins set! 🎉")
 
 	// save deployments
-	fs.writeFileSync(
-		process.cwd() + `/deployments/${hre.network.config.chainId}/config.json`,
-		JSON.stringify(config, null, 2)
-	);
-	fs.writeFileSync(
-		process.cwd() + `/deployments/${hre.network.config.chainId}/deployments.json`,
-		JSON.stringify(deployments, null, 2)
-	);
+    if(!isTest){
+        fs.writeFileSync(
+            process.cwd() + `/deployments/${hre.network.config.chainId}/config.json`,
+            JSON.stringify(config, null, 2)
+        );
+        fs.writeFileSync(
+            process.cwd() + `/deployments/${hre.network.config.chainId}/deployments.json`,
+            JSON.stringify(deployments, null, 2)
+        );
+    }
 
 	console.log("Deployment complete! 🎉")
 	return { ...contracts, ...initiates };

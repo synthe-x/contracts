@@ -4,7 +4,7 @@ import { ethers } from "hardhat";
 import main from "../scripts/main";
 import { ETH_ADDRESS } from "../scripts/utils/const";
 
-describe("SyntheX", function () {
+describe("Testing the complete flow", function () {
 
 	let synthex: any, oracle: any, cryptoPool: any, eth: any, susd: any, sbtc: any, seth: any;
 	let owner: any, user1: any, user2: any, user3: any;
