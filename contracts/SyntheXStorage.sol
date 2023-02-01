@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./PriceOracle.sol";
+import "./oracle/PriceOracle.sol";
 import "./token/SyntheXToken.sol";
 import "./utils/AddressStorage.sol";
 
@@ -18,7 +18,7 @@ contract SyntheXStorage {
     /// @notice If reward token is sealed; if true, reward token cannot be transferred so we mint it
     bool public isRewardTokenSealed;
 
-    /// @notice Safe-Minimum collateral ratio. Debt cannot be issued if collateral ratio is below this value
+    /// @notice Safe-Minimum collateral ratio. Debt cannot be issued if collateral ratio is below this value. 1e18 = 100%
     uint256 public safeCRatio;
 
     /// @notice RewardToken initial index

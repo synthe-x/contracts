@@ -21,7 +21,7 @@ import "./interfaces/ISyntheX.sol";
  * @title SyntheX
  * @author SyntheX
  * @custom:security-contact prasad@chainscore.finance
- * @notice SyntheX is a decentralized synthetic asset protocol that allows users to mint synthetic assets backed by collateral assets.
+ * @notice This contract connects with debt pools to allows users to mint synthetic assets backed by collateral assets.
  */
 contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgradeable, SyntheXStorage {
     /// @notice Using SafeMath for uint256 to avoid overflow/underflow
@@ -49,14 +49,14 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
     
     /**
      * @notice Initialize the contract
-     * @param _sealedSyn The address of the Sealed SyntheX token
+     * @param _lockedSYN The address of the Sealed SyntheX token
      * @param _system The address of the system contract
      */
-    function initialize(address _sealedSyn, address _system, uint _safeCRatio) public initializer {
+    function initialize(address _lockedSYN, address _system, uint _safeCRatio) public initializer {
         __ReentrancyGuard_init();
         __Pausable_init();
         
-        rewardToken = SyntheXToken(_sealedSyn);
+        rewardToken = SyntheXToken(_lockedSYN);
         isRewardTokenSealed = true;
 
         system = System(_system);
@@ -220,7 +220,7 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         }
 
         // check health after withdrawal
-        require(healthFactor(msg.sender) > safeCRatio, "Health factor below safeCRatio");
+        require(healthFactor(msg.sender) >= safeCRatio, "Health factor below safeCRatio");
 
         // Update collateral supply
         supply.totalDeposits = supply.totalDeposits.sub(_amount);
@@ -262,8 +262,8 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         // issue synth and debt
         _amount = DebtPool(_debtPool).mint(_synth, msg.sender, msg.sender, _amount, amountUSD);
 
-        // ensure [after debt] health factor is positive
-        require(healthFactor(msg.sender) > safeCRatio, "Health factor below safeCRatio");
+        // ensure that [after issuing debt] health factor is positive
+        require(healthFactor(msg.sender) >= safeCRatio, "Health factor below safeCRatio");
 
         // emit event
         emit Issue(msg.sender, _debtPool, _synth, _amount);
@@ -830,6 +830,15 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
             );
         }
         return adjustedTotalDebt;
+    }
+
+    function getBorrowCapacity(address _account) virtual override external view returns(uint) {
+        // Get the total collateral of the account
+        uint totalCollateral = getAdjustedUserTotalCollateralUSD(_account);
+        // Get the total debt of the account
+        uint totalDebt = getAdjustedUserTotalDebtUSD(_account);
+        // Borrow capacity = (total collateral * LTV) - total debt
+        return totalCollateral.mul(1e18).div(safeCRatio).sub(totalDebt);
     }
     
     /**

@@ -16,7 +16,7 @@ import "./utils/AddressStorage.sol";
  * DEFAULT_ADMIN - Backup admin
  * L1_ADMIN - Top admininistrator: can set addresses, can upgrade contracts
  * L2_ADMIN - Admin to manage contracts params
- * GOVERNANCE_MODULE - Can handle proposals passed thru protocol governance
+ * GOVERNANCE_MODULE - Can handle proposals actions passed thru protocol governance
  */
 contract System is AddressStorage, AccessControlUpgradeable {
 

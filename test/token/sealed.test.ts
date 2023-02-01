@@ -1,8 +1,7 @@
-// import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
+import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
-import initiate from "../../scripts/test";
-import { time } from "@nomicfoundation/hardhat-network-helpers";
+import main from "../../scripts/main";
 
 describe("Testing sealed erc20", function () {
 
@@ -12,7 +11,7 @@ describe("Testing sealed erc20", function () {
 	before(async () => {
 		// Contracts are deployed using the first signer/account by default
         [owner, user1, user2] = await ethers.getSigners();
-        const deployments = await initiate(owner);
+		const deployments = await loadFixture(main);
         sealed = deployments.sealedSYN;
 	});
 
