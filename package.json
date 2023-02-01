@@ -3,10 +3,13 @@
   "scripts": {
     "compile": "hardhat compile",
     "test": "hardhat test --network hardhat",
+    "test:fork": "hardhat --config hardhat-fork.config.ts test --network hardhat",
+    "test:fork:custom": "hardhat --config hardhat-fork.config.ts test test/aave/wrap.test.ts --network hardhat",
     "console": "hardhat console",
     "node": "hardhat node",
     "deploy": "hardhat run scripts --network hardhat",
-    "slither": "slither . --checklist --markdown-root --codex docs/SECURITY.md"
+    "deploy:fork": "hardhat --config hardhat-fork.config.ts run scripts --network hardhat",
+    "slither": "slither . --checklist docs/SECURITY.md"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^2.0.0",
@@ -25,6 +28,7 @@
     "typescript": "^4.9.3"
   },
   "dependencies": {
+    "@aave/core-v3": "^1.17.1",
     "@nomicfoundation/hardhat-chai-matchers": "^1.0.5",
     "@nomicfoundation/hardhat-network-helpers": "^1.0.7",
     "@openzeppelin/contracts": "^4.7.3",

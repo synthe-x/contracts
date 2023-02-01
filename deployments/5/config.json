@@ -1,0 +1,114 @@
+{
+  "name": "synthex",
+  "version": "0.13.0",
+  "latest": "0.13.0",
+  "l0Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+  "l1Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+  "l2Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+  "governanceModule": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+  "safeCRatio": "1.3",
+  "debtRewardAlloc": "1000000",
+  "stakingRewards": {
+    "reward": "0",
+    "days": "0"
+  },
+  "unlocker": {
+    "lockupPeriod": "15552000",
+    "unlockPeriod": "15552000",
+    "percReleaseAtUnlock": "500",
+    "quota": "1000000"
+  },
+  "collaterals": [
+    {
+      "name": "Ethereum",
+      "symbol": "ETH",
+      "decimals": 18,
+      "volatilityRatio": "0.9",
+      "feed": "0xD4a33860578De61DBAbDc8BFdb98FD742fA7028e",
+      "address": "0x0000000000000000000000000000000000000000",
+      "cap": "100000000000000000000000"
+    },
+    {
+      "name": "Wrapped Bitcoin",
+      "symbol": "wBTC",
+      "decimals": 18,
+      "volatilityRatio": "0.8",
+      "feed": "0xA39434A63A52E749F02807ae27335515BA4b07F7",
+      "cap": "10000000000000000000000000"
+    },
+    {
+      "name": "USD Coin",
+      "symbol": "USDC",
+      "decimals": 18,
+      "volatilityRatio": "0.95",
+      "feed": "0xAb5c49580294Aff77670F839ea425f5b78ab3Ae7",
+      "cap": "10000000000000000000000000"
+    },
+    {
+      "name": "Compound Ether",
+      "symbol": "cETH",
+      "decimals": 18,
+      "address": "0x64078a6189Bf45f80091c6Ff2fCEe1B15Ac8dbde",
+      "isCToken": true,
+      "volatilityRatio": "0.9",
+      "cap": "10000000000000000000000000"
+    },
+    {
+      "name": "Compound USD Coin",
+      "symbol": "cUSDC",
+      "decimals": 6,
+      "address": "0x73506770799Eb04befb5AaE4734e58C2C624F493",
+      "isCToken": true,
+      "volatilityRatio": "0.95",
+      "cap": "10000000000000000000000000"
+    },
+    {
+      "name": "Aave Ethereum WETH",
+      "symbol": "aEthWETH",
+      "decimals": 18,
+      "address": "0x7649e0d153752c556b8b23DB1f1D3d42993E83a5",
+      "isAToken": true,
+      "poolAddressesProvider": "0xC911B590248d127aD18546B186cC6B324e99F02c",
+      "volatilityRatio": "0.9",
+      "cap": "10000000000000000000000"
+    },
+    {
+      "name": "Aave Ethereum USDC",
+      "symbol": "aEthUSDC",
+      "decimals": 6,
+      "address": "0x8Be59D90A7Dc679C5cE5a7963cD1082dAB499918",
+      "isAToken": true,
+      "poolAddressesProvider": "0xC911B590248d127aD18546B186cC6B324e99F02c",
+      "volatilityRatio": "0.95",
+      "cap": "10000000000000000000000"
+    }
+  ],
+  "tradingPools": [
+    {
+      "name": "Crypto Market",
+      "symbol": "CRY",
+      "volatilityRatio": "0.9",
+      "rewardSpeed": "0",
+      "fee": "0",
+      "issuerAlloc": "0",
+      "synths": [
+        {
+          "name": "Bitcoin X",
+          "symbol": "BTCx",
+          "feed": "0xA39434A63A52E749F02807ae27335515BA4b07F7"
+        },
+        {
+          "name": "Ethereum X",
+          "symbol": "ETHx",
+          "feed": "0x7649e0d153752c556b8b23DB1f1D3d42993E83a5"
+        },
+        {
+          "name": "US Dollar CX",
+          "symbol": "USDcx",
+          "price": "1.00",
+          "isFeeToken": true
+        }
+      ]
+    }
+  ]
+}

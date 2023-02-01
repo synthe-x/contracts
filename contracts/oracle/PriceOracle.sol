@@ -1,10 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./interfaces/IPriceOracle.sol";
-import "./System.sol";
-import "./interfaces/IChainlinkAggregator.sol";
-
+import "../interfaces/IPriceOracle.sol";
+import "../System.sol";
+import "../interfaces/IChainlinkAggregator.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 /**

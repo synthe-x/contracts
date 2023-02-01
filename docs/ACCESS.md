@@ -31,10 +31,12 @@ Contract level admin
 - All: Can Pause/Unpause contracts
 - Staking rewards: Can update amount, speed, reward period
 - Unlocker: Withdraw extra tokens, set lock period
+- Debt Pool: Update fee token, Disable synth
 
 ### Governance (GOVERNANCE_MODULE_ROLE)
 
 Can handle proposals passed thru protocol governance
 
 - Updating contract level params
-- Adding a trading pool, synth
+- SyntheX: Adding a trading pool
+- Debt Pool: Add/Enable synths, Update fee, Disable synth, Remove Synth
