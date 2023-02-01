@@ -10,7 +10,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
  * @author SyntheX
  * @custom:security-contact prasad@chainscore.finance
  */
-abstract contract ERC20Sealed is ERC20, ERC20Burnable, AccessControl {
+abstract contract ERC20Locked is ERC20, ERC20Burnable, AccessControl {
 
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 

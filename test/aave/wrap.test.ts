@@ -2,7 +2,6 @@ import { time, loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import main from "../../scripts/main";
-import { ETH_ADDRESS } from "../../scripts/utils/const";
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { Contract } from 'ethers';
 
@@ -33,7 +32,7 @@ describe("Testing wrapped atokens", function () {
         await weth.connect(user1).deposit({value: ethers.utils.parseEther("10")});
         // check balance
         expect(await weth.balanceOf(user1.address)).to.equal(ethers.utils.parseEther("10"));
-        
+
         // deposit to aave
         await weth.connect(user1).approve(pool.address, ethers.utils.parseEther("10"));
         await pool.connect(user1).deposit(weth.address, ethers.utils.parseEther("10"), user1.address, 0);

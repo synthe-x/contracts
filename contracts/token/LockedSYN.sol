@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./ERC20Sealed.sol";
+import "./ERC20Locked.sol";
 import "../System.sol";
 
 /**
@@ -11,7 +11,7 @@ import "../System.sol";
  * @notice Sealed tokens cannot be transferred
  * @notice Sealed tokens can only be minted and burned
  */
-contract LockedSYN is ERC20Sealed {
+contract LockedSYN is ERC20Locked {
     /// @notice AddressStorage contract
     System public system;
     
@@ -37,7 +37,7 @@ contract LockedSYN is ERC20Sealed {
 
     function _beforeTokenTransfer(address from, address to, uint256 amount)
         internal
-        override(ERC20Sealed)
+        override(ERC20Locked)
     {
         super._beforeTokenTransfer(from, to, amount);
     }

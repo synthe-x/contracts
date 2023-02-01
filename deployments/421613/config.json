@@ -1,7 +1,7 @@
 {
   "name": "synthex",
-  "version": "0.9.0",
-  "latest": "0.9.0",
+  "version": "0.10.0",
+  "latest": "0.10.0",
   "l0Admin": "0x084cD22eA15E4C262408e561a5AFa8431Bd7fa5d",
   "l1Admin": "0x2646306d3191AEE905bf9065bD1B7cC71c9036D0",
   "l2Admin": "0x46c18c6d5526E17B34a3deB43e5E9Ba2A659c23a",
@@ -26,7 +26,7 @@
       "volatilityRatio": "0.85",
       "feed": "0x62CAe0FA2da220f43a51F86Db2EDb36DcA9A5A08",
       "address": "0x0000000000000000000000000000000000000000",
-      "cap": "100"
+      "cap": "1000"
     },
     {
       "name": "USD Coin",
@@ -37,165 +37,236 @@
       "cap": "1000000"
     },
     {
-      "name": "Lido Staked ETH",
+      "name": "Lido wstETH",
       "symbol": "stETH",
       "decimals": 18,
       "volatilityRatio": "0.85",
       "feed": "0x62CAe0FA2da220f43a51F86Db2EDb36DcA9A5A08",
-      "address": "0x0000000000000000000000000000000000000000",
       "cap": "100"
     },
     {
-      "name": "Aave Ethereum WETH",
-      "symbol": "aEthWETH",
+      "name": "Aave WETH",
+      "symbol": "aArbWETH",
       "decimals": 18,
       "address": "0xBA3a852aDB46C8AD31A03397CD22b2E896625548",
       "isAToken": true,
       "poolAddressesProvider": "0x4eee0bb72c2717310318f27628b3c8a708e4951c",
       "volatilityRatio": "0.75",
-      "cap": "10000000000000000000000"
+      "cap": "25"
     },
     {
-      "name": "Aave Ethereum USDC",
-      "symbol": "aEthUSDC",
+      "name": "Aave USDC",
+      "symbol": "aArbUSDC",
       "decimals": 6,
       "address": "0xd9933e10d6d9453FFaCF1236aF7ea1a61EA4D2c5",
       "isAToken": true,
       "poolAddressesProvider": "0x4eee0bb72c2717310318f27628b3c8a708e4951c",
-      "volatilityRatio": "0.95",
-      "cap": "10000000000000000000000"
+      "volatilityRatio": "0.80",
+      "cap": "100000"
     }
   ],
   "tradingPools": [
     {
-      "name": "Crypto Market",
-      "symbol": "CRY",
+      "name": "Crypto Elite Pool",
+      "symbol": "CE",
       "volatilityRatio": "0.8",
       "rewardSpeed": "2.5",
       "fee": "15",
       "issuerAlloc": "7000",
       "synths": [
         {
-          "name": "Bitcoin X",
-          "symbol": "BTCx",
+          "name": "Bitcoin",
+          "symbol": "BTC",
           "feed": "0x6550bc2301936011c1334555e62A87705A81C12C"
         },
         {
-          "name": "Ethereum X",
-          "symbol": "ETHx",
+          "name": "Ethereum",
+          "symbol": "ETH",
           "feed": "0x62CAe0FA2da220f43a51F86Db2EDb36DcA9A5A08"
         },
         {
-          "name": "Binance Coin X",
-          "symbol": "BNBx",
+          "name": "Binance Coin",
+          "symbol": "BNB",
           "price": "295.22"
         },
         {
-          "name": "US Coin X",
-          "symbol": "USDCx",
+          "name": "USD Coin",
+          "symbol": "USDC",
           "price": "1.00",
           "isFeeToken": true
         },
         {
-          "name": "Cardano X",
-          "symbol": "ADAx",
+          "name": "Cardano",
+          "symbol": "ADA",
           "price": "0.32"
         },
         {
-          "name": "Aave X",
-          "symbol": "AAVEx",
+          "name": "Aave",
+          "symbol": "AAVE",
           "price": "66.39"
         },
         {
-          "name": "Chainlink X",
-          "symbol": "LINKx",
+          "name": "Chainlink",
+          "symbol": "LINK",
           "feed": "0xd28Ba6CA3bB72bF371b80a2a0a33cBcf9073C954"
         },
         {
-          "name": "Uniswap X",
-          "symbol": "UNIx",
+          "name": "Uniswap",
+          "symbol": "UNI",
           "price": "6.38"
         },
         {
-          "name": "Dogecoin X",
-          "symbol": "DOGEx",
+          "name": "Dogecoin",
+          "symbol": "DOGE",
           "price": "0.1074"
         },
         {
-          "name": "Polkadot X",
-          "symbol": "DOTx",
+          "name": "Polkadot",
+          "symbol": "DOT",
           "price": "5.70"
         }
       ]
     },
     {
-      "name": "US Stocks",
-      "symbol": "USST",
+      "name": "ETH-USDC Atomic Pool",
+      "symbol": "EU",
+      "volatilityRatio": "0.8",
+      "rewardSpeed": "2.5",
+      "fee": "15",
+      "issuerAlloc": "7000",
+      "synths": [
+        {
+          "name": "Ethereum",
+          "symbol": "ETH",
+          "feed": "0x62CAe0FA2da220f43a51F86Db2EDb36DcA9A5A08"
+        },
+        {
+          "name": "USD Coin",
+          "symbol": "USDC",
+          "price": "1.00",
+          "isFeeToken": true
+        }
+      ]
+    },
+    {
+      "name": "Mid-Cap Marvel Pool",
+      "symbol": "MM",
+      "volatilityRatio": "0.8",
+      "rewardSpeed": "2.5",
+      "fee": "15",
+      "issuerAlloc": "7000",
+      "synths": [
+        {
+          "name": "The Graph",
+          "symbol": "GRT",
+          "price": "0.088"
+        },
+        {
+          "name": "Curve DAO",
+          "symbol": "CRV",
+          "price": "1.01"
+        },
+        {
+          "name": "GMX",
+          "symbol": "GMX",
+          "price": "56.22"
+        },
+        {
+          "name": "AAVE",
+          "symbol": "AAVE",
+          "price": "81.01"
+        },
+        {
+          "name": "Optimism",
+          "symbol": "OP",
+          "price": "2.1"
+        },
+        {
+          "name": "Ethereum Name Service",
+          "symbol": "ENS",
+          "price": "15.96"
+        },
+        {
+          "name": "Harmony",
+          "symbol": "ONE",
+          "price": "0.023"
+        },
+        {
+          "name": "USD Coin",
+          "symbol": "USDC",
+          "price": "1.00",
+          "isFeeToken": true
+        }
+      ]
+    },
+    {
+      "name": "US Stock Pool",
+      "symbol": "US",
       "volatilityRatio": "0.9",
       "rewardSpeed": "1.1",
       "fee": "10",
       "issuerAlloc": "6000",
       "synths": [
         {
-          "name": "Apple X",
-          "symbol": "AAPLx",
+          "name": "Apple",
+          "symbol": "AAPL",
           "price": "130.00"
         },
         {
-          "name": "Tesla X",
-          "symbol": "TSLAx",
+          "name": "Tesla",
+          "symbol": "TSLA",
           "price": "700.00"
         },
         {
-          "name": "Amazon X",
-          "symbol": "AMZNx",
+          "name": "Amazon",
+          "symbol": "AMZN",
           "price": "3500.00"
         },
         {
-          "name": "Facebook X",
-          "symbol": "FBx",
+          "name": "Facebook",
+          "symbol": "FB",
           "price": "300.00"
         },
         {
-          "name": "Microsoft X",
-          "symbol": "MSFTx",
+          "name": "Microsoft",
+          "symbol": "MSFT",
           "price": "250.00"
         },
         {
-          "name": "S&P 500 X",
-          "symbol": "^GSPCx",
+          "name": "S&P 500",
+          "symbol": "^GSPC",
           "price": "3934.00"
         },
         {
-          "name": "Netflix X",
-          "symbol": "NFLXx",
+          "name": "Netflix",
+          "symbol": "NFLX",
           "price": "500.00"
         },
         {
-          "name": "Alphabet X",
-          "symbol": "GOOGLx",
+          "name": "Alphabet",
+          "symbol": "GOOGL",
           "price": "2500.00"
         },
         {
-          "name": "Nvidia X",
-          "symbol": "NVDAx",
+          "name": "Nvidia",
+          "symbol": "NVDA",
           "price": "500.00"
         },
         {
-          "name": "AMD X",
-          "symbol": "AMDx",
+          "name": "AMD",
+          "symbol": "AMD",
           "price": "100.00"
         },
         {
-          "name": "US Dollar SX",
-          "symbol": "USDsx",
+          "name": "US Dollar",
+          "symbol": "USD",
           "price": "1.00",
           "isFeeToken": true
         }
       ]
     },
     {
-      "name": "Foreign Exchange",
+      "name": "Global Currency Pool",
       "symbol": "FX",
       "volatilityRatio": "0.95",
       "rewardSpeed": "0.85",
@@ -203,54 +274,54 @@
       "issuerAlloc": "5000",
       "synths": [
         {
-          "name": "US Dollar FX",
-          "symbol": "USDfx",
+          "name": "US Dollar",
+          "symbol": "USD",
           "price": "1.00",
           "isFeeToken": true
         },
         {
-          "name": "Euro X",
-          "symbol": "EURx",
+          "name": "Euro",
+          "symbol": "EUR",
           "price": "0.85"
         },
         {
-          "name": "Japanese Yen X",
-          "symbol": "JPYx",
+          "name": "Japanese Yen",
+          "symbol": "JPY",
           "price": "0.0094"
         },
         {
-          "name": "British Pound X",
-          "symbol": "GBPx",
+          "name": "British Pound",
+          "symbol": "GBP",
           "price": "1.25"
         },
         {
-          "name": "Swiss Franc X",
-          "symbol": "CHFx",
+          "name": "Swiss Franc",
+          "symbol": "CHF",
           "price": "1.10"
         },
         {
-          "name": "Canadian Dollar X",
-          "symbol": "CADx",
+          "name": "Canadian Dollar",
+          "symbol": "CAD",
           "price": "0.80"
         },
         {
-          "name": "Australian Dollar X",
-          "symbol": "AUDx",
+          "name": "Australian Dollar",
+          "symbol": "AUD",
           "price": "0.75"
         },
         {
-          "name": "Korean Republic won X",
-          "symbol": "WONx",
+          "name": "Korean Republic won",
+          "symbol": "WON",
           "price": "0.0009"
         },
         {
-          "name": "UAE Dirham X",
-          "symbol": "AEDx",
+          "name": "UAE Dirham",
+          "symbol": "AED",
           "price": "0.27"
         },
         {
-          "name": "Indian Rupee X",
-          "symbol": "INRx",
+          "name": "Indian Rupee",
+          "symbol": "INR",
           "price": "0.013"
         }
       ]

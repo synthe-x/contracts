@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./ERC20Sealed.sol";
+import "./ERC20Locked.sol";
 import "../System.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
@@ -35,8 +35,8 @@ contract TokenUnlocker is Pausable {
         uint requestTime;
     }
 
-    /// @notice SEALED_TOKEN is the address of sealed token
-    ERC20Sealed public SEALED_TOKEN;
+    /// @notice LOCKED_TOKEN is the address of locked token
+    ERC20Locked public LOCKED_TOKEN;
     /// @notice TOKEN is the address of token be unlocked
     IERC20 public TOKEN;
     /// @notice Reserved for unlock is the amount of SYN that is reserved for unlock
@@ -58,12 +58,12 @@ contract TokenUnlocker is Pausable {
 
     /**
      * @notice Constructor
-     * @param _SEALED_TOKEN Address of SEALED_SYN
+     * @param _LOCKED_TOKEN Address of SEALED_SYN
      * @param _TOKEN Address of SYN
      */
-    constructor(address _system, address _SEALED_TOKEN, address _TOKEN, uint _lockPeriod, uint _unlockPeriod, uint _percUnlockAtRelease) {
+    constructor(address _system, address _LOCKED_TOKEN, address _TOKEN, uint _lockPeriod, uint _unlockPeriod, uint _percUnlockAtRelease) {
         system = System(_system);
-        SEALED_TOKEN = ERC20Sealed(_SEALED_TOKEN);
+        LOCKED_TOKEN = ERC20Locked(_LOCKED_TOKEN);
         TOKEN = IERC20(_TOKEN);
         lockPeriod = _lockPeriod;
         unlockPeriod = _unlockPeriod;
@@ -174,7 +174,7 @@ contract TokenUnlocker is Pausable {
         require(_amount > 0, "Amount must be greater than 0");
 
         // burn sealed tokens from user
-        SEALED_TOKEN.burnFrom(msg.sender, _amount);
+        LOCKED_TOKEN.burnFrom(msg.sender, _amount);
 
         // create unlock request
         bytes32 requestId = keccak256(abi.encodePacked(msg.sender, unlockRequestCount[msg.sender]));
