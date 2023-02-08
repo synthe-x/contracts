@@ -1,9 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./oracle/PriceOracle.sol";
-import "./token/SyntheXToken.sol";
-import "./utils/AddressStorage.sol";
+import "../oracle/PriceOracle.sol";
+import "../token/SyntheXToken.sol";
 
 /**
  * @title SyntheX Storage Contract
@@ -78,5 +77,5 @@ contract SyntheXStorage {
     /// @notice The reward accrued but not yet transferred to each user
     mapping(address => mapping(address => uint)) public rewardAccrued;
 
-    uint256[49] private __gap;
+    uint256[50] private __gap;
 }

@@ -1,21 +1,23 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./ERC20Locked.sol";
-import "../System.sol";
+import "./EscrowedSYN.sol";
+import "./SyntheXToken.sol";
+
+import "../system/System.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 /**
- * @title TokenUnlocker
+ * @title TokenRedeemer
  * @author SyntheX <prasad@chainscore.finance>
  * @notice This contract is used to unlock SYN tokens for users
  * @notice Users can request to unlock their SYN tokens after a lock period
  * @notice Tokens are released linearly over a period of time (unlock period)
  */
-contract TokenUnlocker is Pausable {
+contract TokenRedeemer is Pausable {
     /// @notice SafeMath library is used for uint operations
     using SafeMath for uint;
     /// @notice SafeERC20 library is used for ERC20 operations
@@ -36,9 +38,9 @@ contract TokenUnlocker is Pausable {
     }
 
     /// @notice LOCKED_TOKEN is the address of locked token
-    ERC20Locked public LOCKED_TOKEN;
+    EscrowedSYN public LOCKED_TOKEN;
     /// @notice TOKEN is the address of token be unlocked
-    IERC20 public TOKEN;
+    SyntheXToken public TOKEN;
     /// @notice Reserved for unlock is the amount of SYN that is reserved for unlock
     uint public reservedForUnlock;
     /// @notice Lock period is the time (in sec) that user must wait before they can claim their unlocked SYN
@@ -63,8 +65,8 @@ contract TokenUnlocker is Pausable {
      */
     constructor(address _system, address _LOCKED_TOKEN, address _TOKEN, uint _lockPeriod, uint _unlockPeriod, uint _percUnlockAtRelease) {
         system = System(_system);
-        LOCKED_TOKEN = ERC20Locked(_LOCKED_TOKEN);
-        TOKEN = IERC20(_TOKEN);
+        LOCKED_TOKEN = EscrowedSYN(_LOCKED_TOKEN);
+        TOKEN = SyntheXToken(_TOKEN);
         lockPeriod = _lockPeriod;
         unlockPeriod = _unlockPeriod;
         percUnlockAtRelease = _percUnlockAtRelease;
@@ -85,7 +87,7 @@ contract TokenUnlocker is Pausable {
     /* -------------------------------------------------------------------------- */
 
     modifier onlyAdmin() {
-        require(system.hasRole(system.L2_ADMIN_ROLE(), msg.sender), "Caller is not an admin");
+        require(system.isL2Admin(msg.sender), "Caller is not an admin");
         _;
     }
     /**

@@ -13,11 +13,10 @@ interface ISyntheX {
     function exitCollateral(address _collateral) external;
     function deposit(address _collateral, uint _amount) external payable ;
     function withdraw(address _collateral, uint _amount) external;
-    function issue(address _tradingPool, address _synth, uint _amount) external;
-    function burn(address _tradingPool, address _synth, uint _amount) external;
-    function exchange(address _tradingPool, address _synthFrom, address _synthTo, uint _amount) external;
-    function setPoolSpeed(address _rewardToken, address _tradingPool, uint _speed) external ;
-    function liquidate(address _account, address _tradingPool, address _inAsset, uint _inAmount, address _outAsset) external;
+    function commitMint(address _account, address _synth, uint _amount) external returns(int);    
+    function commitBurn(address _account, address _synth, uint _amount) external;
+    function setPoolSpeed(address _rewardToken, address _tradingPool, uint _speed) external;
+    function commitLiquidate(address _account, address _liquidator, address _outAsset, uint _outAmount, uint _penalty, uint _fee) external returns(uint);    
     
     /* -------------------------------------------------------------------------- */
     /*                               Admin Functions                              */
@@ -42,14 +41,11 @@ interface ISyntheX {
     /* -------------------------------------------------------------------------- */
     function collateralMembership(address market, address account) external view returns(bool);
     function tradingPoolMembership(address market, address account) external view returns(bool);
-    function healthFactor(address _account) external view returns(uint) ;
-    function getLTV(address _account) external view returns(uint) ;
-    function getUserTotalCollateralUSD(address _account) external view returns(uint);
-    function getAdjustedUserTotalCollateralUSD(address _account) external view returns(uint);
-    function getUserTotalDebtUSD(address _account) external view returns(uint);
-    function getAdjustedUserTotalDebtUSD(address _account) external view returns(uint) ;
-    function oracle() external view returns(IPriceOracle);
-    function getBorrowCapacity(address _account) external view returns(uint);
+    function healthFactorOf(address _account) external view returns(uint);
+    function ltvOf(address _account) external view returns(uint);
+    function getBorrowCapacity(address _account) external view returns(int);
+    function getAccountLiquidity(address _account) external view returns(uint, uint);
+    function getAdjustedAccountLiquidity(address _account) external view returns(uint, uint);
 
     /* -------------------------------------------------------------------------- */
     /*                               Events                                       */

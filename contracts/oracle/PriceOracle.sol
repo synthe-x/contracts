@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "../interfaces/IPriceOracle.sol";
-import "../System.sol";
+import "../system/System.sol";
 import "../interfaces/IChainlinkAggregator.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
@@ -48,7 +48,7 @@ contract PriceOracle is IPriceOracle {
      * @dev Get price feed address for an asset
      * @param _token Asset address
      */
-    function getFeed(address _token) public view returns (address) {
+    function getFeed(address _token) public view override returns (address) {
         return address(feeds[_token]);
     }
 
@@ -57,7 +57,7 @@ contract PriceOracle is IPriceOracle {
      * @param _asset Asset address
      * @return Price
      */
-    function getAssetPrice(address _asset) public view returns(Price memory) {
+    function getAssetPrice(address _asset) public view override returns(Price memory) {
         IChainlinkAggregator _feed = feeds[_asset];
         int256 price = _feed.latestAnswer();
         uint8 decimals = _feed.decimals();
@@ -75,7 +75,7 @@ contract PriceOracle is IPriceOracle {
      * @param _assets Asset addresses
      * @return Array of prices
      */
-    function getAssetPrices(address[] memory _assets) public view returns(Price[] memory) {
+    function getAssetPrices(address[] memory _assets) public view override returns(Price[] memory) {
         Price[] memory prices = new Price[](_assets.length);
         for(uint256 i = 0; i < _assets.length; i++) {
             prices[i] = getAssetPrice(_assets[i]);

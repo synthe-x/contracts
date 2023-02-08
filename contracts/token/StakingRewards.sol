@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import './ERC20Locked.sol';
+import './EscrowedSYN.sol';
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "../interfaces/IStaking.sol";
-import "../System.sol";
+import "../system/System.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 
 /**
@@ -127,7 +127,7 @@ contract StakingRewards is IStaking, ReentrancyGuard, Pausable {
         require(amount > 0, "Cannot stake 0");
         totalSupply = totalSupply.add(amount);
         balanceOf[msg.sender] = balanceOf[msg.sender].add(amount);
-        ERC20Locked(stakingToken).burnFrom(msg.sender, amount);
+        EscrowedSYN(stakingToken).transferFrom(msg.sender, address(this), amount);
         emit Staked(msg.sender, amount);
     }
 
@@ -139,7 +139,7 @@ contract StakingRewards is IStaking, ReentrancyGuard, Pausable {
         require(amount > 0, "Cannot withdraw 0");
         totalSupply = totalSupply.sub(amount);
         balanceOf[msg.sender] = balanceOf[msg.sender].sub(amount);
-        ERC20Locked(stakingToken).mint(msg.sender, amount);
+        EscrowedSYN(stakingToken).transfer(msg.sender, amount);
         emit Withdrawn(msg.sender, amount);
     }
     
@@ -152,7 +152,7 @@ contract StakingRewards is IStaking, ReentrancyGuard, Pausable {
     
         if (reward > 0) {
             rewards[msg.sender] = 0;
-            ERC20Locked(rewardsToken).mint(msg.sender, reward);
+            EscrowedSYN(rewardsToken).transfer(msg.sender, reward);
             emit RewardPaid(msg.sender, reward);       
         }
     }

@@ -1,5 +1,5 @@
 import hre, { ethers } from "hardhat";
-import { PRICE_ORACLE, SYNTHEX, VAULT } from "./utils/const";
+import { PRICE_ORACLE, SYNTHEX, VAULT, MINTER_ROLE, AUTHORIZED_SENDER } from './utils/const';
 import { _deploy } from './utils/helper';
 import { _deploy as _deployDefender, _propose as _proposeDefender } from './utils/defender';
 import { Contract } from 'ethers';
@@ -22,19 +22,19 @@ export async function deploy(deployments: any, config: any, deployer: SignerWith
   _deployDefender("SyntheXToken_"+versionSuffix, syn);
 
   // deploy Sealed SYN
-  const sealedSYN = await _deploy("LockedSYN", [system.address], deployments);
+  const sealedSYN = await _deploy("EscrowedSYN", [system.address], deployments);
   // _deployDefender("SealedSYN_"+versionSuffix, sealedSYN);
   
   // deploy synthex
-  const synthex = await _deploy("SyntheX", [sealedSYN.address, system.address, ethers.utils.parseEther(config.safeCRatio)], deployments, {upgradable: true});
+  const synthex = await _deploy("SyntheX", [system.address, ethers.utils.parseEther(config.safeCRatio)], deployments, {upgradable: true});
   _deployDefender("SyntheX_"+versionSuffix, synthex);
   await system.setAddress(SYNTHEX, synthex.address);
-  await sealedSYN.grantMinterRole(synthex.address);
+  await sealedSYN.grantRole(MINTER_ROLE, synthex.address);
 
   // deploy staking rewards : get xSYN on staking xSYN
   const stakingRewards = await _deploy("StakingRewards", [sealedSYN.address, sealedSYN.address, system.address, config.stakingRewards.days * 24 * 60 * 60], deployments)
   // _deployDefender("StakingRewards_"+versionSuffix, stakingRewards);
-  await sealedSYN.grantMinterRole(stakingRewards.address);
+  await sealedSYN.grantRole(MINTER_ROLE, stakingRewards.address);
   if(Number(config.stakingRewards.reward) > 0) await stakingRewards.notifyReward(ethers.utils.parseEther(config.stakingRewards.reward));
 
   // deploy price oracle
@@ -44,12 +44,12 @@ export async function deploy(deployments: any, config: any, deployer: SignerWith
 
   // deploy unlocker
   const unlocker = await _deploy(
-    "TokenUnlocker", 
+    "TokenRedeemer", 
     [system.address, sealedSYN.address, syn.address, config.unlocker.lockupPeriod, config.unlocker.unlockPeriod, ethers.utils.parseEther(config.unlocker.percReleaseAtUnlock)], 
     deployments
   );
-  await sealedSYN.grantMinterRole(deployer.address);
   // mint tokens to unlocker
+  await sealedSYN.grantRole(MINTER_ROLE, deployer.address);
   await sealedSYN.mint(unlocker.address, ethers.utils.parseEther(config.unlocker.quota));
 
   // deploy multicall

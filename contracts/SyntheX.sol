@@ -6,15 +6,17 @@ import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
-import "./DebtPool.sol";
-import "./SyntheXStorage.sol";
-import "./token/SyntheXToken.sol";
-import "./interfaces/IPriceOracle.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
-import "./utils/FeeVault.sol";
+import "@openzeppelin/contracts-upgradeable/utils/math/SignedSafeMathUpgradeable.sol";
+
+import "./DebtPool.sol";
+import "./storage/SyntheXStorage.sol";
+import "./token/SyntheXToken.sol";
+import "./interfaces/IPriceOracle.sol";
+import "./vault/FeeVault.sol";
 import "./interfaces/ISyntheX.sol";
 
 /**
@@ -22,10 +24,15 @@ import "./interfaces/ISyntheX.sol";
  * @author SyntheX
  * @custom:security-contact prasad@chainscore.finance
  * @notice This contract connects with debt pools to allows users to mint synthetic assets backed by collateral assets.
+ * @dev Handles Reward Distribution: setPoolSpeed, claimReward
+ * @dev Handle collateral: deposit/withdraw, enable/disable collateral, set collateral cap, volatility ratio
+ * @dev Enable/disale trading pool, volatility ratio 
  */
 contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgradeable, SyntheXStorage {
     /// @notice Using SafeMath for uint256 to avoid overflow/underflow
     using SafeMathUpgradeable for uint256;
+    using SignedSafeMathUpgradeable for int256;
+
     /// @notice Using Math for uint256 to use min/max
     using MathUpgradeable for uint256;
     /// @notice Using SafeERC20 for ERC20 to avoid reverts
@@ -38,25 +45,14 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
     uint public constant VERSION = 0;
 
     /**
-     * @notice Address storage keys // To avoid cross contract call to get role hash, we hardcode the hash here to save gas
-     */
-    bytes32 public constant PRICE_ORACLE = keccak256("PRICE_ORACLE");
-
-    /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor() {
-        _disableInitializers();
-    }
-    
-    /**
      * @notice Initialize the contract
-     * @param _lockedSYN The address of the Sealed SyntheX token
      * @param _system The address of the system contract
+     * @param _safeCRatio Safe Collateralization Ratio
      */
-    function initialize(address _lockedSYN, address _system, uint _safeCRatio) public initializer {
+    function initialize(address _system, uint _safeCRatio) public initializer {
         __ReentrancyGuard_init();
         __Pausable_init();
         
-        rewardToken = SyntheXToken(_lockedSYN);
         isRewardTokenSealed = true;
 
         system = System(_system);
@@ -64,22 +60,22 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
     }
 
     modifier onlyL1Admin() {
-        require(system.hasRole(system.L2_ADMIN_ROLE(), msg.sender), "SyntheX: Not authorized");
+        require(system.isL1Admin(msg.sender), "SyntheX: Not authorized");
         _;
     }
 
     modifier onlyL2Admin() {
-        require(system.hasRole(system.L2_ADMIN_ROLE(), msg.sender), "SyntheX: Not authorized");
+        require(system.isL2Admin(msg.sender), "SyntheX: Not authorized");
         _;
     }
 
     modifier onlyGov() {
-        require(system.hasRole(system.GOVERNANCE_MODULE_ROLE(), msg.sender), "SyntheX: Not authorized");
+        require(system.isGovernanceModule(msg.sender), "SyntheX: Not authorized");
         _;
     }
 
     modifier onlyGovOrL2() {
-        require(system.hasRole(system.L2_ADMIN_ROLE(), msg.sender) || system.hasRole(system.GOVERNANCE_MODULE_ROLE(), msg.sender), "SyntheX: Not authorized");
+        require(system.isL2Admin(msg.sender) || system.isGovernanceModule(msg.sender), "SyntheX: Not authorized");
         _;
     }
 
@@ -95,14 +91,18 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
      * @param _tradingPool The address of the trading pool
      */
     function enterPool(address _tradingPool) virtual override public {
+        _enterPool(msg.sender, _tradingPool);
+    }
+
+    function _enterPool(address _account, address _tradingPool) internal {
         // get pool
         Market storage market = tradingPools[_tradingPool];
         // ensure that the user is not already in the pool
-        require(!market.accountMembership[msg.sender], "SyntheX: Already in pool");
+        require(!market.accountMembership[_account], "SyntheX: Already in pool");
         // enable account's pool membership
-        market.accountMembership[msg.sender] = true;
+        market.accountMembership[_account] = true;
         // add to account's pool list
-        accountPools[msg.sender].push(_tradingPool);
+        accountPools[_account].push(_tradingPool);
     }
 
     /**
@@ -207,207 +207,132 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         uint depositBalance = accountCollateralBalance[msg.sender][_collateral];
         // ensure user has enough deposit balance
         require(depositBalance >= _amount, "Insufficient balance");
-        // deduct balance
-        accountCollateralBalance[msg.sender][_collateral] = depositBalance.sub(_amount);
 
         // Transfer assets to user
-        if(_collateral == address(0)){
-            require(address(this).balance >= _amount, "Insufficient ETH balance");
-            payable(msg.sender).transfer(_amount);
-        } else {
-            require(ERC20Upgradeable(_collateral).balanceOf(address(this)) >= _amount, "Insufficient ERC20 balance");
-            ERC20Upgradeable(_collateral).safeTransfer(msg.sender, _amount);
-        }
+        _amount = transferOut(_collateral, msg.sender, _amount);
 
-        // check health after withdrawal
-        require(healthFactor(msg.sender) >= safeCRatio, "Health factor below safeCRatio");
-
+        // Update balance
+        accountCollateralBalance[msg.sender][_collateral] = depositBalance.sub(_amount);
         // Update collateral supply
         supply.totalDeposits = supply.totalDeposits.sub(_amount);
 
-        // emit successful event
+        // Check health after withdrawal
+        require(healthFactorOf(msg.sender) >= safeCRatio, "Health factor below safeCRatio");
+
+        // Emit successful event
         emit Withdraw(msg.sender, _collateral, _amount);
+    }
+
+    function transferOut(address _collateral, address recipient, uint _amount) internal nonReentrant returns(uint) {
+        if(_collateral == address(0)){
+            if(address(this).balance < _amount){
+                _amount = address(this).balance;
+            }
+            payable(recipient).transfer(_amount);
+        } else {
+            if(ERC20Upgradeable(_collateral).balanceOf(address(this)) < _amount){
+                _amount = ERC20Upgradeable(_collateral).balanceOf(address(this));
+            }
+            ERC20Upgradeable(_collateral).safeTransfer(recipient, _amount);
+        }
+
+        return _amount;
     }
 
     /**
      * @notice Issue a synthetic asset
-     * @param _debtPool The address of the trading pool
+     * @param _account The address of the user
      * @param _synth The address of the synthetic asset
-     * @param _amount The amount of synthetic asset to issue
+     * @param _amount Amount
      */
-    function issue(address _debtPool, address _synth, uint _amount) virtual override public whenNotPaused {
-        // ensure amount is greater than 0
-        require(_amount > 0, "Amount must be greater than 0");
+    function commitMint(address _account, address _synth, uint _amount) external override whenNotPaused returns(int) {
+        _synth;
+        _amount;
+
+        address debtPool = msg.sender;
         // get trading pool market
-        Market storage pool = tradingPools[_debtPool];
+        Market storage pool = tradingPools[debtPool];
         // ensure the pool is enabled
         require(pool.isEnabled, "Trading pool not enabled");
         // ensure the account is in the pool
-        if(!pool.accountMembership[msg.sender]){
-            enterPool(_debtPool);
+        if(!pool.accountMembership[_account]){
+            _enterPool(_account, debtPool);
         }
-        // ensure the synth to issue is enabled from the trading pool
-        require(DebtPool(_debtPool).synths(_synth), "Synth not enabled");
         
         // update reward index for the pool 
-        updatePoolRewardIndex(address(rewardToken), _debtPool);
+        updatePoolRewardIndex(address(rewardToken), debtPool);
         // distribute pending reward tokens to user
-        distributeAccountReward(address(rewardToken), _debtPool, msg.sender);
+        distributeAccountReward(address(rewardToken), debtPool, _account);
 
-        // get price from oracle
-        IPriceOracle.Price memory price = oracle().getAssetPrice(_synth);
-
-        // amoount to issue in USD; needed to issue debt
-        uint amountUSD = _amount.mul(price.price).div(10**price.decimals);
-        // issue synth and debt
-        _amount = DebtPool(_debtPool).mint(_synth, msg.sender, msg.sender, _amount, amountUSD);
-
-        // ensure that [after issuing debt] health factor is positive
-        require(healthFactor(msg.sender) >= safeCRatio, "Health factor below safeCRatio");
-
-        // emit event
-        emit Issue(msg.sender, _debtPool, _synth, _amount);
+        return getBorrowCapacity(_account);
     }
 
     /**
      * @notice Redeem a synthetic asset
-     * @param _debtPool The address of the trading pool
+     * @param _account The address of the user
      * @param _synth The address of the synthetic asset
-     * @param _amount The amount of synthetic asset to redeem
+     * @param _amount Amount
      */
-    function burn(address _debtPool, address _synth, uint _amount) virtual override public whenNotPaused {
-        // ensure amount is greater than 0
-        require(_amount > 0, "Amount must be greater than 0");
+    function commitBurn(address _account, address _synth, uint _amount) external override whenNotPaused {
+        _synth;
+        _amount;
 
         // update reward index for the pool 
-        updatePoolRewardIndex(address(rewardToken), _debtPool);
+        updatePoolRewardIndex(address(rewardToken), msg.sender);
         // distribute pending reward tokens to user
-        distributeAccountReward(address(rewardToken), _debtPool, msg.sender);
-
-        // get synth price
-        IPriceOracle _oracle = IPriceOracle(system.getAddress(PRICE_ORACLE));
-        IPriceOracle.Price memory price = _oracle.getAssetPrice(_synth);
-
-        // amount in USD for debt calculation
-        uint amountUSD = _amount.mul(price.price).div(10**price.decimals);
-
-        _amount = DebtPool(_debtPool).burn(_synth, msg.sender, msg.sender, _amount, amountUSD);
-
-        emit Burn(msg.sender, _debtPool, _synth, _amount);
+        distributeAccountReward(address(rewardToken), msg.sender, _account);
     }
 
-    /**
-     * @notice Exchange a synthetic asset for another
-     * @param _debtPool The address of the trading pool
-     * @param _synthFrom The address of the synthetic asset to exchange
-     * @param _synthTo The address of the synthetic asset to receive
-     * @param _amount The amount of synthetic asset to exchange
-     */
-    function exchange(address _debtPool, address _synthFrom, address _synthTo, uint _amount) virtual override public whenNotPaused nonReentrant {
-        // ensure exchange is not to same synth
-        require(_synthFrom != _synthTo, "Synths are the same");
-        // ensure amount > 0
-        require(_amount > 0, "Amount must be greater than 0");
-
-        IPriceOracle.Price[] memory prices;
-        address[] memory t = new address[](2);
-        t[0] = _synthFrom;
-        t[1] = _synthTo;
-        prices = oracle().getAssetPrices(t);
-
-        // _amount in terms of _synthTo
-        uint amountUSD = _amount.mul(prices[0].price).div(10**prices[0].decimals);
-        uint amountDst = _amount.mul(prices[0].price).mul(10**prices[1].decimals).div(prices[1].price).div(10**prices[0].decimals);
-
-        // Burn fromSynth from users
-        DebtPool(_debtPool).burnSynth(_synthFrom, msg.sender, _amount);
-        // Mint toSynth to user
-        DebtPool(_debtPool).mintSynth(_synthTo, msg.sender, amountDst, amountUSD);
-
-        // emit successful exchange event
-        emit Exchange(msg.sender, _debtPool, _synthFrom, _synthTo, _amount, amountDst);
+    struct AccountLiquidity {
+        uint totalCollateral;
+        uint totalAdjustedCollateral;
+        uint totalDebt;
+        uint totalAdjustedDebt;
     }
 
     /**
      * @notice Liquidate an account
-     * @param _account The address of the account to liquidate
-     * @param _debtPool The address of the trading pool
-     * @param _inAsset The address of the asset to liquidate
-     * @param _inAmount The amount of asset to liquidate
-     * @param _outAsset The address of the collateral to receive
      */
-    function liquidate(address _account, address _debtPool, address _inAsset, uint _inAmount, address _outAsset) virtual override external whenNotPaused nonReentrant {
-        uint _healthFactor = healthFactor(_account);
-        // ensure account is below liquidation threshold
-        require(_healthFactor < 1e18, "Health factor above 1");
-        // ensure account is not already liquidated
-        // health factor goes 0 when completely liquidated (as collateral = 0)
-        require(_healthFactor > 0, "Account is already liquidated");
-        // amount should be greater than 0
-        require(_inAmount > 0, "Amount must be greater than 0");
+    function commitLiquidate(address _account, address _liquidator, address _outAsset, uint _outAmount, uint _penalty, uint _fee) external override whenNotPaused returns(uint) {
+        require(_outAmount > 0, "Invalid tokenOut amount");
+        // Get account liquidity
+        (uint totalCollateral, uint totalAdjustedCollateral, uint totalDebt, uint totalAdjustedDebt) = _getAccountLiquidity(_account);
+        require(totalDebt > 0, "Account has no debt");
+        require(totalAdjustedDebt > 0, "Account has no collateral");
+        
+        // Calculate health factor
+        (uint _health, uint _ltv) = (totalAdjustedCollateral.mul(1e18).div(totalAdjustedDebt), totalCollateral.mul(1e18).div(totalDebt));
+        // Ensure account is below liquidation threshold
+        require(_health < 1e18, "Health factor above 1");
+        // Ensure account is not already liquidated
+        // Health factor goes 0 when completely liquidated (as collateral = 0)
+        require(_health > 0, "Account is already liquidated");
+        // Ensure incentive is greater than 0
+        require(_ltv > 0, "Account has zero LTV");
 
-        // liquidation incentive is the account loan to value ratio
-        uint incentive = getLTV(_account);
-        // ensure incentive is greater than 0
-        require(incentive > 0, "Account has zero LTV");
+        // Ensure collateral market is enabled
+        require(collaterals[_outAsset].isEnabled, "Collateral not enabled");
+        // Ensure user has entered the collateral market
+        require(collaterals[_outAsset].accountMembership[_account], "Account not in collateral");
 
-        IPriceOracle.Price[] memory prices;
-        address[] memory t = new address[](2);
-        t[0] = _inAsset;
-        t[1] = _outAsset;
-        prices = oracle().getAssetPrices(t);
+        // Sieze collateral
+        uint siezePercent = accountCollateralBalance[_account][_outAsset].mul(1e18).div(_outAmount);
+        if(siezePercent < 1e18){
+            _outAmount = _outAmount.mul(siezePercent).div(1e18);
+            _penalty = _penalty.mul(siezePercent).div(1e18);
+            _fee = _fee.mul(siezePercent).div(1e18);
+        }
+        accountCollateralBalance[_account][_outAsset] = accountCollateralBalance[_account][_outAsset].sub(_outAmount.add(_penalty));
 
-        // give back inAmountUSD*(discount) of collateral
-        Market storage collateral = collaterals[_outAsset];
-        // ensure collateral market is enabled
-        require(collateral.isEnabled, "Collateral not enabled");
-        // ensure user has entered the collateral market
-        require(collateral.accountMembership[_account], "Account not in collateral");
+        // Add collateral to liquidator
+        accountCollateralBalance[_liquidator][_outAsset] = accountCollateralBalance[_liquidator][_outAsset].add(_outAmount.add(_penalty).sub(_fee));
 
-        // get collateral balance
-        uint collateralBalance = accountCollateralBalance[_account][_outAsset];
-
-        // inAssetAmount (synth) => collateralAmount (collateral)
-        // collateral to sieze = incentive * (inAmount * inAmountPrice) / outAssetPrice
-        uint collateralToSieze = _inAmount
-            .mul(prices[0].price)           // in asset price
-            .mul(10**prices[1].decimals)    // from dividing outAssetPrice
-            .mul(incentive)                 // liquidation incentive
-            .div(1e18)                      // decimal points from multiplying incentive
-            .div(prices[1].price)           // out asset price
-            .div(10**prices[0].decimals);   // from multiplying inAssetPrice
-
-        // if collateral to sieze is more than collateral balance, sieze all collateral
-        if(collateralBalance < collateralToSieze){
-            collateralToSieze = collateralBalance;
+        // Transfer fee to vault
+        if(_fee > 0){
+            require(transferOut(_outAsset, system.vault(), _fee) == _fee, "Fee transfer failed");
         }
 
-        uint amountUSD = collateralToSieze
-            .mul(prices[1].price)
-            .mul(1e18)
-            .div(incentive)
-            .div(10**prices[1].decimals);
-
-        // burn synth & debt
-        uint synthToBurn = amountUSD
-            .mul(10**prices[0].decimals)
-            .div(prices[0].price);
-        
-        uint synthBurned = DebtPool(_debtPool).burn(
-            _inAsset, 
-            msg.sender,
-            _account, 
-            synthToBurn,
-            amountUSD
-        );
-
-        collateralToSieze = collateralToSieze.mul(synthBurned).div(synthToBurn);        
-
-        // sieze collateral
-        accountCollateralBalance[_account][_outAsset] = collateralBalance.sub(collateralToSieze);
-
-        // add collateral to liquidator
-        accountCollateralBalance[msg.sender][_outAsset] = accountCollateralBalance[msg.sender][_outAsset].add(collateralToSieze);
+        return _outAmount;
     }
     
     /* -------------------------------------------------------------------------- */
@@ -438,11 +363,11 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
     function enableTradingPool(address _tradingPool, uint _volatilityRatio) virtual override public onlyGov {
         require(_volatilityRatio > 0, "Volatility ratio must be greater than 0");
         Market storage pool = tradingPools[_tradingPool];
-        // enable pool
+        // Enable pool
         pool.isEnabled = true;
-        // set pool's volatility ratio
+        // Set pool's volatility ratio
         pool.volatilityRatio = _volatilityRatio;
-        // emit event
+        // Emit event
         emit TradingPoolEnabled(_tradingPool, _volatilityRatio);
     }
     
@@ -550,6 +475,7 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
      * @param _tradingPool The market whose reward index to update
      */
     function updatePoolRewardIndex(address _rewardToken, address _tradingPool) internal {
+        if(_rewardToken == address(0)) return;
         PoolRewardState storage poolRewardState = rewardState[_rewardToken][_tradingPool];
         uint rewardSpeed = rewardSpeeds[_rewardToken][_tradingPool];
         uint deltaTimestamp = block.timestamp - poolRewardState.timestamp;
@@ -572,6 +498,7 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
      * @param _account The address of the supplier to distribute reward to
      */
     function distributeAccountReward(address _rewardToken, address _debtPool, address _account) internal {
+        if(_rewardToken == address(0)) return;
         // This check should be as gas efficient as possible as distributeAccountReward is called in many places.
         // - We really don't want to call an external contract as that's quite expensive.
 
@@ -647,6 +574,9 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
      * @return The amount of COMP SYN was NOT transferred to the user
      */
     function grantRewardInternal(address _reward, address _user, uint _amount) internal whenNotPaused nonReentrant returns (uint) {
+        
+        if(_reward == address(0)) return(0);
+
         SyntheXToken _rewardToken = SyntheXToken(_reward);
         // Check if the reward token is sealed
         // if sealed: mint it, else: transfer it
@@ -710,15 +640,13 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
      * @param _account The address of the account.
      * @return The health factor of the account.
      */
-    function healthFactor(address _account) virtual override public view returns(uint) {
-        // Total adjusted collateral in USD
-        uint totalCollateral = getAdjustedUserTotalCollateralUSD(_account);
-        // Total adjusted debt in USD
-        uint totalDebt = getAdjustedUserTotalDebtUSD(_account);
+    function healthFactorOf(address _account) virtual override public view returns(uint) {
+        // Total adjusted collateral & Total adjusted debt in USD
+        (uint totalCollateral, uint totalDebt) = getAdjustedAccountLiquidity(_account);
         // If total debt is 0, health factor is infinite
         if(totalDebt == 0) return type(uint).max;
         // health factor = collateral / debt
-        return totalCollateral * 1e18 / totalDebt;
+        return totalCollateral.mul(1e18).div(totalDebt);
     }
 
     /**
@@ -727,15 +655,24 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
      * @param _account The address of the account
      * @return The health factor of the account
      */
-    function getLTV(address _account) virtual override public view returns(uint) {
-        // Total collateral in USD
-        uint totalCollateral = getUserTotalCollateralUSD(_account);
-        // Total debt in USD
-        uint totalDebt = getUserTotalDebtUSD(_account);
-        // If total debt is 0, LTV is infinite
+    function ltvOf(address _account) virtual override public view returns(uint) {
+        // Total collateral & Total debt in USD
+        (uint totalCollateral, uint totalDebt) = getAccountLiquidity(_account);
+        // If total debt is 0, LTV is infinite 
         if(totalDebt == 0) return type(uint).max;
         // LTV = collateral / debt
-        return totalCollateral * 1e18 / totalDebt;
+        return totalCollateral.mul(1e18).div(totalDebt);
+    }
+
+    /**
+     * @dev Get the borrow capacity of an account
+     * @dev Borrow Capacity = (Total Collateral / safeCRatio) - Total Debt
+     */
+    function getBorrowCapacity(address _account) virtual override public view returns(int) {
+        // Get the total collateral & total debt of the account
+        (uint totalCollateral, uint totalDebt) = getAdjustedAccountLiquidity(_account);
+        // Borrow capacity = (total collateral * LTV) - total debt
+        return int(totalCollateral.mul(1e18).div(safeCRatio)).sub(int(totalDebt));
     }
 
     /**
@@ -743,12 +680,12 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
      * @param _account The address of the account
      * @return The total collateral of the account
      */
-    function getUserTotalCollateralUSD(address _account) virtual override public view returns(uint) {
+    function getAccountLiquidity(address _account) virtual override public view returns(uint, uint) {
         // Total collateral in USD
         uint totalCollateral = 0;
 
         // Read and cache the price oracle
-        IPriceOracle _oracle = oracle();
+        IPriceOracle _oracle = IPriceOracle(system.priceOracle());
 
         // Iterate over all the collaterals of the account
         for(uint i = 0; i < accountCollaterals[_account].length; i++){
@@ -760,7 +697,17 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
                 accountCollateralBalance[_account][collateral].mul(price.price).div(10**price.decimals)
             );
         }
-        return totalCollateral;
+
+        // Total debt in USD
+        uint totalDebt = 0;
+        // Read and cache the trading pools the user is in
+        address[] memory _accountPools = accountPools[_account];
+        // Iterate over all the trading pools of the account
+        for(uint i = 0; i < _accountPools.length; i++){
+            // Add the debt amount in USD
+            totalDebt = totalDebt.add(DebtPool(_accountPools[i]).getUserDebtUSD(_account));
+        }
+        return (totalCollateral, totalDebt);
     }
 
     /**
@@ -768,12 +715,12 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
      * @param _account The address of the account
      * @return The total debt of the account
      */
-    function getAdjustedUserTotalCollateralUSD(address _account) virtual override public view returns(uint) {
+    function getAdjustedAccountLiquidity(address _account) virtual override public view returns(uint, uint) {
         // Total collateral in USD
         uint totalCollateral = 0;
         
         // Read and cache the price oracle
-        IPriceOracle _oracle = oracle();
+        IPriceOracle _oracle = IPriceOracle(system.priceOracle());
 
         // Iterate over all the collaterals of the account
         for(uint i = 0; i < accountCollaterals[_account].length; i++){
@@ -789,62 +736,66 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
                 .div(10**price.decimals)        // adjust for price
             ); 
         }
-        return totalCollateral;
-    }
 
-    /**
-     * @dev Get the total debt of an account
-     * @param _account The address of the account
-     * @return The total debt of the account
-     */
-    function getUserTotalDebtUSD(address _account) virtual override public view returns(uint) {
-        // Total debt in USD
+        // Total adjusted debt in USD
         uint totalDebt = 0;
         // Read and cache the trading pools the user is in
         address[] memory _accountPools = accountPools[_account];
         // Iterate over all the trading pools of the account
         for(uint i = 0; i < _accountPools.length; i++){
-            // Add the debt amount in USD
-            totalDebt = totalDebt.add(DebtPool(_accountPools[i]).getUserDebtUSD(_account));
-        }
-        return totalDebt;
-    }
-
-    /**
-     * @dev Get the total adjusted debt of an account: E(debt of an asset)/(volatility ratio of the asset)
-     * @param _account The address of the account
-     * @return The total debt of the account
-     */
-    function getAdjustedUserTotalDebtUSD(address _account) virtual override public view returns(uint) {
-        // Total adjusted debt in USD
-        uint adjustedTotalDebt = 0;
-        // Read and cache the trading pools the user is in
-        address[] memory _accountPools = accountPools[_account];
-        // Iterate over all the trading pools of the account
-        for(uint i = 0; i < _accountPools.length; i++){
             // Add the adjusted debt amount in USD
-            adjustedTotalDebt = adjustedTotalDebt.add(
+            totalDebt = totalDebt.add(
                 DebtPool(_accountPools[i]).getUserDebtUSD(_account)
                 .mul(1e18)
                 .div(tradingPools[_accountPools[i]].volatilityRatio)
             );
         }
-        return adjustedTotalDebt;
+        return (totalCollateral, totalDebt);
     }
 
-    function getBorrowCapacity(address _account) virtual override external view returns(uint) {
-        // Get the total collateral of the account
-        uint totalCollateral = getAdjustedUserTotalCollateralUSD(_account);
-        // Get the total debt of the account
-        uint totalDebt = getAdjustedUserTotalDebtUSD(_account);
-        // Borrow capacity = (total collateral * LTV) - total debt
-        return totalCollateral.mul(1e18).div(safeCRatio).sub(totalDebt);
-    }
-    
-    /**
-     * @dev Get price oracle
-     */
-    function oracle() virtual override public view returns(IPriceOracle){
-        return IPriceOracle(system.getAddress(PRICE_ORACLE));
+    function _getAccountLiquidity(address _account) public view returns(uint, uint, uint, uint) {
+        // Total collateral in USD
+        uint totalCollateral = 0;
+        uint totalAdjustedCollateral = 0;
+        // Total adjusted debt in USD
+        uint totalDebt = 0;
+        uint totalAdjustedDebt = 0;
+
+        // Read and cache the price oracle
+        IPriceOracle _oracle = IPriceOracle(system.priceOracle());
+
+        // Iterate over all the collaterals of the account
+        for(uint i = 0; i < accountCollaterals[_account].length; i++){
+            address collateral = accountCollaterals[_account][i];
+            IPriceOracle.Price memory price = _oracle.getAssetPrice(collateral);
+            // Add the adjusted collateral amount in USD
+            // AdjustedCollateralAmountUSD = CollateralAmount * Price * volatilityRatio / 10^PriceDecimals
+            totalAdjustedCollateral = totalAdjustedCollateral.add(
+                accountCollateralBalance[_account][collateral]
+                .mul(price.price)
+                .mul(collaterals[collateral].volatilityRatio)
+                .div(1e18)                      // adjust for volatility ratio
+                .div(10**price.decimals)        // adjust for price
+            ); 
+
+            totalCollateral = totalCollateral.add(
+                accountCollateralBalance[_account][collateral].mul(price.price).div(10**price.decimals)
+            );
+        }
+        
+        // Read and cache the trading pools the user is in
+        address[] memory _accountPools = accountPools[_account];
+        // Iterate over all the trading pools of the account
+        for(uint i = 0; i < _accountPools.length; i++){
+            // Add the adjusted debt amount in USD
+            totalAdjustedDebt = totalAdjustedDebt.add(
+                DebtPool(_accountPools[i]).getUserDebtUSD(_account)
+                .mul(1e18)
+                .div(tradingPools[_accountPools[i]].volatilityRatio)
+            );
+
+            totalDebt = totalDebt.add(DebtPool(_accountPools[i]).getUserDebtUSD(_account));
+        }
+        return (totalCollateral, totalAdjustedCollateral, totalDebt, totalAdjustedDebt);
     }
 }

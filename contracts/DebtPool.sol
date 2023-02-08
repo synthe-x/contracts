@@ -5,12 +5,17 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
 import "./ERC20X.sol";
 import "./oracle/PriceOracle.sol";
 import "./SyntheX.sol";
-import "./System.sol";
+import "./system/System.sol";
 import "./interfaces/IDebtPool.sol";
+import "./libraries/PriceConvertor.sol";
+import "./storage/DebtPoolStorage.sol";
+
+import "hardhat/console.sol";
 
 /**
  * @title DebtPool
@@ -18,40 +23,77 @@ import "./interfaces/IDebtPool.sol";
  * @author SyntheX
  * @custom:security-contact prasad@chainscore.finance
  */
-contract DebtPool is IDebtPool, ERC20Upgradeable {
+contract DebtPool is IDebtPool, ERC20Upgradeable, PausableUpgradeable, DebtPoolStorage {
     /// @notice Using SafeMath for uint256 to prevent overflows and underflows
     using SafeMathUpgradeable for uint256;
     /// @notice Using Math for uint256 to calculate minimum and maximum
     using MathUpgradeable for uint256; 
-
-    /**
-     * @dev Address storage keys
-     */
-    bytes32 public constant PRICE_ORACLE = keccak256("PRICE_ORACLE");
-    bytes32 public constant VAULT = keccak256("VAULT");
-    bytes32 public constant SYNTHEX = keccak256("SYNTHEX");
-
-    /// @notice Check if synth is enabled
-    mapping(address => bool) public synths;
-    /// @notice The fee for minting synths in the pool in basis points
-    uint public fee;
-    /// @notice Issuer allocation (of fee) in basis points
-    uint public issuerAlloc;
-    /// @notice Basis points constant. 10000 basis points * 1e18 = 100%
-    uint private constant BASIS_POINTS = 10000;
-    /// @notice The synth token used to pass on to vault as fee
-    address public feeToken;
-    /// @notice The list of synths in the pool. Needed to calculate total debt
-    address[] private _synthsList;
-    /// @notice The address of the address storage contract
-    System public system;
-
+    /// @notice for converting token prices
+    using PriceConvertor for uint256;
+    
     /**
      * @dev Initialize the contract
      */
     function initialize(string memory name, string memory symbol, address _system) public initializer {
         __ERC20_init(name, symbol);
+        __Pausable_init();
         system = System(_system);
+    }
+
+    // Override transfer
+    function _transfer(address, address, uint256) internal virtual override {
+        revert("DebtPool: Transfer not allowed");
+    }
+
+    /**
+     * @notice Pause the contract
+     * @dev Only callable by L2 admin
+     */
+    function pause() public onlyL2Admin() {
+        _pause();
+    }
+
+    /**
+     * @notice Unpause the contract
+     * @dev Only callable by L2 admin
+     */
+    function unpause() public onlyL2Admin() {
+        _unpause();
+    }
+
+    /* -------------------------------------------------------------------------- */
+    /*                                 Modifiers                                  */
+    /* -------------------------------------------------------------------------- */
+    /**
+     * @notice Only L2_ADMIN_ROLE can call admin functions
+     */
+    modifier onlyL2Admin(){
+        require(system.isL2Admin(msg.sender), "SyntheXPool: Only L2_ADMIN_ROLE can call");
+        _;
+    }
+
+    /**
+     * @notice Only GOVERNANCE_MODULE_ROLE can call function
+     */
+    modifier onlyGov(){
+        require(system.isGovernanceModule(msg.sender), "SyntheXPool: Only GOVERNANCE_MODULE_ROLE can call");
+        _;
+    }
+
+    /**
+     * @notice Only GOVERNANCE_MODULE_ROLE or L2_ADMIN_ROLE can call function
+     */
+    modifier onlyGovOrL2Admin(){
+        require(system.isGovernanceModule(msg.sender) || system.isL2Admin(msg.sender), "SyntheXPool: Only GOVERNANCE_MODULE_ROLE or L2_ADMIN_ROLE can call");
+        _;
+    }
+
+    /**
+     * @notice Only synthex can call
+     */
+    modifier onlyInternal(){
+        require(system.synthex() == msg.sender, "SyntheXPool: Only SyntheX can call this function");
+        _;
     }
 
     /* -------------------------------------------------------------------------- */
@@ -69,27 +111,33 @@ contract DebtPool is IDebtPool, ERC20Upgradeable {
         // Enable synth
         synths[_synth] = true;
         // Ensure _synthsList does not already contain _synth
-        for(uint i = 0; i < _synthsList.length; i++){
-            require(_synthsList[i] != _synth, "Synth already exists in pool, but is disabled");
+        for(uint i = 0; i < synthsList.length; i++){
+            require(synthsList[i] != _synth, "Synth already exists in pool, but is disabled");
         }
         // Append to _synthsList
-        _synthsList.push(_synth); 
+        synthsList.push(_synth); 
         // Sanity check. Ensure synth has pool as owner
-        require(ERC20X(_synth).pool() == address(this), "Synth must have pool as owner");
+        require(address(ERC20X(_synth).pool()) == address(this), "Synth must have pool as owner");
         // Emit event on synth enabled
         emit SynthEnabled(_synth);
     }
 
     /**
      * @dev Update the fee for the pool
-     * @param _fee The new fee
-     * @param _alloc The new issuer allocation
+     * @param _mintFee New mint fee
+     * @param _swapFee New swap fee
+     * @param _burnFee New burn fee
+     * @param _issuerAlloc The new issuer allocation
      */
-    function updateFee(uint _fee, uint _alloc) virtual override public onlyGov {
-        fee = _fee;
-        issuerAlloc = _alloc;
+    function updateFee(uint _mintFee, uint _swapFee, uint _burnFee, uint _liquidationFee, uint _liquidationPenalty, uint _issuerAlloc) virtual override public onlyGov {
+        mintFee = _mintFee;
+        swapFee = _swapFee;
+        burnFee = _burnFee;
+        liquidationFee = _liquidationFee;
+        liquidationPenalty = _liquidationPenalty;
+        issuerAlloc = _issuerAlloc;
         // Emit event on fee updated
-        emit FeesUpdated(_fee, _alloc);
+        emit FeesUpdated(_mintFee, _swapFee, _burnFee, _liquidationFee, _liquidationPenalty, _issuerAlloc);
     }
 
     /**
@@ -97,6 +145,7 @@ contract DebtPool is IDebtPool, ERC20Upgradeable {
      */
     function updateFeeToken(address _feeToken) virtual override public onlyL2Admin {
         feeToken = _feeToken;
+        require(synths[_feeToken], "Synth not enabled");
         // Emit event on primary token updated
         emit FeeTokenUpdated(_feeToken);
     }
@@ -121,10 +170,10 @@ contract DebtPool is IDebtPool, ERC20Upgradeable {
      */
     function removeSynth(address _synth) virtual override public onlyGov {
         synths[_synth] = false;
-        for (uint i = 0; i < _synthsList.length; i++) {
-            if (_synthsList[i] == _synth) {
-                _synthsList[i] = _synthsList[_synthsList.length - 1];
-                _synthsList.pop();
+        for (uint i = 0; i < synthsList.length; i++) {
+            if (synthsList[i] == _synth) {
+                synthsList[i] = synthsList[synthsList.length - 1];
+                synthsList.pop();
                 emit SynthRemoved(_synth);
                 break;
             } 
@@ -138,7 +187,7 @@ contract DebtPool is IDebtPool, ERC20Upgradeable {
      * @dev Returns the list of synths in the pool
      */
     function getSynths() virtual override public view returns (address[] memory) {
-        return _synthsList;
+        return synthsList;
     }
 
     /**
@@ -151,7 +200,7 @@ contract DebtPool is IDebtPool, ERC20Upgradeable {
         // Total debt in USD
         uint totalDebt = 0;
         // Fetch and cache oracle address
-        IPriceOracle _oracle = IPriceOracle(system.getAddress(PRICE_ORACLE));
+        IPriceOracle _oracle = IPriceOracle(system.priceOracle());
         // Iterate through the list of synths and add each synth's total supply in USD to the total debt
         for(uint i = 0; i < _synths.length; i++){
             address synth = _synths[i];
@@ -168,141 +217,106 @@ contract DebtPool is IDebtPool, ERC20Upgradeable {
      * @return The debt of the account in this trading pool
      */
     function getUserDebtUSD(address _account) virtual override public view returns(uint){
-        // Get the total debt shares (supply) of the trading pool
-        uint totalDebtShare = totalSupply();
-        // If totalShares == 0, there's no debt
-        if(totalDebtShare == 0){
+        // If totalShares == 0, there's zero pool debt
+        if(totalSupply() == 0){
             return 0;
         }
         // Get the debt of the account in the trading pool, based on its debt share balance
-        return balanceOf(_account).mul(getTotalDebtUSD()).div(totalDebtShare); 
+        return balanceOf(_account).mul(getTotalDebtUSD()).div(totalSupply()); 
     }
 
     /* -------------------------------------------------------------------------- */
-    /*                                  Override                                  */
-    /* -------------------------------------------------------------------------- */
-    /**
-     * @notice Make debt tokens non-transferrable
-     * @dev Override the transfer function to restrict transfer of pool debt tokens
-     */
-    function _beforeTokenTransfer(address from, address to, uint256 amount) internal virtual override {
-        super._beforeTokenTransfer(from, to, amount);
-        // If not minting or burning
-        if(from != address(0) && to != address(0)) {
-            revert("SyntheXPool: Cannot transfer debt tokens");
-        }
-    }
-
-    /**
-     * @notice Only L2_ADMIN_ROLE can call admin functions
-     */
-    modifier onlyL2Admin(){
-        require(system.hasRole(system.L2_ADMIN_ROLE(), msg.sender), "SyntheXPool: Only L2_ADMIN_ROLE can call");
-        _;
-    }
-
-    /**
-     * @notice Only GOVERNANCE_MODULE_ROLE can call function
-     */
-    modifier onlyGov(){
-        require(system.hasRole(system.GOVERNANCE_MODULE_ROLE(), msg.sender), "SyntheXPool: Only GOVERNANCE_MODULE_ROLE can call");
-        _;
-    }
-
-    /**
-     * @notice Only GOVERNANCE_MODULE_ROLE or L2_ADMIN_ROLE can call function
-     */
-    modifier onlyGovOrL2Admin(){
-        require(system.hasRole(system.GOVERNANCE_MODULE_ROLE(), msg.sender) || system.hasRole(system.L2_ADMIN_ROLE(), msg.sender), "SyntheXPool: Only GOVERNANCE_MODULE_ROLE or L2_ADMIN_ROLE can call");
-        _;
-    }
-
-    /**
-     * @notice Only synthex can call
-     */
-    modifier onlyInternal(){
-        require(system.getAddress(SYNTHEX) == msg.sender, "SyntheXPool: Only SyntheX can call this function");
-        _;
-    }
-
-    /* -------------------------------------------------------------------------- */
-    /*                              Internal Functions                            */
+    /*                              External Functions                            */
     /* -------------------------------------------------------------------------- */
     /**
      * @notice Issue synths to the user
-     * @param _borrower The address that is issuing the debt
      * @param _account The address of the user to issue synths to
-     * @param _amountUSD The amount of USD to issue
+     * @param _amount Amount of synth
      * @notice Only SyntheX can call this function
      */
-    function mint(address _synth, address _borrower, address _account, uint _amount, uint _amountUSD) virtual override public onlyInternal returns(uint) {
-        if(totalSupply() == 0){
-            _mint(_borrower, _amountUSD);
-        } else {
-            /**
-             * Calculate the amount of debt tokens to mint
-             * debtSharePrice = totalDebt / totalSupply
-             * mintAmount = amountUSD / debtSharePrice
-             */
-            uint mintAmount = _amountUSD.mul(totalSupply()).div(getTotalDebtUSD());
-            // Mint the debt tokens
-            _mint(_borrower, mintAmount);
-        }
-        return mintSynth(_synth, _account, _amount, _amountUSD);
-    }
-
-    /**
-     * @notice Issue synths to the user
-     * @param _synth The address of the synth to issue
-     * @param _user The address of the user
-     * @param _amount The amount of synths to issue
-     */
-    function mintSynth(address _synth, address _user, uint _amount, uint amountUSD) virtual override public onlyInternal returns(uint) {
+    function commitMint(address _account, uint _amount) virtual override whenNotPaused external returns(uint) {
         // check if synth is enabled
-        require(synths[_synth], "SyntheXPool: Synth not enabled");
-        // Fetch the fee and cache it
-        uint _fee = fee;
-        // Mint (amount - fee) toSynth to user
-        ERC20X(_synth).mint(_user, _amount.mul(uint(1e18).mul(BASIS_POINTS).sub(_fee)).div(1e18).div(BASIS_POINTS));
-        // (issuerAlloc * fee) is burned permanently
+        require(synths[msg.sender], "SyntheXPool: Synth not enabled");
 
-        // Mint ((1 - issuerAlloc) * fee) to staking rewards
-        IPriceOracle _oracle = IPriceOracle(system.getAddress(PRICE_ORACLE));
-        IPriceOracle.Price memory feeTokenPrice = _oracle.getAssetPrice(feeToken);
+        IPriceOracle.Price[] memory prices;
+        address[] memory t = new address[](2);
+        t[0] = msg.sender;
+        t[1] = feeToken;
+        prices = IPriceOracle(system.priceOracle()).getAssetPrices(t);
 
-        // Fee amount in feeToken
-        // NOTE - Here performing all multiplications before all division causes overflow. So moved one multiplication after division
-        uint feeAmount = amountUSD
-            .mul(_fee)
-            .mul(uint(1e18).mul(BASIS_POINTS).sub(issuerAlloc))
-            .div(BASIS_POINTS).div(1e18)            // for multiplying _fee
-            .div(BASIS_POINTS).div(1e18)            // for multiplying issuerAlloc
-            .mul(10**feeTokenPrice.decimals)        // for dividing with feeToken price
-            .div(feeTokenPrice.price);
+        int borrowCapacity = ISyntheX(system.synthex()).commitMint(_account, msg.sender, _amount);
+        require(borrowCapacity > 0, "SyntheXPool: Insufficient liquidity");
+        
+        // amount of debt to issue (in usd, including mintFee)
+        uint amountPlusFeeUSD = _amount.toUSD(prices[0]);
+        amountPlusFeeUSD = amountPlusFeeUSD.add(amountPlusFeeUSD.mul(mintFee).div(BASIS_POINTS));
+        if(borrowCapacity < int(amountPlusFeeUSD)){
+            amountPlusFeeUSD = uint(borrowCapacity);
+        }
+
+        if(totalSupply() == 0){
+            // Mint initial debt tokens
+            _mint(_account, amountPlusFeeUSD);
+        } else {
+            // Calculate the amount of debt tokens to mint
+            // debtSharePrice = totalDebt / totalSupply
+            // mintAmount = amountUSD / debtSharePrice 
+            uint mintAmount = amountPlusFeeUSD.mul(totalSupply()).div(getTotalDebtUSD());
+            // Mint the debt tokens
+            _mint(_account, mintAmount);
+        }
+
+        // Amount * (fee * issuerAlloc) is burned from global debt
+        // Amount * (fee * (1 - issuerAlloc)) to vault
+        // Fee amount of feeToken: amountUSD * fee * (1 - issuerAlloc) / feeTokenPrice
+        uint initialAmountUSD = amountPlusFeeUSD.mul(BASIS_POINTS).div(BASIS_POINTS.add(mintFee));
+        uint feeAmount = amountPlusFeeUSD.sub(initialAmountUSD) // fee amount in USD
+            .mul(uint(BASIS_POINTS).sub(issuerAlloc))           // multiplying (1 - issuerAlloc)
+            .div(BASIS_POINTS)                                  // for multiplying issuerAlloc
+            .toToken(prices[1]);                                // to feeToken amount
         
         // Mint fee
-        ERC20X(feeToken).mint(
-            system.getAddress(VAULT), 
+        ERC20X(feeToken).mintInternal(
+            system.vault(),
             feeAmount
         );
 
-        return _amount;
+        // Mint (amount - fee) toSynth to user
+        return initialAmountUSD.toToken(prices[0]);
     }
 
     /**
-     * @notice Burn synths from the user 
-     * @param _synth The address of the synth to burn
-     * @param _repayer User that is repaying the debt; the user that is burning the synth
-     * @param _borrower User whose debt is being burned
+     * @notice Burn synths from the user
+     * @param _account User whose debt is being burned
      * @param _amount The amount of synths to burn
-     * @param amountUSD The amount of USD debt to burn
      * @return The amount of synth burned
      * @notice Only SyntheX can call this function
      * @notice The amount of synths to burn is calculated based on the amount of debt tokens burned
      */
-    function burn(address _synth, address _repayer, address _borrower, uint _amount, uint amountUSD) virtual override public onlyInternal returns(uint) {
+    function commitBurn(address _account, uint _amount) virtual override whenNotPaused external returns(uint) {
+        // check if synth is valid
+        for(uint i = 0; i < synthsList.length; i++){
+            if(synthsList[i] == msg.sender){
+                break;
+            } else if(i == synthsList.length - 1){
+                revert("SyntheXPool: Synth not found");
+            }
+        }
 
-        uint burnablePerc = getUserDebtUSD(_borrower).min(amountUSD).mul(1e18).div(amountUSD);
+        IPriceOracle.Price[] memory prices;
+        address[] memory t = new address[](2);
+        t[0] = msg.sender;
+        t[1] = feeToken;
+        prices = IPriceOracle(system.priceOracle()).getAssetPrices(t);
+        /**
+         * debt: $100 + $10 (10% fee)
+         * 10 usdx = 9.09%
+         */
+        _amount = _amount;
+        uint amountUSD = _amount.toUSD(prices[0]);
+        uint debt = getUserDebtUSD(_account);
+        uint burnablePerc = debt //.add(debt.mul(burnFee).div(BASIS_POINTS))
+                .min(amountUSD).mul(1e18).div(amountUSD);
 
         // ensure user has enough debt to burn
         if(burnablePerc == 0) return 0;
@@ -311,23 +325,86 @@ contract DebtPool is IDebtPool, ERC20Upgradeable {
         amountUSD = amountUSD.mul(burnablePerc).div(1e18);
 
         uint _totalDebt = getTotalDebtUSD();
-        uint totalSupply = totalSupply();
-        uint burnAmount = totalSupply * amountUSD / _totalDebt;
-        _burn(_borrower, burnAmount);
+        uint burnAmount = totalSupply().mul(amountUSD).div(_totalDebt);
+        _burn(_account, burnAmount);
 
-        return burnSynth(_synth, _repayer, _amount);
+        return _amount;
+    }
+    
+
+    /**
+     * @notice Exchange a synthetic asset for another
+     * @param _amount The amount of synthetic asset to exchange
+     * @param _synthTo The address of the synthetic asset to receive
+     */
+    function commitSwap(address _account, uint _amount, address _synthTo) virtual override whenNotPaused external returns(uint) {
+        // check if synth is enabled
+        require(synths[msg.sender], "DebtPool: SynthFrom not enabled");
+        require(synths[_synthTo], "DebtPool: SynthTo not enabled");
+        // ensure exchange is not to same synth
+        require(msg.sender != _synthTo, "DebtPool: Synths are the same");
+
+        IPriceOracle.Price[] memory prices;
+        address[] memory t = new address[](3);
+        t[0] = msg.sender;
+        t[1] = _synthTo;
+        t[2] = feeToken;
+        prices = IPriceOracle(system.priceOracle()).getAssetPrices(t);
+
+        uint amountUSD = _amount.toUSD(prices[0]);
+        uint fee = amountUSD.mul(swapFee).div(BASIS_POINTS);
+
+        // 1. Mint (amount - fee) toSynth to user
+        ERC20X(_synthTo).mintInternal(_account, amountUSD.sub(fee).toToken(prices[1]));
+        // 2. Mint fee * (1 - issuerAlloc) (in feeToken) to vault
+        ERC20X(feeToken).mintInternal(
+            system.vault(),     
+            fee.mul(uint(BASIS_POINTS).sub(issuerAlloc))        // multiplying (1 - issuerAlloc)
+            .div(BASIS_POINTS)                                  // for multiplying issuerAlloc
+            .toToken(prices[2])
+        );
+        // 3. Burn all fromSynth
+        return _amount;
     }
 
     /**
-     * @notice Burn synths from the user
-     * @param _synth The address of the synth to burn
-     * @param _user The address of the user
-     * @param _amount The amount of synths to burn
+     * @notice Liquidate a user's debt
      */
-    function burnSynth(address _synth, address _user, uint _amount) virtual override public onlyInternal returns(uint) {
-        // Burn amount
-        ERC20X(_synth).burn(_user, _amount);
+    function commitLiquidate(address _liquidator, address _account, uint _amount, address _outAsset) virtual override whenNotPaused external returns(uint) {
+        // check if synth is enabled
+        require(synths[msg.sender], "DebtPool: SynthFrom not enabled");
 
-        return _amount;
+        IPriceOracle.Price[] memory prices;
+        address[] memory t = new address[](3);
+        t[0] = msg.sender;
+        t[1] = _outAsset;
+        prices = IPriceOracle(system.priceOracle()).getAssetPrices(t);
+
+        uint amountUSD = _amount.toUSD(prices[0]);
+        uint debtUSD = balanceOf(_account).mul(getTotalDebtUSD()).div(totalSupply());
+        // burn only the amount of debt that the user has
+        if(debtUSD < amountUSD) {
+            _amount = debtUSD.toToken(prices[0]);
+        }
+
+        // amount in terms of collateral
+        uint amountOut = _amount.t1t2(prices[0], prices[1]); 
+        // penalty on amountOut
+        uint penalty = amountOut.mul(liquidationPenalty).div(BASIS_POINTS); 
+        // fee from penalty to send to vault
+        uint reserve = penalty.mul(liquidationFee).div(BASIS_POINTS); 
+
+        // % of collateral that was siezed
+        uint executedOut = SyntheX(system.synthex()).commitLiquidate(
+            _account, _liquidator, _outAsset, 
+            amountOut, 
+            penalty,
+            reserve
+        );
+
+        amountUSD = executedOut.toUSD(prices[1]);
+        _burn(_account, totalSupply().mul(amountUSD).div(getTotalDebtUSD()));
+
+        return amountUSD.toToken(prices[0]);
     }
 }

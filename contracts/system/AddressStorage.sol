@@ -17,7 +17,7 @@ abstract contract AddressStorage {
     /// @notice Event to be emitted when address is updated
     event AddressUpdated(bytes32 indexed key, address indexed value);
 
-    /// @notice Mapping to store addresses (hashedKey => address)
+    // Mapping to store addresses (hashedKey => address)
     mapping(bytes32 => address) private addresses;
 
     /**
@@ -39,6 +39,5 @@ abstract contract AddressStorage {
         emit AddressUpdated(_key, _value);
     }
 
-    /// @notice gap
     uint256[49] private __gap;
 }

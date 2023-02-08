@@ -30,8 +30,10 @@ export async function initiate(
     poolSynthPriceFeeds: []
   } as IInitiateResult;
 
+  /* -------------------------------------------------------------------------- */
+  /*                                 Collaterals                                */
+  /* -------------------------------------------------------------------------- */
   if(!isTest) console.log("\nDeploying Collaterals... 💬");
-
   for(let i = 0; i < config.collaterals.length; i++){
     let collateral: string|Contract = config.collaterals[i].address as string;
     let feed: string|Contract = config.collaterals[i].feed as string;
@@ -82,6 +84,9 @@ export async function initiate(
   }
   if(!isTest) console.log("Collaterals added successfully 🎉 \n");
 
+  /* -------------------------------------------------------------------------- */
+  /*                                 Debt pools                                 */
+  /* -------------------------------------------------------------------------- */
   if(!isTest) console.log("Deploying Debt Pools... 💬");
   for(let i = 0; i < config.tradingPools.length; i++){
     // deploy pools
@@ -92,7 +97,14 @@ export async function initiate(
     // set reward speed
     await contracts.synthex.setPoolSpeed(contracts.sealedSYN.address, pool.address, ethers.utils.parseEther(config.tradingPools[i].rewardSpeed));
     // set fee
-    await pool.updateFee(ethers.utils.parseEther(config.tradingPools[i].fee), ethers.utils.parseEther(config.tradingPools[i].issuerAlloc));
+    await pool.updateFee(
+      ethers.utils.parseEther(config.tradingPools[i].mintFee), 
+      ethers.utils.parseEther(config.tradingPools[i].swapFee), 
+      ethers.utils.parseEther(config.tradingPools[i].burnFee), 
+      ethers.utils.parseEther(config.tradingPools[i].liquidationFee),
+      ethers.utils.parseEther(config.tradingPools[i].liquidationPenalty),
+      ethers.utils.parseEther(config.tradingPools[i].issuerAlloc)
+    );
     
     if(!isTest) console.log(`\t ${config.tradingPools[i].name} (${config.tradingPools[i].symbol}) deployed successfully ✅`);
     result.pools.push(pool);
@@ -112,8 +124,7 @@ export async function initiate(
       const name = 'SyntheX '+ config.tradingPools[i].symbol + ' ' + config.tradingPools[i].synths[j].name;
       if(!synth){
         // deploy token
-
-        synth = await _deploy('ERC20X', [name, symbol, pool.address, contracts.system.address], deployments, { name: symbol });
+        synth = await _deploy('ERC20X', [name, symbol, pool.address, contracts.system.address], deployments, { name: symbol, upgradable: true });
       } else {
         synth = await ethers.getContractAt('ERC20X', synth);
       }

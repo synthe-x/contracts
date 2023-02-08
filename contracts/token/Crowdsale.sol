@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./SyntheXToken.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "./LockedSYN.sol";
+import "./EscrowedSYN.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 

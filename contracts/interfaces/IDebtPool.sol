@@ -8,7 +8,7 @@ interface IDebtPool {
     /*                               Admin Functions                              */
     /* -------------------------------------------------------------------------- */
     function enableSynth(address _synth) external;
-    function updateFee(uint _fee, uint _alloc) external;
+    function updateFee(uint _mintFee, uint _swapFee, uint _burnFee, uint _liquidationFee, uint _liquidationPenalty, uint _issuerAlloc) external;
     function disableSynth(address _synth) external;
     function removeSynth(address _synth) external;
     function updateFeeToken(address _feeToken) external;
@@ -23,10 +23,10 @@ interface IDebtPool {
     /* -------------------------------------------------------------------------- */
     /*                              Internal Functions                            */
     /* -------------------------------------------------------------------------- */
-    function mint(address _synth, address _borrower, address _account, uint _amount, uint _amountUSD) external returns(uint);
-    function mintSynth(address _synth, address _user, uint _amount, uint amountUSD) external returns(uint);
-    function burn(address _synth, address _repayer, address _borrower, uint _amount, uint _amountUSD) external returns(uint);
-    function burnSynth(address _synth, address _user, uint _amount) external returns(uint);
+    function commitMint(address _account, uint _amount) external returns(uint);
+    function commitBurn(address _account, uint _amount) external returns(uint);
+    function commitSwap(address _account, uint _amount, address _synthTo) external returns(uint);
+    function commitLiquidate(address _liquidator, address _account, uint _amount, address _outAsset) external returns(uint);
 
     /* -------------------------------------------------------------------------- */
     /*                                 Events                                     */
@@ -34,6 +34,6 @@ interface IDebtPool {
     event SynthEnabled(address indexed synth);
     event SynthDisabled(address indexed synth);
     event SynthRemoved(address indexed synth);
-    event FeesUpdated(uint fee, uint issuerAlloc);
+    event FeesUpdated(uint mintFee, uint swapFee, uint burnFee, uint _liquidationFee, uint _liquidationPenalty, uint issuerAlloc);
     event FeeTokenUpdated(address feeToken);
 }

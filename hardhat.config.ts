@@ -4,6 +4,7 @@ import "@nomicfoundation/hardhat-toolbox";
 import "hardhat-gas-reporter"
 import "@openzeppelin/hardhat-defender"
 import "hardhat-openzeppelin-defender";
+import 'solidity-docgen';
 
 require('dotenv').config();
 
@@ -12,6 +13,7 @@ const ARBITRUM_GOERLI_RPC = process.env.ARBITRUM_GOERLI_RPC ?? 'https://goerli.a
 
 
 const config: HardhatUserConfig = {
+  docgen: {},
   defender: {
     apiKey: process.env.DEFENDER_TEAM_API_KEY!,
     apiSecret: process.env.DEFENDER_TEAM_API_SECRET_KEY!,
@@ -64,7 +66,7 @@ const config: HardhatUserConfig = {
     },
     localhost: {
       url: "http://localhost:8545",
-      chainId: 1337
+      chainId: 31337
     },
   },
   gasReporter: {

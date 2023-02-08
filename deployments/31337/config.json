@@ -1,7 +1,7 @@
 {
   "name": "synthex",
-  "version": "0.15.0",
-  "latest": "0.15.0",
+  "version": "0.16.0",
+  "latest": "0.16.0",
   "l0Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
   "l1Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
   "l2Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
@@ -35,7 +35,11 @@
       "symbol": "CRY",
       "volatilityRatio": "0.9",
       "rewardSpeed": "0",
-      "fee": "0",
+      "mintFee": "0",
+      "swapFee": "0",
+      "burnFee": "0",
+      "liquidationFee": "0",
+      "liquidationPenalty": "0",
       "issuerAlloc": "0",
       "synths": [
         {
