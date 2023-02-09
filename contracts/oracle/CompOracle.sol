@@ -23,12 +23,12 @@ contract CompoundOracle is IChainlinkAggregator {
     }
 
     function latestAnswer() external view override returns (int256) {
-        return int(comptroller.oracle().getUnderlyingPrice(cToken) * cToken.exchangeRateStored());
+        return int(comptroller.oracle().getUnderlyingPrice(cToken) * cToken.exchangeRateStored()) / (10**18);
     }
 
     function decimals() external view override returns (uint8) {
         // 18 decimals for underlying + 10 decimals for exchange rate
-        return 18 + 10 + 18;
+        return 18 + 10;
     }
 
     function latestTimestamp() external view returns (uint256){

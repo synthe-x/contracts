@@ -6,7 +6,7 @@ import "../interfaces/IChainlinkAggregator.sol";
 /**
  * @title Secondary oracle 
  * @notice This contract is used to get the price of a token (in usd) derived from the price of another token (in usd)
- * @notice Eg. If we want to get the price of COMP in USD, we can use the price of COMP in ETH and the price of ETH in USD
+ * @notice Eg. COMP/USD, from COMP/ETH and ETH/USD
  */
 contract SecondaryOracle {
     // COMP/ETH oracle

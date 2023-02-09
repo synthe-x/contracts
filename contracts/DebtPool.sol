@@ -130,11 +130,17 @@ contract DebtPool is IDebtPool, ERC20Upgradeable, PausableUpgradeable, DebtPoolS
      * @param _issuerAlloc The new issuer allocation
      */
     function updateFee(uint _mintFee, uint _swapFee, uint _burnFee, uint _liquidationFee, uint _liquidationPenalty, uint _issuerAlloc) virtual override public onlyGov {
+        require(_mintFee <= BASIS_POINTS, "Mint fee cannot be more than 100%");
         mintFee = _mintFee;
+        require(_swapFee <= BASIS_POINTS, "Swap fee cannot be more than 100%");
         swapFee = _swapFee;
+        require(_burnFee <= BASIS_POINTS, "Burn fee cannot be more than 100%");
         burnFee = _burnFee;
+        require(_liquidationFee <= BASIS_POINTS, "Liquidation fee cannot be more than 100%");
         liquidationFee = _liquidationFee;
+        require(_liquidationPenalty <= BASIS_POINTS, "Liquidation penalty cannot be more than 100%");
         liquidationPenalty = _liquidationPenalty;
+        require(_issuerAlloc <= BASIS_POINTS, "Issuer allocation cannot be more than 100%");
         issuerAlloc = _issuerAlloc;
         // Emit event on fee updated
         emit FeesUpdated(_mintFee, _swapFee, _burnFee, _liquidationFee, _liquidationPenalty, _issuerAlloc);
@@ -290,7 +296,6 @@ contract DebtPool is IDebtPool, ERC20Upgradeable, PausableUpgradeable, DebtPoolS
      * @param _account User whose debt is being burned
      * @param _amount The amount of synths to burn
      * @return The amount of synth burned
-     * @notice Only SyntheX can call this function
      * @notice The amount of synths to burn is calculated based on the amount of debt tokens burned
      */
     function commitBurn(address _account, uint _amount) virtual override whenNotPaused external returns(uint) {
@@ -308,29 +313,32 @@ contract DebtPool is IDebtPool, ERC20Upgradeable, PausableUpgradeable, DebtPoolS
         t[0] = msg.sender;
         t[1] = feeToken;
         prices = IPriceOracle(system.priceOracle()).getAssetPrices(t);
-        /**
-         * debt: $100 + $10 (10% fee)
-         * 10 usdx = 9.09%
-         */
-        _amount = _amount;
+
+        // amount of debt to burn (in usd, including burnFee)
         uint amountUSD = _amount.toUSD(prices[0]);
+        amountUSD = amountUSD.mul(BASIS_POINTS).div(BASIS_POINTS.add(burnFee));
+        // ensure user has enough debt to burn
         uint debt = getUserDebtUSD(_account);
-        uint burnablePerc = debt //.add(debt.mul(burnFee).div(BASIS_POINTS))
-                .min(amountUSD).mul(1e18).div(amountUSD);
+        if(debt < amountUSD){
+            _amount = debt.add(debt.mul(burnFee).div(BASIS_POINTS)).toToken(prices[0]);
+            amountUSD = debt;
+        }
 
         // ensure user has enough debt to burn
-        if(burnablePerc == 0) return 0;
-
-        _amount = _amount.mul(burnablePerc).div(1e18);
-        amountUSD = amountUSD.mul(burnablePerc).div(1e18);
+        if(amountUSD == 0) return 0;
 
         uint _totalDebt = getTotalDebtUSD();
         uint burnAmount = totalSupply().mul(amountUSD).div(_totalDebt);
         _burn(_account, burnAmount);
 
+        // Mint fee * (1 - issuerAlloc) to vault
+        ERC20X(feeToken).mintInternal(
+            system.vault(),
+            amountUSD.mul(burnFee).mul(uint(BASIS_POINTS).sub(issuerAlloc)).div(BASIS_POINTS).div(BASIS_POINTS).toToken(prices[1])
+        );
+
         return _amount;
     }
-    
 
     /**
      * @notice Exchange a synthetic asset for another
