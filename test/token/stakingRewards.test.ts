@@ -2,6 +2,7 @@ import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import main from "../../scripts/main";
+import { MINTER_ROLE } from '../../scripts/utils/const';
 
 describe("Testing Staking Rewards", function () {
 	let sealedSyn: any, syn: any, stakingRewards: any;
@@ -16,7 +17,7 @@ describe("Testing Staking Rewards", function () {
 		sealedSyn = deployments.sealedSYN;
 		stakingRewards = deployments.stakingRewards;
 
-		await sealedSyn.grantMinterRole(owner.address);
+		await sealedSyn.grantRole(MINTER_ROLE, owner.address);
 		// for user1 to stake
 		await sealedSyn.mint(user1.address, ethers.utils.parseEther("10000"));
         // for user2 to stake

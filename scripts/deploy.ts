@@ -26,10 +26,12 @@ export async function deploy(deployments: any, config: any, deployer: SignerWith
   // _deployDefender("SealedSYN_"+versionSuffix, sealedSYN);
   
   // deploy synthex
-  const synthex = await _deploy("SyntheX", [system.address, ethers.utils.parseEther(config.safeCRatio)], deployments, {upgradable: true});
+  const synthex = await _deploy("SyntheX", [system.address], deployments, {upgradable: true});
   _deployDefender("SyntheX_"+versionSuffix, synthex);
   await system.setAddress(SYNTHEX, synthex.address);
   await sealedSYN.grantRole(MINTER_ROLE, synthex.address);
+
+  await synthex.setSafeCRatio(ethers.utils.parseEther(config.safeCRatio).mul(10000));
 
   // deploy staking rewards : get xSYN on staking xSYN
   const stakingRewards = await _deploy("StakingRewards", [sealedSYN.address, sealedSYN.address, system.address, config.stakingRewards.days * 24 * 60 * 60], deployments)

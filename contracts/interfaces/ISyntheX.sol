@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 import "./IPriceOracle.sol";
+import "../storage/SyntheXStorage.sol";
 
 interface ISyntheX {
   
@@ -11,8 +12,21 @@ interface ISyntheX {
     function exitPool(address _tradingPool) external;
     function enterCollateral(address _collateral) external;
     function exitCollateral(address _collateral) external;
-    function deposit(address _collateral, uint _amount) external payable ;
+    
+    function deposit(address _collateral, uint _amount) external;
+    function depositWithPermit(
+        address _collateral, 
+        uint _amount,
+        uint _deadline,
+        uint8 _v,
+        bytes32 _r,
+        bytes32 _s
+    ) external;
+    function depositETH(uint _amount) external payable;
+    
     function withdraw(address _collateral, uint _amount) external;
+    function withdrawETH(uint _amount) external;
+
     function commitMint(address _account, address _synth, uint _amount) external returns(int);    
     function commitBurn(address _account, address _synth, uint _amount) external;
     function setPoolSpeed(address _rewardToken, address _tradingPool, uint _speed) external;
@@ -26,7 +40,7 @@ interface ISyntheX {
     function enableCollateral(address _collateral, uint _volatilityRatio) external;
     function disableCollateral(address _collateral) external;
     function setSafeCRatio(uint256 _safeCRatio) external;
-    function setCollateralCap(address _collateral, uint _maxDeposit) external;
+    function setCollateralParams(address _collateral, SyntheXStorage.CollateralSupply memory) external;
     
     /* -------------------------------------------------------------------------- */
     /*                          $SYN Reward Distribution                          */
@@ -39,13 +53,12 @@ interface ISyntheX {
     /* -------------------------------------------------------------------------- */
     /*                               View Functions                               */
     /* -------------------------------------------------------------------------- */
+    function healthFactorOf(address _account) virtual override external view returns(uint);
     function collateralMembership(address market, address account) external view returns(bool);
     function tradingPoolMembership(address market, address account) external view returns(bool);
-    function healthFactorOf(address _account) external view returns(uint);
-    function ltvOf(address _account) external view returns(uint);
-    function getBorrowCapacity(address _account) external view returns(int);
-    function getAccountLiquidity(address _account) external view returns(uint, uint);
-    function getAdjustedAccountLiquidity(address _account) external view returns(uint, uint);
+    function borrowCapacity(SyntheXStorage.AccountLiquidity memory _liquidity) external view returns(int);
+    function getAccountLiquidity(address _account) external view returns(SyntheXStorage.AccountLiquidity memory liquidity);
+    function getAccountPosition(address _account) external view returns(SyntheXStorage.AccountLiquidity memory liquidity);
 
     /* -------------------------------------------------------------------------- */
     /*                               Events                                       */
@@ -61,6 +74,6 @@ interface ISyntheX {
     event Exchange(address indexed user, address indexed tradingPool, address indexed fromAsset, address toAsset, uint256 fromAmount, uint256 toAmount);
     event SetPoolRewardSpeed(address indexed rewardToken, address indexed pool, uint256 rewardSpeed);
     event DistributedReward(address indexed rewardToken, address indexed pool, address _account, uint256 accountDelta, uint rewardIndex);
-    event CollateralCapUpdated(address indexed asset, uint256 newCap);
-    event RewardTokenAdded(address indexed rewardToken, bool isSealed);
+    event CollateralParamsUpdated(address indexed asset, uint maxDeposits, uint minDeposit, uint maxDeposit, uint maxWithdraw, uint totalDeposits);
+    event RewardTokenAdded(address indexed rewardToken);
 }

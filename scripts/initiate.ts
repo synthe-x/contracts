@@ -49,10 +49,10 @@ export async function initiate(
     else if(config.collaterals[i].isAToken){
       const aToken = await ethers.getContractAt('IAToken', collateral);
       const underlying = await aToken.UNDERLYING_ASSET_ADDRESS();
-      feed = await _deploy('AAVEOracle', [underlying, config.collaterals[i].poolAddressesProvider, config.collaterals[i].decimals], deployments, {name: `${config.collaterals[i].symbol}_PriceFeed`});
+      collateral = (await _deploy('ATokenWrapper', ["Wrapped "+config.collaterals[i].name, "w"+config.collaterals[i].symbol, aToken.address], deployments, {name: config.collaterals[i].symbol})).address;
+      feed = await _deploy('AAVEOracle', [collateral, underlying, config.collaterals[i].poolAddressesProvider, config.collaterals[i].decimals], deployments, {name: `${config.collaterals[i].symbol}_PriceFeed`});
       feed = feed.address;
       // aToken wrapper
-      collateral = (await _deploy('ATokenWrapper', ["Wrapped "+config.collaterals[i].name, "w"+config.collaterals[i].symbol, aToken.address], deployments, {name: config.collaterals[i].symbol})).address;
     }
     // handle secondary oracle feeds
     else if(config.collaterals[i].isFeedSecondary){
@@ -75,8 +75,8 @@ export async function initiate(
     }
 
     await contracts.oracle.setFeed(collateral.address, feed.address);
-    await contracts.synthex.enableCollateral(collateral.address, ethers.utils.parseEther(config.collaterals[i].volatilityRatio));
-    await contracts.synthex.setCollateralCap(collateral.address, ethers.utils.parseEther(config.collaterals[i].cap));
+    await contracts.synthex.enableCollateral(collateral.address, ethers.utils.parseEther(config.collaterals[i].volatilityRatio).mul(10000));
+    await contracts.synthex.setCollateralParams(collateral.address, config.collaterals[i].params);
     if(!isTest) console.log(`\t Collateral ${config.collaterals[i].symbol} ($${parseFloat(ethers.utils.formatUnits(await feed.latestAnswer(), await feed.decimals())).toFixed(4)}) added successfully ✅`);
 
     result.collateralTokens.push(collateral);
@@ -93,7 +93,7 @@ export async function initiate(
     const pool = await _deploy('DebtPool', [config.tradingPools[i].name, config.tradingPools[i].symbol, contracts.system.address], deployments, {name: config.tradingPools[i].symbol, upgradable: true});
 
     // enable trading pool
-    await contracts.synthex.enableTradingPool(pool.address, ethers.utils.parseEther(config.tradingPools[i].volatilityRatio))
+    await contracts.synthex.enableTradingPool(pool.address, ethers.utils.parseEther(config.tradingPools[i].volatilityRatio).mul(10000))
     // set reward speed
     await contracts.synthex.setPoolSpeed(contracts.sealedSYN.address, pool.address, ethers.utils.parseEther(config.tradingPools[i].rewardSpeed));
     // set fee

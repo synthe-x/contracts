@@ -25,8 +25,14 @@
       "decimals": 18,
       "volatilityRatio": "0.9",
       "price": "1000",
-      "address": "0x0000000000000000000000000000000000000000",
-      "cap": "100000000000000000000000"
+      "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      "params": {
+        "maxDeposits": "100000000000000000000000",
+        "minDeposit": "0",
+        "maxDeposit": "100000000000000000000000",
+        "maxWithdraw": "100000000000000000000000",
+        "totalDeposits": "0"
+      }
     }
   ],
   "tradingPools": [

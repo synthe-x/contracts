@@ -37,12 +37,12 @@ describe('Testing liquidation', function () {
 
     await synthex
       .connect(user1)
-      .deposit(ETH_ADDRESS, ethers.utils.parseEther('100'), {
+      .depositETH(ethers.utils.parseEther('100'), {
         value: ethers.utils.parseEther('100'),
       })
     await synthex
       .connect(user2)
-      .deposit(ETH_ADDRESS, ethers.utils.parseEther('100'), {
+      .depositETH(ethers.utils.parseEther('100'), {
         value: ethers.utils.parseEther('100'),
       })
     await synthex

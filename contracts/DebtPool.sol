@@ -31,204 +31,16 @@ contract DebtPool is IDebtPool, ERC20Upgradeable, PausableUpgradeable, DebtPoolS
     /// @notice for converting token prices
     using PriceConvertor for uint256;
     
-    /**
-     * @dev Initialize the contract
-     */
+    /// @dev Initialize the contract
     function initialize(string memory name, string memory symbol, address _system) public initializer {
         __ERC20_init(name, symbol);
         __Pausable_init();
         system = System(_system);
     }
 
-    // Override transfer
+    /// @dev Override to disable transfer
     function _transfer(address, address, uint256) internal virtual override {
         revert("DebtPool: Transfer not allowed");
-    }
-
-    /**
-     * @notice Pause the contract
-     * @dev Only callable by L2 admin
-     */
-    function pause() public onlyL2Admin() {
-        _pause();
-    }
-
-    /**
-     * @notice Unpause the contract
-     * @dev Only callable by L2 admin
-     */
-    function unpause() public onlyL2Admin() {
-        _unpause();
-    }
-
-    /* -------------------------------------------------------------------------- */
-    /*                                 Modifiers                                  */
-    /* -------------------------------------------------------------------------- */
-    /**
-     * @notice Only L2_ADMIN_ROLE can call admin functions
-     */
-    modifier onlyL2Admin(){
-        require(system.isL2Admin(msg.sender), "SyntheXPool: Only L2_ADMIN_ROLE can call");
-        _;
-    }
-
-    /**
-     * @notice Only GOVERNANCE_MODULE_ROLE can call function
-     */
-    modifier onlyGov(){
-        require(system.isGovernanceModule(msg.sender), "SyntheXPool: Only GOVERNANCE_MODULE_ROLE can call");
-        _;
-    }
-
-    /**
-     * @notice Only GOVERNANCE_MODULE_ROLE or L2_ADMIN_ROLE can call function
-     */
-    modifier onlyGovOrL2Admin(){
-        require(system.isGovernanceModule(msg.sender) || system.isL2Admin(msg.sender), "SyntheXPool: Only GOVERNANCE_MODULE_ROLE or L2_ADMIN_ROLE can call");
-        _;
-    }
-
-    /**
-     * @notice Only synthex can call
-     */
-    modifier onlyInternal(){
-        require(system.synthex() == msg.sender, "SyntheXPool: Only SyntheX can call this function");
-        _;
-    }
-
-    /* -------------------------------------------------------------------------- */
-    /*                               Admin Functions                              */
-    /* -------------------------------------------------------------------------- */
-    /**
-     * @dev Add a new synth to the pool
-     * @param _synth The address of the synth to add
-     * @notice Only the owner can call this function
-     * @notice The synth contract must have pool (this contract) as owner
-     */
-    function enableSynth(address _synth) virtual override public onlyGov {
-        // Ensure _synth is not already enabled in pool
-        require(!synths[_synth], "Synth already exists in pool");
-        // Enable synth
-        synths[_synth] = true;
-        // Ensure _synthsList does not already contain _synth
-        for(uint i = 0; i < synthsList.length; i++){
-            require(synthsList[i] != _synth, "Synth already exists in pool, but is disabled");
-        }
-        // Append to _synthsList
-        synthsList.push(_synth); 
-        // Sanity check. Ensure synth has pool as owner
-        require(address(ERC20X(_synth).pool()) == address(this), "Synth must have pool as owner");
-        // Emit event on synth enabled
-        emit SynthEnabled(_synth);
-    }
-
-    /**
-     * @dev Update the fee for the pool
-     * @param _mintFee New mint fee
-     * @param _swapFee New swap fee
-     * @param _burnFee New burn fee
-     * @param _issuerAlloc The new issuer allocation
-     */
-    function updateFee(uint _mintFee, uint _swapFee, uint _burnFee, uint _liquidationFee, uint _liquidationPenalty, uint _issuerAlloc) virtual override public onlyGov {
-        require(_mintFee <= BASIS_POINTS, "Mint fee cannot be more than 100%");
-        mintFee = _mintFee;
-        require(_swapFee <= BASIS_POINTS, "Swap fee cannot be more than 100%");
-        swapFee = _swapFee;
-        require(_burnFee <= BASIS_POINTS, "Burn fee cannot be more than 100%");
-        burnFee = _burnFee;
-        require(_liquidationFee <= BASIS_POINTS, "Liquidation fee cannot be more than 100%");
-        liquidationFee = _liquidationFee;
-        require(_liquidationPenalty <= BASIS_POINTS, "Liquidation penalty cannot be more than 100%");
-        liquidationPenalty = _liquidationPenalty;
-        require(_issuerAlloc <= BASIS_POINTS, "Issuer allocation cannot be more than 100%");
-        issuerAlloc = _issuerAlloc;
-        // Emit event on fee updated
-        emit FeesUpdated(_mintFee, _swapFee, _burnFee, _liquidationFee, _liquidationPenalty, _issuerAlloc);
-    }
-
-    /**
-     * @dev Update the address of the primary token
-     */
-    function updateFeeToken(address _feeToken) virtual override public onlyL2Admin {
-        feeToken = _feeToken;
-        require(synths[_feeToken], "Synth not enabled");
-        // Emit event on primary token updated
-        emit FeeTokenUpdated(_feeToken);
-    }
-
-    /**
-     * @dev Disable a synth from the pool
-     * @param _synth The address of the synth to disable
-     * @notice Only the owner can call this function
-     */
-    function disableSynth(address _synth) virtual override public onlyGovOrL2Admin {
-        require(synths[_synth], "Synth is not enabled in pool");
-        // Disable synth
-        // Not removing from _synthsList => would still contribute to pool debt
-        synths[_synth] = false;
-        emit SynthDisabled(_synth);
-    }
-
-    /**
-     * @dev Removes the synth from the pool
-     * @param _synth The address of the synth to remove
-     * @notice Removes from synthList => would not contribute to pool debt
-     */
-    function removeSynth(address _synth) virtual override public onlyGov {
-        synths[_synth] = false;
-        for (uint i = 0; i < synthsList.length; i++) {
-            if (synthsList[i] == _synth) {
-                synthsList[i] = synthsList[synthsList.length - 1];
-                synthsList.pop();
-                emit SynthRemoved(_synth);
-                break;
-            } 
-        }
-    }
-
-    /* -------------------------------------------------------------------------- */
-    /*                               View Functions                               */
-    /* -------------------------------------------------------------------------- */
-    /**
-     * @dev Returns the list of synths in the pool
-     */
-    function getSynths() virtual override public view returns (address[] memory) {
-        return synthsList;
-    }
-
-    /**
-     * @dev Get the total debt of a trading pool
-     * @return The total debt of the trading pool
-     */
-    function getTotalDebtUSD() virtual override public view returns(uint) {
-        // Get the list of synths in this trading pool
-        address[] memory _synths = getSynths();
-        // Total debt in USD
-        uint totalDebt = 0;
-        // Fetch and cache oracle address
-        IPriceOracle _oracle = IPriceOracle(system.priceOracle());
-        // Iterate through the list of synths and add each synth's total supply in USD to the total debt
-        for(uint i = 0; i < _synths.length; i++){
-            address synth = _synths[i];
-            IPriceOracle.Price memory price = _oracle.getAssetPrice(synth);
-            // synthDebt = synthSupply * price
-            totalDebt = totalDebt.add(ERC20X(synth).totalSupply().mul(price.price).div(10**price.decimals));
-        }
-        return totalDebt;
-    }
-
-    /**
-     * @dev Get the debt of an account in this trading pool
-     * @param _account The address of the account
-     * @return The debt of the account in this trading pool
-     */
-    function getUserDebtUSD(address _account) virtual override public view returns(uint){
-        // If totalShares == 0, there's zero pool debt
-        if(totalSupply() == 0){
-            return 0;
-        }
-        // Get the debt of the account in the trading pool, based on its debt share balance
-        return balanceOf(_account).mul(getTotalDebtUSD()).div(totalSupply()); 
     }
 
     /* -------------------------------------------------------------------------- */
@@ -327,9 +139,7 @@ contract DebtPool is IDebtPool, ERC20Upgradeable, PausableUpgradeable, DebtPoolS
         // ensure user has enough debt to burn
         if(amountUSD == 0) return 0;
 
-        uint _totalDebt = getTotalDebtUSD();
-        uint burnAmount = totalSupply().mul(amountUSD).div(_totalDebt);
-        _burn(_account, burnAmount);
+        _burn(_account, totalSupply().mul(amountUSD).div(getTotalDebtUSD()));
 
         // Mint fee * (1 - issuerAlloc) to vault
         ERC20X(feeToken).mintInternal(
@@ -414,5 +224,191 @@ contract DebtPool is IDebtPool, ERC20Upgradeable, PausableUpgradeable, DebtPoolS
         _burn(_account, totalSupply().mul(amountUSD).div(getTotalDebtUSD()));
 
         return amountUSD.toToken(prices[0]);
+    }
+
+    /* -------------------------------------------------------------------------- */
+    /*                               View Functions                               */
+    /* -------------------------------------------------------------------------- */
+    /**
+     * @dev Returns the list of synths in the pool
+     */
+    function getSynths() virtual override public view returns (address[] memory) {
+        return synthsList;
+    }
+
+    /**
+     * @dev Get the total debt of a trading pool
+     * @return The total debt of the trading pool
+     */
+    function getTotalDebtUSD() virtual override public view returns(uint) {
+        // Get the list of synths in this trading pool
+        address[] memory _synths = getSynths();
+        // Total debt in USD
+        uint totalDebt = 0;
+        // Fetch and cache oracle address
+        IPriceOracle _oracle = IPriceOracle(system.priceOracle());
+        // Iterate through the list of synths and add each synth's total supply in USD to the total debt
+        for(uint i = 0; i < _synths.length; i++){
+            address synth = _synths[i];
+            IPriceOracle.Price memory price = _oracle.getAssetPrice(synth);
+            // synthDebt = synthSupply * price
+            totalDebt = totalDebt.add(ERC20X(synth).totalSupply().mul(price.price).div(10**price.decimals));
+        }
+        return totalDebt;
+    }
+
+    /**
+     * @dev Get the debt of an account in this trading pool
+     * @param _account The address of the account
+     * @return The debt of the account in this trading pool
+     */
+    function getUserDebtUSD(address _account) virtual override public view returns(uint){
+        // If totalShares == 0, there's zero pool debt
+        if(totalSupply() == 0){
+            return 0;
+        }
+        // Get the debt of the account in the trading pool, based on its debt share balance
+        return balanceOf(_account).mul(getTotalDebtUSD()).div(totalSupply()); 
+    }
+
+    /* -------------------------------------------------------------------------- */
+    /*                               Admin Functions                              */
+    /* -------------------------------------------------------------------------- */
+    /**
+     * @notice Pause the contract
+     * @dev Only callable by L2 admin
+     */
+    function pause() public onlyL2Admin() {
+        _pause();
+    }
+
+    /**
+     * @notice Unpause the contract
+     * @dev Only callable by L2 admin
+     */
+    function unpause() public onlyL2Admin() {
+        _unpause();
+    }
+    /**
+     * @dev Add a new synth to the pool
+     * @param _synth The address of the synth to add
+     * @notice Only the owner can call this function
+     * @notice The synth contract must have pool (this contract) as owner
+     */
+    function enableSynth(address _synth) virtual override public onlyGov {
+        // Ensure _synth is not already enabled in pool
+        require(!synths[_synth], "Synth already exists in pool");
+        // Enable synth
+        synths[_synth] = true;
+        // Ensure _synthsList does not already contain _synth
+        for(uint i = 0; i < synthsList.length; i++){
+            require(synthsList[i] != _synth, "Synth already exists in pool, but is disabled");
+        }
+        // Append to _synthsList
+        synthsList.push(_synth); 
+        // Sanity check. Ensure synth has pool as owner
+        require(address(ERC20X(_synth).pool()) == address(this), "Synth must have pool as owner");
+        // Emit event on synth enabled
+        emit SynthEnabled(_synth);
+    }
+
+    /**
+     * @dev Update the fee for the pool
+     * @param _mintFee New mint fee
+     * @param _swapFee New swap fee
+     * @param _burnFee New burn fee
+     * @param _issuerAlloc The new issuer allocation
+     */
+    function updateFee(uint _mintFee, uint _swapFee, uint _burnFee, uint _liquidationFee, uint _liquidationPenalty, uint _issuerAlloc) virtual override public onlyGov {
+        require(_mintFee <= BASIS_POINTS, "Mint fee cannot be more than 100%");
+        mintFee = _mintFee;
+        require(_swapFee <= BASIS_POINTS, "Swap fee cannot be more than 100%");
+        swapFee = _swapFee;
+        require(_burnFee <= BASIS_POINTS, "Burn fee cannot be more than 100%");
+        burnFee = _burnFee;
+        require(_liquidationFee <= BASIS_POINTS, "Liquidation fee cannot be more than 100%");
+        liquidationFee = _liquidationFee;
+        require(_liquidationPenalty <= BASIS_POINTS, "Liquidation penalty cannot be more than 100%");
+        liquidationPenalty = _liquidationPenalty;
+        require(_issuerAlloc <= BASIS_POINTS, "Issuer allocation cannot be more than 100%");
+        issuerAlloc = _issuerAlloc;
+        // Emit event on fee updated
+        emit FeesUpdated(_mintFee, _swapFee, _burnFee, _liquidationFee, _liquidationPenalty, _issuerAlloc);
+    }
+
+    /**
+     * @dev Update the address of the primary token
+     */
+    function updateFeeToken(address _feeToken) virtual override public onlyL2Admin {
+        feeToken = _feeToken;
+        require(synths[_feeToken], "Synth not enabled");
+        // Emit event on primary token updated
+        emit FeeTokenUpdated(_feeToken);
+    }
+
+    /**
+     * @dev Disable a synth from the pool
+     * @param _synth The address of the synth to disable
+     * @notice Only the owner can call this function
+     */
+    function disableSynth(address _synth) virtual override public onlyGovOrL2Admin {
+        require(synths[_synth], "Synth is not enabled in pool");
+        // Disable synth
+        // Not removing from _synthsList => would still contribute to pool debt
+        synths[_synth] = false;
+        emit SynthDisabled(_synth);
+    }
+
+    /**
+     * @dev Removes the synth from the pool
+     * @param _synth The address of the synth to remove
+     * @notice Removes from synthList => would not contribute to pool debt
+     */
+    function removeSynth(address _synth) virtual override public onlyGov {
+        synths[_synth] = false;
+        for (uint i = 0; i < synthsList.length; i++) {
+            if (synthsList[i] == _synth) {
+                synthsList[i] = synthsList[synthsList.length - 1];
+                synthsList.pop();
+                emit SynthRemoved(_synth);
+                break;
+            } 
+        }
+    }
+
+
+    /* -------------------------------------------------------------------------- */
+    /*                                 Modifiers                                  */
+    /* -------------------------------------------------------------------------- */
+    /**
+     * @notice Only L2_ADMIN_ROLE can call admin functions
+     */
+    modifier onlyL2Admin(){
+        require(system.isL2Admin(msg.sender), "SyntheXPool: Only L2_ADMIN_ROLE can call");
+        _;
+    }
+
+    /**
+     * @notice Only GOVERNANCE_MODULE_ROLE can call function
+     */
+    modifier onlyGov(){
+        require(system.isGovernanceModule(msg.sender), "SyntheXPool: Only GOVERNANCE_MODULE_ROLE can call");
+        _;
+    }
+
+    /**
+     * @notice Only GOVERNANCE_MODULE_ROLE or L2_ADMIN_ROLE can call function
+     */
+    modifier onlyGovOrL2Admin(){
+        require(system.isGovernanceModule(msg.sender) || system.isL2Admin(msg.sender), "SyntheXPool: Only GOVERNANCE_MODULE_ROLE or L2_ADMIN_ROLE can call");
+        _;
+    }
+
+    /**
+     * @notice Only synthex can call
+     */
+    modifier onlyInternal(){
+        require(system.synthex() == msg.sender, "SyntheXPool: Only SyntheX can call this function");
+        _;
     }
 }

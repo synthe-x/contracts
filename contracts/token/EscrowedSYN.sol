@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
-
+import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
 import "../system/System.sol";
 import "hardhat/console.sol";
 
@@ -12,18 +12,20 @@ import "hardhat/console.sol";
  * @title Locked SYN
  * @author SyntheX
  * @custom:security-contact prasad@chainscore.finance
- * @notice Sealed tokens cannot be transferred
- * @notice Sealed tokens can only be minted and burned
+ * @notice Sealed tokens can only be transferred by authorized senders
+ * @notice Sealed tokens can only be minted and burned by authorized minters and burners
  */
-contract EscrowedSYN is ERC20, ERC20Burnable, AccessControl {
+contract EscrowedSYN is ERC20, ERC20Permit, ERC20Burnable, AccessControl {
     /// @notice System contract
     System public system;
 
+    // This role can transfer tokens
+    bytes32 public constant AUTHORIZED_SENDER = keccak256("AUTHORIZED_SENDER");
+    // This role can mint and burn tokens. Also needs to be an authorized sender
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
-    bytes32 public constant AUTHORIZED_SENDER = keccak256("AUTHORIZED_SENDER");
 
-    constructor(address _system) ERC20("Escrowed SYN", "esSYN") {
+    constructor(address _system) ERC20("Escrowed SYN", "esSYN") ERC20Permit("Escrowed SYN") {
         system = System(_system);
     }
 
@@ -36,7 +38,7 @@ contract EscrowedSYN is ERC20, ERC20Burnable, AccessControl {
     }
 
     /**
-     * @notice Sealed tokens cannot be transferred, can only be minted and burned
+     * @notice Sealed tokens can be transferred only by authorized senders
      */
     function _transfer(
         address,

@@ -10,6 +10,8 @@ import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol"
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol";
+
 import "@openzeppelin/contracts-upgradeable/utils/math/SignedSafeMathUpgradeable.sol";
 
 import "./DebtPool.sol";
@@ -18,6 +20,7 @@ import "./token/SyntheXToken.sol";
 import "./interfaces/IPriceOracle.sol";
 import "./vault/FeeVault.sol";
 import "./interfaces/ISyntheX.sol";
+import "./libraries/PriceConvertor.sol";
 
 /**
  * @title SyntheX
@@ -32,11 +35,20 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
     /// @notice Using SafeMath for uint256 to avoid overflow/underflow
     using SafeMathUpgradeable for uint256;
     using SignedSafeMathUpgradeable for int256;
+    /// @notice for converting token prices
+    using PriceConvertor for uint256;
 
     /// @notice Using Math for uint256 to use min/max
     using MathUpgradeable for uint256;
     /// @notice Using SafeERC20 for ERC20 to avoid reverts
     using SafeERC20Upgradeable for ERC20Upgradeable;
+
+    struct VarsLiquidity {
+        IPriceOracle oracle;
+        address collateral;
+        IPriceOracle.Price price;
+        address[] _accountPools;
+    }
 
     /**
      * @notice Contract name and version
@@ -47,44 +59,19 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
     /**
      * @notice Initialize the contract
      * @param _system The address of the system contract
-     * @param _safeCRatio Safe Collateralization Ratio
      */
-    function initialize(address _system, uint _safeCRatio) public initializer {
+    function initialize(address _system) public initializer {
         __ReentrancyGuard_init();
         __Pausable_init();
-        
-        isRewardTokenSealed = true;
+        __UUPSUpgradeable_init();
+        __ReentrancyGuard_init();
 
         system = System(_system);
-        safeCRatio = _safeCRatio;
+        safeCRatio = MIN_C_RATIO;
     }
-
-    modifier onlyL1Admin() {
-        require(system.isL1Admin(msg.sender), "SyntheX: Not authorized");
-        _;
-    }
-
-    modifier onlyL2Admin() {
-        require(system.isL2Admin(msg.sender), "SyntheX: Not authorized");
-        _;
-    }
-
-    modifier onlyGov() {
-        require(system.isGovernanceModule(msg.sender), "SyntheX: Not authorized");
-        _;
-    }
-
-    modifier onlyGovOrL2() {
-        require(system.isL2Admin(msg.sender) || system.isGovernanceModule(msg.sender), "SyntheX: Not authorized");
-        _;
-    }
-
-
-    ///@notice required by the OZ UUPS module
-    function _authorizeUpgrade(address) internal override onlyL1Admin {}
 
     /* -------------------------------------------------------------------------- */
-    /*                              Public Functions                              */
+    /*                             External Functions                             */
     /* -------------------------------------------------------------------------- */
     /**
      * @notice Enable a pool for trading
@@ -158,83 +145,141 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
 
     /**
      * @notice Deposit collateral
-     * @param _collateral The address of the erc20 collateral; for ETH
      * @param _amount The amount of collateral to deposit
      */
-    function deposit(address _collateral, uint _amount) virtual override public payable whenNotPaused nonReentrant {
+    function depositETH(uint _amount) virtual override public payable {
+        // check if param _amount == msg.value sent with tx
+        require(msg.value == _amount, "Incorrect ETH amount");
+        depositInternal(msg.sender, ETH_ADDRESS, _amount);
+    }
+
+    /**
+     * @notice Deposit collateral
+     * @param _collateral The address of the erc20 collateral
+     * @param _amount The amount of collateral to deposit
+     */
+    function deposit(address _collateral, uint _amount) virtual override public {
+        // check if param _amount == msg.value sent with tx
+        ERC20Upgradeable(_collateral).safeTransferFrom(msg.sender, address(this), _amount);
+        depositInternal(msg.sender, _collateral, _amount);
+    }
+
+    /**
+     * @notice Deposit collateral
+     * @param _collateral The address of the erc20 collateral
+     * @param _amount The amount of collateral to deposit
+     */
+    function depositWithPermit(
+        address _collateral, 
+        uint _amount,
+        uint _deadline,
+        uint8 _v,
+        bytes32 _r,
+        bytes32 _s
+    ) virtual override public {
+        // permit approval
+        IERC20Permit(_collateral).permit(msg.sender, address(this), _amount, _deadline, _v, _r, _s);
+        // transfer
+        ERC20Upgradeable(_collateral).safeTransferFrom(msg.sender, address(this), _amount);
+        depositInternal(msg.sender, _collateral, _amount);
+    }
+
+    /**
+     * @notice Deposit collateral
+     * @param _collateral The address of the erc20 collateral
+     * @param _amount The amount of collateral to deposit
+     */
+    function depositInternal(address _account, address _collateral, uint _amount) internal whenNotPaused {
         // get collateral market
         Market storage collateral = collaterals[_collateral];
-        CollateralSupply storage supply = collateralSupplies[_collateral];
         // ensure collateral is globally enabled
         require(collateral.isEnabled, "Collateral not enabled");
+
         // ensure user has entered the market
-        if(!collateral.accountMembership[msg.sender]){
+        if(!collateral.accountMembership[_account]){
             enterCollateral(_collateral);
         }
         
-        // Transfer of tokens
-        // if eth deposit; _collateral should be set address(0)
-        if(_collateral == address(0)){
-            // check if param _amount == msg.value sent with tx
-            require(msg.value == _amount, "Incorrect ETH amount");
-        } 
-        // if erc20 deposit; _collateral should be set to asset address
-        // safe transfer from user
-        else {
-            ERC20Upgradeable(_collateral).safeTransferFrom(msg.sender, address(this), _amount);
-        }
+        CollateralSupply storage supply = collateralSupplies[_collateral];
+        require(supply.totalDeposits.add(_amount) <= supply.maxDeposits, "Collateral supply exceeded");
+        require(_amount >= supply.minDeposit, "Collateral deposit too small");
+        require(_amount <= supply.maxDeposit, "Collateral deposit too large");
+
         // Update balance
-        accountCollateralBalance[msg.sender][_collateral] = accountCollateralBalance[msg.sender][_collateral].add(_amount);
+        accountCollateralBalance[_account][_collateral] = accountCollateralBalance[_account][_collateral].add(_amount);
 
         // Update collateral supply
         supply.totalDeposits = supply.totalDeposits.add(_amount);
-        require(supply.totalDeposits <= supply.maxDeposits, "Collateral supply exceeded");
 
         // emit event
-        emit Deposit(msg.sender, _collateral, _amount);
+        emit Deposit(_account, _collateral, _amount);
     }
 
     /**
      * @notice Withdraw collateral
      * @param _collateral The address of the collateral
-     * @dev if eth withdraw; _collateral should be set address(0)
-     * @dev if erc20 withdraw; _collateral should be set to asset address
      * @param _amount The amount of collateral to withdraw
      */
-    function withdraw(address _collateral, uint _amount) virtual override public whenNotPaused nonReentrant {
-        CollateralSupply storage supply = collateralSupplies[_collateral];
+    function withdraw(address _collateral, uint _amount) virtual override public {
+        // Transfer collateral to user
+        _amount = transferOut(_collateral, msg.sender, _amount);
+        // Process withdraw
+        withdrawInternal(msg.sender, _collateral, _amount);
+    }
+
+    /**
+     * @notice Withdraw eth collateral
+     * @param _amount The amount of eth to withdraw
+     */
+    function withdrawETH(uint _amount) virtual override public {
+        // Transfer ETH to user
+        _amount = transferETH(msg.sender, _amount);
+        // Process withdraw
+        withdrawInternal(msg.sender, ETH_ADDRESS, _amount);
+    }
+
+    function withdrawInternal(address _account, address _collateral, uint _amount) internal whenNotPaused {
         // check deposit balance
         uint depositBalance = accountCollateralBalance[msg.sender][_collateral];
         // ensure user has enough deposit balance
         require(depositBalance >= _amount, "Insufficient balance");
 
-        // Transfer assets to user
-        _amount = transferOut(_collateral, msg.sender, _amount);
-
         // Update balance
-        accountCollateralBalance[msg.sender][_collateral] = depositBalance.sub(_amount);
+        accountCollateralBalance[_account][_collateral] = depositBalance.sub(_amount);
+
+        CollateralSupply storage supply = collateralSupplies[_collateral];
+        require(_amount < supply.maxWithdraw, "Collateral withdraw too large");
         // Update collateral supply
         supply.totalDeposits = supply.totalDeposits.sub(_amount);
 
         // Check health after withdrawal
-        require(healthFactorOf(msg.sender) >= safeCRatio, "Health factor below safeCRatio");
+        require(borrowCapacity(getAccountLiquidity(_account)) >= 0, "Health factor below safeCRatio");
 
         // Emit successful event
-        emit Withdraw(msg.sender, _collateral, _amount);
+        emit Withdraw(_account, _collateral, _amount);
     }
 
-    function transferOut(address _collateral, address recipient, uint _amount) internal nonReentrant returns(uint) {
-        if(_collateral == address(0)){
-            if(address(this).balance < _amount){
-                _amount = address(this).balance;
-            }
-            payable(recipient).transfer(_amount);
-        } else {
-            if(ERC20Upgradeable(_collateral).balanceOf(address(this)) < _amount){
-                _amount = ERC20Upgradeable(_collateral).balanceOf(address(this));
-            }
-            ERC20Upgradeable(_collateral).safeTransfer(recipient, _amount);
+    /**
+     * @notice Transfer asset out to address
+     * @param _asset The address of the asset
+     * @param recipient The address of the recipient
+     * @param _amount Amount
+     * @return The amount transferred
+     */
+    function transferOut(address _asset, address recipient, uint _amount) internal returns(uint) {
+        if(ERC20Upgradeable(_asset).balanceOf(address(this)) < _amount){
+            _amount = ERC20Upgradeable(_asset).balanceOf(address(this));
         }
+        ERC20Upgradeable(_asset).safeTransfer(recipient, _amount);
+
+        return _amount;
+    }
+
+    function transferETH(address recipient, uint _amount) internal nonReentrant returns(uint) {
+        if(address(this).balance < _amount){
+            _amount = address(this).balance;
+        }
+        payable(recipient).transfer(_amount);
 
         return _amount;
     }
@@ -259,12 +304,12 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
             _enterPool(_account, debtPool);
         }
         
-        // update reward index for the pool 
+        // update reward index for the pool
         updatePoolRewardIndex(address(rewardToken), debtPool);
         // distribute pending reward tokens to user
         distributeAccountReward(address(rewardToken), debtPool, _account);
 
-        return getBorrowCapacity(_account);
+        return borrowCapacity(getAccountLiquidity(_account));
     }
 
     /**
@@ -283,32 +328,16 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         distributeAccountReward(address(rewardToken), msg.sender, _account);
     }
 
-    struct AccountLiquidity {
-        uint totalCollateral;
-        uint totalAdjustedCollateral;
-        uint totalDebt;
-        uint totalAdjustedDebt;
-    }
-
     /**
      * @notice Liquidate an account
      */
     function commitLiquidate(address _account, address _liquidator, address _outAsset, uint _outAmount, uint _penalty, uint _fee) external override whenNotPaused returns(uint) {
         require(_outAmount > 0, "Invalid tokenOut amount");
         // Get account liquidity
-        (uint totalCollateral, uint totalAdjustedCollateral, uint totalDebt, uint totalAdjustedDebt) = _getAccountLiquidity(_account);
-        require(totalDebt > 0, "Account has no debt");
-        require(totalAdjustedDebt > 0, "Account has no collateral");
-        
-        // Calculate health factor
-        (uint _health, uint _ltv) = (totalAdjustedCollateral.mul(1e18).div(totalAdjustedDebt), totalCollateral.mul(1e18).div(totalDebt));
-        // Ensure account is below liquidation threshold
-        require(_health < 1e18, "Health factor above 1");
-        // Ensure account is not already liquidated
-        // Health factor goes 0 when completely liquidated (as collateral = 0)
-        require(_health > 0, "Account is already liquidated");
-        // Ensure incentive is greater than 0
-        require(_ltv > 0, "Account has zero LTV");
+        AccountLiquidity memory liq = getAccountLiquidity(_account);
+        require(liq.totalDebt > 0, "Account has no debt");
+        require(liq.totalCollateral > 0, "Account has no collateral");
+        require(liq.totalCollateral.mul(BASIS_POINTS).div(liq.totalDebt) < MIN_C_RATIO, "Account health factor above liquidationCRatio");
 
         // Ensure collateral market is enabled
         require(collaterals[_outAsset].isEnabled, "Collateral not enabled");
@@ -316,11 +345,11 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         require(collaterals[_outAsset].accountMembership[_account], "Account not in collateral");
 
         // Sieze collateral
-        uint siezePercent = accountCollateralBalance[_account][_outAsset].mul(1e18).div(_outAmount);
-        if(siezePercent < 1e18){
-            _outAmount = _outAmount.mul(siezePercent).div(1e18);
-            _penalty = _penalty.mul(siezePercent).div(1e18);
-            _fee = _fee.mul(siezePercent).div(1e18);
+        uint siezePercent = accountCollateralBalance[_account][_outAsset].mul(BASIS_POINTS).div(_outAmount);
+        if(siezePercent < BASIS_POINTS){
+            _outAmount = _outAmount.mul(siezePercent).div(BASIS_POINTS);
+            _penalty = _penalty.mul(siezePercent).div(BASIS_POINTS);
+            _fee = _fee.mul(siezePercent).div(BASIS_POINTS);
         }
         accountCollateralBalance[_account][_outAsset] = accountCollateralBalance[_account][_outAsset].sub(_outAmount.add(_penalty));
 
@@ -336,8 +365,141 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
     }
     
     /* -------------------------------------------------------------------------- */
+    /*                               View Functions                               */
+    /* -------------------------------------------------------------------------- */
+    /**
+     * @dev Returns if the collateral is enabled for an account
+     */
+    function collateralMembership(address market, address account) virtual override public view returns(bool){
+        // reading the mapping accountMembership from struct collateral
+        return collaterals[market].accountMembership[account];
+    }
+
+    /**
+     * @dev Returns if the trading pool is enabled for an account.
+     */
+    function tradingPoolMembership(address market, address account) virtual override public view returns(bool){
+        // reading the mapping accountMembership from struct tradingPool
+        return tradingPools[market].accountMembership[account];
+    }
+
+    /**
+     * @dev Get user health factor
+     */
+    function healthFactorOf(address _account) virtual override external view returns(uint) {
+        AccountLiquidity memory liq = getAccountLiquidity(_account);
+        if(liq.totalDebt == 0){
+            return 0;
+        }
+        return liq.totalCollateral.mul(BASIS_POINTS).div(liq.totalDebt);
+    }
+
+    /**
+     * @dev Get the borrow capacity of an account
+     * @dev Borrow Capacity = (Total Collateral / safeCRatio) - Total Debt
+     */
+    function borrowCapacity(AccountLiquidity memory _liquidity) virtual override public view returns(int) {
+        // Borrow capacity = (total collateral * LTV) - total debt
+        return int(_liquidity.totalCollateral.mul(BASIS_POINTS).div(safeCRatio)).sub(int(_liquidity.totalDebt));
+    }
+
+    /**
+     * @dev Get the total adjusted position of an account: E(amount of an asset)*(volatility ratio of the asset)
+     * @param _account The address of the account
+     * @return liquidity The total debt of the account
+     */
+    function getAccountLiquidity(address _account) virtual override public view returns(AccountLiquidity memory liquidity) {
+        VarsLiquidity memory vars;
+        // Read and cache the price oracle
+        vars.oracle = IPriceOracle(system.priceOracle());
+
+        // Iterate over all the collaterals of the account
+        for(uint i = 0; i < accountCollaterals[_account].length; i++){
+            vars.collateral = accountCollaterals[_account][i];
+            vars.price = vars.oracle.getAssetPrice(vars.collateral);
+            // Add the adjusted collateral amount in USD
+            // AdjustedCollateralAmountUSD = CollateralAmount * Price * volatilityRatio / 10^PriceDecimals
+            liquidity.totalCollateral = liquidity.totalCollateral.add(
+                accountCollateralBalance[_account][vars.collateral]
+                .mul(vars.price.price)
+                .mul(collaterals[vars.collateral].volatilityRatio)
+                .div(BASIS_POINTS)                      // adjust for volatility ratio
+                .div(10**vars.price.decimals)        // adjust for price
+            );
+        }
+
+        // Read and cache the trading pools the user is in
+        vars._accountPools = accountPools[_account];
+        // Iterate over all the trading pools of the account
+        for(uint i = 0; i < vars._accountPools.length; i++){
+            // Add the adjusted debt amount in USD
+            liquidity.totalDebt = liquidity.totalDebt.add(
+                DebtPool(vars._accountPools[i]).getUserDebtUSD(_account)
+                .mul(BASIS_POINTS)
+                .div(tradingPools[vars._accountPools[i]].volatilityRatio)
+            );
+        }
+        return liquidity;
+    }
+
+    /**
+     * @notice Get overall position of the account is USD, total collateral and total debt
+     * @param _account The address of the account
+     * @return liquidity The total collateral, and total debt of the account
+     */
+    function getAccountPosition(address _account) external view override returns(AccountLiquidity memory liquidity) {
+        VarsLiquidity memory vars;
+
+        // Read and cache the price oracle
+        vars.oracle = IPriceOracle(system.priceOracle());
+
+        // Iterate over all the collaterals of the account
+        for(uint i = 0; i < accountCollaterals[_account].length; i++){
+            vars.collateral = accountCollaterals[_account][i];
+            vars.price = vars.oracle.getAssetPrice(vars.collateral);
+            // Add the collateral amount in USD
+            liquidity.totalCollateral = liquidity.totalCollateral.add(
+                accountCollateralBalance[_account][vars.collateral].mul(vars.price.price).div(10**vars.price.decimals)
+            );
+        }
+        
+        // Read and cache the trading pools the user is in
+        address[] memory _accountPools = accountPools[_account];
+        // Iterate over all the trading pools of the account
+        for(uint i = 0; i < _accountPools.length; i++){
+            // Add the debt amount in USD
+            liquidity.totalDebt = liquidity.totalDebt.add(DebtPool(_accountPools[i]).getUserDebtUSD(_account));
+        }
+        return liquidity;
+    }
+
+
+    /* -------------------------------------------------------------------------- */
     /*                               Admin Functions                              */
     /* -------------------------------------------------------------------------- */
+
+    modifier onlyL1Admin() {
+        require(system.isL1Admin(msg.sender), "SyntheX: Not authorized");
+        _;
+    }
+
+    modifier onlyL2Admin() {
+        require(system.isL2Admin(msg.sender), "SyntheX: Not authorized");
+        _;
+    }
+
+    modifier onlyGov() {
+        require(system.isGovernanceModule(msg.sender), "SyntheX: Not authorized");
+        _;
+    }
+
+    modifier onlyGovOrL2() {
+        require(system.isL2Admin(msg.sender) || system.isGovernanceModule(msg.sender), "SyntheX: Not authorized");
+        _;
+    }
+
+    ///@notice required by the OZ UUPS module
+    function _authorizeUpgrade(address) internal override onlyL1Admin {}
 
     /**
      * @notice Pause the contract
@@ -420,14 +582,18 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
      * @notice Update collateral max deposits
      * @notice Only governance module or l2Admin (in case of emergency) can update collateral cap
      */
-    function setCollateralCap(address _collateral, uint _maxDeposit) virtual override public onlyGovOrL2 {
+    function setCollateralParams(address _collateral, CollateralSupply memory _supplyParam) virtual override public onlyGovOrL2 {
         CollateralSupply storage supply = collateralSupplies[_collateral];
         // if max deposit is less than total deposits, set max deposit to total deposits
-        if(_maxDeposit < supply.totalDeposits){
-            _maxDeposit = supply.totalDeposits;
+        if(_supplyParam.maxDeposits < supply.totalDeposits){
+            _supplyParam.maxDeposits = supply.totalDeposits;
         }
-        supply.maxDeposits = _maxDeposit;
-        emit CollateralCapUpdated(_collateral, _maxDeposit);
+        supply.maxDeposits = _supplyParam.maxDeposits;
+        supply.minDeposit = _supplyParam.minDeposit;
+        supply.maxDeposit = _supplyParam.maxDeposit;
+        supply.maxWithdraw = _supplyParam.maxWithdraw;
+
+        emit CollateralParamsUpdated(_collateral, supply.maxDeposits, supply.minDeposit, supply.maxDeposit, supply.maxWithdraw, supply.totalDeposits);
     }
 
     /**
@@ -435,19 +601,21 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
      * @notice Only governance module or l2Admin (in case of emergency) can update safe collateral ratio
      */
     function setSafeCRatio(uint256 _safeCRatio) public virtual override onlyGovOrL2 {
+        require(_safeCRatio > MIN_C_RATIO, "Safe collateral ratio must be greater than MIN_C_RATIO");
         safeCRatio = _safeCRatio;
     }
+
     /* -------------------------------------------------------------------------- */
     /*                             Reward Distribution                            */
     /* -------------------------------------------------------------------------- */
-
-    function updateRewardToken(address _rewardToken, bool isSealed) virtual public onlyGov {
+    /**
+     * @dev Update the reward token
+     */
+    function updateRewardToken(address _rewardToken) virtual public onlyGov {
         // update reward token
         rewardToken = SyntheXToken(_rewardToken);
-        // update reward token sealed status
-        isRewardTokenSealed = isSealed;
         // emit successful event
-        emit RewardTokenAdded(_rewardToken, isSealed);
+        emit RewardTokenAdded(_rewardToken);
     }
     
     /**
@@ -489,7 +657,7 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         } else {
             poolRewardState.timestamp = uint32(block.timestamp);
         }
-    } 
+    }
 
     /**
      * @notice Calculate reward accrued by a supplier and possibly transfer it to them
@@ -561,40 +729,8 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
             }
         }
         for (uint j = 0; j < holders.length; j++) {
-            grantRewardInternal(_rewardToken, holders[j], rewardAccrued[_rewardToken][holders[j]]);
-            rewardAccrued[_rewardToken][holders[j]] = 0;
+            rewardAccrued[_rewardToken][holders[j]] = rewardAccrued[_rewardToken][holders[j]].sub(transferOut(_rewardToken, holders[j], rewardAccrued[_rewardToken][holders[j]]));
         }
-    }
-
-    /** 
-     * @notice Mint/Transfer SYN to the user
-     * @param _reward The address of the reward token
-     * @param _user The address of the user to transfer SYN to
-     * @param _amount The amount of SYN to (possibly) mint
-     * @return The amount of COMP SYN was NOT transferred to the user
-     */
-    function grantRewardInternal(address _reward, address _user, uint _amount) internal whenNotPaused nonReentrant returns (uint) {
-        
-        if(_reward == address(0)) return(0);
-
-        SyntheXToken _rewardToken = SyntheXToken(_reward);
-        // Check if the reward token is sealed
-        // if sealed: mint it, else: transfer it
-        if(isRewardTokenSealed){
-            SyntheXToken(_reward).mint(_user, _amount);
-            return 0;
-        } else {
-            // check if there is enough SYN
-            uint rewardRemaining = _rewardToken.balanceOf(address(this));
-
-            if (_amount > 0 && _amount <= rewardRemaining) {
-                _rewardToken.transfer(_user, _amount);
-                return 0;
-            }
-
-            return _amount;
-        }
-
     }
 
     /**
@@ -611,191 +747,5 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         }
         // Get the rewards accrued
         return rewardAccrued[_rewardToken][_account];
-    }
-
-    /* -------------------------------------------------------------------------- */
-    /*                               View Functions                               */
-    /* -------------------------------------------------------------------------- */
-    /**
-     * @dev Returns if the collateral is enabled for an account
-     */
-    function collateralMembership(address market, address account) virtual override public view returns(bool){
-        // reading the mapping accountMembership from struct collateral
-        return collaterals[market].accountMembership[account];
-    }
-
-    /**
-     * @dev Returns if the trading pool is enabled for an account.
-     */
-    function tradingPoolMembership(address market, address account) virtual override public view returns(bool){
-        // reading the mapping accountMembership from struct tradingPool
-        return tradingPools[market].accountMembership[account];
-    }
-
-    /**
-     * @dev Get the health factor of an account.
-     * @dev Health Factor = Total Adjusted Collateral / Total Adjusted Debt
-     * @dev Total Adjusted Collateral = Sum(collateral.amount * (collateral.volatilityRatio))
-     * @dev Total Adjusted Debt = Sum(debt.amount / (debt.volatilityRatio))
-     * @param _account The address of the account.
-     * @return The health factor of the account.
-     */
-    function healthFactorOf(address _account) virtual override public view returns(uint) {
-        // Total adjusted collateral & Total adjusted debt in USD
-        (uint totalCollateral, uint totalDebt) = getAdjustedAccountLiquidity(_account);
-        // If total debt is 0, health factor is infinite
-        if(totalDebt == 0) return type(uint).max;
-        // health factor = collateral / debt
-        return totalCollateral.mul(1e18).div(totalDebt);
-    }
-
-    /**
-     * @dev Get the Loan-To-Value ratio of an account
-     * @dev LTV = Total Collateral / Total Debt
-     * @param _account The address of the account
-     * @return The health factor of the account
-     */
-    function ltvOf(address _account) virtual override public view returns(uint) {
-        // Total collateral & Total debt in USD
-        (uint totalCollateral, uint totalDebt) = getAccountLiquidity(_account);
-        // If total debt is 0, LTV is infinite 
-        if(totalDebt == 0) return type(uint).max;
-        // LTV = collateral / debt
-        return totalCollateral.mul(1e18).div(totalDebt);
-    }
-
-    /**
-     * @dev Get the borrow capacity of an account
-     * @dev Borrow Capacity = (Total Collateral / safeCRatio) - Total Debt
-     */
-    function getBorrowCapacity(address _account) virtual override public view returns(int) {
-        // Get the total collateral & total debt of the account
-        (uint totalCollateral, uint totalDebt) = getAdjustedAccountLiquidity(_account);
-        // Borrow capacity = (total collateral * LTV) - total debt
-        return int(totalCollateral.mul(1e18).div(safeCRatio)).sub(int(totalDebt));
-    }
-
-    /**
-     * @dev Returns the total collateral amount of an account
-     * @param _account The address of the account
-     * @return The total collateral of the account
-     */
-    function getAccountLiquidity(address _account) virtual override public view returns(uint, uint) {
-        // Total collateral in USD
-        uint totalCollateral = 0;
-
-        // Read and cache the price oracle
-        IPriceOracle _oracle = IPriceOracle(system.priceOracle());
-
-        // Iterate over all the collaterals of the account
-        for(uint i = 0; i < accountCollaterals[_account].length; i++){
-            address collateral = accountCollaterals[_account][i];
-            IPriceOracle.Price memory price = _oracle.getAssetPrice(collateral);
-            // Add the collateral amount in USD
-            // CollateralAmountUSD = CollateralAmount * Price / 10^PriceDecimals
-            totalCollateral = totalCollateral.add(
-                accountCollateralBalance[_account][collateral].mul(price.price).div(10**price.decimals)
-            );
-        }
-
-        // Total debt in USD
-        uint totalDebt = 0;
-        // Read and cache the trading pools the user is in
-        address[] memory _accountPools = accountPools[_account];
-        // Iterate over all the trading pools of the account
-        for(uint i = 0; i < _accountPools.length; i++){
-            // Add the debt amount in USD
-            totalDebt = totalDebt.add(DebtPool(_accountPools[i]).getUserDebtUSD(_account));
-        }
-        return (totalCollateral, totalDebt);
-    }
-
-    /**
-     * @dev Get the total adjusted collateral of an account: E(amount of an asset)*(volatility ratio of the asset)
-     * @param _account The address of the account
-     * @return The total debt of the account
-     */
-    function getAdjustedAccountLiquidity(address _account) virtual override public view returns(uint, uint) {
-        // Total collateral in USD
-        uint totalCollateral = 0;
-        
-        // Read and cache the price oracle
-        IPriceOracle _oracle = IPriceOracle(system.priceOracle());
-
-        // Iterate over all the collaterals of the account
-        for(uint i = 0; i < accountCollaterals[_account].length; i++){
-            address collateral = accountCollaterals[_account][i];
-            IPriceOracle.Price memory price = _oracle.getAssetPrice(collateral);
-            // Add the adjusted collateral amount in USD
-            // AdjustedCollateralAmountUSD = CollateralAmount * Price * volatilityRatio / 10^PriceDecimals
-            totalCollateral = totalCollateral.add(
-                accountCollateralBalance[_account][collateral]
-                .mul(price.price)
-                .mul(collaterals[collateral].volatilityRatio)
-                .div(1e18)                      // adjust for volatility ratio
-                .div(10**price.decimals)        // adjust for price
-            ); 
-        }
-
-        // Total adjusted debt in USD
-        uint totalDebt = 0;
-        // Read and cache the trading pools the user is in
-        address[] memory _accountPools = accountPools[_account];
-        // Iterate over all the trading pools of the account
-        for(uint i = 0; i < _accountPools.length; i++){
-            // Add the adjusted debt amount in USD
-            totalDebt = totalDebt.add(
-                DebtPool(_accountPools[i]).getUserDebtUSD(_account)
-                .mul(1e18)
-                .div(tradingPools[_accountPools[i]].volatilityRatio)
-            );
-        }
-        return (totalCollateral, totalDebt);
-    }
-
-    function _getAccountLiquidity(address _account) public view returns(uint, uint, uint, uint) {
-        // Total collateral in USD
-        uint totalCollateral = 0;
-        uint totalAdjustedCollateral = 0;
-        // Total adjusted debt in USD
-        uint totalDebt = 0;
-        uint totalAdjustedDebt = 0;
-
-        // Read and cache the price oracle
-        IPriceOracle _oracle = IPriceOracle(system.priceOracle());
-
-        // Iterate over all the collaterals of the account
-        for(uint i = 0; i < accountCollaterals[_account].length; i++){
-            address collateral = accountCollaterals[_account][i];
-            IPriceOracle.Price memory price = _oracle.getAssetPrice(collateral);
-            // Add the adjusted collateral amount in USD
-            // AdjustedCollateralAmountUSD = CollateralAmount * Price * volatilityRatio / 10^PriceDecimals
-            totalAdjustedCollateral = totalAdjustedCollateral.add(
-                accountCollateralBalance[_account][collateral]
-                .mul(price.price)
-                .mul(collaterals[collateral].volatilityRatio)
-                .div(1e18)                      // adjust for volatility ratio
-                .div(10**price.decimals)        // adjust for price
-            ); 
-
-            totalCollateral = totalCollateral.add(
-                accountCollateralBalance[_account][collateral].mul(price.price).div(10**price.decimals)
-            );
-        }
-        
-        // Read and cache the trading pools the user is in
-        address[] memory _accountPools = accountPools[_account];
-        // Iterate over all the trading pools of the account
-        for(uint i = 0; i < _accountPools.length; i++){
-            // Add the adjusted debt amount in USD
-            totalAdjustedDebt = totalAdjustedDebt.add(
-                DebtPool(_accountPools[i]).getUserDebtUSD(_account)
-                .mul(1e18)
-                .div(tradingPools[_accountPools[i]].volatilityRatio)
-            );
-
-            totalDebt = totalDebt.add(DebtPool(_accountPools[i]).getUserDebtUSD(_account));
-        }
-        return (totalCollateral, totalAdjustedCollateral, totalDebt, totalAdjustedDebt);
     }
 }

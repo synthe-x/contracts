@@ -1,8 +1,7 @@
-import { time, loadFixture } from '@nomicfoundation/hardhat-network-helpers';
+import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import main from "../scripts/main";
-import { ETH_ADDRESS } from "../scripts/utils/const";
 
 describe("Testing the complete flow", function () {
 
@@ -23,13 +22,17 @@ describe("Testing the complete flow", function () {
 	});
 
 	it("Should stake eth", async function () {
-		await synthex.connect(user1).deposit(ETH_ADDRESS, ethers.utils.parseEther("20"), {value: ethers.utils.parseEther("20").toString()});    // $ 20000
-		await synthex.connect(user2).deposit(ETH_ADDRESS, ethers.utils.parseEther("10"), {value: ethers.utils.parseEther("10").toString()});    // $ 10000
-		await synthex.connect(user3).deposit(ETH_ADDRESS, ethers.utils.parseEther("200"), {value: ethers.utils.parseEther("200").toString()});   // $ 100000
+		const user1Deposit = ethers.utils.parseEther("20");
+		const user2Deposit = ethers.utils.parseEther("10");
+		const user3Deposit = ethers.utils.parseEther("200");
 
-		expect(await synthex.healthFactorOf(user1.address)).to.equal(ethers.constants.MaxUint256);
-		expect(await synthex.healthFactorOf(user2.address)).to.equal(ethers.constants.MaxUint256);
-		expect(await synthex.healthFactorOf(user3.address)).to.equal(ethers.constants.MaxUint256);
+		await synthex.connect(user1).depositETH(user1Deposit, {value: user1Deposit});    // $ 20000
+		await synthex.connect(user2).depositETH(user2Deposit, {value: user2Deposit});    // $ 10000
+		await synthex.connect(user3).depositETH(user3Deposit, {value: user3Deposit});   // $ 100000
+
+		expect((await synthex.getAccountPosition(user1.address)).totalCollateral).to.equal(ethers.utils.parseEther('20000'));
+		expect((await synthex.getAccountPosition(user2.address)).totalCollateral).to.equal(ethers.utils.parseEther('10000'));
+		expect((await synthex.getAccountPosition(user3.address)).totalCollateral).to.equal(ethers.utils.parseEther('200000'));
 	});
 
 	it("issue synths", async function () {
@@ -40,8 +43,8 @@ describe("Testing the complete flow", function () {
 
 		const user1Liquidity = await synthex.getAccountLiquidity(user1.address);
 		const user3Liquidity = await synthex.getAccountLiquidity(user3.address);
-        expect(user1Liquidity[1]).to.be.equal(ethers.utils.parseEther("10000.00"));
-        expect(user3Liquidity[1]).to.be.equal(ethers.utils.parseEther("90000.00"));
+        expect(user1Liquidity[1]).to.be.equal(ethers.utils.parseEther("10000.00").mul(10).div(9));
+        expect(user3Liquidity[1]).to.be.equal(ethers.utils.parseEther("90000.00").mul(10).div(9));
 	});
 
     it("swap em", async () => {
@@ -50,8 +53,8 @@ describe("Testing the complete flow", function () {
         // check balances
 		const user1Liquidity = await synthex.getAccountLiquidity(user1.address);
 		const user3Liquidity = await synthex.getAccountLiquidity(user3.address);
-		expect(user1Liquidity[1]).to.be.equal(ethers.utils.parseEther("10000.00"));
-		expect(user3Liquidity[1]).to.be.equal(ethers.utils.parseEther("90000.00"));
+		expect(user1Liquidity[1]).to.be.equal(ethers.utils.parseEther("10000.00").mul(10).div(9));
+		expect(user3Liquidity[1]).to.be.equal(ethers.utils.parseEther("90000.00").mul(10).div(9));
 
 		expect(await seth.balanceOf(user1.address)).to.equal(0);
 		expect(await sbtc.balanceOf(user1.address)).to.equal(ethers.utils.parseEther("1"));
