@@ -16,7 +16,6 @@ describe("Testing wrapped atokens", function () {
         [owner, user1, user2, user3] = await ethers.getSigners();
 		const deployments = await loadFixture(main);
         synthex = deployments.synthex;
-        oracle = deployments.oracle;
         waEthWETH = deployments.collateralTokens[6];
         weth = deployments.collateralTokens[1];
         if(!waEthWETH) throw new Error("waEthWETH not found");

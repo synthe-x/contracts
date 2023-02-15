@@ -15,7 +15,6 @@ import "@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol";
 import "@openzeppelin/contracts-upgradeable/utils/math/SignedSafeMathUpgradeable.sol";
 
 import "./DebtPool.sol";
-import "./storage/SyntheXStorage.sol";
 import "./token/SyntheXToken.sol";
 import "./interfaces/IPriceOracle.sol";
 import "./vault/FeeVault.sol";
@@ -31,7 +30,7 @@ import "./libraries/PriceConvertor.sol";
  * @dev Handle collateral: deposit/withdraw, enable/disable collateral, set collateral cap, volatility ratio
  * @dev Enable/disale trading pool, volatility ratio 
  */
-contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgradeable, SyntheXStorage {
+contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, PausableUpgradeable {
     /// @notice Using SafeMath for uint256 to avoid overflow/underflow
     using SafeMathUpgradeable for uint256;
     using SignedSafeMathUpgradeable for int256;
@@ -46,7 +45,7 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
     struct VarsLiquidity {
         IPriceOracle oracle;
         address collateral;
-        IPriceOracle.Price price;
+        uint price;
         address[] _accountPools;
     }
 
@@ -68,6 +67,14 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
 
         system = System(_system);
         safeCRatio = MIN_C_RATIO;
+    }
+
+    receive() external payable {
+        depositETH(msg.value);
+    }
+
+    fallback() external payable {
+        depositETH(msg.value);
     }
 
     /* -------------------------------------------------------------------------- */
@@ -411,7 +418,7 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
     function getAccountLiquidity(address _account) virtual override public view returns(AccountLiquidity memory liquidity) {
         VarsLiquidity memory vars;
         // Read and cache the price oracle
-        vars.oracle = IPriceOracle(system.priceOracle());
+        vars.oracle = IPriceOracle(priceOracle);
 
         // Iterate over all the collaterals of the account
         for(uint i = 0; i < accountCollaterals[_account].length; i++){
@@ -421,10 +428,9 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
             // AdjustedCollateralAmountUSD = CollateralAmount * Price * volatilityRatio / 10^PriceDecimals
             liquidity.totalCollateral = liquidity.totalCollateral.add(
                 accountCollateralBalance[_account][vars.collateral]
-                .mul(vars.price.price)
                 .mul(collaterals[vars.collateral].volatilityRatio)
                 .div(BASIS_POINTS)                      // adjust for volatility ratio
-                .div(10**vars.price.decimals)        // adjust for price
+                .toUSD(vars.price)
             );
         }
 
@@ -451,7 +457,7 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
         VarsLiquidity memory vars;
 
         // Read and cache the price oracle
-        vars.oracle = IPriceOracle(system.priceOracle());
+        vars.oracle = IPriceOracle(priceOracle);
 
         // Iterate over all the collaterals of the account
         for(uint i = 0; i < accountCollaterals[_account].length; i++){
@@ -459,7 +465,7 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
             vars.price = vars.oracle.getAssetPrice(vars.collateral);
             // Add the collateral amount in USD
             liquidity.totalCollateral = liquidity.totalCollateral.add(
-                accountCollateralBalance[_account][vars.collateral].mul(vars.price.price).div(10**vars.price.decimals)
+                accountCollateralBalance[_account][vars.collateral].toUSD(vars.price)
             );
         }
         
@@ -500,6 +506,11 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
 
     ///@notice required by the OZ UUPS module
     function _authorizeUpgrade(address) internal override onlyL1Admin {}
+
+    
+    function setPriceOracle(address _priceOracle) external onlyL1Admin {
+        priceOracle = IPriceOracle(_priceOracle);
+    }
 
     /**
      * @notice Pause the contract

@@ -34,6 +34,9 @@ export async function initiate(
   /*                                 Collaterals                                */
   /* -------------------------------------------------------------------------- */
   if(!isTest) console.log("\nDeploying Collaterals... 💬");
+  let assets = [];
+  let feeds = [];
+  let oracles = []
   for(let i = 0; i < config.collaterals.length; i++){
     let collateral: string|Contract = config.collaterals[i].address as string;
     let feed: string|Contract = config.collaterals[i].feed as string;
@@ -74,7 +77,8 @@ export async function initiate(
       feed = await ethers.getContractAt('MockPriceFeed', feed);
     }
 
-    await contracts.oracle.setFeed(collateral.address, feed.address);
+    assets.push(collateral.address); 
+    feeds.push(feed.address);
     await contracts.synthex.enableCollateral(collateral.address, ethers.utils.parseEther(config.collaterals[i].volatilityRatio).mul(10000));
     await contracts.synthex.setCollateralParams(collateral.address, config.collaterals[i].params);
     if(!isTest) console.log(`\t Collateral ${config.collaterals[i].symbol} ($${parseFloat(ethers.utils.formatUnits(await feed.latestAnswer(), await feed.decimals())).toFixed(4)}) added successfully ✅`);
@@ -82,6 +86,20 @@ export async function initiate(
     result.collateralTokens.push(collateral);
     result.collateralPriceFeeds.push(feed);
   }
+
+  // deploy price oracle
+  oracles.push(await _deploy("PriceOracle", [
+    contracts.system.address, 
+    assets,
+    feeds,
+    ethers.constants.AddressZero,
+    ethers.constants.AddressZero,
+    1e8
+  ], deployments));
+  await contracts.synthex.setPriceOracle(oracles[0].address);
+  // _deployDefender("PriceOracle_"+versionSuffix, oracle);
+
+
   if(!isTest) console.log("Collaterals added successfully 🎉 \n");
 
   /* -------------------------------------------------------------------------- */
@@ -118,10 +136,12 @@ export async function initiate(
     _deployDefender(config.tradingPools[i].symbol+'_'+versionSuffix, pool);
 
     let feeToken = '';
+    assets = [];
+    feeds = [];
     for(let j = 0; j < config.tradingPools[i].synths.length; j++){
       let synth: string|Contract = config.tradingPools[i].synths[j].address as string;
       const symbol = config.tradingPools[i].symbol.toLowerCase() + config.tradingPools[i].synths[j].symbol;
-      const name = 'SyntheX '+ config.tradingPools[i].symbol + ' ' + config.tradingPools[i].synths[j].name;
+      const name = 'SyntheX ' + config.tradingPools[i].synths[j].name + ' ' + config.tradingPools[i].symbol;
       if(!synth){
         // deploy token
         synth = await _deploy('ERC20X', [name, symbol, pool.address, contracts.system.address], deployments, { name: symbol, upgradable: true });
@@ -141,7 +161,8 @@ export async function initiate(
       } else {
         feed = await ethers.getContractAt('MockPriceFeed', feed);
       }
-      await contracts.oracle.setFeed(synth.address, feed.address);
+      assets.push(synth.address);
+      feeds.push(feed.address);
       await pool.enableSynth(synth.address);
       if(!isTest) console.log(`\t\t ${name} (${symbol}) ($${parseFloat(ethers.utils.formatUnits(await feed.latestAnswer(), await feed.decimals())).toFixed(4)}) added  ✨`);
       result.poolSynths[i].push(synth);
@@ -155,8 +176,22 @@ export async function initiate(
       }
     }
 
+    // deploy price oracle
+    oracles.push(await _deploy("PriceOracle", [
+      contracts.system.address, 
+      assets,
+      feeds,
+      ethers.constants.AddressZero,
+      ethers.constants.AddressZero,
+      1e8
+    ], deployments));
+    await pool.setPriceOracle(oracles[i+1].address);
+    // _deployDefender("PriceOracle_"+versionSuffix, oracle);
+
     await pool.updateFeeToken(feeToken);
   }
+
+  
   
   if(!isTest) console.log("Trading Pools deployed successfully 🎉\n");
   return result;

@@ -26,7 +26,6 @@ contract System is AddressStorage, AccessControlUpgradeable {
     bytes32 public constant GOVERNANCE_MODULE_ROLE = keccak256("GOVERNANCE_MODULE_ROLE");
 
     /// @notice Address storage keys
-    bytes32 public constant PRICE_ORACLE = keccak256("PRICE_ORACLE");
     bytes32 public constant VAULT = keccak256("VAULT");
     bytes32 public constant SYNTHEX = keccak256("SYNTHEX");
 
@@ -68,9 +67,6 @@ contract System is AddressStorage, AccessControlUpgradeable {
     /* -------------------------------------------------------------------------- */
     /*                              Address Getteŗ̧̧                             */
     /* -------------------------------------------------------------------------- */
-    function priceOracle() external view returns (address) {
-        return getAddress(PRICE_ORACLE);
-    }
 
     function vault() external view returns (address) {
         return getAddress(VAULT);

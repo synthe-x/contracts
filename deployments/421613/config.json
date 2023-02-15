@@ -1,7 +1,7 @@
 {
   "name": "synthex",
-  "version": "0.10.0",
-  "latest": "0.10.0",
+  "version": "0.11.0",
+  "latest": "0.11.0",
   "l0Admin": "0x084cD22eA15E4C262408e561a5AFa8431Bd7fa5d",
   "l1Admin": "0x2646306d3191AEE905bf9065bD1B7cC71c9036D0",
   "l2Admin": "0x46c18c6d5526E17B34a3deB43e5E9Ba2A659c23a",
@@ -26,7 +26,13 @@
       "volatilityRatio": "0.85",
       "feed": "0x62CAe0FA2da220f43a51F86Db2EDb36DcA9A5A08",
       "address": "0x0000000000000000000000000000000000000000",
-      "cap": "1000"
+      "params": {
+        "maxDeposits": "100000000000000000000000",
+        "minDeposit": "0",
+        "maxDeposit": "100000000000000000000",
+        "maxWithdraw": "100000000000000000000",
+        "totalDeposits": "0"
+      }
     },
     {
       "name": "USD Coin",
@@ -34,7 +40,13 @@
       "decimals": 18,
       "volatilityRatio": "0.95",
       "feed": "0x1692Bdd32F31b831caAc1b0c9fAF68613682813b",
-      "cap": "1000000"
+      "params": {
+        "maxDeposits": "100000000000000000000000000",
+        "minDeposit": "0",
+        "maxDeposit": "100000000000000000000000",
+        "maxWithdraw": "100000000000000000000000",
+        "totalDeposits": "0"
+      }
     },
     {
       "name": "Lido wstETH",
@@ -42,7 +54,13 @@
       "decimals": 18,
       "volatilityRatio": "0.85",
       "feed": "0x62CAe0FA2da220f43a51F86Db2EDb36DcA9A5A08",
-      "cap": "100"
+      "params": {
+        "maxDeposits": "10000000000000000000000",
+        "minDeposit": "0",
+        "maxDeposit": "10000000000000000000",
+        "maxWithdraw": "10000000000000000000",
+        "totalDeposits": "0"
+      }
     },
     {
       "name": "Aave WETH",
@@ -52,7 +70,13 @@
       "isAToken": true,
       "poolAddressesProvider": "0x4eee0bb72c2717310318f27628b3c8a708e4951c",
       "volatilityRatio": "0.75",
-      "cap": "25"
+      "params": {
+        "maxDeposits": "1000000000000000000000",
+        "minDeposit": "0",
+        "maxDeposit": "1000000000000000000",
+        "maxWithdraw": "1000000000000000000",
+        "totalDeposits": "0"
+      }
     },
     {
       "name": "Aave USDC",
@@ -62,7 +86,13 @@
       "isAToken": true,
       "poolAddressesProvider": "0x4eee0bb72c2717310318f27628b3c8a708e4951c",
       "volatilityRatio": "0.80",
-      "cap": "100000"
+      "params": {
+        "maxDeposits": "100000000000000000000000",
+        "minDeposit": "0",
+        "maxDeposit": "100000000000000000000",
+        "maxWithdraw": "100000000000000000000",
+        "totalDeposits": "0"
+      }
     }
   ],
   "tradingPools": [
@@ -71,7 +101,11 @@
       "symbol": "CE",
       "volatilityRatio": "0.8",
       "rewardSpeed": "2.5",
-      "fee": "15",
+      "mintFee": "15",
+      "swapFee": "15",
+      "burnFee": "15",
+      "liquidationFee": "1500",
+      "liquidationPenalty": "500",
       "issuerAlloc": "7000",
       "synths": [
         {
@@ -96,11 +130,6 @@
           "isFeeToken": true
         },
         {
-          "name": "Cardano",
-          "symbol": "ADA",
-          "price": "0.32"
-        },
-        {
           "name": "Aave",
           "symbol": "AAVE",
           "price": "66.39"
@@ -109,11 +138,6 @@
           "name": "Chainlink",
           "symbol": "LINK",
           "feed": "0xd28Ba6CA3bB72bF371b80a2a0a33cBcf9073C954"
-        },
-        {
-          "name": "Uniswap",
-          "symbol": "UNI",
-          "price": "6.38"
         },
         {
           "name": "Dogecoin",
@@ -128,32 +152,15 @@
       ]
     },
     {
-      "name": "ETH-USDC Atomic Pool",
-      "symbol": "EU",
-      "volatilityRatio": "0.8",
-      "rewardSpeed": "2.5",
-      "fee": "15",
-      "issuerAlloc": "7000",
-      "synths": [
-        {
-          "name": "Ethereum",
-          "symbol": "ETH",
-          "feed": "0x62CAe0FA2da220f43a51F86Db2EDb36DcA9A5A08"
-        },
-        {
-          "name": "USD Coin",
-          "symbol": "USDC",
-          "price": "1.00",
-          "isFeeToken": true
-        }
-      ]
-    },
-    {
       "name": "Mid-Cap Marvel Pool",
       "symbol": "MM",
       "volatilityRatio": "0.8",
       "rewardSpeed": "2.5",
-      "fee": "15",
+      "mintFee": "15",
+      "swapFee": "15",
+      "burnFee": "15",
+      "liquidationFee": "1500",
+      "liquidationPenalty": "500",
       "issuerAlloc": "7000",
       "synths": [
         {
@@ -182,11 +189,6 @@
           "price": "2.1"
         },
         {
-          "name": "Ethereum Name Service",
-          "symbol": "ENS",
-          "price": "15.96"
-        },
-        {
           "name": "Harmony",
           "symbol": "ONE",
           "price": "0.023"
@@ -200,77 +202,15 @@
       ]
     },
     {
-      "name": "US Stock Pool",
-      "symbol": "US",
-      "volatilityRatio": "0.9",
-      "rewardSpeed": "1.1",
-      "fee": "10",
-      "issuerAlloc": "6000",
-      "synths": [
-        {
-          "name": "Apple",
-          "symbol": "AAPL",
-          "price": "130.00"
-        },
-        {
-          "name": "Tesla",
-          "symbol": "TSLA",
-          "price": "700.00"
-        },
-        {
-          "name": "Amazon",
-          "symbol": "AMZN",
-          "price": "3500.00"
-        },
-        {
-          "name": "Facebook",
-          "symbol": "FB",
-          "price": "300.00"
-        },
-        {
-          "name": "Microsoft",
-          "symbol": "MSFT",
-          "price": "250.00"
-        },
-        {
-          "name": "S&P 500",
-          "symbol": "^GSPC",
-          "price": "3934.00"
-        },
-        {
-          "name": "Netflix",
-          "symbol": "NFLX",
-          "price": "500.00"
-        },
-        {
-          "name": "Alphabet",
-          "symbol": "GOOGL",
-          "price": "2500.00"
-        },
-        {
-          "name": "Nvidia",
-          "symbol": "NVDA",
-          "price": "500.00"
-        },
-        {
-          "name": "AMD",
-          "symbol": "AMD",
-          "price": "100.00"
-        },
-        {
-          "name": "US Dollar",
-          "symbol": "USD",
-          "price": "1.00",
-          "isFeeToken": true
-        }
-      ]
-    },
-    {
       "name": "Global Currency Pool",
       "symbol": "FX",
       "volatilityRatio": "0.95",
       "rewardSpeed": "0.85",
-      "fee": "5",
+      "mintFee": "5",
+      "swapFee": "5",
+      "burnFee": "5",
+      "liquidationFee": "1500",
+      "liquidationPenalty": "500",
       "issuerAlloc": "5000",
       "synths": [
         {

@@ -7,15 +7,17 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 library PriceConvertor {
     using SafeMath for uint256;
     
-    function t1t2(uint amount, IPriceOracle.Price memory t1Price, IPriceOracle.Price memory t2Price) internal pure returns(uint) {
-        return amount.mul(t1Price.price).mul(10**t2Price.decimals).div(t2Price.price).div(10**t2Price.decimals);
+    uint constant public PRICE_PRECISION = 1e8;
+    
+    function t1t2(uint amount, uint t1Price, uint t2Price) internal pure returns(uint) {
+        return amount.mul(t1Price).div(t2Price);
     }
 
-    function toUSD(uint amount, IPriceOracle.Price memory price) internal pure returns(uint){
-        return amount.mul(price.price).div(10**price.decimals);
+    function toUSD(uint amount, uint price) internal pure returns(uint){
+        return amount.mul(price).div(PRICE_PRECISION);
     }
 
-    function toToken(uint amount, IPriceOracle.Price memory price) internal pure returns(uint){
-        return amount.mul(10**price.decimals).div(price.price);
+    function toToken(uint amount, uint price) internal pure returns(uint){
+        return amount.mul(PRICE_PRECISION).div(price);
     }
 }

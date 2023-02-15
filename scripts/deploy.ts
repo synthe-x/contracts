@@ -39,11 +39,6 @@ export async function deploy(deployments: any, config: any, deployer: SignerWith
   await sealedSYN.grantRole(MINTER_ROLE, stakingRewards.address);
   if(Number(config.stakingRewards.reward) > 0) await stakingRewards.notifyReward(ethers.utils.parseEther(config.stakingRewards.reward));
 
-  // deploy price oracle
-  const oracle = await _deploy("PriceOracle", [system.address], deployments);
-  await system.setAddress(PRICE_ORACLE, oracle.address);
-  // _deployDefender("PriceOracle_"+versionSuffix, oracle);
-
   // deploy unlocker
   const unlocker = await _deploy(
     "TokenRedeemer", 
@@ -56,13 +51,13 @@ export async function deploy(deployments: any, config: any, deployer: SignerWith
 
   // deploy multicall
   await _deploy("Multicall2", [], deployments);
+  await _deploy("WETH9", [], deployments);
 
-  return { synthex, oracle, system, syn, sealedSYN, stakingRewards, vault, unlocker };
+  return { synthex, system, syn, sealedSYN, stakingRewards, vault, unlocker };
 }
 
 export interface IDeploymentResult {
   synthex: Contract;
-  oracle: Contract;
   system: Contract;
   syn: Contract;
   sealedSYN: Contract;

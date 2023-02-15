@@ -2,10 +2,15 @@
 pragma solidity ^0.8.0;
 
 import "../system/System.sol";
+import "../interfaces/IPriceOracle.sol";
 
 contract DebtPoolStorage {
     /// @notice The address of the address storage contract
     System public system;
+
+    /// @notice The address of the price oracle
+    IPriceOracle public priceOracle;
+
     /// @notice If synth is enabled
     mapping(address => bool) public synths;
     /// @notice Fee for swapping synths in the pool (in bps)

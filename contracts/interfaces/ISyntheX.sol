@@ -3,17 +3,16 @@ pragma solidity ^0.8.0;
 import "./IPriceOracle.sol";
 import "../storage/SyntheXStorage.sol";
 
-interface ISyntheX {
-  
+abstract contract ISyntheX is SyntheXStorage {
     /* -------------------------------------------------------------------------- */
     /*                              Public Functions                              */
     /* -------------------------------------------------------------------------- */
-    function enterPool(address _tradingPool) external;
-    function exitPool(address _tradingPool) external;
-    function enterCollateral(address _collateral) external;
-    function exitCollateral(address _collateral) external;
+    function enterPool(address _tradingPool) external virtual;
+    function exitPool(address _tradingPool) external virtual;
+    function enterCollateral(address _collateral) external virtual;
+    function exitCollateral(address _collateral) external virtual;
     
-    function deposit(address _collateral, uint _amount) external;
+    function deposit(address _collateral, uint _amount) external virtual;
     function depositWithPermit(
         address _collateral, 
         uint _amount,
@@ -21,44 +20,44 @@ interface ISyntheX {
         uint8 _v,
         bytes32 _r,
         bytes32 _s
-    ) external;
-    function depositETH(uint _amount) external payable;
+    ) external virtual;
+    function depositETH(uint _amount) external virtual payable;
     
-    function withdraw(address _collateral, uint _amount) external;
-    function withdrawETH(uint _amount) external;
+    function withdraw(address _collateral, uint _amount) external virtual;
+    function withdrawETH(uint _amount) external virtual;
 
-    function commitMint(address _account, address _synth, uint _amount) external returns(int);    
-    function commitBurn(address _account, address _synth, uint _amount) external;
-    function setPoolSpeed(address _rewardToken, address _tradingPool, uint _speed) external;
-    function commitLiquidate(address _account, address _liquidator, address _outAsset, uint _outAmount, uint _penalty, uint _fee) external returns(uint);    
+    function commitMint(address _account, address _synth, uint _amount) external virtual returns(int);    
+    function commitBurn(address _account, address _synth, uint _amount) external virtual;
+    function setPoolSpeed(address _rewardToken, address _tradingPool, uint _speed) external virtual;
+    function commitLiquidate(address _account, address _liquidator, address _outAsset, uint _outAmount, uint _penalty, uint _fee) external virtual returns(uint);    
     
     /* -------------------------------------------------------------------------- */
     /*                               Admin Functions                              */
     /* -------------------------------------------------------------------------- */
-    function enableTradingPool(address _tradingPool, uint _volatilityRatio) external;
-    function disableTradingPool(address _tradingPool) external;
-    function enableCollateral(address _collateral, uint _volatilityRatio) external;
-    function disableCollateral(address _collateral) external;
-    function setSafeCRatio(uint256 _safeCRatio) external;
-    function setCollateralParams(address _collateral, SyntheXStorage.CollateralSupply memory) external;
+    function enableTradingPool(address _tradingPool, uint _volatilityRatio) external virtual;
+    function disableTradingPool(address _tradingPool) external virtual;
+    function enableCollateral(address _collateral, uint _volatilityRatio) external virtual;
+    function disableCollateral(address _collateral) external virtual;
+    function setSafeCRatio(uint256 _safeCRatio) external virtual;
+    function setCollateralParams(address _collateral, SyntheXStorage.CollateralSupply memory) external virtual;
     
     /* -------------------------------------------------------------------------- */
     /*                          $SYN Reward Distribution                          */
     /* -------------------------------------------------------------------------- */
-    function claimReward(address _rewardToken, address holder, address[] memory tradingPoolsList) external;
-    function claimReward(address _rewardToken, address[] memory holders, address[] memory tradingPoolsList) external;
-    function getRewardsAccrued(address _rewardToken, address _account, address[] memory tradingPoolsList) external returns(uint);
+    function claimReward(address _rewardToken, address holder, address[] memory tradingPoolsList) external virtual;
+    function claimReward(address _rewardToken, address[] memory holders, address[] memory tradingPoolsList) external virtual;
+    function getRewardsAccrued(address _rewardToken, address _account, address[] memory tradingPoolsList) external virtual returns(uint);
 
 
     /* -------------------------------------------------------------------------- */
     /*                               View Functions                               */
     /* -------------------------------------------------------------------------- */
-    function healthFactorOf(address _account) virtual override external view returns(uint);
-    function collateralMembership(address market, address account) external view returns(bool);
-    function tradingPoolMembership(address market, address account) external view returns(bool);
-    function borrowCapacity(SyntheXStorage.AccountLiquidity memory _liquidity) external view returns(int);
-    function getAccountLiquidity(address _account) external view returns(SyntheXStorage.AccountLiquidity memory liquidity);
-    function getAccountPosition(address _account) external view returns(SyntheXStorage.AccountLiquidity memory liquidity);
+    function healthFactorOf(address _account) external virtual view returns(uint);
+    function collateralMembership(address market, address account) external virtual view returns(bool);
+    function tradingPoolMembership(address market, address account) external virtual view returns(bool);
+    function borrowCapacity(SyntheXStorage.AccountLiquidity memory _liquidity) external virtual view returns(int);
+    function getAccountLiquidity(address _account) external virtual view returns(SyntheXStorage.AccountLiquidity memory liquidity);
+    function getAccountPosition(address _account) external virtual view returns(SyntheXStorage.AccountLiquidity memory liquidity);
 
     /* -------------------------------------------------------------------------- */
     /*                               Events                                       */

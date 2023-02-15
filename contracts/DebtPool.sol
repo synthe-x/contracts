@@ -23,7 +23,7 @@ import "hardhat/console.sol";
  * @author SyntheX
  * @custom:security-contact prasad@chainscore.finance
  */
-contract DebtPool is IDebtPool, ERC20Upgradeable, PausableUpgradeable, DebtPoolStorage {
+contract DebtPool is IDebtPool, ERC20Upgradeable, PausableUpgradeable {
     /// @notice Using SafeMath for uint256 to prevent overflows and underflows
     using SafeMathUpgradeable for uint256;
     /// @notice Using Math for uint256 to calculate minimum and maximum
@@ -32,15 +32,15 @@ contract DebtPool is IDebtPool, ERC20Upgradeable, PausableUpgradeable, DebtPoolS
     using PriceConvertor for uint256;
     
     /// @dev Initialize the contract
-    function initialize(string memory name, string memory symbol, address _system) public initializer {
-        __ERC20_init(name, symbol);
+    function initialize(string memory _name, string memory _symbol, address _system) public initializer {
+        __ERC20_init(_name, _symbol);
         __Pausable_init();
         system = System(_system);
     }
 
     /// @dev Override to disable transfer
     function _transfer(address, address, uint256) internal virtual override {
-        revert("DebtPool: Transfer not allowed");
+        revert("DebtPool: Cannot transfer debt");
     }
 
     /* -------------------------------------------------------------------------- */
@@ -56,11 +56,10 @@ contract DebtPool is IDebtPool, ERC20Upgradeable, PausableUpgradeable, DebtPoolS
         // check if synth is enabled
         require(synths[msg.sender], "SyntheXPool: Synth not enabled");
 
-        IPriceOracle.Price[] memory prices;
         address[] memory t = new address[](2);
         t[0] = msg.sender;
         t[1] = feeToken;
-        prices = IPriceOracle(system.priceOracle()).getAssetPrices(t);
+        uint[] memory prices = priceOracle.getAssetsPrices(t);
 
         int borrowCapacity = ISyntheX(system.synthex()).commitMint(_account, msg.sender, _amount);
         require(borrowCapacity > 0, "SyntheXPool: Insufficient liquidity");
@@ -120,11 +119,10 @@ contract DebtPool is IDebtPool, ERC20Upgradeable, PausableUpgradeable, DebtPoolS
             }
         }
 
-        IPriceOracle.Price[] memory prices;
         address[] memory t = new address[](2);
         t[0] = msg.sender;
         t[1] = feeToken;
-        prices = IPriceOracle(system.priceOracle()).getAssetPrices(t);
+        uint[] memory prices = priceOracle.getAssetsPrices(t);
 
         // amount of debt to burn (in usd, including burnFee)
         uint amountUSD = _amount.toUSD(prices[0]);
@@ -162,12 +160,11 @@ contract DebtPool is IDebtPool, ERC20Upgradeable, PausableUpgradeable, DebtPoolS
         // ensure exchange is not to same synth
         require(msg.sender != _synthTo, "DebtPool: Synths are the same");
 
-        IPriceOracle.Price[] memory prices;
         address[] memory t = new address[](3);
         t[0] = msg.sender;
         t[1] = _synthTo;
         t[2] = feeToken;
-        prices = IPriceOracle(system.priceOracle()).getAssetPrices(t);
+        uint[] memory prices = priceOracle.getAssetsPrices(t);
 
         uint amountUSD = _amount.toUSD(prices[0]);
         uint fee = amountUSD.mul(swapFee).div(BASIS_POINTS);
@@ -192,11 +189,10 @@ contract DebtPool is IDebtPool, ERC20Upgradeable, PausableUpgradeable, DebtPoolS
         // check if synth is enabled
         require(synths[msg.sender], "DebtPool: SynthFrom not enabled");
 
-        IPriceOracle.Price[] memory prices;
         address[] memory t = new address[](3);
         t[0] = msg.sender;
         t[1] = _outAsset;
-        prices = IPriceOracle(system.priceOracle()).getAssetPrices(t);
+        uint[] memory prices = priceOracle.getAssetsPrices(t);
 
         uint amountUSD = _amount.toUSD(prices[0]);
         uint debtUSD = balanceOf(_account).mul(getTotalDebtUSD()).div(totalSupply());
@@ -213,7 +209,7 @@ contract DebtPool is IDebtPool, ERC20Upgradeable, PausableUpgradeable, DebtPoolS
         uint reserve = penalty.mul(liquidationFee).div(BASIS_POINTS); 
 
         // % of collateral that was siezed
-        uint executedOut = SyntheX(system.synthex()).commitLiquidate(
+        uint executedOut = SyntheX(payable(system.synthex())).commitLiquidate(
             _account, _liquidator, _outAsset, 
             amountOut, 
             penalty,
@@ -246,13 +242,14 @@ contract DebtPool is IDebtPool, ERC20Upgradeable, PausableUpgradeable, DebtPoolS
         // Total debt in USD
         uint totalDebt = 0;
         // Fetch and cache oracle address
-        IPriceOracle _oracle = IPriceOracle(system.priceOracle());
+        IPriceOracle _oracle = priceOracle;
         // Iterate through the list of synths and add each synth's total supply in USD to the total debt
         for(uint i = 0; i < _synths.length; i++){
             address synth = _synths[i];
-            IPriceOracle.Price memory price = _oracle.getAssetPrice(synth);
             // synthDebt = synthSupply * price
-            totalDebt = totalDebt.add(ERC20X(synth).totalSupply().mul(price.price).div(10**price.decimals));
+            totalDebt = totalDebt.add(
+                ERC20X(synth).totalSupply().toUSD(_oracle.getAssetPrice(synth))
+            );
         }
         return totalDebt;
     }
@@ -275,6 +272,14 @@ contract DebtPool is IDebtPool, ERC20Upgradeable, PausableUpgradeable, DebtPoolS
     /*                               Admin Functions                              */
     /* -------------------------------------------------------------------------- */
     /**
+     * @notice Set the price oracle
+     * @param _priceOracle The address of the price oracle
+     * @dev Only callable by L1 admin
+     */
+    function setPriceOracle(address _priceOracle) external onlyL1Admin {
+        priceOracle = IPriceOracle(_priceOracle);
+    }
+    /**
      * @notice Pause the contract
      * @dev Only callable by L2 admin
      */
@@ -289,6 +294,7 @@ contract DebtPool is IDebtPool, ERC20Upgradeable, PausableUpgradeable, DebtPoolS
     function unpause() public onlyL2Admin() {
         _unpause();
     }
+
     /**
      * @dev Add a new synth to the pool
      * @param _synth The address of the synth to add
@@ -385,6 +391,14 @@ contract DebtPool is IDebtPool, ERC20Upgradeable, PausableUpgradeable, DebtPoolS
      */
     modifier onlyL2Admin(){
         require(system.isL2Admin(msg.sender), "SyntheXPool: Only L2_ADMIN_ROLE can call");
+        _;
+    }
+
+    /**
+     * @notice Only L1_ADMIN_ROLE can call admin functions
+     */
+    modifier onlyL1Admin(){
+        require(system.isL1Admin(msg.sender), "SyntheXPool: Only L1_ADMIN_ROLE can call");
         _;
     }
 

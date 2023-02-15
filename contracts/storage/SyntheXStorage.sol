@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "../oracle/PriceOracle.sol";
+import "../interfaces/IPriceOracle.sol";
 import "../token/SyntheXToken.sol";
 
 /**
@@ -10,9 +10,13 @@ import "../token/SyntheXToken.sol";
  * @dev This contract is used to store all the data for SyntheX main contract
  * @dev SyntheX is upgradable
  */
-contract SyntheXStorage {
+abstract contract SyntheXStorage {
     /// @notice System contract address
     System public system;
+
+    /// @notice Price oracle contract address
+    IPriceOracle public priceOracle;
+
     /// @notice Reward token contract address
     IERC20 public rewardToken;
 

@@ -9,6 +9,7 @@
     "create:node": "hardhat node",
     "deploy": "hardhat run scripts --network hardhat",
     "deploy:fork": "hardhat --config hardhat-fork.config.ts run scripts --network hardhat",
+    "deploy:testnet": "hardhat run scripts --network arbitrumGoerli",
     "slither": "slither . --checklist docs/SECURITY.md"
   },
   "devDependencies": {
