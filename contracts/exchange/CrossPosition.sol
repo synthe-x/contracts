@@ -24,13 +24,29 @@ contract CrossPosition {
         _;
     }
 
-    function withdraw(
+    function supply(
         IPool pool,
         address asset,
         uint256 amount
+    ) external onlyAuthorized returns(uint) {
+        // transfer from owner to this contract
+        require(IERC20(asset).transferFrom(owner, address(this), amount), "Transfer failed");
+        // approve aave
+        IERC20(asset).safeApprove(address(pool), amount);
+
+        IPool(pool).supply(asset, amount, address(this), 0);
+        
+        return amount;
+    }
+
+    function withdraw(
+        IPool pool,
+        address asset,
+        uint256 amount,
+        address recipient
     ) external onlyAuthorized returns (uint256) {
         // withdraw from aave
-        return pool.withdraw(asset, amount, msg.sender);
+        return pool.withdraw(asset, amount, recipient);
     }
 
     function borrowAndTransfer(

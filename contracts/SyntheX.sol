@@ -70,11 +70,11 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
     }
 
     receive() external payable {
-        depositETH(msg.value);
+        depositETH();
     }
 
     fallback() external payable {
-        depositETH(msg.value);
+        depositETH();
     }
 
     /* -------------------------------------------------------------------------- */
@@ -151,13 +151,12 @@ contract SyntheX is ISyntheX, UUPSUpgradeable, ReentrancyGuardUpgradeable, Pausa
     }
 
     /**
-     * @notice Deposit collateral
-     * @param _amount The amount of collateral to deposit
+     * @notice Deposit ETH
      */
-    function depositETH(uint _amount) virtual override public payable {
+    function depositETH() virtual override public payable {
         // check if param _amount == msg.value sent with tx
-        require(msg.value == _amount, "Incorrect ETH amount");
-        depositInternal(msg.sender, ETH_ADDRESS, _amount);
+        require(msg.value > 0, "Zero ETH amount");
+        depositInternal(msg.sender, ETH_ADDRESS, msg.value);
     }
 
     /**

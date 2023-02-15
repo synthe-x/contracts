@@ -3,6 +3,8 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts/utils/Create2.sol";
+
 import "@aave/core-v3/contracts/flashloan/interfaces/IFlashLoanSimpleReceiver.sol";
 import "@aave/core-v3/contracts/flashloan/base/FlashLoanSimpleReceiverBase.sol";
 
@@ -18,7 +20,7 @@ import "./IsolatedPosition.sol";
 
 import "hardhat/console.sol";
 
-contract Exchange is FlashLoanSimpleReceiverBase {
+contract Perps is FlashLoanSimpleReceiverBase {
     using PriceConvertor for uint;
     using SafeMath for uint;
     using SafeERC20 for IERC20;
@@ -27,7 +29,7 @@ contract Exchange is FlashLoanSimpleReceiverBase {
 
     uint public constant BASIS_POINTS = 10000e18;
 
-    mapping(address => address) public crossAccount;
+    mapping(address => address) public crossPosition;
     mapping(bytes32 => address) public isolatedAccount;
 
     enum Action {
@@ -42,7 +44,16 @@ contract Exchange is FlashLoanSimpleReceiverBase {
         DEBT_POOL = debtPool;
     }
 
-    function long(
+    function createCrossPosition() external {
+        require(crossPosition[msg.sender] == address(0), "Already created");
+        crossPosition[msg.sender] = Create2.deploy(
+            0,
+            keccak256(abi.encodePacked(msg.sender)),
+            abi.encodePacked(type(CrossPosition).creationCode, abi.encode(msg.sender, address(this)))
+        );
+    }
+
+    function openPosition(
         address asset,
         uint amount,
         address base,
@@ -51,6 +62,11 @@ contract Exchange is FlashLoanSimpleReceiverBase {
         // args check
         require(leverage >= 2, "leverage must be greater than or equal to 2");
         require(amount > 0, "amount must be greater than 0");
+
+        console.log(uint(Action.LONG));
+        console.log(base);
+        console.log(leverage);
+        console.log(string(abi.encode(Action.LONG, base, leverage)));
 
         POOL.flashLoanSimple(
             address(this),
@@ -73,10 +89,15 @@ contract Exchange is FlashLoanSimpleReceiverBase {
         
         require(initiator == address(this), "Unauthorized");
 
-        (Action action, address base,) = decodeParams(
+        (Action action, address base, uint8 leverage) = decodeParams(
             params
         );
-        
+
+        console.log(uint(action));
+        console.log(base);
+        console.log(leverage);
+        console.log(string(params));
+
         if(action == Action.LONG){
             handleLong(reserve, reserveAmount, premium, base);
             return true;
@@ -105,28 +126,24 @@ contract Exchange is FlashLoanSimpleReceiverBase {
         POOL.supply(
             reserve,
             reserveAmount.sub(reserveAmount.mul(DEBT_POOL.swapFee()).div(BASIS_POINTS)).add(premium),
-            crossAccount[msg.sender],
+            crossPosition[msg.sender],
             0
         );
         // borrow synthBase
-        CrossPosition(crossAccount[msg.sender]).borrowAndTransfer(POOL, base, baseAmount, address(this));
+        CrossPosition(crossPosition[msg.sender]).borrowAndTransfer(POOL, base, baseAmount, address(this));
         // swap borrowed base asset to reserve
         ERC20X(base).swap(baseAmount, reserve);
         // repay flash loan
-        IERC20(reserve).safeTransfer(address(POOL), reserveAmount.add(premium));
+        IERC20(reserve).approve(address(POOL), reserveAmount.add(premium));
     }
 
     function decodeParams(
         bytes memory _params
-    ) internal pure returns (Action, address, uint8) {
-        Action action;
-        address synthBase;
-        uint8 leverage;
+    ) internal pure returns (Action action, address base, uint8 leverage) {
         assembly {
-            action := mload(add(_params, 0x20))
-            synthBase := mload(add(_params, 0x40))
-            leverage := mload(add(_params, 0x60))
+            action := mload(add(_params, 0x2))
+            base := mload(add(_params, 0x40))
+            leverage := mload(add(_params, 0x16))
         }
-        return (action, synthBase, leverage);
     }
 }

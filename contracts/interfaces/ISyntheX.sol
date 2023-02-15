@@ -21,7 +21,7 @@ abstract contract ISyntheX is SyntheXStorage {
         bytes32 _r,
         bytes32 _s
     ) external virtual;
-    function depositETH(uint _amount) external virtual payable;
+    function depositETH() external virtual payable;
     
     function withdraw(address _collateral, uint _amount) external virtual;
     function withdrawETH(uint _amount) external virtual;
