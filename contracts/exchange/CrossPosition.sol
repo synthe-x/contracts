@@ -2,9 +2,11 @@
 pragma solidity ^0.8.0;
 
 import "@aave/core-v3/contracts/interfaces/IPool.sol";
-// safe erc20
+
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
+import "hardhat/console.sol";
 
 contract CrossPosition {
     using SafeERC20 for IERC20;
@@ -55,17 +57,20 @@ contract CrossPosition {
         uint256 amount,
         address recipient
     ) external onlyAuthorized returns (uint256) {
-        uint preBorrowBalance = IERC20(asset).balanceOf(address(this));
+        require(amount > 0, "Amount must be greater than 0");
+
+        (uint c, uint d, uint a,,,) = pool.getUserAccountData(address(this));
+        console.log("c: %s \n d: %s \n a: %s", c, d, a);
+
+        // console.log("amount: %s", amount);
         // borrow from aave
         pool.borrow(asset, amount, 2, 0, address(this));
 
-        require(
-            IERC20(asset).balanceOf(address(this)) >= preBorrowBalance + amount,
-            "Borrow failed"
-        );
-
         // transfer to recipient
         require(IERC20(asset).transfer(recipient, amount), "Transfer failed");
+
+        (c, d, a,,,) = pool.getUserAccountData(address(this));
+        console.log("c: %s \n d: %s \n a: %s", c, d, a);
 
         return amount;
     }

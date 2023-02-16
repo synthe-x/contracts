@@ -5,25 +5,28 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/Create2.sol";
 
-import "@aave/core-v3/contracts/flashloan/interfaces/IFlashLoanSimpleReceiver.sol";
-import "@aave/core-v3/contracts/flashloan/base/FlashLoanSimpleReceiverBase.sol";
+import "@openzeppelin/contracts/interfaces/IERC3156FlashBorrower.sol";
+import "@openzeppelin/contracts/interfaces/IERC3156FlashLender.sol";
 
 import "@aave/core-v3/contracts/interfaces/IPool.sol";
 
 import "../../ERC20X.sol";
-import "./CrossPosition.sol";
+import "../CrossPosition.sol";
 import "../../interfaces/IPriceOracle.sol";
 import "../../interfaces/IDebtPool.sol";
 import "../../libraries/PriceConvertor.sol";
 
-import "./IsolatedPosition.sol";
+import "../IsolatedPosition.sol";
 
 import "hardhat/console.sol";
 
-contract Perps is FlashLoanSimpleReceiverBase {
+contract Perps is IERC3156FlashBorrower {
     using PriceConvertor for uint;
     using SafeMath for uint;
     using SafeERC20 for IERC20;
+
+    IPool public immutable POOL;
+    IPoolAddressesProvider public immutable POOL_ADDRESSES_PROVIDER;
 
     IDebtPool public immutable DEBT_POOL;
 
@@ -32,16 +35,13 @@ contract Perps is FlashLoanSimpleReceiverBase {
     mapping(address => address) public crossPosition;
     mapping(bytes32 => address) public isolatedAccount;
 
-    enum Action {
-        LONG,
-        SHORT
-    }
-
     constructor(
         IPoolAddressesProvider provider,
         IDebtPool debtPool
-    ) FlashLoanSimpleReceiverBase(provider) {
+    ) {
         DEBT_POOL = debtPool;
+        POOL = IPool(provider.getPool());
+        POOL_ADDRESSES_PROVIDER = provider;
     }
 
     function createCrossPosition() external {
@@ -63,87 +63,85 @@ contract Perps is FlashLoanSimpleReceiverBase {
         require(leverage >= 2, "leverage must be greater than or equal to 2");
         require(amount > 0, "amount must be greater than 0");
 
-        console.log(uint(Action.LONG));
-        console.log(base);
-        console.log(leverage);
-        console.log(string(abi.encode(Action.LONG, base, leverage)));
-
-        POOL.flashLoanSimple(
-            address(this),
+        require(IERC3156FlashLender(asset).flashLoan(
+            this,
             asset,
             amount * (leverage - 1),
-            abi.encodePacked(Action.LONG, base, leverage),
-            0
-        );
+            abi.encode(base, msg.sender)
+        ), "Flash loan failed");
 
-        // post sanity check
+        // TODO: post sanity check
     }
 
-    function executeOperation(
-        address reserve,
-        uint256 reserveAmount,
-        uint256 premium,
+    function onFlashLoan(
         address initiator,
-        bytes calldata params
-    ) external override returns (bool) {
+        address token,
+        uint256 amount,
+        uint256 fee,
+        bytes calldata data
+    ) external override returns (bytes32) {
         
         require(initiator == address(this), "Unauthorized");
 
-        (Action action, address base, uint8 leverage) = decodeParams(
-            params
+        (address base, address sender) = decodeParams(
+            data
         );
 
-        console.log(uint(action));
-        console.log(base);
-        console.log(leverage);
-        console.log(string(params));
+        handler(HandlerParams({
+                    reserve: token,
+                    reserveAmount: amount,
+                    premium: fee,
+                    base: base,
+                    sender: sender
+                }));
 
-        if(action == Action.LONG){
-            handleLong(reserve, reserveAmount, premium, base);
-            return true;
-        } else if(action == Action.SHORT){
-
-        }
-        // Invalid action
-        return false;
+        return keccak256("ERC3156FlashBorrower.onFlashLoan");
     }
 
-    function handleLong(
-        address reserve,
-        uint256 reserveAmount,
-        uint256 premium,
-        address base
+    struct HandlerParams {
+        address reserve;
+        uint256 reserveAmount;
+        uint256 premium;
+        address base;
+        address sender;
+    }
+
+    function handler(
+        HandlerParams memory params
     ) internal {
         // get prices
+        // get prices
         address[] memory assets = new address[](2);
-        assets[0] = reserve;
-        assets[1] = base;
-        uint[] memory prices = IPriceOracle(ADDRESSES_PROVIDER.getPriceOracle()).getAssetsPrices(assets);
+        assets[0] = params.reserve;
+        assets[1] = params.base;
+        uint[] memory prices = IPriceOracle(POOL_ADDRESSES_PROVIDER.getPriceOracle()).getAssetsPrices(assets);
 
-        uint baseAmount = reserveAmount.t1t2(prices[0], prices[1]);
 
+        uint baseAmount = params.reserveAmount.t1t2(prices[0], prices[1]);
+
+        IERC20(params.reserve).safeIncreaseAllowance(address(POOL), params.reserveAmount);
+        
         // supply synth
         POOL.supply(
-            reserve,
-            reserveAmount.sub(reserveAmount.mul(DEBT_POOL.swapFee()).div(BASIS_POINTS)).add(premium),
-            crossPosition[msg.sender],
+            params.reserve,
+            params.reserveAmount.sub(params.reserveAmount.mul(DEBT_POOL.swapFee()).div(BASIS_POINTS)).sub(params.premium),
+            crossPosition[params.sender],
             0
         );
         // borrow synthBase
-        CrossPosition(crossPosition[msg.sender]).borrowAndTransfer(POOL, base, baseAmount, address(this));
+        CrossPosition(crossPosition[params.sender]).borrowAndTransfer(POOL, params.base, baseAmount, address(this));
         // swap borrowed base asset to reserve
-        ERC20X(base).swap(baseAmount, reserve);
-        // repay flash loan
-        IERC20(reserve).approve(address(POOL), reserveAmount.add(premium));
+        ERC20X(params.base).swap(baseAmount, params.reserve);
+        // repay borrowed base asset
+        IERC20(params.reserve).safeIncreaseAllowance(params.reserve, params.reserveAmount.add(params.premium));
     }
 
     function decodeParams(
         bytes memory _params
-    ) internal pure returns (Action action, address base, uint8 leverage) {
+    ) internal pure returns (address base, address sender) {
         assembly {
-            action := mload(add(_params, 0x2))
-            base := mload(add(_params, 0x40))
-            leverage := mload(add(_params, 0x16))
+            base := mload(add(_params, 32))
+            sender := mload(add(_params, 64))
         }
     }
 }
