@@ -1,7 +1,7 @@
 {
   "name": "synthex",
-  "version": "0.23.0",
-  "latest": "0.23.0",
+  "version": "0.24.0",
+  "latest": "0.24.0",
   "l0Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
   "l1Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
   "l2Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
@@ -75,6 +75,20 @@
           "price": "10"
         }
       ]
+    }
+  ],
+  "dummyTokens": [
+    {
+      "name": "Dummy USD Tether",
+      "symbol": "DUMMYUSDT"
+    },
+    {
+      "name": "Dummy Ethereum",
+      "symbol": "DUMMYETH"
+    },
+    {
+      "name": "Dummy Bitcoin",
+      "symbol": "DUMMYBTC"
     }
   ]
 }

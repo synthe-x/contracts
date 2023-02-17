@@ -12,6 +12,7 @@ export interface IInitiateResult {
   pools: Contract[];
   poolSynths: Contract[][];
   poolSynthPriceFeeds: Contract[][];
+  dummyTokens: Contract[]
 }
 
 export async function initiate(
@@ -27,7 +28,8 @@ export async function initiate(
     collateralPriceFeeds: [],
     pools: [],
     poolSynths: [],
-    poolSynthPriceFeeds: []
+    poolSynthPriceFeeds: [],
+    dummyTokens: []
   } as IInitiateResult;
 
   /* -------------------------------------------------------------------------- */
@@ -191,7 +193,20 @@ export async function initiate(
     await pool.updateFeeToken(feeToken);
   }
 
-  
+  // Dummy tokens
+  if(!isTest) console.log("Deploying Dummy Tokens... 💬");
+  for(let i = 0; i < config.dummyTokens.length; i++){
+    result.dummyTokens.push(await _deploy(
+      'MockToken',
+      [
+        config.dummyTokens[i].name,
+        config.dummyTokens[i].symbol,
+        18
+      ],
+      deployments,
+      {name: config.dummyTokens[i].symbol}
+    ))
+  }
   
   if(!isTest) console.log("Trading Pools deployed successfully 🎉\n");
   return result;

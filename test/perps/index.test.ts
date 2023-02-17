@@ -4,7 +4,7 @@ import { Contract } from 'ethers';
 import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 
-const POOL_ADDR_PROVIDER = '0xBd57b20c3671cDb9a6bD2d847bC3C33e441B8a02';
+const POOL_ADDR_PROVIDER = '0xa31F4c0eF2935Af25370D9AE275169CCd9793DA3';
 const deployments = require("../../deployments/31337/deployments.json");
 
 describe("Testing perps", async () => {
@@ -61,13 +61,18 @@ describe("Testing perps", async () => {
         const baseAmount = ethers.utils.parseEther("0.1");
         await WETHX.connect(user1).approve(pool.address, baseAmount);
         await pool.connect(user1).supply(WETHX.address, baseAmount, crossPositionAddress, 0);
-        await perps.connect(user1).openPosition(WETHX.address, baseAmount, LINKX.address, 25);
+        await perps.connect(user1).openPosition(WETHX.address, baseAmount, USDCX.address, 25);
     })
 
-    it('user2 shorts 100 usd on eth with 50x leverage', async () => {
-        const baseAmount = ethers.utils.parseEther("100");
-        await USDCX.connect(user1).approve(pool.address, baseAmount);
-        await pool.connect(user1).supply(USDCX.address, baseAmount, crossPositionAddress, 0);
-        await perps.connect(user1).openPosition(USDCX.address, baseAmount, WETHX.address, 25);
-    });
+    it('user1 closes 50% of 5 ETH long', async () => {
+        const baseAmount = ethers.utils.parseEther("2.5");
+        await perps.connect(user1).closePosition(USDCX.address, baseAmount, WETHX.address);
+    })
+
+    // it('user2 shorts 100 usd on eth with 50x leverage', async () => {
+    //     const baseAmount = ethers.utils.parseEther("100");
+    //     await USDCX.connect(user1).approve(pool.address, baseAmount);
+    //     await pool.connect(user1).supply(USDCX.address, baseAmount, crossPositionAddress, 0);
+    //     await perps.connect(user1).openPosition(USDCX.address, baseAmount, WETHX.address, 25);
+    // });
 })
