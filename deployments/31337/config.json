@@ -1,7 +1,7 @@
 {
   "name": "synthex",
-  "version": "0.25.0",
-  "latest": "0.25.0",
+  "version": "0.26.0",
+  "latest": "0.26.0",
   "l0Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
   "l1Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
   "l2Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
@@ -25,6 +25,50 @@
       "decimals": 18,
       "volatilityRatio": "0.9",
       "price": "1000",
+      "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      "params": {
+        "maxDeposits": "100000000000000000000000",
+        "minDeposit": "0",
+        "maxDeposit": "100000000000000000000",
+        "maxWithdraw": "100000000000000000000",
+        "totalDeposits": "0"
+      }
+    },
+    {
+      "name": "Wrapped Ethereum",
+      "symbol": "WETH",
+      "decimals": 18,
+      "volatilityRatio": "0.9",
+      "price": "1000",
+      "params": {
+        "maxDeposits": "100000000000000000000000",
+        "minDeposit": "0",
+        "maxDeposit": "100000000000000000000",
+        "maxWithdraw": "100000000000000000000",
+        "totalDeposits": "0"
+      }
+    },
+    {
+      "name": "USDT Coin",
+      "symbol": "USDT",
+      "decimals": 18,
+      "volatilityRatio": "0.9",
+      "price": "11",
+      "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      "params": {
+        "maxDeposits": "100000000000000000000000",
+        "minDeposit": "0",
+        "maxDeposit": "100000000000000000000",
+        "maxWithdraw": "100000000000000000000",
+        "totalDeposits": "0"
+      }
+    },
+    {
+      "name": "Bitcoin",
+      "symbol": "BTC",
+      "decimals": 18,
+      "volatilityRatio": "0.9",
+      "price": "20000",
       "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
       "params": {
         "maxDeposits": "100000000000000000000000",
