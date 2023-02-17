@@ -30,6 +30,8 @@ describe("Testing perps", async () => {
         await WETH.connect(user2).mint(user2.address, ethers.utils.parseEther("1"));
 
         await USDT.connect(user1).approve(spot.address, ethers.utils.parseEther("1000"));
+        await USDT.connect(user2).approve(spot.address, ethers.utils.parseEther("1000"));
+        await WETH.connect(user1).approve(spot.address, ethers.utils.parseEther("1"));
         await WETH.connect(user2).approve(spot.address, ethers.utils.parseEther("1"));
     })
 
@@ -93,5 +95,83 @@ describe("Testing perps", async () => {
 
         expect(await USDT.balanceOf(user2.address)).to.equal(ethers.utils.parseEther('1000'));
         expect(await WETH.balanceOf(user2.address)).to.equal(ethers.utils.parseEther('0'));
+
     })
+
+    it('user1 create limit order to buy 500 USDT with 0.5 WETH', async () => {
+        const domain = {
+			name: 'zexe',
+			version: '1',
+			chainId: hre.network.config.chainId,
+			verifyingContract: spot.address,
+		};
+
+		// The named list of all type definitions
+		const types = {
+			Order: [
+				{ name: 'maker', type: 'address' },
+				{ name: 'token0', type: 'address' },
+				{ name: 'token1', type: 'address' },
+				{ name: 'amount', type: 'uint256' },
+				{ name: 'price', type: 'uint128' },
+                { name: 'expiry', type: 'uint64' },
+				{ name: 'nonce', type: 'uint48' }
+			],
+		};
+
+		// The data to sign
+		const value = {
+			maker: user1.address,
+			token0: USDT.address, 
+            token1: WETH.address,
+			amount: ethers.utils.parseEther('1000').toString(),
+            price: ethers.utils.parseEther('0.001'),
+            expiry: ((Date.now()/1000) + 1000).toFixed(0),
+            nonce: '12345'
+		};
+
+        orders.push(value);
+
+		// sign typed data
+		const storedSignature = await user1._signTypedData(
+			domain,
+			types,
+			value
+		);
+		signatures.push(storedSignature);
+            // console.log(value)
+		// get typed hash
+		const hash = ethers.utils._TypedDataEncoder.hash(domain, types, value);
+		expect(await spot.verifyOrderHash(storedSignature, value)).to.equal(hash);
+        orderIds.push(hash);
+    })
+
+    it('user2 sell 500 USDT for 0.5 WETH', async () => {
+        await spot.connect(user2).executeLimitOrder(
+            signatures[1],
+            orders[1],
+            ethers.utils.parseEther('500')
+        )
+
+        expect(await USDT.balanceOf(user1.address)).to.equal(ethers.utils.parseEther('500'));
+        expect(await WETH.balanceOf(user1.address)).to.equal(ethers.utils.parseEther('0.5'));
+
+        expect(await USDT.balanceOf(user2.address)).to.equal(ethers.utils.parseEther('500'));
+        expect(await WETH.balanceOf(user2.address)).to.equal(ethers.utils.parseEther('0.5'));
+
+    })
+
 })
+
+ /**
+            LIMIT: SELL 0.1 BTC for USDC (0.0001)
+            token0: USDC
+            token1: BTC
+            amount: 1000 USDC
+         */
+        /**
+            LIMIT: BUY 0.1 BTC for USDC (10000)
+            token0: BTC
+            token1: USDC
+            amount: 0.1 BTC
+         */
