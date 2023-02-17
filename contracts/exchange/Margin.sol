@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts-upgradeable/utils/cryptography/EIP712Upgradeable.sol";
+import "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 import "@openzeppelin/contracts-upgradeable/utils/cryptography/SignatureCheckerUpgradeable.sol";
 
 import "@aave/core-v3/contracts/flashloan/base/FlashLoanSimpleReceiverBase.sol";
@@ -17,7 +18,7 @@ import "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
 
 import "../libraries/PriceConvertor.sol";
 
-contract Margin is IFlashLoanSimpleReceiver, EIP712Upgradeable {
+contract Margin is IFlashLoanSimpleReceiver, EIP712 {
     using SafeMathUpgradeable for uint;
     using MathUpgradeable for uint;
     using PriceConvertor for uint;
@@ -57,12 +58,12 @@ contract Margin is IFlashLoanSimpleReceiver, EIP712Upgradeable {
     }
 
     // (address maker, address taker, address token1, uint price)
-    function initialize(
-        address _system,
+    constructor(
+        // address _system,
         address poolAddressProvider
-    ) public initializer {
-        __EIP712_init("zexe", "1");
-        system = System(_system);
+    ) EIP712("zexe", "1") {
+        // __EIP712_init("zexe", "1");
+        // system = System(_system);
 
         ADDRESSES_PROVIDER = IPoolAddressesProvider(poolAddressProvider);
         POOL = IPool(ADDRESSES_PROVIDER.getPool());
@@ -84,7 +85,7 @@ contract Margin is IFlashLoanSimpleReceiver, EIP712Upgradeable {
         Order memory order,
         bytes memory signature,
         uint amountToFill // leveraged amount in token0
-    ) internal {
+    ) external {
         Params_OpenPosition memory vars;
         vars.orderId = verifyOrderHash(signature, order);
         require(validateOrder(order));
@@ -99,9 +100,11 @@ contract Margin is IFlashLoanSimpleReceiver, EIP712Upgradeable {
         );
 
         // supply 1 * perc ETH to Aave
+        IERC20(order.token0).transferFrom(order.maker, address(this), order.amount.mul(vars.perc).div(1e18));
+        IERC20(order.token0).approve(address(POOL), order.amount.mul(vars.perc).div(1e18));
         POOL.supply(
             order.token0,
-            order.amount.mul(order.leverage - 1).mul(vars.perc).div(1e18),
+            order.amount.mul(vars.perc).div(1e18),
             crossPosition[order.maker],
             0
         );
@@ -131,7 +134,8 @@ contract Margin is IFlashLoanSimpleReceiver, EIP712Upgradeable {
         );
 
         // supply to aave
-        POOL.supply(asset, amount, crossPosition[vars.maker], 0);
+        IERC20(asset).approve(address(POOL), amount.sub(premium));
+        POOL.supply(asset, amount.sub(premium), crossPosition[vars.maker], 0);
 
         address[] memory tokens = new address[](2);
         tokens[0] = asset;
@@ -155,7 +159,7 @@ contract Margin is IFlashLoanSimpleReceiver, EIP712Upgradeable {
         IERC20(asset).transferFrom(vars.taker, address(this), amount);
 
         // repay flashloan
-        IERC20(asset).approve(address(POOL), amount);
+        IERC20(asset).approve(address(POOL), amount.add(premium));
 
         return true;
     }
@@ -208,14 +212,6 @@ contract Margin is IFlashLoanSimpleReceiver, EIP712Upgradeable {
 
         require(order.leverage > 1, "Leverage must be greater than 1");
 
-        //     require(order.token0 != address(0), "Invalid token0 address");
-        //     require(order.token1 != address(0), "Invalid token1 address");
-        //     require(
-        //         order.token0 != order.token1,
-        //         "token0 and token1 must be different"
-        //     );
-
-        //     // order is not cancelled
-        //     return true;
+        return true;
     }
 }

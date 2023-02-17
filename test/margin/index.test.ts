@@ -4,7 +4,7 @@ import { Contract } from 'ethers';
 import hre, { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import {expect} from "chai";
-const POOL_ADDR_PROVIDER = '0xa31F4c0eF2935Af25370D9AE275169CCd9793DA3';
+const POOL_ADDR_PROVIDER = '0x9DBb24B10502aD166c198Dbeb5AB54d2d13AfcFd';
 const deployments = require("../../deployments/31337/deployments.json");
 
 describe("Testing margin", async () => {
@@ -16,27 +16,32 @@ describe("Testing margin", async () => {
     let orderIds : string[]= [];
 
     before(async () => {
-        [owner, , user1, user2, user3] = await ethers.getSigners();
+        [owner, , , , user1, user2, user3] = await ethers.getSigners();
         const MarginFactory = await ethers.getContractFactory("Margin");
-        Margin = await MarginFactory.deploy();
+        Margin = await MarginFactory.deploy(POOL_ADDR_PROVIDER);
         await Margin.deployed();
-        // console.log("Margin", await Margin.POOL());
-        console.log("WETH", deployments.contracts['WETH'].address);
-        console.log("USDC", deployments.contracts['USDC'].address);
 
-        Pool = await ethers.getContractAt("IPool", "0xD781C44726058d2971B58408c492192877FAAC17");
-        USDT = await ethers.getContractAt("MockToken", deployments.contracts['WETH'].address);
-        WETH = await ethers.getContractAt("MockToken", deployments.contracts['USDC'].address);
+        Pool = await ethers.getContractAt("IPool", await Margin.POOL());
+        WETH = await ethers.getContractAt("MockToken", deployments.contracts['WETH'].address);
+        USDT = await ethers.getContractAt("MockToken", deployments.contracts['USDC'].address);
         // BTC = await ethers.getContractAt("ERC20X", deployments.contracts['DUMMYBTC'].address);
     })
 
     it('mint tokens', async () => {
-        // await USDT.connect(user1).mint(user1.address ,ethers.utils.parseEther("10"));
         // mint token
-        await WETH.connect(user1).mint(user1.address, ethers.utils.parseEther("10"));
-        await WETH.connect(user2).mint(user2.address, ethers.utils.parseEther("20"));
-        expect(await WETH.balanceOf(user1.address)).to.equal(ether.par));
-        console.log((await WETH.balanceOf(user2.address)).toString());
+        await WETH.connect(user1).transfer(owner.address, await WETH.balanceOf(user1.address));
+        await WETH.connect(user2).transfer(owner.address, await WETH.balanceOf(user2.address));
+        await USDT.connect(user2).transfer(owner.address, await USDT.balanceOf(user2.address));
+
+        await WETH.connect(user1).mint(user1.address, ethers.utils.parseEther("1"));
+        await WETH.connect(user2).mint(user2.address, ethers.utils.parseEther("9"));
+
+        await WETH.connect(user1).approve(Margin.address, ethers.utils.parseEther("1"));
+        await WETH.connect(user2).approve(Margin.address, ethers.utils.parseEther("9"));
+
+        // await USDT.connect(user2).mint(user2.address ,ethers.utils.parseEther("1000"));
+        // expect(await WETH.balanceOf(user1.address)).to.equal(ether.par));
+        // console.log((await WETH.balanceOf(user2.address)).toString());
     })
 
     it('supply initial liquidity to lending pool', async () => {
@@ -46,8 +51,8 @@ describe("Testing margin", async () => {
         const wethAmount = ethers.utils.parseEther("100");
 
 
-        await USDT.connect(owner).mint(usdtAmount);
-        await WETH.connect(owner).mint(wethAmount);
+        await USDT.connect(owner).mint(owner.address, usdtAmount);
+        await WETH.connect(owner).mint(owner.address, wethAmount);
 
 
         await USDT.connect(owner).approve(Pool.address, usdtAmount);
@@ -79,10 +84,10 @@ describe("Testing margin", async () => {
                 { name: 'token0', type: 'address' },
                 { name: 'token1', type: 'address' },
                 { name: 'amount', type: 'uint256' },
+                { name: "leverage", type: "uint16" },
                 { name: 'price', type: 'uint128' },
                 { name: 'expiry', type: 'uint64' },
                 { name: 'nonce', type: 'uint48' },
-                { name: "leverage", type: "uint16" }
             ],
         };
 
@@ -92,6 +97,7 @@ describe("Testing margin", async () => {
             token0: WETH.address,
             token1: USDT.address,
             amount: ethers.utils.parseEther('1').toString(),
+            leverage: 10,
             price: ethers.utils.parseEther('1000').toString(),
             expiry: ((Date.now() / 1000) + 1000).toFixed(0),
             nonce: '12345'
@@ -106,11 +112,24 @@ describe("Testing margin", async () => {
             value
         );
         signatures.push(storedSignature);
-        console.log(value);
         // get typed hash
         const hash = ethers.utils._TypedDataEncoder.hash(domain, types, value);
         expect(await Margin.verifyOrderHash(storedSignature, value)).to.equal(hash);
         orderIds.push(hash);
+    })
+
+    it('user2 sells 9 eth for 9000 usdt', async () => {
+
+        const amount = ethers.utils.parseEther('9');
+        await Margin.connect(user2).openPosition(
+            orders[0],
+            signatures[0],
+            amount
+        )
+
+        expect(await WETH.balanceOf(user2.address)).to.equal(0);
+        expect(await USDT.balanceOf(user2.address)).to.equal(ethers.utils.parseEther('9000'));
+        expect(await WETH.balanceOf(user1.address)).to.equal(ethers.utils.parseEther('0'));
     })
 
 
