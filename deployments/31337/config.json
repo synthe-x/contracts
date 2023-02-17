@@ -1,7 +1,7 @@
 {
   "name": "synthex",
-  "version": "0.26.0",
-  "latest": "0.26.0",
+  "version": "0.27.0",
+  "latest": "0.27.0",
   "l0Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
   "l1Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
   "l2Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
@@ -49,12 +49,11 @@
       }
     },
     {
-      "name": "USDT Coin",
-      "symbol": "USDT",
+      "name": "AAVE",
+      "symbol": "AAVE",
       "decimals": 18,
       "volatilityRatio": "0.9",
-      "price": "11",
-      "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      "price": "100",
       "params": {
         "maxDeposits": "100000000000000000000000",
         "minDeposit": "0",
@@ -64,12 +63,39 @@
       }
     },
     {
-      "name": "Bitcoin",
-      "symbol": "BTC",
+      "name": "ChainLink",
+      "symbol": "Link",
       "decimals": 18,
       "volatilityRatio": "0.9",
-      "price": "20000",
-      "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+      "price": "10",
+      "params": {
+        "maxDeposits": "100000000000000000000000",
+        "minDeposit": "0",
+        "maxDeposit": "100000000000000000000",
+        "maxWithdraw": "100000000000000000000",
+        "totalDeposits": "0"
+      }
+    },
+    {
+      "name": "USD Coin",
+      "symbol": "USDC",
+      "decimals": 18,
+      "volatilityRatio": "0.9",
+      "price": "1",
+      "params": {
+        "maxDeposits": "100000000000000000000000",
+        "minDeposit": "0",
+        "maxDeposit": "100000000000000000000",
+        "maxWithdraw": "100000000000000000000",
+        "totalDeposits": "0"
+      }
+    },
+    {
+      "name": "DAI Stablecoin",
+      "symbol": "DAI",
+      "decimals": 18,
+      "volatilityRatio": "0.9",
+      "price": "1",
       "params": {
         "maxDeposits": "100000000000000000000000",
         "minDeposit": "0",

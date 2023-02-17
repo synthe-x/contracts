@@ -20,17 +20,23 @@ describe("Testing margin", async () => {
         const MarginFactory = await ethers.getContractFactory("Margin");
         Margin = await MarginFactory.deploy();
         await Margin.deployed();
+        // console.log("Margin", await Margin.POOL());
+        console.log("WETH", deployments.contracts['WETH'].address);
+        console.log("USDC", deployments.contracts['USDC'].address);
 
-
-        Pool = await ethers.getContractAt("IPool", await Margin.POOL());
-        USDT = await ethers.getContractAt("MockToken", deployments.contracts['DUMMYUSDT'].address);
-        WETH = await ethers.getContractAt("ERC20X", deployments.contracts['DUMMYETH'].address);
-        BTC = await ethers.getContractAt("ERC20X", deployments.contracts['DUMMYBTC'].address);
+        Pool = await ethers.getContractAt("IPool", "0xD781C44726058d2971B58408c492192877FAAC17");
+        USDT = await ethers.getContractAt("MockToken", deployments.contracts['WETH'].address);
+        WETH = await ethers.getContractAt("MockToken", deployments.contracts['USDC'].address);
+        // BTC = await ethers.getContractAt("ERC20X", deployments.contracts['DUMMYBTC'].address);
     })
 
     it('mint tokens', async () => {
-        await USDT.connect(user1).mint(ethers.utils.parseEther("100"));
-        await WETH.connect(user1).mint(ethers.utils.parseEther("0.1"));
+        // await USDT.connect(user1).mint(user1.address ,ethers.utils.parseEther("10"));
+        // mint token
+        await WETH.connect(user1).mint(user1.address, ethers.utils.parseEther("10"));
+        await WETH.connect(user2).mint(user2.address, ethers.utils.parseEther("20"));
+        expect(await WETH.balanceOf(user1.address)).to.equal(ether.par));
+        console.log((await WETH.balanceOf(user2.address)).toString());
     })
 
     it('supply initial liquidity to lending pool', async () => {
@@ -57,16 +63,7 @@ describe("Testing margin", async () => {
         await Margin.connect(user1).createCrossPosition();
         crossPositionAddress = await Margin.crossPosition(user1.address);
     })
-    // struct Order {
-    //     address maker;
-    //     address token0;
-    //     address token1;
-    //     uint256 amount;
-    //     uint16 leverage;
-    //     uint128 price;
-    //     uint64 expiry;
-    //     uint48 nonce;
-    // }
+   
     it('user1 longs 1 eth with 10x leverage', async () => {
         const domain = {
             name: 'zexe',
