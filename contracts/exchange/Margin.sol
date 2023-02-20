@@ -1,70 +1,37 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "@aave/core-v3/contracts/interfaces/IPool.sol";
+import "@aave/core-v3/contracts/flashloan/base/FlashLoanSimpleReceiverBase.sol";
+
+import "../system/System.sol";
+import "./position/CrossPosition.sol";
+import "./position/IsolatedPosition.sol";
+import "../storage/MarginStorage.sol";
+import "../libraries/PriceConvertor.sol";
+
 import "@openzeppelin/contracts-upgradeable/utils/cryptography/EIP712Upgradeable.sol";
 import "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 import "@openzeppelin/contracts-upgradeable/utils/cryptography/SignatureCheckerUpgradeable.sol";
-
-import "@aave/core-v3/contracts/flashloan/base/FlashLoanSimpleReceiverBase.sol";
-import "@aave/core-v3/contracts/interfaces/IPool.sol";
-import "../system/System.sol";
-
-import "./CrossPosition.sol";
 import "@openzeppelin/contracts/utils/Create2.sol";
-
-// safemath
 import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/Multicall.sol";
 
-import "../libraries/PriceConvertor.sol";
-
-contract Margin is IFlashLoanSimpleReceiver, EIP712 {
+contract Margin is MarginStorage, IFlashLoanSimpleReceiver, EIP712, Multicall, ReentrancyGuard {
     using SafeMathUpgradeable for uint;
     using MathUpgradeable for uint;
     using PriceConvertor for uint;
+    using SafeERC20 for IERC20;
 
-    IPoolAddressesProvider public ADDRESSES_PROVIDER;
-    IPool public POOL;
+    IPoolAddressesProvider public immutable override ADDRESSES_PROVIDER;
+    IPool public immutable override POOL;
 
-    System public system;
-
-    mapping(address => address) public crossPosition;
-    mapping(bytes32 => uint) public orderFills;
-
-    struct Order {
-        address maker;
-        address token0;
-        address token1;
-        uint256 amount;
-        uint16 leverage;
-        uint128 price;
-        uint64 expiry;
-        uint48 nonce;
-    }
-
-    struct Params_OpenPosition {
-        bytes32 orderId;
-        address maker;
-        address taker;
-        address token1;
-        uint price;
-        uint perc;
-        // address borrowAsset;
-        // uint256 borrowAmount;
-        // uint256 fee;
-        // address supplyAsset;
-        // address sender;
-        // uint[] prices;
-    }
-
-    // (address maker, address taker, address token1, uint price)
     constructor(
-        // address _system,
         address poolAddressProvider
     ) EIP712("zexe", "1") {
-        // __EIP712_init("zexe", "1");
-        // system = System(_system);
-
         ADDRESSES_PROVIDER = IPoolAddressesProvider(poolAddressProvider);
         POOL = IPool(ADDRESSES_PROVIDER.getPool());
     }
@@ -81,31 +48,66 @@ contract Margin is IFlashLoanSimpleReceiver, EIP712 {
         );
     }
 
+    function createIsolatedPosition(address token0, address token1) external {
+        require(isolatedPosition[
+            keccak256(abi.encodePacked(msg.sender, token0, token1))
+        ] == address(0), "Already created");
+        isolatedPosition[keccak256(abi.encodePacked(msg.sender, token0, token1))] = Create2.deploy(
+            0,
+            keccak256(abi.encodePacked(msg.sender)),
+            abi.encodePacked(
+                type(IsolatedPosition).creationCode,
+                abi.encode(msg.sender, address(this), token0, token1)
+            )
+        );
+    }
+
+    function execute(
+        Order[] memory orders,
+        string[] memory signatures,
+        address token,
+        uint amount
+    ) external {
+        for(uint i = 0; i < orders.length; i++){
+            // TODO: check order and call open/close
+        }
+    }
+
     function openPosition(
         Order memory order,
         bytes memory signature,
         uint amountToFill // leveraged amount in token0
-    ) external {
-        Params_OpenPosition memory vars;
-        vars.orderId = verifyOrderHash(signature, order);
-        require(validateOrder(order));
+    ) internal {
+        bytes32 orderId = verifyOrderHash(order, signature);
+        validateOpenOrder(order);
 
         amountToFill = amountToFill.min(
-            order.amount.mul(order.leverage - 1).sub(orderFills[vars.orderId])
+            order.token0Amount.mul(order.leverage - 1).sub(orderFills[orderId])
         );
 
         // calc percentage of order to execute
-        vars.perc = amountToFill.mul(1e18).div(
-            order.amount.mul(order.leverage - 1)
+        uint perc = amountToFill.mul(1e18).div(
+            order.token0Amount.mul(order.leverage - 1)
         );
 
+        // position 
+        address position;
+        if(order.position == PositionType.ISOLATED){
+            position = isolatedPosition[keccak256(abi.encodePacked(order.maker, order.token0, order.token1))];
+        } else if (order.position == PositionType.CROSS) {
+            position = crossPosition[order.maker];
+        } else {
+            revert("Invalid position type");
+        }
+        require(position != address(0), "Position not created");
+
         // supply 1 * perc ETH to Aave
-        IERC20(order.token0).transferFrom(order.maker, address(this), order.amount.mul(vars.perc).div(1e18));
-        IERC20(order.token0).approve(address(POOL), order.amount.mul(vars.perc).div(1e18));
+        IERC20(order.token0).safeTransferFrom(order.maker, address(this), order.token0Amount.mul(perc).div(1e18));
+        IERC20(order.token0).safeApprove(address(POOL), order.token0Amount.mul(perc).div(1e18));
         POOL.supply(
             order.token0,
-            order.amount.mul(vars.perc).div(1e18),
-            crossPosition[order.maker],
+            order.token0Amount.mul(perc).div(1e18),
+            position,
             0
         );
 
@@ -113,79 +115,178 @@ contract Margin is IFlashLoanSimpleReceiver, EIP712 {
         POOL.flashLoanSimple(
             address(this),
             order.token0,
-            order.amount.mul(order.leverage - 1).mul(vars.perc).div(1e18),
-            abi.encode(order.maker, msg.sender, order.token1, order.price),
+            order.token0Amount.mul(order.leverage - 1).mul(perc).div(1e18),
+            abi.encode(ActionType.OPEN, position, msg.sender, order.token1, order.price, 0),
             0
         );
+
+        orderFills[orderId] = orderFills[orderId].add(amountToFill);
+
+        emit OpenPosition(position, msg.sender, order.token0, order.token1, order.price, amountToFill);
+    }
+
+    function closePosition(
+        Order memory order,
+        bytes memory signature,
+        uint amountToFill // token1 amount to fill
+    ) internal {
+        bytes32 orderId = verifyOrderHash(order, signature);
+        validateCloseOrder(order);
+
+        amountToFill = amountToFill.min(
+            order.token1Amount.sub(orderFills[orderId])
+        );
+
+        // calc percentage of order to execute
+        uint perc = amountToFill.mul(1e18).div(
+            order.token1Amount
+        );
+
+        // position 
+        address position;
+        if(order.position == PositionType.ISOLATED){
+            position = isolatedPosition[keccak256(abi.encodePacked(order.maker, order.token0, order.token1))];
+        } else if (order.position == PositionType.CROSS) {
+            position = crossPosition[order.maker];
+        } else {
+            revert("Invalid position type");
+        }
+        require(position != address(0), "Position not created");
+
+
+        // flash borrow 9000 * perc USDC from Aave
+        POOL.flashLoanSimple(
+            address(this),
+            order.token1,
+            order.token1Amount.mul(perc).div(1e18),
+            abi.encode(ActionType.CLOSE, position, msg.sender, order.token0, order.price, order.token0Amount),
+            0
+        );
+
+        orderFills[orderId] = orderFills[orderId].add(amountToFill);
+
+        emit ClosePosition(order.maker, msg.sender, order.token0, order.token1, order.price, amountToFill);
     }
 
     function executeOperation(
-        address asset,
+        address token,
         uint256 amount,
         uint256 premium,
         address initiator,
         bytes calldata params
     ) external returns (bool) {
-        require(initiator == address(this), "Unauthroized");
-        Params_OpenPosition memory vars;
-        (vars.maker, vars.taker, vars.token1, vars.price) = abi.decode(
+        require(initiator == address(this), "Unauthorized");
+        require(msg.sender == address(POOL), "Unauthorized");
+        
+        VarsHandler memory vars;
+        address _token;
+        uint _amount;
+        ActionType action;
+        (action, vars.position, vars.taker, _token, vars.price, _amount) = abi.decode(
             params,
-            (address, address, address, uint)
+            (ActionType, address, address, address, uint, uint)
         );
+        vars.premium = premium;
 
+        if(action == ActionType.OPEN){
+            // Get price of token0 and token1
+            address[] memory tokens = new address[](2);
+            tokens[0] = _token;
+            tokens[1] = token;
+            vars.prices = IPriceOracle(ADDRESSES_PROVIDER.getPriceOracle()).getAssetsPrices(tokens);
+            
+            // Set vars
+            vars.token0 = token;
+            vars.token1 = _token;
+            vars.token0Amount = amount;
+            vars.token1Amount = amount.t1t2(vars.prices[1], vars.prices[0]);
+
+            // Handle open position
+            return openHandler(vars);
+        } 
+        else if (action == ActionType.CLOSE){
+            // Set vars
+            vars.token0 = _token;
+            vars.token1 = token;
+            vars.token0Amount = _amount;
+            vars.token1Amount = amount;
+
+            // Handle close position
+            return closeHandler(vars);
+        } 
+        else {
+            return false;
+        }
+    }
+
+    function openHandler(VarsHandler memory vars) internal returns(bool) {
         // supply to aave
-        IERC20(asset).approve(address(POOL), amount.sub(premium));
-        POOL.supply(asset, amount.sub(premium), crossPosition[vars.maker], 0);
-
-        address[] memory tokens = new address[](2);
-        tokens[0] = asset;
-        tokens[1] = vars.token1;
-        uint[] memory prices = IPriceOracle(ADDRESSES_PROVIDER.getPriceOracle())
-            .getAssetsPrices(tokens);
+        IERC20(vars.token0).safeApprove(address(POOL), vars.token0Amount.sub(vars.premium));
+        POOL.supply(vars.token0, vars.token0Amount.sub(vars.premium), vars.position, 0);
 
         // borrow from aave
-        uint borrowAmount = amount.t1t2(prices[0], prices[1]);
-        CrossPosition(crossPosition[vars.maker]).borrowAndTransfer(
+        CrossPosition(vars.position).borrowAndTransfer(
             POOL,
             vars.token1,
-            borrowAmount,
+            vars.token1Amount,
             address(this)
         );
 
         // exchange
-        // 9000 USDC from this to taker
-        IERC20(vars.token1).transfer(vars.taker, borrowAmount);
-        // 9 eth from taker to this
-        IERC20(asset).transferFrom(vars.taker, address(this), amount);
+        // token1 from this to taker
+        IERC20(vars.token1).safeTransfer(vars.taker, vars.token1Amount);
+        // token0 from taker to this
+        IERC20(vars.token0).safeTransferFrom(vars.taker, address(this), vars.token0Amount);
 
         // repay flashloan
-        IERC20(asset).approve(address(POOL), amount.add(premium));
+        IERC20(vars.token0).safeApprove(address(POOL), vars.token0Amount.add(vars.premium));
 
         return true;
     }
 
-    // /* -------------------------------------------------------------------------- */
-    // /*                               View Functionş                              */
-    // /* -------------------------------------------------------------------------- */
-    // /**
-    //  * @dev Verify the order
-    //  * @param signature Signature of the order
-    //  * @param order Order struct
-    //  */
-    function verifyOrderHash(
-        bytes memory signature,
-        Order memory order
-    ) public view returns (bytes32) {
+    function closeHandler(VarsHandler memory vars) internal returns(bool) {
+        // repay borrowed amount
+        IERC20(vars.token1).safeApprove(address(POOL), vars.token1Amount);
+        require(POOL.repay(
+            vars.token1,
+            vars.token1Amount.sub(vars.premium), 
+            2, 
+            vars.position
+        ) == vars.token1Amount.sub(vars.premium), "Repay failed");
+
+        // withdraw collateral
+        require(
+            CrossPosition(vars.position).withdrawAndTransfer(POOL, vars.token0, vars.token0Amount, address(this)) == vars.token0Amount, 
+            "Withdraw failed"
+        );
+
+        // exchange
+        // token0 from this to taker
+        IERC20(vars.token0).safeTransfer(vars.taker, vars.token0Amount);
+        // token1 from taker to this
+        IERC20(vars.token1).safeTransferFrom(vars.taker, address(this), vars.token1Amount);
+
+        // repay token1 flashloan
+        IERC20(vars.token1).safeIncreaseAllowance(address(POOL), vars.token1Amount.add(vars.premium));
+
+        return true;
+    }
+
+    /* -------------------------------------------------------------------------- */
+    /*                               View Functions                               */
+    /* -------------------------------------------------------------------------- */
+
+    function verifyOrderHash(Order memory order, bytes memory signature) public view returns(bytes32) {
         bytes32 digest = _hashTypedDataV4(
             keccak256(
                 abi.encode(
-                    keccak256(
-                        "Order(address maker,address token0,address token1,uint256 amount,uint16 leverage,uint128 price,uint64 expiry,uint48 nonce)"
-                    ),
+                    ORDER_HASH,
+                    uint8(order.action),
+                    uint8(order.position),
                     order.maker,
                     order.token0,
                     order.token1,
-                    order.amount,
+                    order.token0Amount,
                     order.leverage,
                     order.price,
                     order.expiry,
@@ -200,18 +301,22 @@ contract Margin is IFlashLoanSimpleReceiver, EIP712 {
                 digest,
                 signature
             ),
-            "invalid signature"
+            "Invalid signature"
         );
 
         return digest;
     }
-
-    function validateOrder(Order memory order) public view returns (bool) {
-        require(order.amount > 0, "OrderAmount must be greater than 0");
+    function validateOpenOrder(Order memory order) public view {
+        // require(crossPosition[order.maker] != address(0), "CrossPosition already exists");
+        require(order.token0Amount > 0, "OrderAmount must be greater than 0");
         require(order.price > 0, "ExchangeRate must be greater than 0");
-
         require(order.leverage > 1, "Leverage must be greater than 1");
+    }
 
-        return true;
+    function validateCloseOrder(Order memory order) public view {
+        // require(crossPosition[order.maker] != address(0), "CrossPosition does not exist");
+        require(order.token1Amount > 0, "OrderAmount must be greater than 0");
+        require(order.token0Amount > 0, "OrderAmount must be greater than 0");
+        require(order.price > 0, "ExchangeRate must be greater than 0");
     }
 }

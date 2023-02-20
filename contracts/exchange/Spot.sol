@@ -5,24 +5,29 @@ import "@openzeppelin/contracts-upgradeable/utils/cryptography/EIP712Upgradeable
 import "@openzeppelin/contracts-upgradeable/utils/cryptography/SignatureCheckerUpgradeable.sol";
 import "../system/System.sol";
 
-// Safemath
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
-// IERC20Upgradeable
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+
 
 contract Spot is EIP712Upgradeable {
     using SafeMath for uint;
     using Math for uint;
+    using SafeERC20Upgradeable for IERC20Upgradeable;
 
-    System public system;
-    mapping (bytes32 => uint) public orderFills;
+    event OrderFilled(bytes32 indexed orderId, uint256 amountFilled, address taker);
+    event OrderCancelled(bytes32 indexed orderId);
 
+    struct OrderData {
+        uint248 fill;
+        bool cancelled;
+    }
+    mapping (bytes32 => OrderData) public orders;
     uint constant public PRICE_UNIT_DECIMALS = 10**18;
 
-    function initialize(address _system) public initializer {
+    function initialize() public initializer {
         __EIP712_init("zexe", "1");
-        system = System(_system);
     }
 
     struct Order {
@@ -40,39 +45,40 @@ contract Spot is EIP712Upgradeable {
         Order memory order,
         uint256 amountToFill
     ) external returns (uint) {
-        // require(order.leverage <= 1, "leverage must be <= 1");
         // check signature
         bytes32 orderId = verifyOrderHash(signature, order);
         require(validateOrder(order));
 
-        /**
-            LIMIT: SELL 0.1 BTC for USDC (0.0001)
-            token0: USDC
-            token1: BTC
-            amount: 1000 USDC
-         */
-        /**
-            LIMIT: BUY 0.1 BTC for USDC (10000)
-            token0: BTC
-            token1: USDC
-            amount: 0.1 BTC
-         */
+        OrderData storage orderData = orders[orderId];
+        require(orderData.cancelled == false, "Order cancelled");
 
-        amountToFill = amountToFill.min(order.amount.sub(orderFills[orderId]));
+        amountToFill = amountToFill.min(order.amount.sub(orderData.fill));
         if (amountToFill == 0) {
             return 0;
         }
 
         // transfer [amountToFill] token0 from taker to maker
-        IERC20Upgradeable(order.token0).transferFrom(msg.sender, order.maker, amountToFill);
+        IERC20Upgradeable(order.token0).safeTransferFrom(msg.sender, order.maker, amountToFill);
 
         // transfer [amountToFill * price] token1 from maker to taker
-        IERC20Upgradeable(order.token1).transferFrom(order.maker, msg.sender, amountToFill.mul(uint256(order.price)).div(PRICE_UNIT_DECIMALS));
+        IERC20Upgradeable(order.token1).safeTransferFrom(order.maker, msg.sender, amountToFill.mul(uint256(order.price)).div(PRICE_UNIT_DECIMALS));
 
+        orderData.fill = uint248(uint(orderData.fill).add(amountToFill));
 
-        orderFills[orderId] = orderFills[orderId].add(amountToFill);
-        // emit OrderExecuted(orderId, msg.sender, amountToFill);
+        emit OrderFilled(orderId, amountToFill, msg.sender);
+        
         return amountToFill;
+    }
+
+    function cancelOrder(Order memory order, bytes memory signature) external {
+        // check signature
+        bytes32 orderId = verifyOrderHash(signature, order);
+        require(validateOrder(order));
+
+        OrderData storage orderData = orders[orderId];
+        orderData.cancelled = true;
+
+        emit OrderCancelled(orderId);
     }
 
 
@@ -127,8 +133,5 @@ contract Spot is EIP712Upgradeable {
             order.token0 != order.token1,
             "token0 and token1 must be different"
         );
-
-        // order is not cancelled
-        return true;
     }
 }

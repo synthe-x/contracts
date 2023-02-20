@@ -4,6 +4,8 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20FlashMintUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-ERC20PermitUpgradeable.sol";
+
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
 
@@ -17,7 +19,7 @@ import "./storage/ERC20XStorage.sol";
  * @dev ERC20 for Synthetic Asset with minting and burning thru pool contract
  * @dev ERC20FlashMint for flash loan with charged fee that burns debt
  */
-contract ERC20X is ERC20Upgradeable, ERC20FlashMintUpgradeable, PausableUpgradeable, MulticallUpgradeable, ERC20XStorage {
+contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgradeable, PausableUpgradeable, MulticallUpgradeable, ERC20XStorage {
     /// @notice Using SafeMath for uint256 to prevent overflow and underflow
     using SafeMathUpgradeable for uint256;
 

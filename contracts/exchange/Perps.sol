@@ -4,20 +4,19 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/Create2.sol";
-
+import "@openzeppelin/contracts/utils/Multicall.sol";
 import "@openzeppelin/contracts/interfaces/IERC3156FlashBorrower.sol";
 import "@openzeppelin/contracts/interfaces/IERC3156FlashLender.sol";
 
 import "@aave/core-v3/contracts/interfaces/IPool.sol";
 
 import "./../ERC20X.sol";
-import "./CrossPosition.sol";
+import "./position/CrossPosition.sol";
+import "./position/IsolatedPosition.sol";
 import "./../interfaces/IPriceOracle.sol";
 import "./../interfaces/IDebtPool.sol";
 import "./../libraries/PriceConvertor.sol";
-import "./IsolatedPosition.sol";
-
-import "hardhat/console.sol";
+import "../storage/MarginStorage.sol";
 
 contract Perps is IERC3156FlashBorrower {
     using PriceConvertor for uint;
@@ -85,6 +84,17 @@ contract Perps is IERC3156FlashBorrower {
         require(leverage >= 2, "leverage must be greater than or equal to 2");
         require(supplyAmount > 0, "amount must be greater than 0");
 
+        require(crossPosition[msg.sender] != address(0), "Cross position not created");
+
+        IERC20(supplyAsset).safeTransferFrom(msg.sender, address(this), supplyAmount);
+        IERC20(supplyAsset).safeApprove(address(POOL), supplyAmount);
+        POOL.supply(
+            supplyAsset,
+            supplyAmount,
+            crossPosition[msg.sender],
+            0
+        );
+
         require(IERC3156FlashLender(supplyAsset).flashLoan(
             this,
             supplyAsset,
@@ -125,9 +135,7 @@ contract Perps is IERC3156FlashBorrower {
         
         require(initiator == address(this), "Unauthorized");
 
-        (Action action, address base, address sender) = decodeParams(
-            data
-        );
+        (Action action, address base, address sender) = abi.decode(data, (Action, address, address));
 
         // get prices
         address[] memory assets = new address[](2);

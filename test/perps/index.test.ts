@@ -59,8 +59,6 @@ describe("Testing perps", async () => {
 
     it('user1 longs 0.1 eth with 50x leverage', async () => {
         const baseAmount = ethers.utils.parseEther("0.1");
-        await WETHX.connect(user1).approve(pool.address, baseAmount);
-        await pool.connect(user1).supply(WETHX.address, baseAmount, crossPositionAddress, 0);
         await perps.connect(user1).openPosition(WETHX.address, baseAmount, USDCX.address, 25);
     })
 

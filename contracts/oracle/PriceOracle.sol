@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import {IPriceOracle, IPriceOracleGetter} from "../interfaces/IPriceOracle.sol";
 import "../system/System.sol";
-import "../interfaces/IChainlinkAggregator.sol";
+import "@aave/core-v3/contracts/dependencies/chainlink/AggregatorInterface.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
@@ -18,7 +18,7 @@ contract PriceOracle is IPriceOracle {
   System public immutable system;
 
   // Map of asset price sources (asset => priceSource)
-  mapping(address => IChainlinkAggregator) private assetsSources;
+  mapping(address => AggregatorInterface) private assetsSources;
 
   IPriceOracleGetter private _fallbackOracle;
   address public immutable override BASE_CURRENCY;
@@ -87,7 +87,7 @@ contract PriceOracle is IPriceOracle {
   function _setAssetsSources(address[] memory assets, address[] memory sources) internal {
     require(assets.length == sources.length, "INCONSISTENT_PARAMS_LENGTH");
     for (uint256 i = 0; i < assets.length; i++) {
-      assetsSources[assets[i]] = IChainlinkAggregator(sources[i]);
+      assetsSources[assets[i]] = AggregatorInterface(sources[i]);
       emit AssetSourceUpdated(assets[i], sources[i]);
     }
   }
@@ -103,7 +103,7 @@ contract PriceOracle is IPriceOracle {
 
   /// @inheritdoc IPriceOracleGetter
   function getAssetPrice(address asset) public view override returns (uint) {
-    IChainlinkAggregator source = assetsSources[asset];
+    AggregatorInterface source = assetsSources[asset];
 
     if (asset == BASE_CURRENCY) {
       return BASE_CURRENCY_UNIT;
@@ -111,7 +111,6 @@ contract PriceOracle is IPriceOracle {
       return _fallbackOracle.getAssetPrice(asset);
     } else {
       int256 price = source.latestAnswer();
-      uint8 decimals = source.decimals();
       if (price > 0) {
         return uint256(price);
       } else {
