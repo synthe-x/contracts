@@ -84,10 +84,12 @@ describe("Testing perps", async () => {
     })
 
     it('user2 sell 1 WETH for 1000 USDT', async () => {
-        await spot.connect(user2).executeLimitOrder(
-            signatures[0],
-            orders[0],
-            ethers.utils.parseEther('1')
+        await spot.connect(user2).execute(
+            [orders[0]],
+            [signatures[0]],
+            WETH.address,
+            ethers.utils.parseEther('1'),
+            USDT.address
         )
 
         expect(await USDT.balanceOf(user1.address)).to.equal(ethers.utils.parseEther('0'));
@@ -147,10 +149,12 @@ describe("Testing perps", async () => {
     })
 
     it('user2 sell 500 USDT for 0.5 WETH', async () => {
-        await spot.connect(user2).executeLimitOrder(
-            signatures[1],
-            orders[1],
-            ethers.utils.parseEther('500')
+        await spot.connect(user2).execute(
+            [orders[1]],
+            [signatures[1]],
+            USDT.address,
+            ethers.utils.parseEther('500'),
+            WETH.address
         )
 
         expect(await USDT.balanceOf(user1.address)).to.equal(ethers.utils.parseEther('500'));
@@ -159,6 +163,13 @@ describe("Testing perps", async () => {
         expect(await USDT.balanceOf(user2.address)).to.equal(ethers.utils.parseEther('500'));
         expect(await WETH.balanceOf(user2.address)).to.equal(ethers.utils.parseEther('0.5'));
 
+    });
+
+    it("cancel Order", async ()=>{
+        await spot.connect(user1).cancelOrder(
+            orders[1],
+            signatures[1]
+        )
     })
 
 })

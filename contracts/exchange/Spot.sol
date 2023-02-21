@@ -10,21 +10,24 @@ import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 
-
 contract Spot is EIP712Upgradeable {
     using SafeMath for uint;
     using Math for uint;
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
-    event OrderFilled(bytes32 indexed orderId, uint256 amountFilled, address taker);
+    event OrderFilled(
+        bytes32 indexed orderId,
+        uint256 amountFilled,
+        address taker
+    );
     event OrderCancelled(bytes32 indexed orderId);
 
     struct OrderData {
         uint248 fill;
         bool cancelled;
     }
-    mapping (bytes32 => OrderData) public orders;
-    uint constant public PRICE_UNIT_DECIMALS = 10**18;
+    mapping(bytes32 => OrderData) public orderData;
+    uint public constant PRICE_UNIT_DECIMALS = 10 ** 18;
 
     function initialize() public initializer {
         __EIP712_init("zexe", "1");
@@ -39,34 +42,77 @@ contract Spot is EIP712Upgradeable {
         uint64 expiry;
         uint48 nonce;
     }
-    
+
+    /**
+            LIMIT: SELL 0.1 BTC for USDC (0.0001)
+            token0: USDC
+            token1: BTC
+            amount: 1000 USDC
+         */
+    /**
+            LIMIT: BUY 0.1 BTC for USDC (10000)
+            token0: BTC
+            token1: USDC
+            amount: 0.1 BTC
+         */
+
+    function execute(
+        Order[] memory orders,
+        bytes[] memory signatures,
+        address tokenFrom,
+        uint amount, // amount of tokenFrom
+        address tokenTo
+    ) external {
+        for (uint i = 0; i < orders.length; i++) {
+            // TODO: check order and call open/close
+            uint amountFilled;
+            if (amount <= 0) {
+                break;
+            }
+
+            if (orders[i].token0 != tokenFrom || orders[i].token1 != tokenTo) {
+                continue;
+            }
+            amountFilled = executeLimitOrder( signatures[i],orders[i], amount);
+            amount = amount.sub(amountFilled);
+        }
+    }
+
     function executeLimitOrder(
         bytes memory signature,
         Order memory order,
         uint256 amountToFill
-    ) external returns (uint) {
+    ) internal returns (uint) {
         // check signature
         bytes32 orderId = verifyOrderHash(signature, order);
         require(validateOrder(order));
 
-        OrderData storage orderData = orders[orderId];
-        require(orderData.cancelled == false, "Order cancelled");
+        OrderData storage _orderData = orderData[orderId];
+        require(_orderData.cancelled == false, "Order cancelled");
 
-        amountToFill = amountToFill.min(order.amount.sub(orderData.fill));
+        amountToFill = amountToFill.min(order.amount.sub(_orderData.fill));
         if (amountToFill == 0) {
             return 0;
         }
 
         // transfer [amountToFill] token0 from taker to maker
-        IERC20Upgradeable(order.token0).safeTransferFrom(msg.sender, order.maker, amountToFill);
+        IERC20Upgradeable(order.token0).safeTransferFrom(
+            msg.sender,
+            order.maker,
+            amountToFill
+        );
 
         // transfer [amountToFill * price] token1 from maker to taker
-        IERC20Upgradeable(order.token1).safeTransferFrom(order.maker, msg.sender, amountToFill.mul(uint256(order.price)).div(PRICE_UNIT_DECIMALS));
+        IERC20Upgradeable(order.token1).safeTransferFrom(
+            order.maker,
+            msg.sender,
+            amountToFill.mul(uint256(order.price)).div(PRICE_UNIT_DECIMALS)
+        );
 
-        orderData.fill = uint248(uint(orderData.fill).add(amountToFill));
+        _orderData.fill = uint248(uint(_orderData.fill).add(amountToFill));
 
         emit OrderFilled(orderId, amountToFill, msg.sender);
-        
+
         return amountToFill;
     }
 
@@ -75,12 +121,11 @@ contract Spot is EIP712Upgradeable {
         bytes32 orderId = verifyOrderHash(signature, order);
         require(validateOrder(order));
 
-        OrderData storage orderData = orders[orderId];
-        orderData.cancelled = true;
+        OrderData storage _orderData = orderData[orderId];
+        _orderData.cancelled = true;
 
         emit OrderCancelled(orderId);
     }
-
 
     /* -------------------------------------------------------------------------- */
     /*                               View Functionş                              */
@@ -123,7 +168,7 @@ contract Spot is EIP712Upgradeable {
         return digest;
     }
 
-    function validateOrder(Order memory order) public view returns (bool) {
+    function validateOrder(Order memory order) internal pure returns (bool) {
         require(order.amount > 0, "OrderAmount must be greater than 0");
         require(order.price > 0, "ExchangeRate must be greater than 0");
 
@@ -133,5 +178,6 @@ contract Spot is EIP712Upgradeable {
             order.token0 != order.token1,
             "token0 and token1 must be different"
         );
+        return true;
     }
 }

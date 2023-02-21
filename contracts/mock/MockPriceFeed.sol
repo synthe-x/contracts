@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
-import "../interfaces/IChainlinkAggregator.sol";
+// import "../interfaces/IChainlinkAggregator.sol";
 
-contract MockPriceFeed is IChainlinkAggregator {
+contract MockPriceFeed /*is IChainlinkAggregator*/ {
     int public price;
     uint8 private _decimals;
 
