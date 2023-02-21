@@ -16,8 +16,8 @@ import "@openzeppelin/contracts-upgradeable/utils/math/SignedSafeMathUpgradeable
 
 import "../debtpool/DebtPool.sol";
 import "../token/SyntheXToken.sol";
-import "../oracle/IPriceOracle.sol";
-import "../vault/FeeVault.sol";
+import "../utils/oracle/IPriceOracle.sol";
+import "../utils/vault/FeeVault.sol";
 import "./ISyntheX.sol";
 import "../libraries/PriceConvertor.sol";
 

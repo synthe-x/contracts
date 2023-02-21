@@ -4,11 +4,12 @@ import { Contract } from 'ethers';
 import hre, { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import {expect} from "chai";
+import { deploy } from '../../scripts/margin/deploy';
 const POOL_ADDR_PROVIDER = '0x4C2F7092C2aE51D986bEFEe378e50BD4dB99C901';
 const deployments = require("../../deployments/31337/deployments.json");
 
 describe("Testing margin", async () => {
-    let Margin: Contract, USDT: Contract, WETH: Contract, BTC: Contract, Pool: Contract;
+    let spot: Contract, USDT: Contract, WETH: Contract, BTC: Contract, pool: Contract;
     let owner: SignerWithAddress, user1: SignerWithAddress, user2: SignerWithAddress, user3: SignerWithAddress;
     let crossPositionAddress: string;
     let orders : any[]= [];
@@ -16,15 +17,12 @@ describe("Testing margin", async () => {
     let orderIds : string[]= [];
 
     before(async () => {
-        [owner, , , , user1, user2, user3] = await ethers.getSigners();
-        const MarginFactory = await ethers.getContractFactory("Margin");
-        Margin = await MarginFactory.deploy(POOL_ADDR_PROVIDER);
-        await Margin.deployed();
-
-        Pool = await ethers.getContractAt("IPool", await Margin.POOL());
+        [owner, user1, user2, user3] = await ethers.getSigners();
+        const SpotFactory = await ethers.getContractFactory("Spot");
+        spot = (await deploy()).spot;
+        pool = await ethers.getContractAt("IPool", await spot.POOL());
         WETH = await ethers.getContractAt("MockToken", deployments.contracts['WETH'].address);
         USDT = await ethers.getContractAt("MockToken", deployments.contracts['USDC'].address);
-        // BTC = await ethers.getContractAt("ERC20X", deployments.contracts['DUMMYBTC'].address);
     })
 
     it('mint tokens', async () => {
@@ -36,8 +34,8 @@ describe("Testing margin", async () => {
         await WETH.connect(user1).mint(user1.address, ethers.utils.parseEther("1"));
         await WETH.connect(user2).mint(user2.address, ethers.utils.parseEther("10"));
 
-        await WETH.connect(user1).approve(Margin.address, ethers.utils.parseEther("1"));
-        await WETH.connect(user2).approve(Margin.address, ethers.utils.parseEther("10"));
+        await WETH.connect(user1).approve(spot.address, ethers.utils.parseEther("1"));
+        await WETH.connect(user2).approve(spot.address, ethers.utils.parseEther("10"));
 
         // await USDT.connect(user2).mint(user2.address ,ethers.utils.parseEther("1000"));
         // expect(await WETH.balanceOf(user1.address)).to.equal(ether.par));
@@ -51,16 +49,17 @@ describe("Testing margin", async () => {
         await USDT.connect(owner).mint(owner.address, usdtAmount);
         await WETH.connect(owner).mint(owner.address, wethAmount);
 
-        await USDT.connect(owner).approve(Pool.address, usdtAmount);
-        await WETH.connect(owner).approve(Pool.address, wethAmount);
+        await USDT.connect(owner).approve(pool.address, usdtAmount);
+        await WETH.connect(owner).approve(pool.address, wethAmount);
 
-        await Pool.connect(owner).supply(USDT.address, usdtAmount, owner.address, 0);
-        await Pool.connect(owner).supply(WETH.address, wethAmount, owner.address, 0);
+        await pool.connect(owner).supply(USDT.address, usdtAmount, owner.address, 0);
+        await pool.connect(owner).supply(WETH.address, wethAmount, owner.address, 0);
     })
 
     it('create cross position', async () => {
-        await Margin.connect(user1).createCrossPosition();
-        crossPositionAddress = await Margin.crossPosition(user1.address);
+        await spot.connect(user1).createPosition([WETH.address, USDT.address]);
+        // require(await spot.totalPositions(user1.address)).to.equal('1');
+        // require(await spot.position(user1.address, 0)).to.not.equal(ethers.constants.AddressZero);
     })
    
     it('user1 longs 1 eth with 10x leverage', async () => {
@@ -68,7 +67,7 @@ describe("Testing margin", async () => {
             name: 'zexe',
             version: '1',
             chainId: hre.network.config.chainId,
-            verifyingContract: Margin.address,
+            verifyingContract: spot.address,
         };
        
         // The named list of all type definitions
@@ -79,12 +78,12 @@ describe("Testing margin", async () => {
                 { name: 'token1', type: 'address' },
                 { name: 'token0Amount', type: 'uint256' },
                 { name: 'token1Amount', type: 'uint256' },
-                { name: "leverage", type: "uint16" },
-                { name: 'price', type: 'uint128' },
-                { name: 'expiry', type: 'uint64' },
-                { name: 'nonce', type: 'uint32' },
-                { name: 'action', type: 'uint8'},
-                { name: 'position', type: 'uint8'},
+                { name: 'leverage', type: 'uint256' },
+                { name: 'price', type: 'uint256' },
+                { name: 'expiry', type: 'uint256' },
+                { name: 'nonce', type: 'uint256' },
+                { name: 'action', type: 'uint256' },
+                { name: 'position', type: 'uint256' }
             ],
         };
         
@@ -99,7 +98,7 @@ describe("Testing margin", async () => {
             expiry: ((Date.now() / 1000) + 1000).toFixed(0),
             nonce: '12345',
             action: 0,
-            position: 1,
+            position: 0,
         };
 
         orders.push(value);
@@ -114,19 +113,20 @@ describe("Testing margin", async () => {
        
         // get typed hash
         const hash = ethers.utils._TypedDataEncoder.hash(domain, types, value);
-        expect(await Margin.verifyOrderHash(value, storedSignature)).to.equal(hash);
+        expect(await spot.verifyOrderHash(value, storedSignature)).to.equal(hash);
         orderIds.push(hash);
     })
 
     it('user2 sells 9 eth for 9000 usdt', async () => {
         const amount = ethers.utils.parseEther('9');
 
-        await Margin.connect(user2).execute(
+        await spot.connect(user2).execute(
             orders,
             signatures,
             WETH.address,
             amount,
-            USDT.address        
+            USDT.address,
+            ethers.constants.HashZero
         );
 
         expect(await WETH.balanceOf(user2.address)).to.equal(ethers.utils.parseEther('1'));
@@ -144,7 +144,7 @@ describe("Testing margin", async () => {
             name: 'zexe',
             version: '1',
             chainId: hre.network.config.chainId,
-            verifyingContract: Margin.address,
+            verifyingContract: spot.address,
         };
 
         // The named list of all type definitions
@@ -155,12 +155,12 @@ describe("Testing margin", async () => {
                 { name: 'token1', type: 'address' },
                 { name: 'token0Amount', type: 'uint256' },
                 { name: 'token1Amount', type: 'uint256' },
-                { name: "leverage", type: "uint16" },
-                { name: 'price', type: 'uint128' },
-                { name: 'expiry', type: 'uint64' },
-                { name: 'nonce', type: 'uint32' },
-                { name: 'action', type: 'uint8'},
-                { name: 'position', type: 'uint8'},
+                { name: 'leverage', type: 'uint256' },
+                { name: 'price', type: 'uint256' },
+                { name: 'expiry', type: 'uint256' },
+                { name: 'nonce', type: 'uint256' },
+                { name: 'action', type: 'uint256' },
+                { name: 'position', type: 'uint256' }
             ],
         };
 
@@ -176,7 +176,7 @@ describe("Testing margin", async () => {
             expiry: ((Date.now() / 1000) + 1000).toFixed(0),
             nonce: '12346',
             action: 1,
-            position: 1,
+            position: 0,
         };
 
         orders.push(value);
@@ -190,7 +190,7 @@ describe("Testing margin", async () => {
         signatures.push(storedSignature);
         // get typed hash
         const hash = ethers.utils._TypedDataEncoder.hash(domain, types, value);
-        expect(await Margin.verifyOrderHash(value,storedSignature)).to.equal(hash);
+        expect(await spot.verifyOrderHash(value,storedSignature)).to.equal(hash);
         orderIds.push(hash);
         // console.log("value", value);
     })
@@ -198,16 +198,17 @@ describe("Testing margin", async () => {
     it('user2 closes 50% position', async () => {
         const amount = ethers.utils.parseEther('9200');
 
-        await USDT.connect(user2).increaseAllowance(Margin.address, amount.add(ethers.utils.parseEther('9200')));
+        await USDT.connect(user2).increaseAllowance(spot.address, amount.add(ethers.utils.parseEther('9200')));
        
         // console.log(await WETH.balanceOf(user2.address));
         // console.log(await USDT.balanceOf(user2.address));
-        await Margin.connect(user2).execute(
+        await spot.connect(user2).execute(
             orders,
             signatures,
             USDT.address,
             amount,
-            WETH.address        
+            WETH.address,
+            ethers.constants.HashZero
         )
         // let crossPosition = await Margin.crossPosition(user1.address);
         // console.log("getUserAccountData",await Pool.getUserAccountData(crossPosition));
@@ -219,13 +220,13 @@ describe("Testing margin", async () => {
         // console.log(await USDT.balanceOf(user1.address));
         // console.log(await WETH.balanceOf(user2.address));
         // console.log(await USDT.balanceOf(user2.address));
-        expect(await WETH.balanceOf(user2.address)).to.equal(ethers.utils.parseEther('5.5'));
+        expect(await WETH.balanceOf(user2.address)).to.equal(ethers.utils.parseEther('5'));
         expect(await USDT.balanceOf(user2.address)).to.equal(ethers.utils.parseEther('4500'));
     })
     // cancelOrder(Order memory order, bytes memory signature)
     it("cancel Order", async ()=>{
 
-        await Margin.connect(user1).cancelOrder(
+        await spot.connect(user1).cancelOrder(
             orders[1],
             signatures[1]
         )

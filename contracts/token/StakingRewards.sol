@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import './EscrowedSYN.sol';
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "../interfaces/IStaking.sol";
+import "../utils/interfaces/IStaking.sol";
 import "../system/System.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 

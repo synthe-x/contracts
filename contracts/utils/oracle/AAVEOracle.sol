@@ -6,7 +6,7 @@ import "@aave/core-v3/contracts/interfaces/IPool.sol";
 import "@aave/core-v3/contracts/interfaces/IAToken.sol";
 import "@aave/core-v3/contracts/interfaces/IPriceOracle.sol";
 
-import {ATokenWrapper, SafeMath} from "../utils/ATokenWrapper.sol";
+import {ATokenWrapper, SafeMath} from "../ATokenWrapper.sol";
 
 contract AAVEOracle {
     using SafeMath for uint256;

@@ -9,19 +9,26 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-ERC20Pe
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
 
-
 import "../system/System.sol";
 import "../debtpool/DebtPool.sol";
-import "./ERC20XStorage.sol";
 
 /**
  * @title ERC20X
  * @dev ERC20 for Synthetic Asset with minting and burning thru pool contract
  * @dev ERC20FlashMint for flash loan with charged fee that burns debt
  */
-contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgradeable, PausableUpgradeable, MulticallUpgradeable, ERC20XStorage {
+contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgradeable, PausableUpgradeable, MulticallUpgradeable {
     /// @notice Using SafeMath for uint256 to prevent overflow and underflow
     using SafeMathUpgradeable for uint256;
+
+    // TradingPool that owns this token
+    DebtPool public pool;
+    // System contract
+    System public system;
+    /// @notice Fee charged for flash loan % in BASIS_POINTS
+    uint public flashLoanFee;
+    /// @notice Basis points: 1e4 * 1e18 = 100%
+    uint public constant BASIS_POINTS = 10000e18;
 
     /// @notice Emitted when flash fee is updated
     event FlashFeeUpdated(uint _flashLoanFee);

@@ -8,7 +8,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
 import "../erc20x/ERC20X.sol";
-import "../oracle/PriceOracle.sol";
+import "../utils/oracle/PriceOracle.sol";
 import "../synthex/SyntheX.sol";
 import "../system/System.sol";
 import "./IDebtPool.sol";

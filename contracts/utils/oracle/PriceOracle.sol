@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import {IPriceOracle, IPriceOracleGetter} from "./IPriceOracle.sol";
-import "../system/System.sol";
+import "../../system/System.sol";
 import "@aave/core-v3/contracts/dependencies/chainlink/AggregatorInterface.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
