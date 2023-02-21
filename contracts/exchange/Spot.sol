@@ -63,20 +63,14 @@ contract Spot is
 
     /// @dev Emitted when a leveraged position is opened
     event OpenPosition(
-        address maker,
+        bytes32 indexed orderId,
         address taker,
-        address token0,
-        address token1,
-        uint256 price,
         uint256 amountToFill
     );
     /// @dev Emitted when a leveraged position is closed
     event ClosePosition(
-        address maker,
+        bytes32 indexed orderId,
         address taker,
-        address token0,
-        address token1,
-        uint256 price,
         uint256 amountToFill
     );
     /// @dev Emitted when a limit order is filled
@@ -293,11 +287,8 @@ contract Spot is
         );
 
         emit OpenPosition(
-            vars.position,
+            vars.orderId,
             taker,
-            order.token0,
-            order.token1,
-            order.price,
             token0AmountToFill
         );
 
@@ -344,11 +335,8 @@ contract Spot is
         );
 
         emit ClosePosition(
-            order.maker,
+            vars.orderId,
             taker,
-            order.token0,
-            order.token1,
-            order.price,
             token1AmountToFill
         );
 
