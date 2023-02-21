@@ -1,5 +1,6 @@
 import { ethers } from 'hardhat';
 
+export const POOL_ADDRESS_PROVIDER = '0x4C2F7092C2aE51D986bEFEe378e50BD4dB99C901';
 export const ETH_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
 
 // contracts

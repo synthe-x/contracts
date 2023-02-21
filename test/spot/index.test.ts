@@ -5,7 +5,8 @@ import { Contract } from 'ethers';
 import { ethers } from 'hardhat';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { expect } from "chai";
-const POOL_ADDR_PROVIDER = '0x4C2F7092C2aE51D986bEFEe378e50BD4dB99C901';
+import { deploy } from '../../scripts/margin/deploy';
+import { POOL_ADDRESS_PROVIDER } from '../../scripts/utils/const';
 const deployments = require("../../deployments/31337/deployments.json");
 
 describe("Testing perps", async () => {
@@ -19,9 +20,7 @@ describe("Testing perps", async () => {
     before(async () => {
         [owner, user1, user2, user3] = await ethers.getSigners();
         const SpotFactory = await ethers.getContractFactory("Spot");
-        spot = await SpotFactory.deploy(POOL_ADDR_PROVIDER, ethers.constants.AddressZero);
-        await spot.deployed();
-
+        spot = (await deploy()).spot;
         pool = await ethers.getContractAt("IPool", await spot.POOL());
         WETH = await ethers.getContractAt("MockToken", deployments.contracts['WETH'].address);
         USDT = await ethers.getContractAt("MockToken", deployments.contracts['USDC'].address);
@@ -29,10 +28,10 @@ describe("Testing perps", async () => {
 
     it('mint tokens', async () => {
         // burn all
-        await WETH.connect(user1).transfer(POOL_ADDR_PROVIDER, await WETH.balanceOf(user1.address));
-        await USDT.connect(user1).transfer(POOL_ADDR_PROVIDER, await USDT.balanceOf(user1.address));
-        await WETH.connect(user2).transfer(POOL_ADDR_PROVIDER, await WETH.balanceOf(user2.address));
-        await USDT.connect(user2).transfer(POOL_ADDR_PROVIDER, await USDT.balanceOf(user2.address));
+        await WETH.connect(user1).transfer(POOL_ADDRESS_PROVIDER, await WETH.balanceOf(user1.address));
+        await USDT.connect(user1).transfer(POOL_ADDRESS_PROVIDER, await USDT.balanceOf(user1.address));
+        await WETH.connect(user2).transfer(POOL_ADDRESS_PROVIDER, await WETH.balanceOf(user2.address));
+        await USDT.connect(user2).transfer(POOL_ADDRESS_PROVIDER, await USDT.balanceOf(user2.address));
 
         await USDT.connect(user1).mint(user1.address, ethers.utils.parseEther("1000"));
 

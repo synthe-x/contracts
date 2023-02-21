@@ -2,10 +2,10 @@
 pragma solidity ^0.8.0;
 
 import "@aave/core-v3/contracts/interfaces/IPool.sol";
-import "./IMargin.sol";
+import "./ISpot.sol";
 import "./IMarginPosition.sol";
 
-abstract contract MarginStorage is IMargin {
+abstract contract SpotStorage is ISpot {
     enum ActionType {
         OPEN,
         CLOSE,
