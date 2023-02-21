@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
-import "./IPriceOracle.sol";
-import "../storage/SyntheXStorage.sol";
+import "../oracle/IPriceOracle.sol";
+import "./SyntheXStorage.sol";
 
 abstract contract ISyntheX is SyntheXStorage {
     /* -------------------------------------------------------------------------- */

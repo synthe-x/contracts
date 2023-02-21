@@ -6,31 +6,32 @@ import "@aave/core-v3/contracts/interfaces/IPool.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "./IMarginPosition.sol";
 
 /**
  * @title Position
  * @author 
  * @notice Tracks a leveraged position of a user. Cross or Isolated position can be tracked
  */
-contract IsolatedPosition {
+contract MarginPosition is IMarginPosition {
     using SafeERC20 for IERC20;
 
-    address public immutable owner;
-    address public immutable exchange;
+    address public immutable override owner;
+    address public immutable override exchange;
 
-    address public immutable token0;
-    address public immutable token1;
+    mapping(address => bool) public override isSupportedMarket;
     
     constructor (
         address _owner,
         address _exchange,
-        address _token0,    
-        address _token1
+        address[] memory _supportedMarkets
     ) {
-        token0 = _token0;
-        token1 = _token1;
         owner = _owner;
         exchange = _exchange;
+
+        for (uint i = 0; i < _supportedMarkets.length; i++) {
+            isSupportedMarket[_supportedMarkets[i]] = true;
+        }
     }
 
     modifier onlyAuthorized() {
@@ -38,13 +39,19 @@ contract IsolatedPosition {
         _;
     }
 
+    function supportTokens(address[] memory tokens) external override onlyAuthorized {
+        for (uint i = 0; i < tokens.length; i++) {
+            isSupportedMarket[tokens[i]] = true;
+        }
+    }
+
     function withdrawAndTransfer(
         IPool pool,
         address asset,
         uint256 amount,
         address recipient
-    ) external onlyAuthorized returns(uint) {
-        require(asset == token0 || asset == token1, "Asset not supported");
+    ) external override onlyAuthorized returns(uint) {
+        require(isSupportedMarket[asset], "Asset not supported");
         // withdraw from aave
         return pool.withdraw(asset, amount, recipient);
     }
@@ -54,8 +61,8 @@ contract IsolatedPosition {
         address asset,
         uint256 amount,
         address recipient
-    ) external onlyAuthorized {
-        require(asset == token0 || asset == token1, "Asset not supported");
+    ) external override onlyAuthorized {
+        require(isSupportedMarket[asset], "Asset not supported");
         require(amount > 0, "Amount must be greater than 0");
 
         // borrow from aave

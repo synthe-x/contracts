@@ -14,7 +14,7 @@ export async function deploy(deployments: any, config: any, deployer: SignerWith
   const system = await _deploy("System", [deployer.address, deployer.address, deployer.address, deployer.address], deployments)
   
   // deploy limit spot contract
-  const spot = await _deploy("Spot",[], deployments, {upgradable: true});
+  const spot = {} as Contract // await _deploy("Spot",[], deployments, {upgradable: true});
   // vault
   const vault = await _deploy("Vault", [system.address], deployments);
   await system.setAddress(VAULT, vault.address);
@@ -55,7 +55,7 @@ export async function deploy(deployments: any, config: any, deployer: SignerWith
   await _deploy("Multicall2", [], deployments);
   await _deploy("WETH9", [], deployments);
 
-  return { synthex, spot,system, syn, sealedSYN, stakingRewards, vault, unlocker };
+  return { synthex, spot, system, syn, sealedSYN, stakingRewards, vault, unlocker };
 }
 
 export interface IDeploymentResult {

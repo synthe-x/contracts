@@ -7,21 +7,18 @@ import "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
-import "./ERC20X.sol";
-import "./oracle/PriceOracle.sol";
-import "./SyntheX.sol";
-import "./system/System.sol";
-import "./interfaces/IDebtPool.sol";
-import "./libraries/PriceConvertor.sol";
-import "./storage/DebtPoolStorage.sol";
-
-import "hardhat/console.sol";
+import "../erc20x/ERC20X.sol";
+import "../oracle/PriceOracle.sol";
+import "../synthex/SyntheX.sol";
+import "../system/System.sol";
+import "./IDebtPool.sol";
+import "../libraries/PriceConvertor.sol";
+import "./DebtPoolStorage.sol";
 
 /**
  * @title DebtPool
  * @notice DebtPool contract to manage synths and debt
- * @author SyntheX
- * @custom:security-contact prasad@chainscore.finance
+ * @author Prasad <prasad@chainscore.finance>
  */
 contract DebtPool is IDebtPool, ERC20Upgradeable, PausableUpgradeable {
     /// @notice Using SafeMath for uint256 to prevent overflows and underflows

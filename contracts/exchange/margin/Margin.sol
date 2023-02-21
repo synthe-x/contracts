@@ -4,11 +4,11 @@ pragma solidity ^0.8.0;
 import "@aave/core-v3/contracts/interfaces/IPool.sol";
 import "@aave/core-v3/contracts/flashloan/base/FlashLoanSimpleReceiverBase.sol";
 
-import "../system/System.sol";
-import "./position/CrossPosition.sol";
-import "./position/IsolatedPosition.sol";
-import "../storage/MarginStorage.sol";
-import "../libraries/PriceConvertor.sol";
+import "../../system/System.sol";
+import "./IMarginPosition.sol";
+import "./MarginPosition.sol";
+import "./MarginStorage.sol";
+import "../../libraries/PriceConvertor.sol";
 
 import "@openzeppelin/contracts-upgradeable/utils/cryptography/EIP712Upgradeable.sol";
 import "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
@@ -19,9 +19,10 @@ import "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/Multicall.sol";
+
 import "hardhat/console.sol";
 
-contract Margin is
+contract Spot is
     MarginStorage,
     IFlashLoanSimpleReceiver,
     EIP712,
@@ -36,40 +37,29 @@ contract Margin is
     IPoolAddressesProvider public immutable override ADDRESSES_PROVIDER;
     IPool public immutable override POOL;
 
-    constructor(address poolAddressProvider) EIP712("zexe", "1") {
+    address public immutable router;
+
+    constructor(address poolAddressProvider, address _router) EIP712("zexe", "1") {
         ADDRESSES_PROVIDER = IPoolAddressesProvider(poolAddressProvider);
         POOL = IPool(ADDRESSES_PROVIDER.getPool());
+        router = _router;
     }
 
-    function createCrossPosition() external {
-        require(crossPosition[msg.sender] == address(0), "Already created");
-        crossPosition[msg.sender] = Create2.deploy(
-            0,
-            keccak256(abi.encodePacked(msg.sender)),
-            abi.encodePacked(
-                type(CrossPosition).creationCode,
-                abi.encode(msg.sender, address(this))
-            )
-        );
+    function createPosition(address[] memory markets) external {
+        position[msg.sender][totalPositions[msg.sender]] = Create2.deploy(
+                0,
+                keccak256(abi.encodePacked(msg.sender)),
+                abi.encodePacked(
+                    type(MarginPosition).creationCode,
+                    abi.encode(msg.sender, address(this), markets)
+                )
+            );
+
+        totalPositions[msg.sender] = totalPositions[msg.sender].add(1);
     }
 
-    function createIsolatedPosition(address token0, address token1) external {
-        require(
-            isolatedPosition[
-                keccak256(abi.encodePacked(msg.sender, token0, token1))
-            ] == address(0),
-            "Already created"
-        );
-        isolatedPosition[
-            keccak256(abi.encodePacked(msg.sender, token0, token1))
-        ] = Create2.deploy(
-            0,
-            keccak256(abi.encodePacked(msg.sender)),
-            abi.encodePacked(
-                type(IsolatedPosition).creationCode,
-                abi.encode(msg.sender, address(this), token0, token1)
-            )
-        );
+    function addMarketToPosition(uint positionId, address[] memory markets) external {
+        MarginPosition(position[msg.sender][positionId]).supportTokens(markets);
     }
 
     function execute(
@@ -77,72 +67,118 @@ contract Margin is
         bytes[] memory signatures,
         address tokenFrom,
         uint amount, // amount of tokenFrom
-        address tokenTo
-    ) external {
-        for (uint i = 0; i < orders.length; i++) {
-            // TODO: check order and call open/close
+        address tokenTo,
+        bytes memory data
+    ) external returns(uint) {
+        require(orders.length == signatures.length, "Invalid input");
+        require(orders.length > 0, "Invalid input");
 
-            uint amountFilled;
-            if (amount <= 0) {
+        address taker = msg.sender;
+
+        if(msg.sender == address(router)) {
+            (taker) = abi.decode(data, (address));
+            require(taker != address(0), "Invalid input");
+        }
+
+        for (uint i = 0; i < orders.length; i++) {
+            if(orders[i].action == ActionType.LIMIT){
+                amount = amount.sub(
+                    executeLimitOrder(orders[i], signatures[i], amount)
+                );
+            }
+            else if (
+                orders[i].action == ActionType.OPEN && 
+                tokenFrom == orders[i].token0 && 
+                tokenTo == orders[i].token1
+            ){
+                amount = amount.sub(
+                    openPosition(orders[i], signatures[i], taker, amount)
+                );
+            }
+            else if (
+                orders[i].action == ActionType.CLOSE && 
+                tokenFrom == orders[i].token1 && 
+                tokenTo == orders[i].token0
+            ){
+                amount = amount.sub(
+                    closePosition(orders[i], signatures[i], taker, amount)
+                );
+            }
+
+            if (amount == 0) {
                 break;
             }
-
-            if (orders[i].action == ActionType.OPEN) {
-                if (
-                    orders[i].token0 != tokenFrom || orders[i].token1 != tokenTo
-                ) {
-                    continue;
-                }
-                amountFilled = openPosition(orders[i], signatures[i], amount);
-                amount = amount.sub(amountFilled);
-            } else {
-                if (
-                    orders[i].token1 != tokenFrom || orders[i].token0 != tokenTo
-                ) {
-                    continue;
-                }
-                amountFilled = closePosition(orders[i], signatures[i], amount);
-                amount = amount.sub(amountFilled);
-                console.log(amountFilled, i);
-            }
         }
+
+        return amount;
+    }
+
+    function executeLimitOrder(
+        Order memory order,
+        bytes memory signature,
+        uint256 token0AmountToFill
+    ) internal returns (uint) {
+        // check signature
+        bytes32 orderId = verifyOrderHash(order, signature);
+        validateOrder(order);
+
+        OrderData storage _orderData = orderData[orderId];
+        require(_orderData.cancelled == false, "Order cancelled");
+
+        token0AmountToFill = token0AmountToFill.min(order.token0Amount.sub(_orderData.fill));
+        if (token0AmountToFill == 0) {
+            return 0;
+        }
+
+        // transfer [amountToFill] token0 from taker to maker
+        IERC20(order.token0).safeTransferFrom(
+            msg.sender,
+            order.maker,
+            token0AmountToFill
+        );
+
+        // transfer [amountToFill * price] token1 from maker to taker
+        IERC20(order.token1).safeTransferFrom(
+            order.maker,
+            msg.sender,
+            token0AmountToFill.mul(uint256(order.price)).div(PRICE_UNIT_DECIMALS)
+        );
+
+        _orderData.fill = uint248(uint(_orderData.fill).add(token0AmountToFill));
+
+        emit LimitOrderFilled(orderId, token0AmountToFill, msg.sender);
+
+        return token0AmountToFill;
     }
 
     function openPosition(
         Order memory order,
         bytes memory signature,
-        uint amountToFill // leveraged amount in token0
+        address taker,
+        uint token0AmountToFill // leveraged amount in token0
     ) internal returns (uint) {
         Vars_Position memory vars;
+
         vars.orderId = verifyOrderHash(order, signature);
-        validateOpenOrder(order);
+        validateOrder(order);
+
         OrderData storage _orderData = orderData[vars.orderId];
         require(_orderData.cancelled == false, "Order cancelled");
 
-        amountToFill = amountToFill.min(
+        token0AmountToFill = token0AmountToFill.min(
             order.token0Amount.mul(order.leverage - 1).sub(
-                orderFills[vars.orderId]
+                _orderData.fill
             )
         );
 
         // calc percentage of order to execute
-        vars.perc = amountToFill.mul(1e18).div(
+        vars.perc = token0AmountToFill.mul(1e18).div(
             order.token0Amount.mul(order.leverage - 1)
         );
 
         // position
-        if (order.position == PositionType.ISOLATED) {
-            vars.position = isolatedPosition[
-                keccak256(
-                    abi.encodePacked(order.maker, order.token0, order.token1)
-                )
-            ];
-        } else if (order.position == PositionType.CROSS) {
-            vars.position = crossPosition[order.maker];
-        } else {
-            revert("Invalid position type");
-        }
-        require(vars.position != address(0), "Position not created");
+        vars.position = position[taker][order.position];
+        require(vars.position != address(0), "Position not found");
 
         // supply 1 * perc ETH to Aave
         IERC20(order.token0).safeTransferFrom(
@@ -165,93 +201,83 @@ contract Margin is
         POOL.flashLoanSimple(
             address(this),
             order.token0,
-            order.token0Amount.mul(order.leverage - 1).mul(vars.perc).div(1e18),
+            token0AmountToFill,
             abi.encode(
                 ActionType.OPEN,
                 vars.position,
-                msg.sender,
+                taker,
                 order.token1,
-                order.price,
-                0
+                order.price
             ),
             0
         );
 
-        orderFills[vars.orderId] = orderFills[vars.orderId].add(amountToFill);
+        _orderData.fill = uint248(uint(_orderData.fill).add(token0AmountToFill));
 
         emit OpenPosition(
             vars.position,
-            msg.sender,
+            taker,
             order.token0,
             order.token1,
             order.price,
-            amountToFill
+            token0AmountToFill
         );
 
-        return amountToFill;
+        return token0AmountToFill;
     }
 
     function closePosition(
         Order memory order,
         bytes memory signature,
-        uint amountToFill // token1 amount to fill
+        address taker,
+        uint token1AmountToFill // token1 amount to fill
     ) internal returns (uint) {
         Vars_Position memory vars;
+        
         vars.orderId = verifyOrderHash(order, signature);
-        validateCloseOrder(order);
+        validateOrder(order);
+
         OrderData storage _orderData = orderData[vars.orderId];
         require(_orderData.cancelled == false, "Order cancelled");
 
-        amountToFill = amountToFill.min(
-            order.token1Amount.sub(orderFills[vars.orderId])
+        token1AmountToFill = token1AmountToFill.min(
+            order.token1Amount.sub(_orderData.fill)
         );
 
         // calc percentage of order to execute
-        vars.perc = amountToFill.mul(1e18).div(order.token1Amount);
+        vars.perc = token1AmountToFill.mul(1e18).div(order.token1Amount);
 
         // position
-
-        if (order.position == PositionType.ISOLATED) {
-            vars.position = isolatedPosition[
-                keccak256(
-                    abi.encodePacked(order.maker, order.token0, order.token1)
-                )
-            ];
-        } else if (order.position == PositionType.CROSS) {
-            vars.position = crossPosition[order.maker];
-        } else {
-            revert("Invalid position type");
-        }
+        vars.position = position[taker][order.position];
         require(vars.position != address(0), "Position not created");
 
         // flash borrow 9000 * perc USDC from Aave
         POOL.flashLoanSimple(
             address(this),
             order.token1,
-            order.token1Amount.mul(vars.perc).div(1e18),
+            token1AmountToFill,
             abi.encode(
                 ActionType.CLOSE,
                 vars.position,
-                msg.sender,
+                taker,
                 order.token0,
-                order.price,
-                order.token0Amount
+                order.price
             ),
             0
         );
 
-        orderFills[vars.orderId] = orderFills[vars.orderId].add(amountToFill);
+        _orderData.fill = uint248(uint(_orderData.fill).add(token1AmountToFill));
 
         emit ClosePosition(
             order.maker,
-            msg.sender,
+            taker,
             order.token0,
             order.token1,
             order.price,
-            amountToFill
+            token1AmountToFill
         );
 
-        return amountToFill;
+        return token1AmountToFill;
     }
 
     function executeOperation(
@@ -266,12 +292,11 @@ contract Margin is
 
         VarsHandler memory vars;
         address _token;
-        uint _amount;
         ActionType action;
-        (action, vars.position, vars.taker, _token, vars.price, _amount) = abi
-            .decode(
+        (action, vars.position, vars.taker, _token, vars.price) = abi
+            .decode( 
                 params,
-                (ActionType, address, address, address, uint, uint)
+                (ActionType, address, address, address, uint)
             );
         vars.premium = premium;
 
@@ -292,16 +317,9 @@ contract Margin is
             // Handle open position
             return openHandler(vars);
         } else if (action == ActionType.CLOSE) {
-            // Set vars
-            address[] memory tokens = new address[](2);
-            tokens[0] = _token; // token0
-            tokens[1] = token; // token1
-            vars.prices = IPriceOracle(ADDRESSES_PROVIDER.getPriceOracle())
-                .getAssetsPrices(tokens);
-
             vars.token0 = _token;
             vars.token1 = token;
-            vars.token0Amount = amount.t1t2(vars.prices[1], vars.prices[0]); //_amount;
+            vars.token0Amount = amount.div(vars.price).mul(1e18); 
             vars.token1Amount = amount;
 
             // Handle close position
@@ -325,7 +343,7 @@ contract Margin is
         );
 
         // borrow from aave
-        CrossPosition(vars.position).borrowAndTransfer(
+        IMarginPosition(vars.position).borrowAndTransfer(
             POOL,
             vars.token1,
             vars.token1Amount,
@@ -363,10 +381,9 @@ contract Margin is
             ) == vars.token1Amount.sub(vars.premium),
             "Repay failed"
         );
-        console.log("premium", vars.premium);
         // withdraw collateral
         require(
-            CrossPosition(vars.position).withdrawAndTransfer(
+            IMarginPosition(vars.position).withdrawAndTransfer(
                 POOL,
                 vars.token0,
                 vars.token0Amount,
@@ -388,7 +405,7 @@ contract Margin is
         // repay token1 flashloan
         IERC20(vars.token1).safeIncreaseAllowance(
             address(POOL),
-            vars.token1Amount.add(vars.premium) //1000+10
+            vars.token1Amount.add(vars.premium) 
         );
 
         return true;
@@ -400,7 +417,7 @@ contract Margin is
     function cancelOrder(Order memory order, bytes memory signature) external {
         // check signature
         bytes32 orderId = verifyOrderHash(order, signature);
-        require(validateCancelOrder(order));
+        validateOrder(order);
 
         OrderData storage _orderData = orderData[orderId];
         _orderData.cancelled = true;
@@ -427,9 +444,9 @@ contract Margin is
                     order.leverage,
                     order.price,
                     order.expiry,
-                    uint32(order.nonce),
-                    uint8(order.action),
-                    uint8(order.position)
+                    uint(order.nonce),
+                    uint(order.action),
+                    order.position
                 )
             )
         );
@@ -446,33 +463,12 @@ contract Margin is
         return digest;
     }
 
-    function validateOpenOrder(
+    function validateOrder(
         Order memory order
-    ) internal pure returns (bool) {
-        // require(crossPosition[order.maker] != address(0), "CrossPosition already exists");
+    ) internal view {
+        require(totalPositions[order.maker] >= order.position, "Positions not found");
         require(order.token0Amount > 0, "OrderAmount must be greater than 0");
         require(order.price > 0, "ExchangeRate must be greater than 0");
-        require(order.leverage > 1, "Leverage must be greater than 1");
-        return true;
-    }
-
-    function validateCloseOrder(
-        Order memory order
-    ) internal pure returns (bool) {
-        // require(crossPosition[order.maker] != address(0), "CrossPosition does not exist");
-        require(order.token1Amount > 0, "OrderAmount must be greater than 0");
-        require(order.token0Amount > 0, "OrderAmount must be greater than 0");
-        require(order.price > 0, "ExchangeRate must be greater than 0");
-        return true;
-    }
-
-    function validateCancelOrder(
-        Order memory order
-    ) internal pure returns (bool) {
-        // require(crossPosition[order.maker] != address(0), "CrossPosition does not exist");
-        require(order.token1Amount > 0, "OrderAmount must be greater than 0");
-        require(order.token0Amount > 0, "OrderAmount must be greater than 0");
-        require(order.price > 0, "ExchangeRate must be greater than 0");
-        return true;
+        require(order.leverage >= 1, "Leverage must be greater than or equal 1");
     }
 }

@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "../system/System.sol";
-import "../interfaces/IPriceOracle.sol";
+import "../oracle/IPriceOracle.sol";
 
 contract DebtPoolStorage {
     /// @notice The address of the address storage contract

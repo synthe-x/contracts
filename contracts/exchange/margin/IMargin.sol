@@ -18,5 +18,12 @@ interface IMargin {
         uint price,
         uint amountToFill
     );
+
+    event LimitOrderFilled(
+        bytes32 indexed orderId,
+        uint256 amountFilled,
+        address taker
+    );
+    
     event OrderCancelled(bytes32 indexed orderId);
 }

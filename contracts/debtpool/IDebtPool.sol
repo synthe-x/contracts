@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "./IPriceOracle.sol";
-import "../storage/DebtPoolStorage.sol";
+import "../oracle/IPriceOracle.sol";
+import "./DebtPoolStorage.sol";
 
 abstract contract IDebtPool is DebtPoolStorage {
     /* -------------------------------------------------------------------------- */

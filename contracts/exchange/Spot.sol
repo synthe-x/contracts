@@ -10,7 +10,7 @@ import "@openzeppelin/contracts/utils/math/Math.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 
-contract Spot is EIP712Upgradeable {
+contract Spot2 is EIP712Upgradeable {
     using SafeMath for uint;
     using Math for uint;
     using SafeERC20Upgradeable for IERC20Upgradeable;

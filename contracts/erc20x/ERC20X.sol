@@ -10,9 +10,9 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
 
 
-import "./system/System.sol";
-import "./DebtPool.sol";
-import "./storage/ERC20XStorage.sol";
+import "../system/System.sol";
+import "../debtpool/DebtPool.sol";
+import "./ERC20XStorage.sol";
 
 /**
  * @title ERC20X

@@ -14,12 +14,12 @@ import "@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol";
 
 import "@openzeppelin/contracts-upgradeable/utils/math/SignedSafeMathUpgradeable.sol";
 
-import "./DebtPool.sol";
-import "./token/SyntheXToken.sol";
-import "./interfaces/IPriceOracle.sol";
-import "./vault/FeeVault.sol";
-import "./interfaces/ISyntheX.sol";
-import "./libraries/PriceConvertor.sol";
+import "../debtpool/DebtPool.sol";
+import "../token/SyntheXToken.sol";
+import "../oracle/IPriceOracle.sol";
+import "../vault/FeeVault.sol";
+import "./ISyntheX.sol";
+import "../libraries/PriceConvertor.sol";
 
 /**
  * @title SyntheX
