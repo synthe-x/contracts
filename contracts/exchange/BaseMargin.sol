@@ -19,7 +19,6 @@ abstract contract BaseMargin {
                     abi.encode(msg.sender, address(this), markets)
                 )
             );
-        console.log("Created position %s at %s", totalPositions[msg.sender], position[msg.sender][totalPositions[msg.sender]]);
         totalPositions[msg.sender] += 1;
     }
 
