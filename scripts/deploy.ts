@@ -11,7 +11,7 @@ export async function deploy(deployments: any, config: any, deployer: SignerWith
   if(!isTest) console.log("Deploying ", versionSuffix, "🚀");
 
   // deploy synthex
-  const synthex = await _deploy("SyntheX", [deployer.address, deployer.address, deployer.address, deployer.address], deployments, {upgradable: true});
+  const synthex = await _deploy("SyntheX", [deployer.address, deployer.address, deployer.address], deployments, {upgradable: true});
   _deployDefender("SyntheX_"+versionSuffix, synthex);
   
   // vault

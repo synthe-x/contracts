@@ -28,8 +28,7 @@ contract PriceOracle is IPriceOracle {
    */
   modifier onlyAssetListingOrPoolAdmins() {
     require(
-            synthex.hasRole(synthex.L1_ADMIN_ROLE(), msg.sender) ||
-            synthex.hasRole(synthex.GOVERNANCE_MODULE_ROLE(), msg.sender), 
+            synthex.hasRole(synthex.L1_ADMIN_ROLE(), msg.sender),
             "PriceOracle: Only L1_ADMIN can set price feed"
         );
     _;

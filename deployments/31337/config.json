@@ -1,7 +1,7 @@
 {
   "name": "synthex",
-  "version": "0.34.0",
-  "latest": "0.34.0",
+  "version": "0.35.0",
+  "latest": "0.35.0",
   "l0Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
   "l1Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
   "l2Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
@@ -32,7 +32,7 @@
           "volatilityRatio": "0.9",
           "price": "1000",
           "params": {
-            "maxDeposits": "100000000000000000000000",
+            "cap": "100000000000000000000000",
             "baseLTV": "0",
             "liqThreshold": "0",
             "liqBonus": "0",
@@ -46,7 +46,7 @@
           "volatilityRatio": "0.9",
           "price": "100",
           "params": {
-            "maxDeposits": "100000000000000000000000",
+            "cap": "100000000000000000000000",
             "baseLTV": "0",
             "liqThreshold": "0",
             "liqBonus": "0",
@@ -60,7 +60,7 @@
           "volatilityRatio": "0.9",
           "price": "10",
           "params": {
-            "maxDeposits": "100000000000000000000000",
+            "cap": "100000000000000000000000",
             "baseLTV": "0",
             "liqThreshold": "0",
             "liqBonus": "0",
@@ -74,7 +74,7 @@
           "volatilityRatio": "0.9",
           "price": "1",
           "params": {
-            "maxDeposits": "100000000000000000000000",
+            "cap": "100000000000000000000000",
             "baseLTV": "0",
             "liqThreshold": "0",
             "liqBonus": "0",
@@ -142,7 +142,7 @@
           "price": "1000",
           "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
           "params": {
-            "maxDeposits": "100000000000000000000000",
+            "cap": "100000000000000000000000",
             "baseLTV": "0",
             "liqThreshold": "0",
             "liqBonus": "0",
@@ -156,7 +156,7 @@
           "volatilityRatio": "0.9",
           "price": "1",
           "params": {
-            "maxDeposits": "100000000000000000000000",
+            "cap": "100000000000000000000000",
             "baseLTV": "0",
             "liqThreshold": "0",
             "liqBonus": "0",
@@ -170,7 +170,7 @@
           "volatilityRatio": "0.9",
           "price": "1",
           "params": {
-            "maxDeposits": "100000000000000000000000",
+            "cap": "100000000000000000000000",
             "baseLTV": "0",
             "liqThreshold": "0",
             "liqBonus": "0",
@@ -184,7 +184,7 @@
           "volatilityRatio": "0.9",
           "price": "1.06",
           "params": {
-            "maxDeposits": "100000000000000000000000",
+            "cap": "100000000000000000000000",
             "baseLTV": "0",
             "liqThreshold": "0",
             "liqBonus": "0",

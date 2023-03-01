@@ -60,4 +60,7 @@ abstract contract IPool is PoolStorage {
     event Mint(address indexed user, address indexed asset, uint256 amount);
     event Burn(address indexed user, address indexed asset, uint256 amount);
     event Swap(address indexed user, address indexed fromAsset, address toAsset, uint256 fromAmount);
+    event IssuerAllocUpdated(uint issuerAlloc);
+    event PriceOracleUpdated(address indexed priceOracle);
+    event FeeTokenUpdated(address indexed feeToken);
 }

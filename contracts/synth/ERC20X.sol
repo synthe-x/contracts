@@ -33,11 +33,11 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
     /// @notice Emitted when flash fee is updated
     event FlashFeeUpdated(uint _flashLoanFee);
 
-    function initialize(string memory _name, string memory _symbol, address _synthex) initializer external {
+    function initialize(string memory _name, string memory _symbol, address _pool, address _synthex) initializer external {
         __ERC20_init(_name, _symbol);
         __ERC20FlashMint_init();
         __Pausable_init();
-        pool = Pool(payable(msg.sender));
+        pool = Pool(payable(_pool));
         synthex = SyntheX(_synthex);
     }
 

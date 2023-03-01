@@ -397,9 +397,19 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
 
     struct Vars_Liquidate {
         AccountLiquidity liq;
+        Collateral collateral;
+        uint ltv;
+
         address[] tokens;
         uint[] prices;
         uint amountUSD;
+        uint debtUSD;
+
+        uint amountOut;
+        uint penalty;
+        uint fee;
+        uint refundOut;
+
     }
 
     /**
@@ -407,63 +417,81 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
      */
     function commitLiquidate(address _liquidator, address _account, uint _amount, address _outAsset) virtual override whenNotPaused external returns(uint) {
         require(_amount > 0);
+
+        Vars_Liquidate memory vars;
         // check if synth is enabled
         require(synths[msg.sender].isEnabled, "DebtPool: SynthFrom not enabled");
 
         // Get account liquidity
-        AccountLiquidity memory liq = getAccountLiquidity(_account);
-        Collateral memory collateral = collaterals[_outAsset];
-        require(liq.debt > 0, "Account has no debt");
-        require(liq.collateral > 0, "Account has no collateral");
-        uint ltv = liq.collateral.mul(BASIS_POINTS).div(liq.debt);
-        require(ltv > collateral.liqThreshold, "Account health factor below liquidation threshold");
-        require(liq.liquidity < 0, "Account has no shortfall");
+        vars.liq = getAccountLiquidity(_account);
+        vars.collateral = collaterals[_outAsset];
+        require(vars.liq.debt > 0, "Account has no debt");
+        require(vars.liq.collateral > 0, "Account has no collateral");
+        vars.ltv = vars.liq.collateral.mul(BASIS_POINTS).div(vars.liq.debt);
+        require(vars.ltv > vars.collateral.liqThreshold, "Account health factor below liquidation threshold");
+        require(vars.liq.liquidity < 0, "Account has no shortfall");
         // Ensure user has entered the collateral market
         require(accountMembership[_outAsset][_account], "Account not in collateral");
 
-        address[] memory t = new address[](3);
-        t[0] = msg.sender;
-        t[1] = _outAsset;
-        uint[] memory prices = priceOracle.getAssetsPrices(t);
+        vars.tokens = new address[](2);
+        vars.tokens[0] = msg.sender;
+        vars.tokens[1] = _outAsset;
+        vars.prices = priceOracle.getAssetsPrices(vars.tokens);
 
-        uint amountUSD = _amount.toUSD(prices[0]);
+        vars.amountUSD = _amount.toUSD(vars.prices[0]);
         uint debtUSD = getUserDebtUSD(_account);
-        require(debtUSD > 0, "Invalid debtUSD");
         // burn only the amount of debt that the user has
-        if(debtUSD < amountUSD) {
-            _amount = debtUSD.toToken(prices[0]);
+        if(debtUSD < vars.amountUSD) {
+            _amount = debtUSD.toToken(vars.prices[0]);
         }
 
         // amount in terms of collateral
-        uint amountOut = _amount.t1t2(prices[0], prices[1]); 
-    
+        vars.amountOut = _amount.t1t2(vars.prices[0], vars.prices[1]); 
+        vars.penalty = 0;
+        vars.fee = 0;
+        vars.refundOut = 0;
+
         // Sieze collateral
-        uint balanceOut = accountCollateralBalance[_account][_outAsset].mul(ltv).div(BASIS_POINTS);
-        if(amountOut > balanceOut){
-            amountOut = balanceOut;
+        uint balanceOut = accountCollateralBalance[_account][_outAsset];
+        if(vars.ltv > BASIS_POINTS){
+            // if ltv > 100%, take all collateral, no penalty
+            if(vars.amountOut > balanceOut){
+                vars.amountOut = balanceOut;
+            }
+        } else {
+            // take collateral based on ltv, and apply penalty
+            balanceOut = balanceOut.mul(vars.ltv).div(BASIS_POINTS);
+            if(vars.amountOut > balanceOut){
+                vars.amountOut = balanceOut;
+            }
+            vars.penalty = vars.amountOut.mul(vars.collateral.liqBonus).div(BASIS_POINTS);
+            // if we don't have enough for [complete] bonus, take partial bonus
+            if(vars.ltv.mul(vars.collateral.liqBonus).div(BASIS_POINTS) > BASIS_POINTS){
+                vars.penalty = vars.amountOut.mul(vars.ltv.mul(vars.collateral.liqBonus).div(BASIS_POINTS).sub(BASIS_POINTS)).div(BASIS_POINTS);
+            } else {
+                vars.refundOut = vars.amountOut.mul(BASIS_POINTS.sub(vars.ltv.mul(vars.collateral.liqBonus).div(BASIS_POINTS))).div(BASIS_POINTS);
+            }
+            vars.fee = vars.penalty.mul(vars.collateral.liqProtocolFee).div(BASIS_POINTS);
         }
 
-        uint penalty = amountOut.mul(collateral.liqBonus).div(BASIS_POINTS);
-        // if we can pay liquidation bonus
-        if(ltv.mul(collateral.liqBonus).div(BASIS_POINTS) > BASIS_POINTS){
-            penalty = amountOut.mul(ltv.mul(collateral.liqBonus).div(BASIS_POINTS).sub(BASIS_POINTS)).div(BASIS_POINTS);
-        }
-        uint reserve = penalty.mul(collateral.liqProtocolFee).div(BASIS_POINTS);
-        
-        accountCollateralBalance[_account][_outAsset] = accountCollateralBalance[_account][_outAsset].sub(amountOut.add(penalty));
+        accountCollateralBalance[_account][_outAsset] = accountCollateralBalance[_account][_outAsset].sub(vars.amountOut.add(vars.penalty));
 
         // Add collateral to liquidator
-        accountCollateralBalance[_liquidator][_outAsset] = accountCollateralBalance[_liquidator][_outAsset].add(amountOut.add(penalty).sub(reserve));
+        accountCollateralBalance[_liquidator][_outAsset] = accountCollateralBalance[_liquidator][_outAsset].add(vars.amountOut.add(vars.penalty).sub(vars.fee));
 
         // Transfer fee to vault
-        if(reserve > 0){
-            require(transferOut(_outAsset, synthex.vault(), reserve) == reserve, "reserve transfer failed");
+        if(vars.fee > 0){
+            require(transferOut(_outAsset, synthex.vault(), vars.fee) == vars.fee, "fee transfer failed");
+        }
+        // Transfer refund to user
+        if(vars.refundOut > 0){
+            require(transferOut(_outAsset, _account, vars.refundOut) == vars.refundOut, "refund transfer failed");
         }
 
-        amountUSD = amountOut.toUSD(prices[1]);
-        _burn(_account, totalSupply().mul(amountUSD).div(getTotalDebtUSD()));
+        vars.amountUSD = vars.amountOut.toUSD(vars.prices[1]);
+        _burn(_account, totalSupply().mul(vars.amountUSD).div(getTotalDebtUSD()));
 
-        return amountUSD.toToken(prices[0]);
+        return vars.amountUSD.toToken(vars.prices[0]);
     }
 
     /* -------------------------------------------------------------------------- */
@@ -560,9 +588,20 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
      */
     function setPriceOracle(address _priceOracle) external onlyL1Admin {
         priceOracle = IPriceOracle(_priceOracle);
+        emit PriceOracleUpdated(_priceOracle);
+    }
+
+    function setIssuerAlloc(uint _issuerAlloc) external onlyL1Admin {
+        issuerAlloc = _issuerAlloc;
+        emit IssuerAllocUpdated(_issuerAlloc);
+    }
+
+    function setFeeToken(address _feeToken) external onlyL1Admin {
+        feeToken = _feeToken;
+        emit FeeTokenUpdated(_feeToken);
     }
     /**
-     * @notice Pause the contract
+     * @notice Pause the contract 
      * @dev Only callable by L2 admin
      */
     function pause() public onlyL2Admin {
@@ -577,6 +616,7 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
         _unpause();
     }
 
+    
     /**
      * @notice Update collateral params
      * @notice Only governance module or l2Admin (in case of emergency) can update collateral params
