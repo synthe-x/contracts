@@ -7,14 +7,14 @@ import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20FlashMint.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
 
-import "../system/System.sol";
+import "../synthex/SyntheX.sol";
 
 contract SyntheXToken is ERC20, ERC20Burnable, Pausable, ERC20Permit {
     /// @notice System contract to check access control
-    System public system;
+    SyntheX public synthex;
 
-    constructor(address _system) ERC20("SyntheX Token", "SYN") ERC20Permit("SyntheX Token") {
-        system = System(_system);
+    constructor(address _synthex) ERC20("SyntheX Token", "SYN") ERC20Permit("SyntheX Token") {
+        synthex = SyntheX(_synthex);
     }
 
     /**
@@ -22,7 +22,7 @@ contract SyntheXToken is ERC20, ERC20Burnable, Pausable, ERC20Permit {
      * @dev Only L2_ADMIN can pause
      */
     function pause() public {
-        require(system.isL2Admin(msg.sender));
+        require(synthex.isL2Admin(msg.sender));
         _pause();
     }
 
@@ -31,7 +31,7 @@ contract SyntheXToken is ERC20, ERC20Burnable, Pausable, ERC20Permit {
      * @dev Only L2_ADMIN can unpause
      */
     function unpause() public {
-        require(system.isL2Admin(msg.sender));
+        require(synthex.isL2Admin(msg.sender));
         _unpause();
     }
 
@@ -42,7 +42,7 @@ contract SyntheXToken is ERC20, ERC20Burnable, Pausable, ERC20Permit {
      * @param amount Amount to mint
      */
     function mint(address to, uint256 amount) public {
-        require(system.isL1Admin(msg.sender));
+        require(synthex.isL1Admin(msg.sender));
         _mint(to, amount);
     }
 

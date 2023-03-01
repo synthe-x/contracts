@@ -9,8 +9,8 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-ERC20Pe
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
 
-import "../system/System.sol";
-import "../debtpool/DebtPool.sol";
+import "../synthex/SyntheX.sol";
+import "../pool/Pool.sol";
 
 /**
  * @title ERC20X
@@ -22,9 +22,9 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
     using SafeMathUpgradeable for uint256;
 
     // TradingPool that owns this token
-    DebtPool public pool;
+    Pool public pool; 
     // System contract
-    System public system;
+    SyntheX public synthex;
     /// @notice Fee charged for flash loan % in BASIS_POINTS
     uint public flashLoanFee;
     /// @notice Basis points: 1e4 * 1e18 = 100%
@@ -33,12 +33,12 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
     /// @notice Emitted when flash fee is updated
     event FlashFeeUpdated(uint _flashLoanFee);
 
-    function initialize(string memory _name, string memory _symbol, address _pool, address _system) initializer external {
+    function initialize(string memory _name, string memory _symbol, address _synthex) initializer external {
         __ERC20_init(_name, _symbol);
         __ERC20FlashMint_init();
         __Pausable_init();
-        pool = DebtPool(_pool);
-        system = System(_system);
+        pool = Pool(payable(msg.sender));
+        synthex = SyntheX(_synthex);
     }
 
     modifier onlyInternal(){
@@ -119,7 +119,7 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
      * @param _flashLoanFee New flash fee
      */
     function updateFlashFee(uint _flashLoanFee) public {
-        require(system.hasRole(system.L2_ADMIN_ROLE(), msg.sender), "SynthERC20: Only L2_ADMIN_ROLE can update flash fee");
+        require(synthex.isL2Admin(msg.sender), "SynthERC20: Only L2_ADMIN_ROLE can update flash fee");
         flashLoanFee = _flashLoanFee;
         emit FlashFeeUpdated(_flashLoanFee);
     }

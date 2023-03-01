@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "../../system/System.sol";
+import "../../synthex/SyntheX.sol";
 
 /**
  * @title FeeVault
@@ -14,14 +14,14 @@ contract Vault {
     using SafeERC20 for ERC20;
 
     // AddressStorage contract
-    System public system;
+    SyntheX public synthex;
 
     /**
      * @dev Constructor
-     * @param _system System contract address
+     * @param _synthex System contract address
      */
-    constructor(address _system) {
-        system = System(_system);
+    constructor(address _synthex) {
+        synthex = SyntheX(_synthex);
     }
 
     /**
@@ -33,7 +33,7 @@ contract Vault {
     function withdraw(address _tokenAddress, uint256 amount)
         external
     {
-        require(system.hasRole(system.L1_ADMIN_ROLE(), msg.sender), "Vault: Only fee collector can withdraw");
+        require(synthex.isL1Admin(msg.sender), "Vault: Only fee collector can withdraw");
         ERC20(_tokenAddress).safeTransfer(msg.sender, amount);
     }
 }

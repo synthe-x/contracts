@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "./EscrowedSYN.sol";
 import "./SyntheXToken.sol";
 
-import "../system/System.sol";
+import "../synthex/SyntheX.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
@@ -56,7 +56,7 @@ contract TokenRedeemer is Pausable {
     /// @notice User address to request count mapping
     mapping(address => uint) public unlockRequestCount;
     /// @notice System contract
-    System public system;
+    SyntheX public synthex;
 
     /**
      * @notice Constructor
@@ -64,7 +64,7 @@ contract TokenRedeemer is Pausable {
      * @param _TOKEN Address of SYN
      */
     constructor(address _system, address _LOCKED_TOKEN, address _TOKEN, uint _lockPeriod, uint _unlockPeriod, uint _percUnlockAtRelease) {
-        system = System(_system);
+        synthex = SyntheX(_system);
         LOCKED_TOKEN = EscrowedSYN(_LOCKED_TOKEN);
         TOKEN = SyntheXToken(_TOKEN);
         lockPeriod = _lockPeriod;
@@ -87,7 +87,7 @@ contract TokenRedeemer is Pausable {
     /* -------------------------------------------------------------------------- */
 
     modifier onlyAdmin() {
-        require(system.isL2Admin(msg.sender), "Caller is not an admin");
+        require(synthex.isL2Admin(msg.sender), "Caller is not an admin");
         _;
     }
     /**

@@ -5,7 +5,7 @@ import './EscrowedSYN.sol';
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "../utils/interfaces/IStaking.sol";
-import "../system/System.sol";
+import "../synthex/SyntheX.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 
 /**
@@ -19,7 +19,7 @@ contract StakingRewards is IStaking, ReentrancyGuard, Pausable {
     using SafeMath for uint256;
 
     // System contract
-    System public system;
+    SyntheX public synthex;
     /// @notice Address of the rewards token
     address public rewardsToken;
     /// @notice Address of the staking token
@@ -61,7 +61,7 @@ contract StakingRewards is IStaking, ReentrancyGuard, Pausable {
         rewardsDuration = initialRewardsDuration;
         
         // Store the system contract
-        system = System(_system);
+        synthex = SyntheX(_system);
     }
 
     /**
@@ -172,7 +172,7 @@ contract StakingRewards is IStaking, ReentrancyGuard, Pausable {
      * @notice Adds rewards to staking contract
      */
     function notifyReward(uint256 reward) external updateReward(address(0)) {
-        require(system.hasRole(system.L2_ADMIN_ROLE(), msg.sender), "Caller is not an admin");
+        require(synthex.isL2Admin(msg.sender), "Caller is not an admin");
         if (block.timestamp >= periodFinish) {
           rewardRate = reward.div(rewardsDuration);
         }
@@ -191,7 +191,7 @@ contract StakingRewards is IStaking, ReentrancyGuard, Pausable {
      * @notice Adds reward duration once previous duration is completed
      */
     function setRewardsDuration(uint256 _rewardsDuration) external {
-        require(system.hasRole(system.L2_ADMIN_ROLE(), msg.sender), "Caller is not an admin");
+        require(synthex.isL2Admin(msg.sender), "Caller is not an admin");
         require(
             block.timestamp > periodFinish,
             "Previous rewards period must be complete before changing the duration for the new period"

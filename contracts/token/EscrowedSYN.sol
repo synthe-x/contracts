@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
-import "../system/System.sol";
+import "../synthex/SyntheX.sol";
 import "hardhat/console.sol";
 
 /**
@@ -17,7 +17,7 @@ import "hardhat/console.sol";
  */
 contract EscrowedSYN is ERC20, ERC20Permit, ERC20Burnable, AccessControl {
     /// @notice System contract
-    System public system;
+    SyntheX public synthex;
 
     // This role can transfer tokens
     bytes32 public constant AUTHORIZED_SENDER = keccak256("AUTHORIZED_SENDER");
@@ -25,8 +25,8 @@ contract EscrowedSYN is ERC20, ERC20Permit, ERC20Burnable, AccessControl {
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
 
-    constructor(address _system) ERC20("Escrowed SYN", "esSYN") ERC20Permit("Escrowed SYN") {
-        system = System(_system);
+    constructor(address _synthex) ERC20("Escrowed SYN", "esSYN") ERC20Permit("Escrowed SYN") {
+        synthex = SyntheX(_synthex);
     }
 
     function mint(address to, uint256 amount) public onlyRole(MINTER_ROLE) {
@@ -55,7 +55,7 @@ contract EscrowedSYN is ERC20, ERC20Permit, ERC20Burnable, AccessControl {
      * @notice L1_ADMIN can grant MINTER_ROLE to any address
      */
     function grantRole(bytes32 role, address account) public override {
-        require(system.isL1Admin(msg.sender), "EscrowedSYN: Only L1_ADMIN can grant roles");
+        require(synthex.isL1Admin(msg.sender), "EscrowedSYN: Only L1_ADMIN can grant roles");
         _grantRole(role, account);
     }
 
@@ -63,7 +63,7 @@ contract EscrowedSYN is ERC20, ERC20Permit, ERC20Burnable, AccessControl {
      * @notice L1_ADMIN can revoke MINTER_ROLE from any address
      */
     function revokeRole(bytes32 role, address account) public override {
-        require(system.isL1Admin(msg.sender), "EscrowedSYN: Only L1_ADMIN can revoke roles");
+        require(synthex.isL1Admin(msg.sender), "EscrowedSYN: Only L1_ADMIN can revoke roles");
         _revokeRole(role, account);
     }
 }

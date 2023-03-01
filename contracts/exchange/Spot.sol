@@ -4,7 +4,6 @@ pragma solidity ^0.8.0;
 import "@aave/core-v3/contracts/interfaces/IPool.sol";
 import "@aave/core-v3/contracts/flashloan/base/FlashLoanSimpleReceiverBase.sol";
 
-import "../system/System.sol";
 import {MarginPosition, IMarginPosition} from "./position/MarginPosition.sol";
 import {BaseMargin} from "./BaseMargin.sol";
 import "../libraries/PriceConvertor.sol";
@@ -108,7 +107,6 @@ contract Spot is
     struct VarsPosition {
         bytes32 orderId;
         address position;
-
     }
 
     IPoolAddressesProvider public immutable override ADDRESSES_PROVIDER;

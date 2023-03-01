@@ -10,10 +10,10 @@ import "@openzeppelin/contracts/interfaces/IERC3156FlashLender.sol";
 
 import "@aave/core-v3/contracts/interfaces/IPool.sol";
 
-import "./../erc20x/ERC20X.sol";
 import "./position/MarginPosition.sol";
-import "./../utils/oracle/IPriceOracle.sol";
-import "../debtpool/IDebtPool.sol";
+import "../synth/IERC20X.sol";
+import "../utils/oracle/IPriceOracle.sol";
+import {IPool as IDebtPool} from "../pool/IPool.sol";
 import "./../libraries/PriceConvertor.sol";
 import "./BaseMargin.sol";
 
@@ -150,10 +150,13 @@ contract Perps is BaseMargin, IERC3156FlashBorrower {
         
         IERC20(params.token0).safeIncreaseAllowance(address(POOL), params.token0Amount);
         
-        // supply synth
+        (, uint mintFee,) = DEBT_POOL.synths(params.token1);
+        (, uint burnFee,) = DEBT_POOL.synths(params.token0);
+
+        // supply synth 
         POOL.supply(
             params.token0,
-            params.token0Amount.sub(params.token0Amount.mul(DEBT_POOL.swapFee()).div(BASIS_POINTS)).sub(params.fee),
+            params.token0Amount.sub(params.token0Amount.mul(mintFee.add(burnFee)).div(BASIS_POINTS)).sub(params.fee),
             params.position,
             0
         );
@@ -161,7 +164,7 @@ contract Perps is BaseMargin, IERC3156FlashBorrower {
         uint baseAmount = params.token0Amount.t1t2(params.prices[0], params.prices[1]); // prices[supplyAsset, borrowAsset]
         MarginPosition(params.position).borrowAndTransfer(POOL, params.token1, baseAmount, address(this));
         // swap borrowed base asset to reserve 
-        ERC20X(params.token1).swap(baseAmount, params.token0);
+        IERC20X(params.token1).swap(baseAmount, params.token0);
         // repay borrowed base asset
         IERC20(params.token0).safeIncreaseAllowance(params.token0, params.token0Amount.add(params.fee));
     }
@@ -172,9 +175,13 @@ contract Perps is BaseMargin, IERC3156FlashBorrower {
         // repay borrowed asset
         IERC20(params.token0).safeIncreaseAllowance(address(POOL), params.token0Amount);
 
+        (, uint mintFee,) = DEBT_POOL.synths(params.token1);
+        (, uint burnFee,) = DEBT_POOL.synths(params.token0);
+
+
         POOL.repay(
             params.token0,
-            params.token0Amount.sub(params.token0Amount.mul(DEBT_POOL.swapFee()).div(BASIS_POINTS)).sub(params.fee),
+            params.token0Amount.sub(params.token0Amount.mul(mintFee.add(burnFee)).div(BASIS_POINTS)).sub(params.fee),
             2,
             params.position
         );
@@ -187,7 +194,7 @@ contract Perps is BaseMargin, IERC3156FlashBorrower {
         );
 
         // swap supplied asset 
-        ERC20X(params.token1).swap(withdrawAmount, params.token0);
+        IERC20X(params.token1).swap(withdrawAmount, params.token0);
 
         // repay supplied asset
         IERC20(params.token0).safeIncreaseAllowance(params.token0, params.token0Amount.add(params.fee));

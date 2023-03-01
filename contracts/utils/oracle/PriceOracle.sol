@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import {IPriceOracle, IPriceOracleGetter} from "./IPriceOracle.sol";
-import "../../system/System.sol";
+import "../../synthex/SyntheX.sol";
 import "@aave/core-v3/contracts/dependencies/chainlink/AggregatorInterface.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
@@ -15,7 +15,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
  * - Owned by the Aave governance
  */
 contract PriceOracle is IPriceOracle {
-  System public immutable system;
+  SyntheX public immutable synthex;
 
   // Map of asset price sources (asset => priceSource)
   mapping(address => AggregatorInterface) private assetsSources;
@@ -28,8 +28,8 @@ contract PriceOracle is IPriceOracle {
    */
   modifier onlyAssetListingOrPoolAdmins() {
     require(
-            system.hasRole(system.L1_ADMIN_ROLE(), msg.sender) ||
-            system.hasRole(system.GOVERNANCE_MODULE_ROLE(), msg.sender), 
+            synthex.hasRole(synthex.L1_ADMIN_ROLE(), msg.sender) ||
+            synthex.hasRole(synthex.GOVERNANCE_MODULE_ROLE(), msg.sender), 
             "PriceOracle: Only L1_ADMIN can set price feed"
         );
     _;
@@ -37,7 +37,7 @@ contract PriceOracle is IPriceOracle {
 
   /**
    * @notice Constructor
-   * @param _system The address of the new System
+   * @param _synthex The address of the new System
    * @param assets The addresses of the assets
    * @param sources The address of the source of each asset
    * @param fallbackOracle The address of the fallback oracle to use if the data of an
@@ -46,14 +46,14 @@ contract PriceOracle is IPriceOracle {
    * @param baseCurrencyUnit The unit of the base currency
    */
   constructor(
-    System _system,
+    SyntheX _synthex,
     address[] memory assets,
     address[] memory sources,
     address fallbackOracle,
     address baseCurrency,
     uint baseCurrencyUnit
   ) {
-    system = _system;
+    synthex = _synthex;
     _setFallbackOracle(fallbackOracle);
     _setAssetsSources(assets, sources);
     BASE_CURRENCY = baseCurrency;
@@ -145,7 +145,7 @@ contract PriceOracle is IPriceOracle {
 
   function _onlyAssetListingOrPoolAdmins() internal view {
     require(
-      system.isL1Admin(msg.sender), "CALLER_NOT_ASSET_LISTING_OR_POOL_ADMIN"
+      synthex.isL1Admin(msg.sender), "CALLER_NOT_ASSET_LISTING_OR_POOL_ADMIN"
     );
   }
 }

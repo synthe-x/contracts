@@ -14,8 +14,15 @@ pragma solidity ^0.8.0;
  * 
  */
 abstract contract AddressStorage {
+    /// @notice Addresses of contracts
+    bytes32 public constant VAULT = keccak256("VAULT");
+
     /// @notice Event to be emitted when address is updated
     event AddressUpdated(bytes32 indexed key, address indexed value);
+
+    function vault() external view returns(address) {
+        return getAddress(VAULT);
+    }
 
     // Mapping to store addresses (hashedKey => address)
     mapping(bytes32 => address) private addresses;

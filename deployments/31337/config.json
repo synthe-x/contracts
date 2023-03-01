@@ -18,131 +18,230 @@
     "percReleaseAtUnlock": "500",
     "quota": "1000000"
   },
-  "collaterals": [
-    {
-      "name": "Ethereum",
-      "symbol": "ETH",
-      "decimals": 18,
-      "volatilityRatio": "0.9",
-      "price": "1000",
-      "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-      "params": {
-        "maxDeposits": "100000000000000000000000",
-        "minDeposit": "0",
-        "maxDeposit": "100000000000000000000",
-        "maxWithdraw": "100000000000000000000",
-        "totalDeposits": "0"
-      }
-    },
-    {
-      "name": "Wrapped Ethereum",
-      "symbol": "WETH",
-      "decimals": 18,
-      "volatilityRatio": "0.9",
-      "price": "1000",
-      "params": {
-        "maxDeposits": "100000000000000000000000",
-        "minDeposit": "0",
-        "maxDeposit": "100000000000000000000",
-        "maxWithdraw": "100000000000000000000",
-        "totalDeposits": "0"
-      }
-    },
-    {
-      "name": "AAVE",
-      "symbol": "AAVE",
-      "decimals": 18,
-      "volatilityRatio": "0.9",
-      "price": "100",
-      "params": {
-        "maxDeposits": "100000000000000000000000",
-        "minDeposit": "0",
-        "maxDeposit": "100000000000000000000",
-        "maxWithdraw": "100000000000000000000",
-        "totalDeposits": "0"
-      }
-    },
-    {
-      "name": "ChainLink",
-      "symbol": "Link",
-      "decimals": 18,
-      "volatilityRatio": "0.9",
-      "price": "10",
-      "params": {
-        "maxDeposits": "100000000000000000000000",
-        "minDeposit": "0",
-        "maxDeposit": "100000000000000000000",
-        "maxWithdraw": "100000000000000000000",
-        "totalDeposits": "0"
-      }
-    },
-    {
-      "name": "USD Coin",
-      "symbol": "USDC",
-      "decimals": 18,
-      "volatilityRatio": "0.9",
-      "price": "1",
-      "params": {
-        "maxDeposits": "100000000000000000000000",
-        "minDeposit": "0",
-        "maxDeposit": "100000000000000000000",
-        "maxWithdraw": "100000000000000000000",
-        "totalDeposits": "0"
-      }
-    },
-    {
-      "name": "DAI Stablecoin",
-      "symbol": "DAI",
-      "decimals": 18,
-      "volatilityRatio": "0.9",
-      "price": "1",
-      "params": {
-        "maxDeposits": "100000000000000000000000",
-        "minDeposit": "0",
-        "maxDeposit": "100000000000000000000",
-        "maxWithdraw": "100000000000000000000",
-        "totalDeposits": "0"
-      }
-    }
-  ],
-  "tradingPools": [
+  "pools": [
     {
       "name": "Crypto Market",
-      "symbol": "CRY",
-      "volatilityRatio": "0.9",
+      "symbol": "C",
       "rewardSpeed": "0",
-      "mintFee": "0",
-      "swapFee": "0",
-      "burnFee": "0",
-      "liquidationFee": "0",
-      "liquidationPenalty": "0",
       "issuerAlloc": "0",
-      "synths": [
+      "collaterals": [
         {
-          "name": "AAVE X",
-          "symbol": "AAVEx",
-          "price": "1"
+          "name": "Wrapped Ethereum",
+          "symbol": "WETH",
+          "decimals": 18,
+          "volatilityRatio": "0.9",
+          "price": "1000",
+          "params": {
+            "maxDeposits": "100000000000000000000000",
+            "baseLTV": "0",
+            "liqThreshold": "0",
+            "liqBonus": "0",
+            "liqProtocolFee": "0"
+          }
         },
         {
-          "name": "DAI Stablecoin X",
-          "symbol": "DAIx",
-          "price": "1"
+          "name": "AAVE",
+          "symbol": "AAVE",
+          "decimals": 18,
+          "volatilityRatio": "0.9",
+          "price": "100",
+          "params": {
+            "maxDeposits": "100000000000000000000000",
+            "baseLTV": "0",
+            "liqThreshold": "0",
+            "liqBonus": "0",
+            "liqProtocolFee": "0"
+          }
+        },
+        {
+          "name": "ChainLink",
+          "symbol": "Link",
+          "decimals": 18,
+          "volatilityRatio": "0.9",
+          "price": "10",
+          "params": {
+            "maxDeposits": "100000000000000000000000",
+            "baseLTV": "0",
+            "liqThreshold": "0",
+            "liqBonus": "0",
+            "liqProtocolFee": "0"
+          }
+        },
+        {
+          "name": "USD Coin",
+          "symbol": "USDC",
+          "decimals": 18,
+          "volatilityRatio": "0.9",
+          "price": "1",
+          "params": {
+            "maxDeposits": "100000000000000000000000",
+            "baseLTV": "0",
+            "liqThreshold": "0",
+            "liqBonus": "0",
+            "liqProtocolFee": "0"
+          }
+        }
+      ],
+      "synths": [
+        {
+          "name": "Bitcoin",
+          "symbol": "BTC",
+          "price": "22799.12",
+          "mintFee": "0",
+          "burnFee": "0"
+        },
+        {
+          "name": "Ethereum",
+          "symbol": "ETH",
+          "price": "1622.2",
+          "mintFee": "0",
+          "burnFee": "0"
         },
         {
           "name": "USD Coin X",
           "symbol": "USDCx",
           "price": "1.00",
-          "isFeeToken": true
+          "isFeeToken": true,
+          "mintFee": "0",
+          "burnFee": "0"
         },
         {
-          "name": "Wrapped Ethereum X",
-          "symbol": "WETHx",
-          "price": "1000"
+          "name": "ChainLink",
+          "symbol": "LINK",
+          "price": "7.38",
+          "mintFee": "0",
+          "burnFee": "0"
         },
         {
-          "name": "ChainLink X",
-          "symbol": "LINKx",
-          "price": "10"
+          "name": "Solana",
+          "symbol": "SOL",
+          "price": "22.56",
+          "mintFee": "0",
+          "burnFee": "0"
+        },
+        {
+          "name": "Optimism",
+          "symbol": "OP",
+          "price": "2.76",
+          "mintFee": "0",
+          "burnFee": "0"
+        }
+      ]
+    },
+    {
+      "name": "Foreign Exchange",
+      "symbol": "F",
+      "rewardSpeed": "0",
+      "issuerAlloc": "0",
+      "collaterals": [
+        {
+          "name": "Ethereum",
+          "symbol": "ETH",
+          "decimals": 18,
+          "volatilityRatio": "0.9",
+          "price": "1000",
+          "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+          "params": {
+            "maxDeposits": "100000000000000000000000",
+            "baseLTV": "0",
+            "liqThreshold": "0",
+            "liqBonus": "0",
+            "liqProtocolFee": "0"
+          }
+        },
+        {
+          "name": "USD Coin",
+          "symbol": "USDC",
+          "decimals": 18,
+          "volatilityRatio": "0.9",
+          "price": "1",
+          "params": {
+            "maxDeposits": "100000000000000000000000",
+            "baseLTV": "0",
+            "liqThreshold": "0",
+            "liqBonus": "0",
+            "liqProtocolFee": "0"
+          }
+        },
+        {
+          "name": "DAI Stablecoin",
+          "symbol": "DAI",
+          "decimals": 18,
+          "volatilityRatio": "0.9",
+          "price": "1",
+          "params": {
+            "maxDeposits": "100000000000000000000000",
+            "baseLTV": "0",
+            "liqThreshold": "0",
+            "liqBonus": "0",
+            "liqProtocolFee": "0"
+          }
+        },
+        {
+          "name": "Euro Coin",
+          "symbol": "EUROC",
+          "decimals": 18,
+          "volatilityRatio": "0.9",
+          "price": "1.06",
+          "params": {
+            "maxDeposits": "100000000000000000000000",
+            "baseLTV": "0",
+            "liqThreshold": "0",
+            "liqBonus": "0",
+            "liqProtocolFee": "0"
+          }
+        }
+      ],
+      "synths": [
+        {
+          "name": "US Dollar",
+          "symbol": "USD",
+          "price": "1.00",
+          "isFeeToken": true,
+          "mintFee": "0",
+          "burnFee": "0"
+        },
+        {
+          "name": "Euro",
+          "symbol": "EUR",
+          "price": "0.85",
+          "mintFee": "0",
+          "burnFee": "0"
+        },
+        {
+          "name": "Japanese Yen",
+          "symbol": "JPY",
+          "price": "0.0094",
+          "mintFee": "0",
+          "burnFee": "0"
+        },
+        {
+          "name": "Canadian Dollar",
+          "symbol": "CAD",
+          "price": "0.80",
+          "mintFee": "0",
+          "burnFee": "0"
+        },
+        {
+          "name": "Korean Republic won",
+          "symbol": "WON",
+          "price": "0.0009",
+          "mintFee": "0",
+          "burnFee": "0"
+        },
+        {
+          "name": "UAE Dirham",
+          "symbol": "AED",
+          "price": "0.27",
+          "mintFee": "0",
+          "burnFee": "0"
+        },
+        {
+          "name": "Indian Rupee",
+          "symbol": "INR",
+          "price": "0.013",
+          "mintFee": "0",
+          "burnFee": "0"
         }
       ]
     }
