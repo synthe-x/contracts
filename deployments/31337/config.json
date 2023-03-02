@@ -29,7 +29,6 @@
           "name": "Ethereum",
           "symbol": "ETH",
           "decimals": 18,
-          "volatilityRatio": "0.9",
           "price": "1000",
           "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
           "params": {
@@ -44,7 +43,6 @@
           "name": "Wrapped Ethereum",
           "symbol": "WETH",
           "decimals": 18,
-          "volatilityRatio": "0.9",
           "price": "1000",
           "params": {
             "cap": "100000000000000000000000",
@@ -58,7 +56,6 @@
           "name": "AAVE",
           "symbol": "AAVE",
           "decimals": 18,
-          "volatilityRatio": "0.9",
           "price": "100",
           "params": {
             "cap": "100000000000000000000000",
@@ -72,7 +69,6 @@
           "name": "ChainLink",
           "symbol": "Link",
           "decimals": 18,
-          "volatilityRatio": "0.9",
           "price": "10",
           "params": {
             "cap": "100000000000000000000000",
@@ -86,7 +82,6 @@
           "name": "USD Coin",
           "symbol": "USDC",
           "decimals": 18,
-          "volatilityRatio": "0.9",
           "price": "1",
           "params": {
             "cap": "100000000000000000000000",
@@ -113,8 +108,8 @@
           "burnFee": "0"
         },
         {
-          "name": "USD Coin X",
-          "symbol": "USDCx",
+          "name": "USD Coin",
+          "symbol": "USDC",
           "price": "1.00",
           "isFeeToken": true,
           "mintFee": "0",
@@ -153,7 +148,6 @@
           "name": "USD Coin",
           "symbol": "USDC",
           "decimals": 18,
-          "volatilityRatio": "0.9",
           "price": "1",
           "params": {
             "cap": "100000000000000000000000",
@@ -167,7 +161,6 @@
           "name": "DAI Stablecoin",
           "symbol": "DAI",
           "decimals": 18,
-          "volatilityRatio": "0.9",
           "price": "1",
           "params": {
             "cap": "100000000000000000000000",
@@ -181,7 +174,6 @@
           "name": "Euro Coin",
           "symbol": "EUROC",
           "decimals": 18,
-          "volatilityRatio": "0.9",
           "price": "1.06",
           "params": {
             "cap": "100000000000000000000000",

@@ -11,7 +11,7 @@ describe('Testing liquidation', function () {
     oracle: any,
     sethPriceFeed: any,
     sbtcPriceFeed: any,
-    cryptoPool: any,
+    pool: any,
     eth: any,
     susd: any,
     sbtc: any,
@@ -27,50 +27,78 @@ describe('Testing liquidation', function () {
     const deployments = await loadFixture(main)
     synthex = deployments.synthex
     syn = deployments.syn
-    oracle = deployments.oracle
-    cryptoPool = deployments.pools[0]
-    sbtc = deployments.poolSynths[0][0]
-    seth = deployments.poolSynths[0][1]
-    susd = deployments.poolSynths[0][2]
-    sbtcPriceFeed = deployments.poolSynthPriceFeeds[0][0]
-    sethPriceFeed = deployments.poolSynthPriceFeeds[0][1]
+    oracle = deployments.pools[0].oracle
+    pool = deployments.pools[0].pool
+    sbtc = deployments.pools[0].synths[0]
+    seth = deployments.pools[0].synths[1]
+    susd = deployments.pools[0].synths[2]
+    sbtcPriceFeed = deployments.pools[0].synthPriceFeeds[0]
+    sethPriceFeed = deployments.pools[0].synthPriceFeeds[1]
 
-    await synthex
+    await pool
       .connect(user1)
-      .depositETH(ethers.utils.parseEther('100'), {
+      .depositETH({
         value: ethers.utils.parseEther('100'),
       })
-    await synthex
+    await pool
       .connect(user2)
-      .depositETH(ethers.utils.parseEther('100'), {
+      .depositETH({
         value: ethers.utils.parseEther('100'),
       })
-    await synthex
+    await pool
       .connect(user3)
-      .deposit(ETH_ADDRESS, ethers.utils.parseEther('100'), {
+      .depositETH({
         value: ethers.utils.parseEther('100'),
       })
 
-    await seth.connect(user1).mint(ethers.utils.parseEther('25')) // $ 25000
-    await sbtc.connect(user2).mint(ethers.utils.parseEther('2.5')) // $ 25000
-    await susd.connect(user3).mint(ethers.utils.parseEther('25000')) // $ 25000
-
-    // increasing btc price to $80000
-    await sbtcPriceFeed.setPrice(ethers.utils.parseUnits('80000', 8), 8)
-
-    // check health factor
-    expect(await synthex.healthFactorOf(user1.address)).to.be.lessThan(
-      ethers.utils.parseEther('1.00'),
-    )
-    expect(await synthex.healthFactorOf(user2.address)).to.be.lessThan(
-      ethers.utils.parseEther('1.00'),
-    )
-    liqHealthFactor = await synthex.healthFactorOf(user1.address)
+    await seth.connect(user1).mint(ethers.utils.parseEther('80')) // $ 80000
+    await sbtc.connect(user2).mint(ethers.utils.parseEther('8')) // $ 80000
+    await susd.connect(user3).mint(ethers.utils.parseEther('80000')) // $ 80000
   }
 
-  describe('Liquidation', function () {
-    before(async function () {
+  describe('Liquidation @ 85', function () {
+    beforeAll(async function () {
       await setup()
+      // If we increase BTC price 1.25x, Total debt = 260000
+      // Then User1 debt = 86666, User2 debt = 86666, User3 debt = 86666
+
+      // increasing btc price to $12500
+      await sbtcPriceFeed.setPrice(ethers.utils.parseUnits('12500', 8), 8)
+
+      // check health factor
+      const user1Liq = await pool.getAccountLiquidity(user1.address);
+      const user2Liq = await pool.getAccountLiquidity(user2.address);
+
+      expect(user1Liq[0]).to.be.lessThan(0);
+      expect(user1Liq[2].mul(ethers.constants.WeiPerEther).div(user1Liq[1])).to.be.greaterThan(ethers.constants.WeiPerEther.mul(9).div(10))
+
+      expect(user2Liq[0]).to.be.lessThan(0);
+    })
+  })
+
+  describe('Liquidation @ 90', function () {
+    beforeAll(async function () {
+      await setup()
+      // If we increase BTC price 1.25x, Total debt = 260000
+      // Then User1 debt = 86666, User2 debt = 86666, User3 debt = 86666
+
+      // If we increase BTC price 1.5x, Total debt = 280000
+      // Then User1 debt = 93333, User2 debt = 93333, User3 debt = 93333
+
+      // If we increase BTC price 1.73x, Total debt = 298...
+      // Then User1 debt = 995.., User2 debt = 995.., User3 debt = 995..
+
+      // increasing btc price to $80000
+      await sbtcPriceFeed.setPrice(ethers.utils.parseUnits('80000', 8), 8)
+
+      // check health factor
+      const user1Liq = await pool.getAccountLiquidity(user1.address);
+      const user2Liq = await pool.getAccountLiquidity(user2.address);
+
+      expect(user1Liq[0]).to.be.lessThan(0);
+      expect(user1Liq[2].mul(ethers.constants.WeiPerEther).div(user1Liq[1])).to.be.greaterThan(ethers.constants.WeiPerEther.mul(9).div(10))
+
+      expect(user2Liq[0]).to.be.lessThan(0);
     })
 
     it('user2 liquidates user1 with 0.05 BTC ($4000)', async function () {
@@ -119,13 +147,91 @@ describe('Testing liquidation', function () {
     })
   })
 
-  describe('liquidation with multiple collateral types', async function () {
+  describe('Liquidation @ 95', function () {
+    beforeAll(async function () {
+      await setup()
+      // If we increase BTC price 1.25x, Total debt = 260000
+      // Then User1 debt = 86666, User2 debt = 86666, User3 debt = 86666
+
+      // If we increase BTC price 1.5x, Total debt = 280000
+      // Then User1 debt = 93333, User2 debt = 93333, User3 debt = 93333
+
+      // If we increase BTC price 1.73x, Total debt = 298...
+      // Then User1 debt = 995.., User2 debt = 995.., User3 debt = 995..
+
+      // increasing btc price to $80000
+      await sbtcPriceFeed.setPrice(ethers.utils.parseUnits('80000', 8), 8)
+
+      // check health factor
+      const user1Liq = await pool.getAccountLiquidity(user1.address);
+      const user2Liq = await pool.getAccountLiquidity(user2.address);
+
+      expect(user1Liq[0]).to.be.lessThan(0);
+      expect(user1Liq[2].mul(ethers.constants.WeiPerEther).div(user1Liq[1])).to.be.greaterThan(ethers.constants.WeiPerEther.mul(9).div(10))
+
+      expect(user2Liq[0]).to.be.lessThan(0);
+    })
+  })
+
+  describe('Liquidation @ 99.5', function () {
+    beforeAll(async function () {
+      await setup()
+      // If we increase BTC price 1.25x, Total debt = 260000
+      // Then User1 debt = 86666, User2 debt = 86666, User3 debt = 86666
+
+      // If we increase BTC price 1.5x, Total debt = 280000
+      // Then User1 debt = 93333, User2 debt = 93333, User3 debt = 93333
+
+      // If we increase BTC price 1.73x, Total debt = 298...
+      // Then User1 debt = 995.., User2 debt = 995.., User3 debt = 995..
+
+      // increasing btc price to $80000
+      await sbtcPriceFeed.setPrice(ethers.utils.parseUnits('80000', 8), 8)
+
+      // check health factor
+      const user1Liq = await pool.getAccountLiquidity(user1.address);
+      const user2Liq = await pool.getAccountLiquidity(user2.address);
+
+      expect(user1Liq[0]).to.be.lessThan(0);
+      expect(user1Liq[2].mul(ethers.constants.WeiPerEther).div(user1Liq[1])).to.be.greaterThan(ethers.constants.WeiPerEther.mul(9).div(10))
+
+      expect(user2Liq[0]).to.be.lessThan(0);
+    })
+  })
+
+  describe('Liquidation @ 100.5', function () {
+    beforeAll(async function () {
+      await setup()
+      // If we increase BTC price 1.25x, Total debt = 260000
+      // Then User1 debt = 86666, User2 debt = 86666, User3 debt = 86666
+
+      // If we increase BTC price 1.5x, Total debt = 280000
+      // Then User1 debt = 93333, User2 debt = 93333, User3 debt = 93333
+
+      // If we increase BTC price 1.73x, Total debt = 298...
+      // Then User1 debt = 995.., User2 debt = 995.., User3 debt = 995..
+
+      // increasing btc price to $80000
+      await sbtcPriceFeed.setPrice(ethers.utils.parseUnits('80000', 8), 8)
+
+      // check health factor
+      const user1Liq = await pool.getAccountLiquidity(user1.address);
+      const user2Liq = await pool.getAccountLiquidity(user2.address);
+
+      expect(user1Liq[0]).to.be.lessThan(0);
+      expect(user1Liq[2].mul(ethers.constants.WeiPerEther).div(user1Liq[1])).to.be.greaterThan(ethers.constants.WeiPerEther.mul(9).div(10))
+
+      expect(user2Liq[0]).to.be.lessThan(0);
+    })
+  })
+
+  describe('liquidating multiple positions', async function () {
     before(async function () {
       await setup()
     })
   })
 
-  describe('Liquidation penalty and fees', async function () {
+  describe('liquidation penalty and fees', async function () {
     before(async function () {
       await setup()
     })

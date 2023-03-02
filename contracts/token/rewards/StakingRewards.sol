@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import './EscrowedSYN.sol';
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "../utils/interfaces/IStaking.sol";
-import "../synthex/SyntheX.sol";
+import "../../utils/interfaces/IStaking.sol";
+import "../../synthex/SyntheX.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 /**
  * @title Staking Rewards contract
@@ -17,6 +17,7 @@ import "@openzeppelin/contracts/security/Pausable.sol";
 contract StakingRewards is IStaking, ReentrancyGuard, Pausable {
     /// @notice SafeMath library for uint256 to avoid overflow and underflow
     using SafeMath for uint256;
+    using SafeERC20 for IERC20;
 
     // System contract
     SyntheX public synthex;
@@ -127,7 +128,7 @@ contract StakingRewards is IStaking, ReentrancyGuard, Pausable {
         require(amount > 0, "Cannot stake 0");
         totalSupply = totalSupply.add(amount);
         balanceOf[msg.sender] = balanceOf[msg.sender].add(amount);
-        EscrowedSYN(stakingToken).transferFrom(msg.sender, address(this), amount);
+        IERC20(stakingToken).safeTransferFrom(msg.sender, address(this), amount);
         emit Staked(msg.sender, amount);
     }
 
@@ -139,7 +140,7 @@ contract StakingRewards is IStaking, ReentrancyGuard, Pausable {
         require(amount > 0, "Cannot withdraw 0");
         totalSupply = totalSupply.sub(amount);
         balanceOf[msg.sender] = balanceOf[msg.sender].sub(amount);
-        EscrowedSYN(stakingToken).transfer(msg.sender, amount);
+        IERC20(stakingToken).safeTransfer(msg.sender, amount);
         emit Withdrawn(msg.sender, amount);
     }
     
@@ -152,7 +153,7 @@ contract StakingRewards is IStaking, ReentrancyGuard, Pausable {
     
         if (reward > 0) {
             rewards[msg.sender] = 0;
-            EscrowedSYN(rewardsToken).transfer(msg.sender, reward);
+            IERC20(rewardsToken).safeTransfer(msg.sender, reward);
             emit RewardPaid(msg.sender, reward);       
         }
     }

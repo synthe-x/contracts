@@ -36,6 +36,7 @@ export async function initiate(
 
   for(let k = 0; k < config.pools.length; k++){
     const poolConfig = config.pools[k];
+    if(!isTest) console.log(`Initializing pool ${poolConfig.name}... 🚀`);
     let poolResult = {
       pool: {} as Contract,
       oracle: {} as Contract,
@@ -107,7 +108,7 @@ export async function initiate(
     for(let i = 0; i < poolConfig.synths.length; i++){
       const synthConfig = poolConfig.synths[i];
       let synth: string|Contract = synthConfig.address as string;
-      const symbol = synthConfig.symbol.toLowerCase() + synthConfig.symbol;
+      const symbol = poolConfig.symbol.toLowerCase() + synthConfig.symbol;
       const name = 'SyntheX ' + synthConfig.name + ' (' + poolConfig.name + ')';
       if(!synth){
         // deploy token
@@ -157,8 +158,6 @@ export async function initiate(
 
     result.pools.push(poolResult);
   }
-
-
 
   // Dummy tokens
   if(!isTest) console.log("Deploying Dummy Tokens... 💬");

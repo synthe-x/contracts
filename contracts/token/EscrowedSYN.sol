@@ -21,19 +21,18 @@ contract EscrowedSYN is ERC20, ERC20Permit, ERC20Burnable, AccessControl {
 
     // This role can transfer tokens
     bytes32 public constant AUTHORIZED_SENDER = keccak256("AUTHORIZED_SENDER");
-    // This role can mint and burn tokens. Also needs to be an authorized sender
-    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
-    bytes32 public constant BURNER_ROLE = keccak256("BURNER_ROLE");
 
     constructor(address _synthex) ERC20("Escrowed SYN", "esSYN") ERC20Permit("Escrowed SYN") {
         synthex = SyntheX(_synthex);
     }
 
-    function mint(address to, uint256 amount) public onlyRole(MINTER_ROLE) {
+    function mint(address to, uint256 amount) public {
+        require(synthex.isL1Admin(msg.sender), "EscrowedSYN: Only L1_ADMIN can mint tokens");
         _mint(to, amount);
     }
 
-    function burn(address from, uint256 amount) public onlyRole(BURNER_ROLE) {
+    function burn(address from, uint256 amount) public {
+        require(synthex.isL1Admin(msg.sender), "EscrowedSYN: Only L1_ADMIN can mint tokens");
         _burn(from, amount);
     }
 
