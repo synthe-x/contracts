@@ -5,6 +5,7 @@ import { _deploy as _deployDefender } from "./utils/defender";
 import { IDeploymentResult } from './deploy';
 
 export interface IPoolData {
+  pool: Contract;
   oracle: Contract;
   // enabled collaterals
   collateralTokens: Contract[];
@@ -36,6 +37,7 @@ export async function initiate(
   for(let k = 0; k < config.pools.length; k++){
     const poolConfig = config.pools[k];
     let poolResult = {
+      pool: {} as Contract,
       oracle: {} as Contract,
       collateralTokens: [],
       collateralPriceFeeds: [],
@@ -43,14 +45,14 @@ export async function initiate(
       synthPriceFeeds: []
     } as IPoolData;
 
-    const pool = await _deploy("Pool", [
+    poolResult.pool = await _deploy("Pool", [
       poolConfig.name,
       poolConfig.symbol,
       contracts.synthex.address,
     ], deployments, {upgradable: true, name: 'POOL_'+poolConfig.symbol});
 
-    await pool.setIssuerAlloc(poolConfig.issuerAlloc);
-    await contracts.synthex.setPoolSpeed(contracts.sealedSYN.address, pool.address, poolConfig.rewardSpeed)
+    await poolResult.pool.setIssuerAlloc(poolConfig.issuerAlloc);
+    await contracts.synthex.setPoolSpeed(contracts.sealedSYN.address, poolResult.pool.address, poolConfig.rewardSpeed)
 
     for(let i = 0; i < poolConfig.collaterals.length; i++){
       let cConfig = poolConfig.collaterals[i];
@@ -94,7 +96,7 @@ export async function initiate(
       }
 
       // Enabling collateral
-      await pool.updateCollateral(collateral.address, {...cConfig.params, isEnabled: true, totalDeposits: 0});
+      await poolResult.pool.updateCollateral(collateral.address, {...cConfig.params, isEnabled: true, totalDeposits: 0});
       if(!isTest) console.log(`\t Collateral ${cConfig.symbol} ($${parseFloat(ethers.utils.formatUnits(await feed.latestAnswer(), await feed.decimals())).toFixed(4)}) added successfully ✅`);
   
       poolResult.collateralTokens.push(collateral);
@@ -109,7 +111,7 @@ export async function initiate(
       const name = 'SyntheX ' + synthConfig.name + ' (' + poolConfig.name + ')';
       if(!synth){
         // deploy token
-        synth = await _deploy('ERC20X', [name, symbol, pool.address, contracts.synthex.address], deployments, { name: symbol, upgradable: true });
+        synth = await _deploy('ERC20X', [name, symbol, poolResult.pool.address, contracts.synthex.address], deployments, { name: symbol, upgradable: true });
       } else {
         synth = await ethers.getContractAt('ERC20X', synth);
       }
@@ -126,7 +128,7 @@ export async function initiate(
       } else {
         feed = await ethers.getContractAt('MockPriceFeed', feed);
       }
-      await pool.addSynth(synth.address, synthConfig.mintFee, synthConfig.burnFee);
+      await poolResult.pool.addSynth(synth.address, synthConfig.mintFee, synthConfig.burnFee);
       if(!isTest) console.log(`\t\t ${name} (${symbol}) ($${parseFloat(ethers.utils.formatUnits(await feed.latestAnswer(), await feed.decimals())).toFixed(4)}) added  ✨`);
       poolResult.synths.push(synth);
       poolResult.synthPriceFeeds.push(feed);
@@ -148,10 +150,12 @@ export async function initiate(
       1e8
     ], deployments, {name: "PriceOracle_"+poolConfig.symbol});
 
-    await pool.setPriceOracle(poolResult.oracle.address);
+    // config and unpause
+    await poolResult.pool.setPriceOracle(poolResult.oracle.address);
+    await poolResult.pool.setFeeToken(feeToken);
+    await poolResult.pool.unpause();
 
-    await pool.setFeeToken(feeToken);
-
+    result.pools.push(poolResult);
   }
 
 

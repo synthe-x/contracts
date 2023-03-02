@@ -12,7 +12,9 @@ contract PoolStorage {
     uint public issuerAlloc;
 
     /// @notice Basis points constant. 10000 basis points * 1e18 = 100%
-    uint public constant BASIS_POINTS = 10000e18;
+    uint public constant BASIS_POINTS = 10000;
+    uint public constant SCALER = 1e18;
+
     address public constant ETH_ADDRESS = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
 
     /// @notice The synth token used to pass on to vault as fee

@@ -17,6 +17,9 @@ import "../synth/ERC20X.sol";
 import { IPool } from "./IPool.sol";
 import "../libraries/PriceConvertor.sol";
 
+// debug
+import "hardhat/console.sol";
+
 /**
  * @title Pool
  * @notice Pool contract to manage collaterals and debt
@@ -266,9 +269,10 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
         int _borrowCapacity = getAccountLiquidity(_account).liquidity;
         
         require(_borrowCapacity > 0, "SyntheXPool: Insufficient liquidity");
-        
+
         // amount of debt to issue (in usd, including mintFee)
         uint amountPlusFeeUSD = _amount.toUSD(vars.prices[0]);
+
         amountPlusFeeUSD = amountPlusFeeUSD.add(amountPlusFeeUSD.mul(synths[msg.sender].mintFee).div(BASIS_POINTS));
         if(_borrowCapacity < int(amountPlusFeeUSD)){
             amountPlusFeeUSD = uint(_borrowCapacity);
@@ -427,7 +431,7 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
         vars.collateral = collaterals[_outAsset];
         require(vars.liq.debt > 0, "Account has no debt");
         require(vars.liq.collateral > 0, "Account has no collateral");
-        vars.ltv = vars.liq.collateral.mul(BASIS_POINTS).div(vars.liq.debt);
+        vars.ltv = vars.liq.collateral.mul(SCALER).div(vars.liq.debt);
         require(vars.ltv > vars.collateral.liqThreshold, "Account health factor below liquidation threshold");
         require(vars.liq.liquidity < 0, "Account has no shortfall");
         // Ensure user has entered the collateral market
@@ -453,23 +457,23 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
 
         // Sieze collateral
         uint balanceOut = accountCollateralBalance[_account][_outAsset];
-        if(vars.ltv > BASIS_POINTS){
+        if(vars.ltv > SCALER){
             // if ltv > 100%, take all collateral, no penalty
             if(vars.amountOut > balanceOut){
                 vars.amountOut = balanceOut;
             }
         } else {
             // take collateral based on ltv, and apply penalty
-            balanceOut = balanceOut.mul(vars.ltv).div(BASIS_POINTS);
+            balanceOut = balanceOut.mul(vars.ltv).div(SCALER);
             if(vars.amountOut > balanceOut){
                 vars.amountOut = balanceOut;
             }
             vars.penalty = vars.amountOut.mul(vars.collateral.liqBonus).div(BASIS_POINTS);
             // if we don't have enough for [complete] bonus, take partial bonus
-            if(vars.ltv.mul(vars.collateral.liqBonus).div(BASIS_POINTS) > BASIS_POINTS){
-                vars.penalty = vars.amountOut.mul(vars.ltv.mul(vars.collateral.liqBonus).div(BASIS_POINTS).sub(BASIS_POINTS)).div(BASIS_POINTS);
+            if(vars.ltv.mul(vars.collateral.liqBonus).div(BASIS_POINTS) > SCALER){
+                vars.penalty = vars.amountOut.mul(vars.ltv.mul(vars.collateral.liqBonus).div(BASIS_POINTS).sub(SCALER)).div(SCALER);
             } else {
-                vars.refundOut = vars.amountOut.mul(BASIS_POINTS.sub(vars.ltv.mul(vars.collateral.liqBonus).div(BASIS_POINTS))).div(BASIS_POINTS);
+                vars.refundOut = vars.amountOut.mul(SCALER.sub(vars.ltv.mul(vars.collateral.liqBonus).div(BASIS_POINTS))).div(SCALER);
             }
             vars.fee = vars.penalty.mul(vars.collateral.liqProtocolFee).div(BASIS_POINTS);
         }
@@ -542,6 +546,8 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
     function getTotalDebtUSD() virtual override public view returns(uint totalDebt) {
         // Get the list of synths in this trading pool
         address[] memory _synths = getSynths();
+
+        totalDebt = 0;
         // Fetch and cache oracle address
         IPriceOracle _oracle = priceOracle;
         // Iterate through the list of synths and add each synth's total supply in USD to the total debt
@@ -633,9 +639,9 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
         collateral.baseLTV = _params.baseLTV;
         require(_params.liqThreshold >= _params.baseLTV && _params.liqThreshold <= BASIS_POINTS, "SyntheX: Invalid liquidationThreshold");
         collateral.liqThreshold = _params.liqThreshold;
-        require(_params.liqBonus >= 0 && _params.liqBonus <= BASIS_POINTS.sub(_params.liqThreshold), "SyntheX: Invalid liquidationBonus");
+        require(_params.liqBonus >= BASIS_POINTS && _params.liqBonus <= BASIS_POINTS.add(BASIS_POINTS.sub(_params.liqThreshold)), "SyntheX: Invalid liquidationBonus");
         collateral.liqBonus = _params.liqBonus;
-        require(_params.liqProtocolFee >= 0 && _params.liqProtocolFee <= BASIS_POINTS.sub(_params.liqThreshold).sub(_params.liqBonus), "SyntheX: Invalid liqProtocolFee");
+        require(_params.liqProtocolFee < BASIS_POINTS, "SyntheX: Invalid liqProtocolFee");
         collateral.liqProtocolFee = _params.liqProtocolFee;
 
         collateral.isEnabled = _params.isEnabled;

@@ -5,7 +5,7 @@ import main from "../scripts/main";
 
 describe("Testing the complete flow", function () {
 
-	let synthex: any, oracle: any, cryptoPool: any, eth: any, susd: any, sbtc: any, seth: any;
+	let synthex: any, oracle: any, pool: any, eth: any, susd: any, sbtc: any, seth: any, sbtcFeed: any;
 	let owner: any, user1: any, user2: any, user3: any;
 
 	before(async () => {
@@ -14,11 +14,12 @@ describe("Testing the complete flow", function () {
 
 		const deployments = await loadFixture(main);
 		synthex = deployments.synthex;
-		oracle = deployments.oracle;
-		cryptoPool = deployments.pools[0];
-		sbtc = deployments.poolSynths[0][0];
-		seth = deployments.poolSynths[0][1];
-		susd = deployments.poolSynths[0][2];
+		pool = deployments.pools[0].pool;
+		oracle = deployments.pools[0].oracle;
+		sbtc = deployments.pools[0].synths[0];
+		sbtcFeed = deployments.pools[0].synthPriceFeeds[0];
+		seth = deployments.pools[0].synths[1];
+		susd = deployments.pools[0].synths[2];
 	});
 
 	it("Should stake eth", async function () {
@@ -26,13 +27,15 @@ describe("Testing the complete flow", function () {
 		const user2Deposit = ethers.utils.parseEther("10");
 		const user3Deposit = ethers.utils.parseEther("200");
 
-		await synthex.connect(user1).depositETH(user1Deposit, {value: user1Deposit});    // $ 20000
-		await synthex.connect(user2).depositETH(user2Deposit, {value: user2Deposit});    // $ 10000
-		await synthex.connect(user3).depositETH(user3Deposit, {value: user3Deposit});   // $ 100000
+		await pool.connect(user1).depositETH({value: user1Deposit});    // $ 20000
+		// user2 transfers 10 eth to pool
+		// await user2.sendTransaction({to: pool.address, value: user2Deposit}); // $ 10000
+		await pool.connect(user2).depositETH({value: user2Deposit});    // $ 10000
+		await pool.connect(user3).depositETH({value: user3Deposit});   // $ 100000
 
-		expect((await synthex.getAccountPosition(user1.address)).totalCollateral).to.equal(ethers.utils.parseEther('20000'));
-		expect((await synthex.getAccountPosition(user2.address)).totalCollateral).to.equal(ethers.utils.parseEther('10000'));
-		expect((await synthex.getAccountPosition(user3.address)).totalCollateral).to.equal(ethers.utils.parseEther('200000'));
+		expect((await pool.getAccountLiquidity(user1.address)).collateral).to.equal(ethers.utils.parseEther('20000'));
+		expect((await pool.getAccountLiquidity(user2.address)).collateral).to.equal(ethers.utils.parseEther('10000'));
+		expect((await pool.getAccountLiquidity(user3.address)).collateral).to.equal(ethers.utils.parseEther('200000'));
 	});
 
 	it("issue synths", async function () {
@@ -41,43 +44,43 @@ describe("Testing the complete flow", function () {
         // user3 issues 100000 susd
         await susd.connect(user3).mint(ethers.utils.parseEther("90000")); // $ 90000
 
-		const user1Liquidity = await synthex.getAccountLiquidity(user1.address);
-		const user3Liquidity = await synthex.getAccountLiquidity(user3.address);
-        expect(user1Liquidity[1]).to.be.equal(ethers.utils.parseEther("10000.00").mul(10).div(9));
-        expect(user3Liquidity[1]).to.be.equal(ethers.utils.parseEther("90000.00").mul(10).div(9));
+		// balance
+		expect(await seth.balanceOf(user1.address)).to.equal(ethers.utils.parseEther("10"));
+		expect(await susd.balanceOf(user3.address)).to.equal(ethers.utils.parseEther("90000"));
+
+		const user1Liquidity = await pool.getAccountLiquidity(user1.address);
+		const user3Liquidity = await pool.getAccountLiquidity(user3.address);
+        expect(user1Liquidity[2]).to.be.equal(ethers.utils.parseEther("10000.00"));
+        expect(user3Liquidity[2]).to.be.equal(ethers.utils.parseEther("90000.00"));
 	});
 
     it("swap em", async () => {
         // user1 exchanges 10 seth for 1 sbtc
         await seth.connect(user1).swap(ethers.utils.parseEther("10"), sbtc.address);
         // check balances
-		const user1Liquidity = await synthex.getAccountLiquidity(user1.address);
-		const user3Liquidity = await synthex.getAccountLiquidity(user3.address);
-		expect(user1Liquidity[1]).to.be.equal(ethers.utils.parseEther("10000.00").mul(10).div(9));
-		expect(user3Liquidity[1]).to.be.equal(ethers.utils.parseEther("90000.00").mul(10).div(9));
+		const user1Liquidity = await pool.getAccountLiquidity(user1.address);
+		const user3Liquidity = await pool.getAccountLiquidity(user3.address);
+		expect(user1Liquidity[2]).to.be.equal(ethers.utils.parseEther("10000.00"));
+		expect(user3Liquidity[2]).to.be.equal(ethers.utils.parseEther("90000.00"));
 
 		expect(await seth.balanceOf(user1.address)).to.equal(0);
 		expect(await sbtc.balanceOf(user1.address)).to.equal(ethers.utils.parseEther("1"));
     })
 
     it("update debt for users", async () => {
-		const priorUser1Liquidity = await synthex.getAccountLiquidity(user1.address);
-		const priorUser3Liquidity = await synthex.getAccountLiquidity(user3.address);
+		const priorUser1Liquidity = await pool.getAccountLiquidity(user1.address);
+		const priorUser3Liquidity = await pool.getAccountLiquidity(user3.address);
 
-		// btc 10000 -> 15000
-		const Feed = await ethers.getContractFactory("MockPriceFeed");
-		const feed = Feed.attach(await oracle.getFeed(sbtc.address));
-        await feed.setPrice(ethers.utils.parseUnits("20000", 8), 8);
+		// btc 10000 -> 20000, increases debt by 100%
+        await sbtcFeed.setPrice(ethers.utils.parseUnits("20000", 8), 8);
 
-		const user1Liquidity = await synthex.getAccountLiquidity(user1.address);
-		const user3Liquidity = await synthex.getAccountLiquidity(user3.address);
-        expect(user1Liquidity[1]).to.be.closeTo(priorUser1Liquidity[1].mul('110').div('100'), ethers.utils.parseEther("50"));
-        expect(user3Liquidity[1]).to.be.closeTo(priorUser3Liquidity[1].mul('110').div('100'), ethers.utils.parseEther("500"));
+        expect((await pool.getAccountLiquidity(user1.address))[2]).to.be.equal(priorUser1Liquidity[2].mul('110').div('100'));
+        expect((await pool.getAccountLiquidity(user3.address))[2]).to.be.equal(priorUser3Liquidity[2].mul('110').div('100'));
     })
 
 	it("burn synths", async function () {
-		const debtUser1 = (await synthex.getAccountLiquidity(user1.address))[1]
-		const debtUser3 = (await synthex.getAccountLiquidity(user3.address))[1]
+		const debtUser1 = (await pool.getAccountLiquidity(user1.address))[2]
+		const debtUser3 = (await pool.getAccountLiquidity(user3.address))[2]
 
 		// user1 burns 10 seth
 		let sbtcBalance = await sbtc.balanceOf(user1.address);
@@ -90,8 +93,7 @@ describe("Testing the complete flow", function () {
 		sbtcBalance = await sbtc.balanceOf(user3.address);
 		await sbtc.connect(user3).burn(sbtcBalance); // $ 45000/118181
 
-		expect((await synthex.getAccountLiquidity(user1.address))[1]).to.be.closeTo(ethers.utils.parseEther("0.00"), ethers.utils.parseEther("0.2"));
-		expect((await synthex.getAccountLiquidity(user3.address))[1]).to.be.lessThan(debtUser3);
-		// expect(await synthex.getUserTotalDebtUSD(user3.address)).to.be.greaterThan(ethers.utils.parseEther("0.00"));
+		expect((await pool.getAccountLiquidity(user1.address))[2]).to.be.closeTo(ethers.utils.parseEther("0.00"), ethers.utils.parseEther("0.2"));
+		expect((await pool.getAccountLiquidity(user3.address))[2]).to.be.lessThan(debtUser3);
 	})
 });

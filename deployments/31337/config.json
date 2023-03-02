@@ -26,6 +26,21 @@
       "issuerAlloc": "0",
       "collaterals": [
         {
+          "name": "Ethereum",
+          "symbol": "ETH",
+          "decimals": 18,
+          "volatilityRatio": "0.9",
+          "price": "1000",
+          "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+          "params": {
+            "cap": "100000000000000000000000",
+            "baseLTV": "8000",
+            "liqThreshold": "9000",
+            "liqBonus": "10100",
+            "liqProtocolFee": "1000"
+          }
+        },
+        {
           "name": "Wrapped Ethereum",
           "symbol": "WETH",
           "decimals": 18,
@@ -33,10 +48,10 @@
           "price": "1000",
           "params": {
             "cap": "100000000000000000000000",
-            "baseLTV": "0",
-            "liqThreshold": "0",
-            "liqBonus": "0",
-            "liqProtocolFee": "0"
+            "baseLTV": "8000",
+            "liqThreshold": "9000",
+            "liqBonus": "10100",
+            "liqProtocolFee": "1000"
           }
         },
         {
@@ -47,10 +62,10 @@
           "price": "100",
           "params": {
             "cap": "100000000000000000000000",
-            "baseLTV": "0",
-            "liqThreshold": "0",
-            "liqBonus": "0",
-            "liqProtocolFee": "0"
+            "baseLTV": "8000",
+            "liqThreshold": "9000",
+            "liqBonus": "10100",
+            "liqProtocolFee": "1000"
           }
         },
         {
@@ -61,10 +76,10 @@
           "price": "10",
           "params": {
             "cap": "100000000000000000000000",
-            "baseLTV": "0",
-            "liqThreshold": "0",
-            "liqBonus": "0",
-            "liqProtocolFee": "0"
+            "baseLTV": "8000",
+            "liqThreshold": "9000",
+            "liqBonus": "10100",
+            "liqProtocolFee": "1000"
           }
         },
         {
@@ -75,10 +90,10 @@
           "price": "1",
           "params": {
             "cap": "100000000000000000000000",
-            "baseLTV": "0",
-            "liqThreshold": "0",
-            "liqBonus": "0",
-            "liqProtocolFee": "0"
+            "baseLTV": "8000",
+            "liqThreshold": "9000",
+            "liqBonus": "10100",
+            "liqProtocolFee": "1000"
           }
         }
       ],
@@ -86,14 +101,14 @@
         {
           "name": "Bitcoin",
           "symbol": "BTC",
-          "price": "22799.12",
+          "price": "10000",
           "mintFee": "0",
           "burnFee": "0"
         },
         {
           "name": "Ethereum",
           "symbol": "ETH",
-          "price": "1622.2",
+          "price": "1000",
           "mintFee": "0",
           "burnFee": "0"
         },
@@ -135,21 +150,6 @@
       "issuerAlloc": "0",
       "collaterals": [
         {
-          "name": "Ethereum",
-          "symbol": "ETH",
-          "decimals": 18,
-          "volatilityRatio": "0.9",
-          "price": "1000",
-          "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-          "params": {
-            "cap": "100000000000000000000000",
-            "baseLTV": "0",
-            "liqThreshold": "0",
-            "liqBonus": "0",
-            "liqProtocolFee": "0"
-          }
-        },
-        {
           "name": "USD Coin",
           "symbol": "USDC",
           "decimals": 18,
@@ -157,10 +157,10 @@
           "price": "1",
           "params": {
             "cap": "100000000000000000000000",
-            "baseLTV": "0",
-            "liqThreshold": "0",
-            "liqBonus": "0",
-            "liqProtocolFee": "0"
+            "baseLTV": "8000",
+            "liqThreshold": "9000",
+            "liqBonus": "10100",
+            "liqProtocolFee": "1000"
           }
         },
         {
@@ -171,10 +171,10 @@
           "price": "1",
           "params": {
             "cap": "100000000000000000000000",
-            "baseLTV": "0",
-            "liqThreshold": "0",
-            "liqBonus": "0",
-            "liqProtocolFee": "0"
+            "baseLTV": "8000",
+            "liqThreshold": "9000",
+            "liqBonus": "10100",
+            "liqProtocolFee": "1000"
           }
         },
         {
@@ -185,10 +185,10 @@
           "price": "1.06",
           "params": {
             "cap": "100000000000000000000000",
-            "baseLTV": "0",
-            "liqThreshold": "0",
-            "liqBonus": "0",
-            "liqProtocolFee": "0"
+            "baseLTV": "8000",
+            "liqThreshold": "9000",
+            "liqBonus": "10100",
+            "liqProtocolFee": "1000"
           }
         }
       ],
