@@ -49,17 +49,13 @@ abstract contract IPool is PoolStorage {
     /* -------------------------------------------------------------------------- */
     /*                                 Events                                     */
     /* -------------------------------------------------------------------------- */
-    event SynthAdded(address indexed synth, uint mintFee, uint burnFee);
-    event SynthUpdated(bool isEnabled, uint mintFee, uint burnFee);
+    event SynthUpdated(address indexed synth, bool isEnabled, uint mintFee, uint burnFee);
     event SynthRemoved(address indexed synth);
     event CollateralParamsUpdated(address indexed asset, uint cap, uint baseLTV, uint liqThreshold, uint liqBonus, uint liqProtocolFee, bool isEnabled);
     event CollateralEntered(address indexed user, address indexed collateral);
     event CollateralExited(address indexed user, address indexed collateral);
     event Deposit(address indexed user, address indexed asset, uint256 amount);
     event Withdraw(address indexed user, address indexed asset, uint256 amount);
-    event Mint(address indexed user, address indexed asset, uint256 amount);
-    event Burn(address indexed user, address indexed asset, uint256 amount);
-    event Swap(address indexed user, address indexed fromAsset, address toAsset, uint256 fromAmount);
     event IssuerAllocUpdated(uint issuerAlloc);
     event PriceOracleUpdated(address indexed priceOracle);
     event FeeTokenUpdated(address indexed feeToken);

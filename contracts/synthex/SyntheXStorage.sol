@@ -12,8 +12,7 @@ import "../token/SyntheXToken.sol";
  */
 abstract contract SyntheXStorage {
 
-    /// @notice Reward token contract address
-    IERC20 public rewardToken;
+    mapping(address => address[]) public rewardTokens;
 
     /// @notice RewardToken initial index
     uint256 public constant rewardInitialIndex = 1e36;
@@ -39,5 +38,5 @@ abstract contract SyntheXStorage {
     /// @notice The reward accrued but not yet transferred to each user
     mapping(address => mapping(address => uint)) public rewardAccrued;
 
-    uint256[50] private __gap;
+    uint256[100] private __gap;
 }

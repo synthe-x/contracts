@@ -271,9 +271,8 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
         require(_borrowCapacity > 0, "SyntheXPool: Insufficient liquidity");
 
         // amount of debt to issue (in usd, including mintFee)
-        uint amountPlusFeeUSD = _amount.toUSD(vars.prices[0]);
-
-        amountPlusFeeUSD = amountPlusFeeUSD.add(amountPlusFeeUSD.mul(synths[msg.sender].mintFee).div(BASIS_POINTS));
+        uint amountUSD = _amount.toUSD(vars.prices[0]);
+        uint amountPlusFeeUSD = amountUSD.add(amountUSD.mul(synths[msg.sender].mintFee).div(BASIS_POINTS));
         if(_borrowCapacity < int(amountPlusFeeUSD)){
             amountPlusFeeUSD = uint(_borrowCapacity);
         }
@@ -293,22 +292,25 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
         // Amount * (fee * issuerAlloc) is burned from global debt
         // Amount * (fee * (1 - issuerAlloc)) to vault
         // Fee amount of feeToken: amountUSD * fee * (1 - issuerAlloc) / feeTokenPrice
-        uint initialAmountUSD = amountPlusFeeUSD.mul(BASIS_POINTS).div(BASIS_POINTS.add(synths[msg.sender].mintFee));
-        uint feeAmount = amountPlusFeeUSD.sub(initialAmountUSD) // fee amount in USD
+        amountUSD = amountPlusFeeUSD.mul(BASIS_POINTS).div(BASIS_POINTS.add(synths[msg.sender].mintFee));
+        _amount = amountUSD.toToken(vars.prices[0]);
+
+        uint feeAmount = amountPlusFeeUSD.sub(amountUSD) // total fee amount in USD
             .mul(uint(BASIS_POINTS).sub(issuerAlloc))           // multiplying (1 - issuerAlloc)
             .div(BASIS_POINTS)                                  // for multiplying issuerAlloc
             .toToken(vars.prices[1]);                                // to feeToken amount
         
-        // Mint fee
+        // Mint FEE tokens to vault
         ERC20X(feeToken).mintInternal(
             synthex.vault(),
             feeAmount
         );
 
-        synthex.commitMint(_account, msg.sender, _amount);
+        // call for reward distribution
+        synthex.distribute(_account, totalSupply(), balanceOf(_account));
 
-        // Mint (amount - fee) toSynth to user
-        return initialAmountUSD.toToken(vars.prices[0]);
+        // return the amount of synths to issue
+        return _amount;
     }
 
 
@@ -361,6 +363,9 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
             synthex.vault(),
             amountUSD.mul(synths[msg.sender].burnFee).mul(uint(BASIS_POINTS).sub(issuerAlloc)).div(BASIS_POINTS).div(BASIS_POINTS).toToken(vars.prices[1])
         );
+
+        // call for reward distribution
+        synthex.distribute(_account, totalSupply(), balanceOf(_account));
 
         return _amount;
     }
@@ -656,14 +661,8 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
     function addSynth(address _synth, uint mintFee, uint burnFee) external onlyL1Admin {
         // Add the synth to the list of synths
         synthsList.push(_synth);
-        // Enable the synth
-        synths[_synth].isEnabled = true;
-        // Set the mint fee
-        synths[_synth].mintFee = mintFee;
-        // Set the burn fee
-        synths[_synth].burnFee = burnFee;
-        // Emit event on synth added
-        emit SynthAdded(_synth, mintFee, burnFee);
+        // Update synth params
+        updateSynth(_synth, Synth(true, mintFee, burnFee));
     }
 
      /**
@@ -676,7 +675,7 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
         synths[_synth].burnFee = _params.burnFee;
 
         // Emit event on synth enabled
-        emit SynthUpdated(_params.isEnabled, _params.mintFee, _params.burnFee);
+        emit SynthUpdated(_synth, _params.isEnabled, _params.mintFee, _params.burnFee);
     }
 
     /**
