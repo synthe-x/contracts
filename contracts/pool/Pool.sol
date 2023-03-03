@@ -103,6 +103,8 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
                 break;
             }
         }
+
+        require(getAccountLiquidity(msg.sender).liquidity > 0, "SyntheX: Insufficient liquidity");
     }
 
     /**
@@ -659,6 +661,9 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
      * @notice Only the owner can call this function
      */
     function addSynth(address _synth, uint mintFee, uint burnFee) external onlyL1Admin {
+        for(uint i = 0; i < synthsList.length; i++){
+            require(synthsList[i] != _synth, "SyntheX: Synth already added");
+        }
         // Add the synth to the list of synths
         synthsList.push(_synth);
         // Update synth params

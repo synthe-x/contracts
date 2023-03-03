@@ -100,7 +100,7 @@ contract SyntheX is ISyntheX, AccessControlList, UUPSUpgradeable, AddressStorage
      * @param _pool The address of the trading pool
      * @param _speed The reward speed
      */
-    function setPoolSpeeds(address _rewardToken, address _pool, uint _speed, bool _addToList) virtual public onlyL2Admin {
+    function setPoolSpeed(address _rewardToken, address _pool, uint _speed, bool _addToList) virtual public onlyL2Admin {
         // update existing rewards
         address[] memory _rewardTokens = new address[](1);
         _rewardTokens[0] = _rewardToken;
@@ -110,16 +110,11 @@ contract SyntheX is ISyntheX, AccessControlList, UUPSUpgradeable, AddressStorage
         // add to list
         if(_addToList) {
             address[] memory _rewardTokens = rewardTokens[_pool];
-            bool _exists = false;
+            // make sure it doesn't already exist
             for(uint i = 0; i < _rewardTokens.length; i++) {
-                if(_rewardTokens[i] == _rewardToken) {
-                    _exists = true;
-                    break;
-                }
+                require(_rewardTokens[i] != _rewardToken, "SyntheX: Reward token already added to list");
             }
-            if(!_exists) {
-                rewardTokens[_pool].push(_rewardToken);
-            }
+            rewardTokens[_pool].push(_rewardToken);
         }
         // emit successful event
         emit SetPoolRewardSpeed(_rewardToken, _pool, _speed); 

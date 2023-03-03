@@ -53,7 +53,7 @@ export async function initiate(
     ], deployments, {upgradable: true, name: 'POOL_'+poolConfig.symbol});
 
     await poolResult.pool.setIssuerAlloc(poolConfig.issuerAlloc);
-    await contracts.synthex.setPoolSpeed(contracts.sealedSYN.address, poolResult.pool.address, poolConfig.rewardSpeed)
+    await contracts.synthex.setPoolSpeed(contracts.sealedSYN.address, poolResult.pool.address, poolConfig.rewardSpeed, true)
 
     for(let i = 0; i < poolConfig.collaterals.length; i++){
       let cConfig = poolConfig.collaterals[i];
