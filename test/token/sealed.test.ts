@@ -2,6 +2,7 @@ import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import main from "../../scripts/main";
+import { MINTER_ROLE } from '../../scripts/utils/const';
 
 describe("Testing sealed erc20", function () {
 
@@ -23,7 +24,7 @@ describe("Testing sealed erc20", function () {
     })
 
     it("admin should be able to grant role", async function () {
-        await sealed.connect(owner).grantMinterRole(owner.address);
+        await sealed.connect(owner).grantRole(MINTER_ROLE, owner.address);
         expect(await sealed.hasRole(await sealed.MINTER_ROLE(), owner.address)).to.equal(true);
     })
 
@@ -33,7 +34,7 @@ describe("Testing sealed erc20", function () {
     })
 
     it("should not be able to transfer", async function () {
-        await expect(sealed.connect(user1).transfer(user2.address, ethers.utils.parseEther('100'))).to.be.revertedWith("ERC20Sealed: Token is sealed");
+        await expect(sealed.connect(user1).transfer(user2.address, ethers.utils.parseEther('100'))).to.be.revertedWith("Not authorized to transfer");
     })
 
     it('should be able to burn', async function () {

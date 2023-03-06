@@ -2,6 +2,7 @@ import { time, loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
 import main from "../../scripts/main";
+import { MINTER_ROLE } from '../../scripts/utils/const';
 
 describe("Testing unlocker", function () {
 
@@ -18,7 +19,7 @@ describe("Testing unlocker", function () {
         unlockerContract = deployments.unlocker;
 
         // grant MINTER_ROLE to owner
-        await sealed.grantMinterRole(owner.address);
+        await sealed.grantRole(MINTER_ROLE, owner.address);
         // give sealed tokens to user1
         await sealed.mint(user1.address, ethers.utils.parseEther('1000'));
 	});
