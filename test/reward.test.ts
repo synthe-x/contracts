@@ -25,29 +25,28 @@ describe("Rewards", function () {
 
 	it("Should deposit eth", async function () {
 		await synthex.connect(user1).deposit(ETH_ADDRESS, ethers.utils.parseEther("50"), {value: ethers.utils.parseEther("50")});    // $ 50000
-		expect(await synthex.healthFactor(user1.address)).to.equal(ethers.constants.MaxUint256);
+		expect(await synthex.healthFactorOf(user1.address)).to.equal(ethers.constants.MaxUint256);
 
 		await synthex.connect(user2).deposit(ETH_ADDRESS, ethers.utils.parseEther("50"), {value: ethers.utils.parseEther("50")});    // $ 50000
-		expect(await synthex.healthFactor(user2.address)).to.equal(ethers.constants.MaxUint256);
+		expect(await synthex.healthFactorOf(user2.address)).to.equal(ethers.constants.MaxUint256);
 	});
 
 	it("user1 issue synths", async function () {
 		// user1 issues 10 seth
-        await synthex.connect(user1).issue(cryptoPool.address, seth.address, ethers.utils.parseEther("10")); // $ 10000
-        expect(await synthex.getUserTotalDebtUSD(user1.address)).to.be.equal(ethers.utils.parseEther("10000.00"));
+        await seth.connect(user1).mint(ethers.utils.parseEther("10")); // $ 10000
+        expect((await synthex.getAccountLiquidity(user1.address))[1]).to.be.equal(ethers.utils.parseEther("10000.00"));
 	});
 
     it("user2 issue synths", async function () {
 		// user1 issues 10 seth
-        await synthex.connect(user2).issue(cryptoPool.address, seth.address, ethers.utils.parseEther("10")); // $ 10000
-
-        expect(await synthex.getUserTotalDebtUSD(user2.address)).to.be.equal(ethers.utils.parseEther("10000.00"));
+        await seth.connect(user2).mint(ethers.utils.parseEther("10")); // $ 10000
+        expect((await synthex.getAccountLiquidity(user2.address))[1]).to.be.equal(ethers.utils.parseEther("10000.00"));
 	});
 
 	it("burn after 30 days", async function () {
 		await time.increase(86400 * 33);
-        await synthex.connect(user1).burn(cryptoPool.address, seth.address, ethers.utils.parseEther("10")); 
-        await synthex.connect(user2).burn(cryptoPool.address, seth.address, ethers.utils.parseEther("10")); 
+        await seth.connect(user1).burn(ethers.utils.parseEther("10")); 
+        await seth.connect(user2).burn(ethers.utils.parseEther("10")); 
 	})
 	
     it("claim SYN", async function () {

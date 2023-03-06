@@ -100,7 +100,11 @@
       "symbol": "CRY",
       "volatilityRatio": "0.9",
       "rewardSpeed": "0",
-      "fee": "0",
+      "mintFee": "0",
+      "swapFee": "0",
+      "burnFee": "0",
+      "liquidationFee": "0",
+      "liquidationPenalty": "0",
       "issuerAlloc": "0",
       "synths": [
         {
@@ -126,7 +130,11 @@
       "symbol": "CRYLC",
       "volatilityRatio": "0.9",
       "rewardSpeed": "0",
-      "fee": "0",
+      "mintFee": "0",
+      "swapFee": "0",
+      "burnFee": "0",
+      "liquidationFee": "0",
+      "liquidationPenalty": "0",
       "issuerAlloc": "0",
       "synths": [
         {

@@ -6,9 +6,10 @@
     "test:fork": "hardhat --config hardhat-fork.config.ts test --network hardhat",
     "test:fork:custom": "hardhat --config hardhat-fork.config.ts test test/aave/wrap.test.ts --network hardhat",
     "console": "hardhat console",
-    "node": "hardhat node",
+    "create:node": "hardhat node",
     "deploy": "hardhat run scripts --network hardhat",
     "deploy:fork": "hardhat --config hardhat-fork.config.ts run scripts --network hardhat",
+    "deploy:testnet": "hardhat run scripts --network arbitrumGoerli",
     "slither": "slither . --checklist docs/SECURITY.md"
   },
   "devDependencies": {
@@ -38,6 +39,7 @@
     "chai": "^4.3.6",
     "hardhat-openzeppelin-defender": "^1.2.5",
     "solidity-coverage": "^0.8.2",
+    "solidity-docgen": "^0.6.0-beta.34",
     "typechain": "^8.1.1",
     "web3": "^1.8.0"
   }

@@ -7,6 +7,8 @@ import { DEFAULT_ADMIN_ROLE, L1_ADMIN_ROLE, L2_ADMIN_ROLE, GOVERNANCE_MODULE_ROL
 
 export default async function main(isTest: boolean = true) {
 
+	console.log(`Deploying to ${hre.network.name} (${hre.network.config.chainId}) ...`);
+
 	// read deployments and config
 	const deployments = JSON.parse(fs.readFileSync(process.cwd() + `/deployments/${hre.network.config.chainId}/deployments.json`, "utf8"));
 	const config = JSON.parse(fs.readFileSync(process.cwd() + `/deployments/${hre.network.config.chainId}/config.json`, "utf8"));
@@ -36,18 +38,13 @@ export default async function main(isTest: boolean = true) {
 	// set admins
 	if(!isTest) console.log("Setting admins... 💬")
 
-	// renounce sealed syn minter role
-	await contracts.sealedSYN.renounceRole(await contracts.sealedSYN.MINTER_ROLE(), deployer.address);
+	await contracts.synthex.grantRole(DEFAULT_ADMIN_ROLE, config.l0Admin);
+	await contracts.synthex.grantRole(L1_ADMIN_ROLE, config.l1Admin);
+	await contracts.synthex.grantRole(L2_ADMIN_ROLE, config.l2Admin);
 
-	await contracts.system.grantRole(DEFAULT_ADMIN_ROLE, config.l0Admin);
-	await contracts.system.grantRole(L1_ADMIN_ROLE, config.l1Admin);
-	await contracts.system.grantRole(L2_ADMIN_ROLE, config.l2Admin);
-	await contracts.system.grantRole(GOVERNANCE_MODULE_ROLE, config.governanceModule);
-
-	if(deployer.address !== config.l0Admin) await contracts.system.renounceRole(DEFAULT_ADMIN_ROLE, deployer.address);
-	if(deployer.address !== config.l1Admin) await contracts.system.renounceRole(L1_ADMIN_ROLE, deployer.address);
-	if(deployer.address !== config.l2Admin) await contracts.system.renounceRole(L2_ADMIN_ROLE, deployer.address);
-	if(deployer.address !== config.governanceModule) await contracts.system.renounceRole(GOVERNANCE_MODULE_ROLE, deployer.address);
+	if(deployer.address !== config.l0Admin) await contracts.synthex.renounceRole(DEFAULT_ADMIN_ROLE, deployer.address);
+	if(deployer.address !== config.l1Admin) await contracts.synthex.renounceRole(L1_ADMIN_ROLE, deployer.address);
+	if(deployer.address !== config.l2Admin) await contracts.synthex.renounceRole(L2_ADMIN_ROLE, deployer.address);
 	if(!isTest) console.log("Admins set! 🎉")
 
 	// save deployments
