@@ -40,14 +40,15 @@ contract EscrowedSYN is ERC20, ERC20Permit, ERC20Burnable, AccessControl {
      * @notice Sealed tokens can be transferred only by authorized senders
      */
     function _transfer(
-        address,
-        address,
-        uint256
+        address from,
+        address to,
+        uint256 amount
     ) internal virtual override {
         require(
             hasRole(AUTHORIZED_SENDER, msg.sender), 
             "Not authorized to transfer"
         );
+        super._transfer(from, to, amount);
     }
     
     /**

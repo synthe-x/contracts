@@ -18,6 +18,9 @@ import "../utils/vault/FeeVault.sol";
 import "./ISyntheX.sol";
 import "../libraries/PriceConvertor.sol";
 
+// debug
+import "hardhat/console.sol";
+
 /**
  * @title SyntheX
  * @author SyntheX
@@ -86,7 +89,7 @@ contract SyntheX is ISyntheX, AccessControlList, UUPSUpgradeable, AddressStorage
     function distribute(address _account, uint _totalSupply, uint _balance) external override whenNotPaused {
         address[] memory _rewardTokens = rewardTokens[msg.sender];
         _updatePoolRewardIndex(_rewardTokens, msg.sender, _totalSupply);
-        _distributeAccountReward(_rewardTokens, _account, msg.sender, _balance);
+        _distributeAccountReward(_rewardTokens, msg.sender,  _account, _balance);
     }
 
     function distribute(uint _totalSupply) external override whenNotPaused {
@@ -109,6 +112,7 @@ contract SyntheX is ISyntheX, AccessControlList, UUPSUpgradeable, AddressStorage
         rewardSpeeds[_rewardToken][_pool] = _speed;
         // add to list
         if(_addToList) {
+            // override existing list
             address[] memory _rewardTokens = rewardTokens[_pool];
             // make sure it doesn't already exist
             for(uint i = 0; i < _rewardTokens.length; i++) {
@@ -118,7 +122,18 @@ contract SyntheX is ISyntheX, AccessControlList, UUPSUpgradeable, AddressStorage
         }
         // emit successful event
         emit SetPoolRewardSpeed(_rewardToken, _pool, _speed); 
-    } 
+    }
+
+    function removeRewardToken(address _rewardToken, address _pool) external onlyL2Admin {
+        address[] memory _rewardTokens = rewardTokens[_pool];
+        for(uint i = 0; i < _rewardTokens.length; i++) {
+            if(_rewardTokens[i] == _rewardToken) {
+                _rewardTokens[i] = _rewardTokens[_rewardTokens.length - 1];
+                rewardTokens[_pool].pop();
+                break;
+            }
+        }
+    }
     
     /**
      * @notice Accrue rewards to the market
@@ -131,10 +146,13 @@ contract SyntheX is ISyntheX, AccessControlList, UUPSUpgradeable, AddressStorage
             PoolRewardState storage poolRewardState = rewardState[_rewardToken][_pool];
             uint rewardSpeed = rewardSpeeds[_rewardToken][_pool];
             uint deltaTimestamp = block.timestamp - poolRewardState.timestamp;
-            if(deltaTimestamp > 0 && rewardSpeed > 0) {
+            if (deltaTimestamp > 0 && rewardSpeed > 0) {
                 uint synAccrued = deltaTimestamp * rewardSpeed;
-                uint ratio = _totalSupply > 0 ? synAccrued * 1e36 / _totalSupply : 0;
+                uint ratio = _totalSupply > 0 ? synAccrued * rewardInitialIndex / _totalSupply : 0;
                 poolRewardState.index = uint224(poolRewardState.index + ratio);
+                poolRewardState.timestamp = uint32(block.timestamp);
+            }
+            else if (deltaTimestamp > 0) {
                 poolRewardState.timestamp = uint32(block.timestamp);
             }
         }
@@ -158,7 +176,7 @@ contract SyntheX is ISyntheX, AccessControlList, UUPSUpgradeable, AddressStorage
             uint borrowIndex = poolRewardState.index;
             uint accountIndex = rewardIndex[_rewardToken][_pool][_account];
 
-            // Update supplier's index to the current index since we are distributing accrued COMP
+            // Update supplier's index to the current index since we are distributing accrued esSYX
             rewardIndex[_rewardToken][_pool][_account] = borrowIndex;
 
             if (accountIndex == 0 && borrowIndex >= rewardInitialIndex) {
@@ -168,8 +186,8 @@ contract SyntheX is ISyntheX, AccessControlList, UUPSUpgradeable, AddressStorage
                 accountIndex = rewardInitialIndex; // 1e36
             }
 
-            // Calculate change in the cumulative sum of the SYN per debt token accrued
-            uint deltaIndex = borrowIndex - accountIndex;
+            // Calculate change in the cumulative sum of the esSYX per debt token accrued
+            uint deltaIndex = borrowIndex.sub(accountIndex);
 
             // Calculate reward accrued: cTokenAmount * accruedPerCToken
             uint accountDelta = _balance * deltaIndex / 1e36;
@@ -187,8 +205,8 @@ contract SyntheX is ISyntheX, AccessControlList, UUPSUpgradeable, AddressStorage
     /**
      * @notice Claim all SYN accrued by the holders
      * @param _rewardTokens The address of the reward token
-     * @param holder The addresses to claim COMP for
-     * @param _pools The list of markets to claim COMP in
+     * @param holder The addresses to claim esSYX for
+     * @param _pools The list of markets to claim esSYX in
      */
     function claimReward(address[] memory _rewardTokens, address holder, address[] memory _pools) virtual override public {
         // Iterate through all holders and trading pools

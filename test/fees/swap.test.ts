@@ -9,7 +9,7 @@ describe("Testing SwapFee", function () {
 	let synthex: any, vault: any, syn: any, oracle: any, sethPriceFeed: any, sbtcPriceFeed: any, cryptoPool: any, eth: any, susd: any, sbtc: any, seth: any;
 	let owner: any, user1: any, user2: any, user3: any;
 
-	let mintFee = ethers.constants.Zero, burnFee = ethers.constants.Zero, swapFee = ethers.constants.Zero, liqFee = ethers.constants.Zero, liqPenalty = ethers.constants.Zero, issuerAlloc = ethers.constants.Zero;
+	let swapFee = 0, issuerAlloc = 0;
 
 	const setup = async () => {
 		// Contracts are deployed using the first signer/account by default
@@ -19,19 +19,17 @@ describe("Testing SwapFee", function () {
         vault = deployments.vault;
 		synthex = deployments.synthex;
         syn = deployments.syn;
-		oracle = deployments.oracle;
-		cryptoPool = deployments.pools[0];
-		sbtc = deployments.poolSynths[0][0];
-		seth = deployments.poolSynths[0][1];
-		susd = deployments.poolSynths[0][2];
+		oracle = deployments.pools[0].oracle;
+		cryptoPool = deployments.pools[0].pool;
+		sbtc = deployments.pools[0].synths[0];
+		seth = deployments.pools[0].synths[1];
+		susd = deployments.pools[0].synths[2];
 
-        await synthex.connect(user1).deposit(ETH_ADDRESS, ethers.utils.parseEther("50"), {value: ethers.utils.parseEther("50")});    // $ 50000
-        expect((await synthex.getAccountLiquidity(user1.address))[0]).to.be.equal(ethers.utils.parseEther("50000"));
+        await cryptoPool.connect(user1).depositETH({value: ethers.utils.parseEther("50")});    // $ 50000
+        expect((await cryptoPool.getAccountLiquidity(user1.address))[1]).to.be.equal(ethers.utils.parseEther("50000"));
 
-        await synthex.connect(user2).deposit(ETH_ADDRESS, ethers.utils.parseEther("50"), {value: ethers.utils.parseEther("50")});    // $ 50000
-        expect((await synthex.getAccountLiquidity(user2.address))[0]).to.be.equal(ethers.utils.parseEther("50000"));
-
-        await cryptoPool.connect(owner).updateFee(mintFee, swapFee, burnFee, liqPenalty, liqFee, issuerAlloc);
+        await cryptoPool.connect(user2).depositETH({value: ethers.utils.parseEther("50")});    // $ 50000
+        expect((await cryptoPool.getAccountLiquidity(user2.address))[1]).to.be.equal(ethers.utils.parseEther("50000"));
 
         // Mint synths
         await seth.connect(user1).mint(ethers.utils.parseEther("10")); // $ 10000
@@ -43,10 +41,9 @@ describe("Testing SwapFee", function () {
             await setup();
         })
         it("should update fee to 1%", async function () {
-            swapFee = ethers.utils.parseEther("100");
-            await cryptoPool.connect(owner).updateFee(mintFee, swapFee, burnFee, liqPenalty, liqFee, issuerAlloc);
-            expect(await cryptoPool.swapFee()).to.equal(swapFee);
-            expect(await cryptoPool.issuerAlloc()).to.equal(issuerAlloc);
+            swapFee = 100;
+            await cryptoPool.connect(owner).updateSynth(seth.address, {mintFee: swapFee/2, isEnabled: true, burnFee: swapFee/2});
+            await cryptoPool.connect(owner).updateSynth(susd.address, {mintFee: swapFee/2, isEnabled: true, burnFee: swapFee/2});
         });
 
         it("user should be able to swap 10 sETH to 10000 sUSD with 100 sUSD fee", async function () {
@@ -64,9 +61,9 @@ describe("Testing SwapFee", function () {
         });
 
         it("should update fee to 0.1%", async function () {
-            swapFee = ethers.utils.parseEther("10");
-            await cryptoPool.connect(owner).updateFee(mintFee, swapFee, burnFee, liqPenalty, liqFee, issuerAlloc);
-            expect(await cryptoPool.swapFee()).to.equal(swapFee);
+            swapFee = 10;
+            await cryptoPool.connect(owner).updateSynth(seth.address, {mintFee: swapFee/2, isEnabled: true, burnFee: swapFee/2});
+            await cryptoPool.connect(owner).updateSynth(susd.address, {mintFee: swapFee/2, isEnabled: true, burnFee: swapFee/2});
         });
 
         it("user2 should issue synths", async function () {
@@ -92,17 +89,17 @@ describe("Testing SwapFee", function () {
         })
 
         it("should update fee to 1% + 50% issuer alloc", async function () {
-            swapFee = ethers.utils.parseEther("100");
-            issuerAlloc = ethers.utils.parseEther("5000");
-            await cryptoPool.connect(owner).updateFee(mintFee, swapFee, burnFee, liqPenalty, liqFee, issuerAlloc);
-            expect(await cryptoPool.swapFee()).to.equal(swapFee);
-            expect(await cryptoPool.issuerAlloc()).to.equal(issuerAlloc);
+            issuerAlloc = 5000;
+            swapFee = 100;
+            await cryptoPool.connect(owner).updateSynth(seth.address, {mintFee: swapFee/2, isEnabled: true, burnFee: swapFee/2});
+            await cryptoPool.connect(owner).updateSynth(susd.address, {mintFee: swapFee/2, isEnabled: true, burnFee: swapFee/2});
+            await cryptoPool.setIssuerAlloc(issuerAlloc);
         });
 
         it("user should be able to swap 10 sETH to 10000 sUSD with 50 sUSD fee + 50 sUSD burned", async function () {
             // initial liquidity of user1 and user2
-            let initialUser1Debt = (await synthex.getAccountLiquidity(user1.address))[1];
-            let initialUser2Debt = (await synthex.getAccountLiquidity(user2.address))[1];
+            let initialUser1Debt = (await cryptoPool.getAccountLiquidity(user1.address))[2];
+            let initialUser2Debt = (await cryptoPool.getAccountLiquidity(user2.address))[2];
             // user1 swaps 10 seth
             await seth.connect(user1).swap(ethers.utils.parseEther("10"), susd.address);
             // 10000 = 9900 + 100 (1%) fee
@@ -111,8 +108,8 @@ describe("Testing SwapFee", function () {
             let burnedIssuerAlloc = fee.mul(issuerAlloc).div(BASIS_POINTS);
 
             // check if both user1 and user2 debt is reduced by 50/2 sUSD
-            expect((await synthex.getAccountLiquidity(user1.address))[1]).to.be.equal(initialUser1Debt.sub(burnedIssuerAlloc.div(2)));
-            expect((await synthex.getAccountLiquidity(user2.address))[1]).to.be.equal(initialUser2Debt.sub(burnedIssuerAlloc.div(2)));
+            expect((await cryptoPool.getAccountLiquidity(user1.address))[2]).to.be.equal(initialUser1Debt.sub(burnedIssuerAlloc.div(2)));
+            expect((await cryptoPool.getAccountLiquidity(user2.address))[2]).to.be.equal(initialUser2Debt.sub(burnedIssuerAlloc.div(2)));
 
             // vault balance should be fee
             expect(await susd.balanceOf(vault.address)).to.be.equal(fee.sub(burnedIssuerAlloc));
@@ -123,17 +120,17 @@ describe("Testing SwapFee", function () {
         });
 
         it("should update fee to 0.1% + 80% issuer alloc", async function () {
-            swapFee = ethers.utils.parseEther("10");
-            issuerAlloc = ethers.utils.parseEther("8000");
-            await cryptoPool.connect(owner).updateFee(mintFee, swapFee, burnFee, liqPenalty, liqFee, issuerAlloc);
-            expect(await cryptoPool.swapFee()).to.equal(swapFee);
-            expect(await cryptoPool.issuerAlloc()).to.equal(issuerAlloc);
+            issuerAlloc = 8000;
+            swapFee = 10;
+            await cryptoPool.connect(owner).updateSynth(seth.address, {mintFee: swapFee/2, isEnabled: true, burnFee: swapFee/2});
+            await cryptoPool.connect(owner).updateSynth(susd.address, {mintFee: swapFee/2, isEnabled: true, burnFee: swapFee/2});
+            await cryptoPool.setIssuerAlloc(issuerAlloc);
         });
 
         it("user should be able to swap 10 sETH to 10000 sUSD with 50 sUSD fee + 50 sUSD burned", async function () {
             // initial liquidity of user1 and user2
-            let initialUser1Debt = (await synthex.getAccountLiquidity(user1.address))[1];
-            let initialUser2Debt = (await synthex.getAccountLiquidity(user2.address))[1];
+            let initialUser1Debt = (await cryptoPool.getAccountLiquidity(user1.address))[2];
+            let initialUser2Debt = (await cryptoPool.getAccountLiquidity(user2.address))[2];
             // initial vault balance
             let initialVaultBalance = await susd.balanceOf(vault.address);
             // user1 swaps 10 seth
@@ -144,8 +141,8 @@ describe("Testing SwapFee", function () {
             let burnedIssuerAlloc = fee.mul(issuerAlloc).div(BASIS_POINTS);
 
             // check if both user1 and user2 debt is reduced by 50/2 sUSD
-            expect((await synthex.getAccountLiquidity(user1.address))[1]).to.be.equal(initialUser1Debt.sub(burnedIssuerAlloc.div(2)));
-            expect((await synthex.getAccountLiquidity(user2.address))[1]).to.be.equal(initialUser2Debt.sub(burnedIssuerAlloc.div(2)));
+            expect((await cryptoPool.getAccountLiquidity(user1.address))[2]).to.be.equal(initialUser1Debt.sub(burnedIssuerAlloc.div(2)));
+            expect((await cryptoPool.getAccountLiquidity(user2.address))[2]).to.be.equal(initialUser2Debt.sub(burnedIssuerAlloc.div(2)));
 
             // vault balance should be fee
             expect(await susd.balanceOf(vault.address)).to.be.equal(initialVaultBalance.add(fee).sub(burnedIssuerAlloc));
