@@ -16,6 +16,9 @@ contract Vault {
     // AddressStorage contract
     SyntheX public synthex;
 
+
+    fallback() external payable {}
+
     /**
      * @dev Constructor
      * @param _synthex System contract address
