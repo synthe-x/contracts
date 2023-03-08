@@ -6,8 +6,7 @@
   "l1Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
   "l2Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
   "governanceModule": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-  "safeCRatio": "1.3",
-  "debtRewardAlloc": "1000000",
+  "rewardAlloc": "100000000000",
   "stakingRewards": {
     "reward": "0",
     "days": "0"
@@ -22,8 +21,8 @@
     {
       "name": "Crypto Market",
       "symbol": "C",
-      "rewardSpeed": "0",
-      "issuerAlloc": "0",
+      "rewardSpeed": "1",
+      "issuerAlloc": "5000",
       "collaterals": [
         {
           "name": "Ethereum",
@@ -35,7 +34,7 @@
             "cap": "100000000000000000000000",
             "baseLTV": "8000",
             "liqThreshold": "9000",
-            "liqBonus": "10100",
+            "liqBonus": "10500",
             "liqProtocolFee": "1000"
           }
         },
@@ -48,7 +47,7 @@
             "cap": "100000000000000000000000",
             "baseLTV": "8000",
             "liqThreshold": "9000",
-            "liqBonus": "10100",
+            "liqBonus": "10500",
             "liqProtocolFee": "1000"
           }
         },
@@ -59,9 +58,9 @@
           "price": "100",
           "params": {
             "cap": "100000000000000000000000",
-            "baseLTV": "8000",
+            "baseLTV": "7000",
             "liqThreshold": "9000",
-            "liqBonus": "10100",
+            "liqBonus": "10500",
             "liqProtocolFee": "1000"
           }
         },
@@ -72,9 +71,9 @@
           "price": "10",
           "params": {
             "cap": "100000000000000000000000",
-            "baseLTV": "8000",
+            "baseLTV": "7500",
             "liqThreshold": "9000",
-            "liqBonus": "10100",
+            "liqBonus": "10500",
             "liqProtocolFee": "1000"
           }
         },
@@ -87,7 +86,7 @@
             "cap": "100000000000000000000000",
             "baseLTV": "8000",
             "liqThreshold": "9000",
-            "liqBonus": "10100",
+            "liqBonus": "10500",
             "liqProtocolFee": "1000"
           }
         }
@@ -97,52 +96,52 @@
           "name": "Bitcoin",
           "symbol": "BTC",
           "price": "10000",
-          "mintFee": "0",
-          "burnFee": "0"
+          "mintFee": "6",
+          "burnFee": "6"
         },
         {
           "name": "Ethereum",
           "symbol": "ETH",
           "price": "1000",
-          "mintFee": "0",
-          "burnFee": "0"
+          "mintFee": "3",
+          "burnFee": "3"
         },
         {
           "name": "USD Coin",
           "symbol": "USDC",
           "price": "1.00",
           "isFeeToken": true,
-          "mintFee": "0",
-          "burnFee": "0"
+          "mintFee": "2",
+          "burnFee": "2"
         },
         {
           "name": "ChainLink",
           "symbol": "LINK",
           "price": "7.38",
-          "mintFee": "0",
-          "burnFee": "0"
+          "mintFee": "10",
+          "burnFee": "10"
         },
         {
           "name": "Solana",
           "symbol": "SOL",
           "price": "22.56",
-          "mintFee": "0",
-          "burnFee": "0"
+          "mintFee": "10",
+          "burnFee": "10"
         },
         {
           "name": "Optimism",
           "symbol": "OP",
           "price": "2.76",
-          "mintFee": "0",
-          "burnFee": "0"
+          "mintFee": "10",
+          "burnFee": "10"
         }
       ]
     },
     {
       "name": "Foreign Exchange",
       "symbol": "F",
-      "rewardSpeed": "0",
-      "issuerAlloc": "0",
+      "rewardSpeed": "1",
+      "issuerAlloc": "5000",
       "collaterals": [
         {
           "name": "USD Coin",
@@ -190,50 +189,50 @@
           "symbol": "USD",
           "price": "1.00",
           "isFeeToken": true,
-          "mintFee": "0",
-          "burnFee": "0"
+          "mintFee": "2",
+          "burnFee": "2"
         },
         {
           "name": "Euro",
           "symbol": "EUR",
           "price": "0.85",
-          "mintFee": "0",
-          "burnFee": "0"
+          "mintFee": "2",
+          "burnFee": "2"
         },
         {
           "name": "Japanese Yen",
           "symbol": "JPY",
           "price": "0.0094",
-          "mintFee": "0",
-          "burnFee": "0"
+          "mintFee": "4",
+          "burnFee": "4"
         },
         {
           "name": "Canadian Dollar",
           "symbol": "CAD",
           "price": "0.80",
-          "mintFee": "0",
-          "burnFee": "0"
+          "mintFee": "4",
+          "burnFee": "4"
         },
         {
           "name": "Korean Republic won",
           "symbol": "WON",
           "price": "0.0009",
-          "mintFee": "0",
-          "burnFee": "0"
+          "mintFee": "4",
+          "burnFee": "4"
         },
         {
           "name": "UAE Dirham",
           "symbol": "AED",
           "price": "0.27",
-          "mintFee": "0",
-          "burnFee": "0"
+          "mintFee": "4",
+          "burnFee": "4"
         },
         {
           "name": "Indian Rupee",
           "symbol": "INR",
           "price": "0.013",
-          "mintFee": "0",
-          "burnFee": "0"
+          "mintFee": "4",
+          "burnFee": "4"
         }
       ]
     }

@@ -35,8 +35,7 @@ describe("Testing wrapped atokens", function () {
 
         it("check initial exchange rate", async function () {
             exchangeRate = await waEthWETH.exchangeRate();
-            expect(exchangeRate).to.equal(ethers.utils.parseEther("1"))
-
+            expect(exchangeRate).to.equal(ethers.utils.parseEther("1"));
         })
 
         it("get aEthWETH from aave", async () => {

@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "../EscrowedSYN.sol";
 import "../SyntheXToken.sol";
 
 import "../../synthex/SyntheX.sol";

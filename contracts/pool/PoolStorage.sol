@@ -46,7 +46,6 @@ contract PoolStorage {
         uint256 baseLTV;        // Base loan to value ratio (in bps) 80% = 8000
         uint256 liqThreshold;   // Liquidation threshold (in bps) 90% = 9000
         uint256 liqBonus;       // Liquidation bonus (in bps) 5% = 500
-        uint256 liqProtocolFee; // Liquidation protocol fee (% of bonus) (in bps) 10% = 1000
     }
 
     /// @notice Mapping from collateral asset address to collateral data

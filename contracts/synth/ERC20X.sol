@@ -23,7 +23,7 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
 
     // TradingPool that owns this token
     Pool public pool; 
-    // System contract
+    // System contract 
     SyntheX public synthex;
     /// @notice Fee charged for flash loan % in BASIS_POINTS
     uint public flashLoanFee;
@@ -56,8 +56,10 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
     function mint(uint256 amount) external whenNotPaused {
         // ensure amount is greater than 0
         require(amount > 0, "SynthERC20: Amount must be greater than 0");
-        amount = pool.commitMint(msg.sender, amount);
-        _mint(msg.sender, amount);
+        uint amountToMint = pool.commitMint(msg.sender, amount);
+        // ensure amount to mint is less than input amount
+        require(amountToMint < amount);
+        _mint(msg.sender, amountToMint);
     }
 
     /**
@@ -67,6 +69,7 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
     function burn(uint256 amount) external whenNotPaused {
         require(amount > 0, "SynthERC20: Amount must be greater than 0");
         amount = pool.commitBurn(msg.sender, amount);
+        // TODO sanity check
         _burn(msg.sender, amount);
     }
 
@@ -78,6 +81,7 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
     function swap(uint256 amount, address synthTo) external whenNotPaused {
         require(amount > 0, "SynthERC20: Amount must be greater than 0");
         amount = pool.commitSwap(msg.sender, amount, synthTo);
+        // TODO sanity check
         _burn(msg.sender, amount);
     }
 
@@ -87,6 +91,7 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
     function liquidate(address account, uint256 amount, address outAsset) external whenNotPaused {
         require(amount > 0, "SynthERC20: Amount must be greater than 0");
         amount = pool.commitLiquidate(msg.sender, account, amount, outAsset);
+        // TODO sanity check
         _burn(msg.sender, amount);
     }
 
@@ -134,4 +139,8 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
         token;
         return amount.mul(flashLoanFee).div(BASIS_POINTS);
     }    
+
+    function _flashFeeReceiver() internal view override returns (address) {
+        return synthex.vault();
+    }
 }

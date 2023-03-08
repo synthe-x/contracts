@@ -19,4 +19,4 @@ export const BURNER_ROLE = ethers.utils.id('BURNER_ROLE');
 export const PAUSER_ROLE = ethers.utils.id('PAUSER_ROLE');
 export const AUTHORIZED_SENDER = ethers.utils.id('AUTHORIZED_SENDER');
 
-export const BASIS_POINTS = ethers.utils.parseEther('10000');
+export const BASIS_POINTS = '10000';

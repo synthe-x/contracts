@@ -18,8 +18,6 @@ describe('Testing liquidation', function () {
     seth: any
   let owner: any, user1: any, user2: any, user3: any
 
-  let liqHealthFactor = ethers.utils.parseEther('1.00')
-
   const setup = async () => {
     // Contracts are deployed using the first signer/account by default
     ;[owner, user1, user2, user3] = await ethers.getSigners()
@@ -57,7 +55,7 @@ describe('Testing liquidation', function () {
   }
 
   describe('Liquidation @ 85', function () {
-    beforeAll(async function () {
+    before(async function () {
       await setup()
       // If we increase BTC price 1.25x, Total debt = 260000
       // Then User1 debt = 86666, User2 debt = 86666, User3 debt = 86666
@@ -77,19 +75,12 @@ describe('Testing liquidation', function () {
   })
 
   describe('Liquidation @ 90', function () {
-    beforeAll(async function () {
+    before(async function () {
       await setup()
-      // If we increase BTC price 1.25x, Total debt = 260000
-      // Then User1 debt = 86666, User2 debt = 86666, User3 debt = 86666
-
       // If we increase BTC price 1.5x, Total debt = 280000
       // Then User1 debt = 93333, User2 debt = 93333, User3 debt = 93333
-
-      // If we increase BTC price 1.73x, Total debt = 298...
-      // Then User1 debt = 995.., User2 debt = 995.., User3 debt = 995..
-
-      // increasing btc price to $80000
-      await sbtcPriceFeed.setPrice(ethers.utils.parseUnits('80000', 8), 8)
+      // increasing btc price to $15000
+      await sbtcPriceFeed.setPrice(ethers.utils.parseUnits('15000', 8), 8)
 
       // check health factor
       const user1Liq = await pool.getAccountLiquidity(user1.address);
@@ -101,40 +92,38 @@ describe('Testing liquidation', function () {
       expect(user2Liq[0]).to.be.lessThan(0);
     })
 
-    it('user2 liquidates user1 with 0.05 BTC ($4000)', async function () {
-      expect(await synthex.healthFactorOf(user1.address)).to.equal(
-        liqHealthFactor,
-      )
-      // liquidate 0.05 BTC
-      await sbtc
-        .connect(user2)
-        .liquidate(user1.address, ethers.utils.parseEther('0.05'), ETH_ADDRESS)
+    it('user2 liquidates user1 with 1 BTC ($15000)', async function () {
+      const initialLiq = await pool.getAccountLiquidity(user1.address);
 
-      // check health factor
-      const liqHealthFactorNow = await synthex.healthFactorOf(user1.address)
-      expect(liqHealthFactorNow).to.be.lessThan(ethers.utils.parseEther('1.00'))
-      expect(liqHealthFactorNow).to.be.greaterThan(liqHealthFactor)
-      liqHealthFactor = liqHealthFactorNow
-      expect(await synthex.healthFactorOf(user2.address)).to.be.greaterThan(
-        ethers.utils.parseEther('1.00'),
-      )
-    })
-
-    it('user2 completely liquidates user1', async function () {
+      expect(initialLiq[2]/initialLiq[1]).to.be.closeTo(0.9333333, 0.000001)
       // liquidate 1 BTC
       await sbtc
         .connect(user2)
         .liquidate(user1.address, ethers.utils.parseEther('1'), ETH_ADDRESS)
 
+        
       // check health factor
-      const user1Liquidity = await synthex.getAccountLiquidity(user1.address)
-      expect(user1Liquidity[1]).to.be.closeTo(0, 1e8)
-      expect(await synthex.healthFactorOf(user1.address)).to.be.greaterThan(
-        ethers.utils.parseEther('100'),
-      )
-      expect(await synthex.healthFactorOf(user2.address)).to.be.greaterThan(
-        ethers.utils.parseEther('1.00'),
-      )
+      const liqNow = await pool.getAccountLiquidity(user1.address)
+      expect(liqNow[2]/liqNow[1]).to.be.closeTo(initialLiq[2]/initialLiq[1], 0.001)
+
+      // check if user2 got bonus
+      expect(await pool.accountCollateralBalance(user2.address, ETH_ADDRESS)).to.be.eq(ethers.utils.parseEther('11575').div(100))
+    })
+
+    it('user2 completely liquidates user1', async function () {
+      const initialLiqBalance = await pool.accountCollateralBalance(user2.address, ETH_ADDRESS);
+
+      // liquidate 6 BTC
+      await sbtc
+        .connect(user2)
+        .liquidate(user1.address, ethers.utils.parseEther('6'), ETH_ADDRESS)
+
+      // check health factor
+      const liqNow = await pool.getAccountLiquidity(user1.address)
+      expect(liqNow[2]).to.be.closeTo(0, 1e6)
+      expect(liqNow[1]).to.be.closeTo(ethers.utils.parseEther('100'), ethers.utils.parseEther('100'))
+
+      expect(await pool.accountCollateralBalance(user2.address, ETH_ADDRESS)).to.be.closeTo(initialLiqBalance.add(ethers.utils.parseEther('83')), ethers.utils.parseEther("2"))
     })
 
     it('tries to liquidate again', async function () {
@@ -143,50 +132,18 @@ describe('Testing liquidation', function () {
         sbtc
           .connect(user2)
           .liquidate(user1.address, ethers.utils.parseEther('1'), ETH_ADDRESS),
-      ).to.be.revertedWith('Invalid tokenOut amount')
-    })
-  })
-
-  describe('Liquidation @ 95', function () {
-    beforeAll(async function () {
-      await setup()
-      // If we increase BTC price 1.25x, Total debt = 260000
-      // Then User1 debt = 86666, User2 debt = 86666, User3 debt = 86666
-
-      // If we increase BTC price 1.5x, Total debt = 280000
-      // Then User1 debt = 93333, User2 debt = 93333, User3 debt = 93333
-
-      // If we increase BTC price 1.73x, Total debt = 298...
-      // Then User1 debt = 995.., User2 debt = 995.., User3 debt = 995..
-
-      // increasing btc price to $80000
-      await sbtcPriceFeed.setPrice(ethers.utils.parseUnits('80000', 8), 8)
-
-      // check health factor
-      const user1Liq = await pool.getAccountLiquidity(user1.address);
-      const user2Liq = await pool.getAccountLiquidity(user2.address);
-
-      expect(user1Liq[0]).to.be.lessThan(0);
-      expect(user1Liq[2].mul(ethers.constants.WeiPerEther).div(user1Liq[1])).to.be.greaterThan(ethers.constants.WeiPerEther.mul(9).div(10))
-
-      expect(user2Liq[0]).to.be.lessThan(0);
+      ).to.be.revertedWith('Account health factor below liquidation threshold')
     })
   })
 
   describe('Liquidation @ 99.5', function () {
-    beforeAll(async function () {
+    before(async function () {
       await setup()
-      // If we increase BTC price 1.25x, Total debt = 260000
-      // Then User1 debt = 86666, User2 debt = 86666, User3 debt = 86666
-
-      // If we increase BTC price 1.5x, Total debt = 280000
-      // Then User1 debt = 93333, User2 debt = 93333, User3 debt = 93333
-
       // If we increase BTC price 1.73x, Total debt = 298...
       // Then User1 debt = 995.., User2 debt = 995.., User3 debt = 995..
 
-      // increasing btc price to $80000
-      await sbtcPriceFeed.setPrice(ethers.utils.parseUnits('80000', 8), 8)
+      // increasing btc price to $17300
+      await sbtcPriceFeed.setPrice(ethers.utils.parseUnits('17300', 8), 8)
 
       // check health factor
       const user1Liq = await pool.getAccountLiquidity(user1.address);
@@ -197,16 +154,54 @@ describe('Testing liquidation', function () {
 
       expect(user2Liq[0]).to.be.lessThan(0);
     })
+
+    it('user2 liquidates user1 with 1 BTC ($15000)', async function () {
+      const initialLiq = await pool.getAccountLiquidity(user1.address);
+
+      expect(initialLiq[2]/initialLiq[1]).to.be.closeTo(0.995, 0.001)
+      // liquidate 1 BTC
+      await sbtc
+        .connect(user2)
+        .liquidate(user1.address, ethers.utils.parseEther('1'), ETH_ADDRESS)
+
+        
+      // check health factor
+      const liqNow = await pool.getAccountLiquidity(user1.address)
+      expect(liqNow[2]/liqNow[1]).to.be.closeTo(initialLiq[2]/initialLiq[1], 0.001)
+
+      // check if user2 got bonus
+      expect(await pool.accountCollateralBalance(user2.address, ETH_ADDRESS)).to.be.closeTo(ethers.utils.parseEther('11730').div(100), ethers.utils.parseEther('0.1'))
+    })
+
+    it('user2 completely liquidates user1', async function () {
+      const initialLiqBalance = await pool.accountCollateralBalance(user2.address, ETH_ADDRESS);
+
+      // liquidate 6 BTC
+      await sbtc
+        .connect(user2)
+        .liquidate(user1.address, ethers.utils.parseEther('7'), ETH_ADDRESS)
+
+      // check health factor
+      const liqNow = await pool.getAccountLiquidity(user1.address)
+      expect(liqNow[2]).to.be.closeTo(0, 1e6)
+      expect(liqNow[1]).to.be.closeTo(ethers.utils.parseEther('100'), ethers.utils.parseEther('100'))
+
+      expect(await pool.accountCollateralBalance(user2.address, ETH_ADDRESS)).to.be.closeTo(initialLiqBalance.add(ethers.utils.parseEther('83')), ethers.utils.parseEther("2"))
+    })
+
+    it('tries to liquidate again', async function () {
+      // expect tx to revert
+      await expect(
+        sbtc
+          .connect(user2)
+          .liquidate(user1.address, ethers.utils.parseEther('1'), ETH_ADDRESS),
+      ).to.be.revertedWith('Account health factor below liquidation threshold')
+    })
   })
 
   describe('Liquidation @ 100.5', function () {
-    beforeAll(async function () {
+    before(async function () {
       await setup()
-      // If we increase BTC price 1.25x, Total debt = 260000
-      // Then User1 debt = 86666, User2 debt = 86666, User3 debt = 86666
-
-      // If we increase BTC price 1.5x, Total debt = 280000
-      // Then User1 debt = 93333, User2 debt = 93333, User3 debt = 93333
 
       // If we increase BTC price 1.73x, Total debt = 298...
       // Then User1 debt = 995.., User2 debt = 995.., User3 debt = 995..
