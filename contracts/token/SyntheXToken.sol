@@ -13,7 +13,7 @@ contract SyntheXToken is ERC20, ERC20Burnable, Pausable, ERC20Permit {
     /// @notice System contract to check access control
     SyntheX public synthex;
 
-    constructor(address _synthex) ERC20("SyntheX Token", "SYN") ERC20Permit("SyntheX Token") {
+    constructor(address _synthex) ERC20("SyntheX Token", "SYX") ERC20Permit("SyntheX Token") {
         synthex = SyntheX(_synthex);
     }
 

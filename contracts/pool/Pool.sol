@@ -490,7 +490,6 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
             }
         }
 
-
         accountCollateralBalance[_account][_outAsset] = accountCollateralBalance[_account][_outAsset].sub(vars.amountOut.add(vars.penalty).add(vars.refundOut));
 
         // Add collateral to liquidator
@@ -504,7 +503,7 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
         vars.amountUSD = vars.amountOut.toUSD(vars.prices[1]);
         _burn(_account, totalSupply().mul(vars.amountUSD).div(getTotalDebtUSD()));
 
-        // mint burn fee - issuerAlloc to vault
+        // send (burn fee - issuerAlloc) in feeToken to vault
         uint fee = vars.amountUSD.mul(synths[msg.sender].burnFee).div(BASIS_POINTS);
         ERC20X(feeToken).mintInternal(
             synthex.vault(),
@@ -512,6 +511,8 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
             .div(BASIS_POINTS)                                  // for multiplying issuerAlloc
             .toToken(vars.prices[2])
         );
+
+        emit Liquidate(_liquidator, _account, _outAsset, vars.amountOut, vars.penalty, vars.refundOut);
 
         // amount (in synth) plus burn fee
         return vars.amountUSD.toToken(vars.prices[0]).mul(BASIS_POINTS.add(synths[msg.sender].burnFee)).div(BASIS_POINTS);

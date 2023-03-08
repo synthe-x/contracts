@@ -2,7 +2,9 @@
 pragma solidity ^0.8.0;
 // import "../interfaces/IChainlinkAggregator.sol";
 
-contract MockPriceFeed /*is IChainlinkAggregator*/ {
+import "@openzeppelin/contracts/access/Ownable.sol";
+
+contract MockPriceFeed is Ownable /*is IChainlinkAggregator*/ {
     int public price;
     uint8 private _decimals;
 
@@ -11,7 +13,7 @@ contract MockPriceFeed /*is IChainlinkAggregator*/ {
         _decimals = __decimals;
     }
 
-    function setPrice(int _price, uint8 __decimals) public {
+    function setPrice(int _price, uint8 __decimals) public onlyOwner {
         price = _price;
         _decimals = __decimals;
     }

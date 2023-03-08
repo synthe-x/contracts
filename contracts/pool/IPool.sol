@@ -56,6 +56,7 @@ abstract contract IPool is PoolStorage {
     event CollateralExited(address indexed user, address indexed collateral);
     event Deposit(address indexed user, address indexed asset, uint256 amount);
     event Withdraw(address indexed user, address indexed asset, uint256 amount);
+    event Liquidate(address indexed liquidator, address indexed account, address indexed outAsset, uint256 outAmount, uint256 outPenalty, uint256 outRefund);
     event IssuerAllocUpdated(uint issuerAlloc);
     event PriceOracleUpdated(address indexed priceOracle);
     event FeeTokenUpdated(address indexed feeToken);
