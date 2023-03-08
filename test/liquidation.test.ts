@@ -202,11 +202,6 @@ describe('Testing liquidation', function () {
   describe('Liquidation @ 100.5', function () {
     before(async function () {
       await setup()
-      // If we increase BTC price 1.25x, Total debt = 260000
-      // Then User1 debt = 86666, User2 debt = 86666, User3 debt = 86666
-
-      // If we increase BTC price 1.5x, Total debt = 280000
-      // Then User1 debt = 93333, User2 debt = 93333, User3 debt = 93333
 
       // If we increase BTC price 1.73x, Total debt = 298...
       // Then User1 debt = 995.., User2 debt = 995.., User3 debt = 995..

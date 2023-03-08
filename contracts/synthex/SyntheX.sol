@@ -12,11 +12,7 @@ import "./AddressStorage.sol";
 import "./AccessControlList.sol";
 
 import "../pool/Pool.sol";
-import "../token/SyntheXToken.sol";
-import "../utils/oracle/IPriceOracle.sol";
-import "../utils/vault/FeeVault.sol";
 import "./ISyntheX.sol";
-import "../libraries/PriceConvertor.sol";
 
 // debug
 import "hardhat/console.sol";

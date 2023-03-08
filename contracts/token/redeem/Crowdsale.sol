@@ -3,7 +3,6 @@ pragma solidity ^0.8.0;
 
 import "../SyntheXToken.sol";
 import "../../synthex/SyntheX.sol";
-import "../EscrowedSYN.sol";
 import "./BaseTokenRedeemer.sol";
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -13,8 +12,8 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 
-// Crowdsale contract that allows users to buy SYN tokens with ETH
-// Issued tokens are released after 180 days
+// Crowdsale contract that allows users to buy SYN tokens with ETH/ERC20 tokens
+// Token release is based on TokenRedeemer contract
 contract Crowdsale is BaseTokenRedeemer, ReentrancyGuard, Pausable {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;

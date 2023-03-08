@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "../EscrowedSYX.sol";
-import "./BaseTokenRedeemer.sol";
+import "../../token/redeem/BaseTokenRedeemer.sol";
 
 import "../../synthex/SyntheX.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -42,7 +41,7 @@ contract MockTokenRedeemer is BaseTokenRedeemer, Pausable {
         uint _percUnlockAtRelease
     ) BaseTokenRedeemer(_TOKEN, _lockPeriod, _unlockPeriod, _percUnlockAtRelease) {
         synthex = SyntheX(_system);
-        LOCKED_TOKEN = EscrowedSYX(_LOCKED_TOKEN);
+        LOCKED_TOKEN = IERC20(_LOCKED_TOKEN);
     }
 
     /* -------------------------------------------------------------------------- */

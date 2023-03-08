@@ -20,8 +20,9 @@ import "hardhat/console.sol";
  * @author SyntheX
  * @custom:security-contact prasad@chainscore.finance
  * @notice Sealed tokens can only be transferred by authorized senders
+ * @notice SNX tokens can be converted to esSYX for earning protocol fees/rewards (in WETH) and governance (ERC20Votes)
+ * @notice Protocol rewards are distributed in esSYX tokens
  * @notice esSNX tokens can be redeemed for SYX tokens, with a lock period, unlock period and percentage unlock at release
- * @notice esSNX tokens can be converted to esSYX for rewards and gov
  */
 contract EscrowedSYX is ERC20Votes, ERC20Burnable, IStaking, BaseTokenRedeemer, AccessControl, Pausable {
     using SafeMath for uint256;
@@ -290,5 +291,4 @@ contract EscrowedSYX is ERC20Votes, ERC20Burnable, IStaking, BaseTokenRedeemer, 
         require(_amount <= remainingQuota(), "Not enough SYN to withdraw");
         TOKEN.safeTransfer(msg.sender, _amount);
     }
-
 }
