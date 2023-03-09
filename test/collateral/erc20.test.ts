@@ -3,6 +3,7 @@ import { expect } from "chai";
 import { ethers } from "hardhat";
 import { ETH_ADDRESS } from "../../scripts/utils/const";
 import main from "../../scripts/main";
+import hre from 'hardhat';
 
 describe("Rewards", function () {
 	let synthex: any,
@@ -49,7 +50,7 @@ describe("Rewards", function () {
 		const domain = {
 			name: await weth.name(),
 			version: "1",
-			chainId: 31337,
+			chainId: hre.network.config.chainId,
 			verifyingContract: weth.address,
 		};
 
