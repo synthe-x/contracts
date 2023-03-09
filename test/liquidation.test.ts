@@ -4,6 +4,7 @@ import { expect } from 'chai'
 import { ethers } from 'hardhat'
 import main from '../scripts/main'
 import { ETH_ADDRESS } from '../scripts/utils/const'
+import { ERRORS } from '../scripts/utils/errors'
 
 describe('Testing liquidation', function () {
   let synthex: any,
@@ -78,7 +79,7 @@ describe('Testing liquidation', function () {
         sbtc
           .connect(user2)
           .liquidate(user1.address, ethers.utils.parseEther('1'), ETH_ADDRESS)
-      ).to.be.revertedWith('Account health factor below liquidation threshold')
+      ).to.be.revertedWith(ERRORS.ACCOUNT_BELOW_LIQ_THRESHOLD)
     });
   })
 
@@ -140,7 +141,7 @@ describe('Testing liquidation', function () {
         sbtc
           .connect(user2)
           .liquidate(user1.address, ethers.utils.parseEther('1'), ETH_ADDRESS),
-      ).to.be.revertedWith('Account health factor below liquidation threshold')
+      ).to.be.revertedWith(ERRORS.ACCOUNT_BELOW_LIQ_THRESHOLD)
     })
   })
 

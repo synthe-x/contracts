@@ -10,7 +10,7 @@ import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
 import "../synthex/SyntheX.sol";
 import "../utils/interfaces/IStaking.sol";
 import "./redeem/BaseTokenRedeemer.sol";
-
+import "../libraries/Errors.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 
 import "hardhat/console.sol";
@@ -223,17 +223,6 @@ contract EscrowedSYX is ERC20Votes, ERC20Burnable, IStaking, BaseTokenRedeemer, 
         _unpause();
     }
 
-    /**
-     * @notice Withdraw SYN from the contract
-     * @param _amount Amount of SYN to withdraw
-     * @dev This function is only used to withdraw extra SYN from the contract
-     * @dev Reserved amount for unlock will not be withdrawn
-     */
-    function withdraw(uint _amount) external onlyL1Admin {
-        require(_amount <= remainingQuota(), "Not enough SYN to withdraw");
-        TOKEN.safeTransfer(msg.sender, _amount);
-    }
-
     /* -------------------------------------------------------------------------- */
     /*                                  Modifiers                                 */
     /* -------------------------------------------------------------------------- */
@@ -251,12 +240,12 @@ contract EscrowedSYX is ERC20Votes, ERC20Burnable, IStaking, BaseTokenRedeemer, 
     }
 
     modifier onlyL2Admin() {
-        require(synthex.isL2Admin(msg.sender), "Caller is not an admin");
+        require(synthex.isL2Admin(msg.sender), Errors.CALLER_NOT_L2_ADMIN);
         _;
     }
 
     modifier onlyL1Admin() {
-        require(synthex.isL1Admin(msg.sender), "Caller is not an admin");
+        require(synthex.isL1Admin(msg.sender), Errors.CALLER_NOT_L1_ADMIN);
         _;
     }
 
@@ -292,7 +281,7 @@ contract EscrowedSYX is ERC20Votes, ERC20Burnable, IStaking, BaseTokenRedeemer, 
     ) internal virtual override updateReward(from) updateReward(to) {
         require(
             hasRole(AUTHORIZED_SENDER, msg.sender), 
-            "Not authorized to transfer"
+            Errors.TRANSFER_FAILED
         );
         super._transfer(from, to, amount);
     }

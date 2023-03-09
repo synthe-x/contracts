@@ -3,6 +3,7 @@ import { expect } from "chai";
 import { ethers } from "hardhat";
 import main from "../../scripts/main";
 import { AUTHORIZED_SENDER } from '../../scripts/utils/const';
+import { ERRORS } from '../../scripts/utils/errors';
 
 describe("Testing seal of esSYX", function () {
 
@@ -31,7 +32,7 @@ describe("Testing seal of esSYX", function () {
     })
 
     it("should not be able to transfer", async function () {
-        await expect(esSYX.connect(user1).transfer(user2.address, amount.div(2))).to.be.revertedWith("Not authorized to transfer");
+        await expect(esSYX.connect(user1).transfer(user2.address, amount.div(2))).to.be.revertedWith(ERRORS.TRANSFER_FAILED);
     })
 
     it("should be able to transfer & transferFrom after getting authorized", async function () {

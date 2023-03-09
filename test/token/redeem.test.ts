@@ -3,6 +3,7 @@ import { expect } from "chai";
 import { ethers } from "hardhat";
 import main from "../../scripts/main";
 import { MINTER_ROLE } from '../../scripts/utils/const';
+import { ERRORS } from "../../scripts/utils/errors";
 
 describe("Testing unlocker", function () {
 
@@ -70,7 +71,7 @@ describe("Testing unlocker", function () {
 
     it("index1: should not able to unlock", async function () {
         const requestId = ethers.utils.solidityKeccak256(['address', 'uint256'], [user1.address, '1']);
-        await expect(esSYX.connect(user1).claimUnlocked([requestId])).to.be.revertedWith("Unlock period has not passed");
+        await expect(esSYX.connect(user1).claimUnlocked([requestId])).to.be.revertedWith(ERRORS.UNLOCK_NOT_STARTED);
     })
 
     it("index0: unlock after lockPeriod, 60/180 of unlockPeriod", async function () {

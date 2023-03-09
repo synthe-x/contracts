@@ -3,6 +3,7 @@ import { expect } from "chai";
 import { ethers } from "hardhat";
 import { ETH_ADDRESS } from "../scripts/utils/const";
 import main from "../scripts/main";
+import { ERRORS } from '../scripts/utils/errors';
 
 describe("Rewards", function () {
 
@@ -31,7 +32,7 @@ describe("Rewards", function () {
 
 	it("set pool speed", async function () {
 		// expect to revert, as it is already added to list
-		await expect(synthex.setPoolSpeed(esSYX.address, cryptoPool.address, ethers.utils.parseEther("10"), true)).to.be.revertedWith("SyntheX: Reward token already added to list");
+		await expect(synthex.setPoolSpeed(esSYX.address, cryptoPool.address, ethers.utils.parseEther("10"), true)).to.be.revertedWith(ERRORS.ASSET_ALREADY_ADDED);
 		await synthex.setPoolSpeed(esSYX.address, cryptoPool.address, ethers.utils.parseEther("10"), false);
 	});
 

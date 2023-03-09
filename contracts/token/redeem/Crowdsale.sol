@@ -61,7 +61,7 @@ contract Crowdsale is BaseTokenRedeemer, ReentrancyGuard, Pausable {
      */
     function buyWithToken(address _token, uint _amount) external whenNotPaused {
         require(block.timestamp >= startTime && block.timestamp <= endTime);
-        require(rate[ETH_ADDRESS] > 0, "Token not supported");
+        require(rate[ETH_ADDRESS] > 0, Errors.TOKEN_NOT_SUPPORTED);
         // Transfer In
         IERC20(_token).safeTransferFrom(
             msg.sender,
@@ -86,12 +86,12 @@ contract Crowdsale is BaseTokenRedeemer, ReentrancyGuard, Pausable {
     /*                               Admin Functions                              */
     /* -------------------------------------------------------------------------- */
     modifier onlyL1Admin() {
-        require(synthex.isL1Admin(msg.sender), "Not Authorized");
+        require(synthex.isL1Admin(msg.sender), Errors.CALLER_NOT_L1_ADMIN);
         _;
     }
 
     modifier onlyL2Admin() {
-        require(synthex.isL2Admin(msg.sender), "Not Authorized");
+        require(synthex.isL2Admin(msg.sender), Errors.CALLER_NOT_L2_ADMIN);
         _;
     }
 

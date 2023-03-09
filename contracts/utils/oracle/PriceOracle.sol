@@ -28,8 +28,8 @@ contract PriceOracle is IPriceOracle {
    */
   modifier onlyAssetListingOrPoolAdmins() {
     require(
-            synthex.hasRole(synthex.L1_ADMIN_ROLE(), msg.sender),
-            "PriceOracle: Only L1_ADMIN can set price feed"
+            synthex.isL1Admin(msg.sender),
+            Errors.CALLER_NOT_L1_ADMIN
         );
     _;
   }
@@ -84,7 +84,7 @@ contract PriceOracle is IPriceOracle {
    * @param sources The address of the source of each asset
    */
   function _setAssetsSources(address[] memory assets, address[] memory sources) internal {
-    require(assets.length == sources.length, "INCONSISTENT_PARAMS_LENGTH");
+    require(assets.length == sources.length, Errors.INVAILD_ARGUMENT);
     for (uint256 i = 0; i < assets.length; i++) {
       assetsSources[assets[i]] = AggregatorInterface(sources[i]);
       emit AssetSourceUpdated(assets[i], sources[i]);
@@ -140,11 +140,5 @@ contract PriceOracle is IPriceOracle {
   /// @inheritdoc IPriceOracle
   function getFallbackOracle() external view returns (address) {
     return address(_fallbackOracle);
-  }
-
-  function _onlyAssetListingOrPoolAdmins() internal view {
-    require(
-      synthex.isL1Admin(msg.sender), "CALLER_NOT_ASSET_LISTING_OR_POOL_ADMIN"
-    );
   }
 }

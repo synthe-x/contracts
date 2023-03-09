@@ -48,6 +48,7 @@ contract BaseTokenRedeemer {
     /// @notice PercUnlockAtRelease is the percentage of tokens that are unlocked at release. In Basis Points
     uint public percUnlockAtRelease;
     uint public constant BASIS_POINTS = 10000;
+    uint public constant SCALER = 1e18;
     /// @notice Request ID to Unlock struct mapping
     /// @notice Request ID is a hash of user address and request index
     mapping(bytes32 => UnlockData) public unlockRequests;
@@ -67,14 +68,13 @@ contract BaseTokenRedeemer {
 
     function _startUnlock(address user, uint _amount) internal virtual {
         // check if user has enough SYN to unlock
-        require(remainingQuota() >= _amount, "Not enough SYN to unlock");
-        require(_amount > 0, "Amount must be greater than 0");
+        require(remainingQuota() >= _amount, Errors.NOT_ENOUGH_SYX_TO_UNLOCK);
 
         // create unlock request
         bytes32 requestId = keccak256(abi.encodePacked(user, unlockRequestCount[user]));
         
         UnlockData storage _unlockRequest = unlockRequests[requestId];
-        require(_unlockRequest.amount == 0, "Unlock request already exists");
+        require(_unlockRequest.amount == 0, Errors.REQUEST_ALREADY_EXISTS);
         _unlockRequest.amount = _amount;
         _unlockRequest.requestTime = block.timestamp;
         _unlockRequest.claimed = 0;
@@ -137,28 +137,28 @@ contract BaseTokenRedeemer {
     function unlocked(bytes32 _requestId) public virtual view returns (uint) {
         // Check if unlock request exists
         UnlockData memory unlockRequest = unlockRequests[_requestId];
-        require(unlockRequest.amount > 0, "Unlock request does not exist");
+        require(unlockRequest.amount > 0, Errors.REQUEST_DOES_NOT_EXIST);
         // Check if unlock period has passed
-        require(block.timestamp >= unlockRequest.requestTime.add(lockPeriod), "Unlock period has not passed");
+        require(block.timestamp >= unlockRequest.requestTime.add(lockPeriod), Errors.UNLOCK_NOT_STARTED);
 
         // Calculate amount to unlock
         // Time since unlock date will give percentage of total to unlock, excluding percUnlockAtRelease
         uint timeSinceUnlock = block.timestamp.sub(unlockRequest.requestTime.add(lockPeriod));
-        uint percentUnlock = timeSinceUnlock.mul(1e18).div(unlockPeriod);
+        uint percentUnlock = timeSinceUnlock.mul(SCALER).div(unlockPeriod);
             
         // If unlock period has passed, unlock 100% of tokens
-        if(percentUnlock > 1e18){
-            percentUnlock = 1e18;
+        if(percentUnlock > SCALER){
+            percentUnlock = SCALER;
         }
 
-        percentUnlock = percentUnlock.mul(BASIS_POINTS);
+        percentUnlock = percentUnlock.mul(BASIS_POINTS); // convert to basis points
 
         // Calculate amount to unlock
         // Amount to unlock = totalAmount * (percentUnlock * (1 - percUnlockAtRelease) + percUnlockAtRelease) - alreadyClaimed
         uint amountToUnlock = unlockRequest.amount
         .mul(
-            percentUnlock.add(percUnlockAtRelease.mul(1e18)).sub(percentUnlock.mul(percUnlockAtRelease).div(BASIS_POINTS))
-        ).div(1e18).div(BASIS_POINTS)
+            percentUnlock.add(percUnlockAtRelease.mul(SCALER)).sub(percentUnlock.mul(percUnlockAtRelease).div(BASIS_POINTS))
+        ).div(SCALER).div(BASIS_POINTS)
         .sub(unlockRequest.claimed);
 
         return amountToUnlock;
