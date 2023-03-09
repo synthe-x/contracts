@@ -6,7 +6,7 @@ import main from "../scripts/main";
 
 describe("Rewards", function () {
 
-	let synthex: any, syn: any, sealedSyn: any, oracle: any, cryptoPool: any, eth: any, susd: any, sbtc: any, seth: any, pool2;
+	let synthex: any, SYX: any, esSYX: any, oracle: any, cryptoPool: any, eth: any, susd: any, sbtc: any, seth: any, pool2;
 	let owner: any, user1: any, user2: any, user3: any;
 
 	before(async () => {
@@ -15,19 +15,24 @@ describe("Rewards", function () {
 
 		const deployments = await loadFixture(main);
 		synthex = deployments.synthex;
-        sealedSyn = deployments.sealedSYN;
+        esSYX = deployments.esSYX;
+		SYX = deployments.SYX;
 		oracle = deployments.pools[0].oracle;
 		cryptoPool = deployments.pools[0].pool;
 		sbtc = deployments.pools[0].synths[0];
 		seth = deployments.pools[0].synths[1];
 		susd = deployments.pools[0].synths[2];
 
+		// supply reward tokens
+		await SYX.mint(owner.address, ethers.utils.parseEther("100000000"));
+		await SYX.increaseAllowance(esSYX.address, ethers.utils.parseEther("100000000"));
+		await esSYX.lock(ethers.utils.parseEther("100000000"), synthex.address);
 	});
 
 	it("set pool speed", async function () {
 		// expect to revert, as it is already added to list
-		await expect(synthex.setPoolSpeed(sealedSyn.address, cryptoPool.address, ethers.utils.parseEther("10"), true)).to.be.revertedWith("SyntheX: Reward token already added to list");
-		await synthex.setPoolSpeed(sealedSyn.address, cryptoPool.address, ethers.utils.parseEther("10"), false);
+		await expect(synthex.setPoolSpeed(esSYX.address, cryptoPool.address, ethers.utils.parseEther("10"), true)).to.be.revertedWith("SyntheX: Reward token already added to list");
+		await synthex.setPoolSpeed(esSYX.address, cryptoPool.address, ethers.utils.parseEther("10"), false);
 	});
 
 	it("Should deposit eth", async function () {
@@ -55,8 +60,8 @@ describe("Rewards", function () {
 	
     it("check esSYN rewards", async function () {
 		const totalRewards = ethers.utils.parseEther((10 * 86400 * 33).toString());
-		const user1Rewards = await synthex.callStatic.getRewardsAccrued([sealedSyn.address], user1.address, [cryptoPool.address])
-		const user2Rewards = await synthex.callStatic.getRewardsAccrued([sealedSyn.address], user2.address, [cryptoPool.address])
+		const user1Rewards = await synthex.callStatic.getRewardsAccrued([esSYX.address], user1.address, [cryptoPool.address])
+		const user2Rewards = await synthex.callStatic.getRewardsAccrued([esSYX.address], user2.address, [cryptoPool.address])
 
 		expect(user1Rewards[0]).to.be.closeTo(totalRewards.mul(1).div(3), ethers.utils.parseEther("10000"));
 		expect(user2Rewards[0]).to.be.closeTo(totalRewards.mul(2).div(3), ethers.utils.parseEther("10000"));
@@ -65,12 +70,12 @@ describe("Rewards", function () {
 
 	it("claim rewards", async function () {
 		const totalRewards = ethers.utils.parseEther((10 * 86400 * 33).toString());
-		await synthex.connect(user1).claimReward([sealedSyn.address], user1.address, [cryptoPool.address]);
-		await synthex.connect(user2).claimReward([sealedSyn.address], user2.address, [cryptoPool.address]);
+		await synthex.connect(user1).claimReward([esSYX.address], user1.address, [cryptoPool.address]);
+		await synthex.connect(user2).claimReward([esSYX.address], user2.address, [cryptoPool.address]);
 
 		// check balance
-		expect(await sealedSyn.balanceOf(user1.address)).to.be.closeTo(totalRewards.mul(1).div(3), ethers.utils.parseEther("10000"));
-		expect(await sealedSyn.balanceOf(user2.address)).to.be.closeTo(totalRewards.mul(2).div(3), ethers.utils.parseEther("10000"));
+		expect(await esSYX.balanceOf(user1.address)).to.be.closeTo(totalRewards.mul(1).div(3), ethers.utils.parseEther("10000"));
+		expect(await esSYX.balanceOf(user2.address)).to.be.closeTo(totalRewards.mul(2).div(3), ethers.utils.parseEther("10000"));
 	});
 
 	it("user2 burn remaining debt after 10 days", async function () {
@@ -80,8 +85,8 @@ describe("Rewards", function () {
 
 	it("check esSYN rewards", async function () {
 		const totalRewards = ethers.utils.parseEther((10 * 86400 * 10).toString());
-		const user1Rewards = await synthex.callStatic.getRewardsAccrued([sealedSyn.address], user1.address, [cryptoPool.address])
-		const user2Rewards = await synthex.callStatic.getRewardsAccrued([sealedSyn.address], user2.address, [cryptoPool.address])
+		const user1Rewards = await synthex.callStatic.getRewardsAccrued([esSYX.address], user1.address, [cryptoPool.address])
+		const user2Rewards = await synthex.callStatic.getRewardsAccrued([esSYX.address], user2.address, [cryptoPool.address])
 
 		expect(user1Rewards[0]).to.be.equal(0);
 		expect(user2Rewards[0]).to.be.closeTo(totalRewards, ethers.utils.parseEther("2000"));

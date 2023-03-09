@@ -57,8 +57,8 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
         // ensure amount is greater than 0
         require(amount > 0, "SynthERC20: Amount must be greater than 0");
         uint amountToMint = pool.commitMint(msg.sender, amount);
-        // ensure amount to mint is less than input amount
-        require(amountToMint < amount);
+        // ensure amount to mint is not more than input amount
+        require(amountToMint <= amount, "SynthERC20: Amount to mint must be less than input");
         _mint(msg.sender, amountToMint);
     }
 

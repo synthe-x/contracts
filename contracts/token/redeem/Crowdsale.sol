@@ -76,7 +76,7 @@ contract Crowdsale is BaseTokenRedeemer, ReentrancyGuard, Pausable {
      * @notice Claim all unlocked SYN tokens
      * @param _requestIds Request IDs of unlock requests
      */
-    function unlock(bytes32[] calldata _requestIds) external {
+    function unlock(bytes32[] calldata _requestIds) external whenNotPaused {
         for (uint256 i = 0; i < _requestIds.length; i++) {
             _unlockInternal(_requestIds[i]);
         }
@@ -90,6 +90,11 @@ contract Crowdsale is BaseTokenRedeemer, ReentrancyGuard, Pausable {
         _;
     }
 
+    modifier onlyL2Admin() {
+        require(synthex.isL2Admin(msg.sender), "Not Authorized");
+        _;
+    }
+
     function updateRate(address _token, uint256 _rate) public onlyL1Admin {
         rate[_token] = _rate;
     }
@@ -99,11 +104,11 @@ contract Crowdsale is BaseTokenRedeemer, ReentrancyGuard, Pausable {
         endTime = block.timestamp;
     }
 
-    function pause() external onlyL1Admin {
+    function pause() external onlyL2Admin {
         _pause();
     }
 
-    function unpause() external onlyL1Admin {
+    function unpause() external onlyL2Admin {
         _unpause();
     }
 }

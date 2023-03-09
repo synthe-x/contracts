@@ -18,7 +18,6 @@ describe("Testing BurnFee", function () {
 		const deployments = await loadFixture(main);
         vault = deployments.vault;
 		synthex = deployments.synthex;
-        syn = deployments.syn;
 		oracle = deployments.pools[0].oracle;
 		cryptoPool = deployments.pools[0].pool;
 		sbtc = deployments.pools[0].synths[0];
@@ -42,7 +41,7 @@ describe("Testing BurnFee", function () {
         })
         it("should update fee to 1%", async function () {
             burnFee = 100;
-            await cryptoPool.connect(owner).updateSynth(seth.address, {mintFee, isEnabled: true, burnFee});
+            await cryptoPool.connect(owner).updateSynth(seth.address, {mintFee, isActive: true, isDisabled: false, burnFee});
         });
 
         it("user should be able to burn 1 sETH with 10 sUSD fee", async function () {
@@ -61,7 +60,7 @@ describe("Testing BurnFee", function () {
 
         it("should update fee to 0.1%", async function () {
             burnFee = 10;
-            await cryptoPool.connect(owner).updateSynth(seth.address, {mintFee, isEnabled: true, burnFee});
+            await cryptoPool.connect(owner).updateSynth(seth.address, {mintFee, isActive: true, isDisabled: false, burnFee});
         });
 
         it("user2 should issue synths", async function () {
@@ -89,7 +88,7 @@ describe("Testing BurnFee", function () {
         it("should update fee to 1% + 50% issuer alloc", async function () {
             burnFee = 100;
             issuerAlloc = 5000;
-            await cryptoPool.connect(owner).updateSynth(seth.address, {mintFee, isEnabled: true, burnFee});
+            await cryptoPool.connect(owner).updateSynth(seth.address, {mintFee, isActive: true, isDisabled: false, burnFee});
             await cryptoPool.connect(owner).setIssuerAlloc(issuerAlloc);
         });
 
@@ -118,7 +117,7 @@ describe("Testing BurnFee", function () {
         it("should update fee to 0.1% + 80% issuer alloc", async function () {
             burnFee = 10;
             issuerAlloc = 8000;
-            await cryptoPool.connect(owner).updateSynth(seth.address, {mintFee, isEnabled: true, burnFee});
+            await cryptoPool.connect(owner).updateSynth(seth.address, {mintFee, isActive: true, isDisabled: false, burnFee});
             await cryptoPool.connect(owner).setIssuerAlloc(issuerAlloc);
         });
 

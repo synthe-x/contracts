@@ -38,7 +38,7 @@ describe("Testing MintFee", function () {
         })
         it("should update fee to 1%", async function () {
             mintFee = 100;
-            await cryptoPool.connect(owner).updateSynth(seth.address, {mintFee, isEnabled: true, burnFee});
+            await cryptoPool.connect(owner).updateSynth(seth.address, {mintFee, isActive: true, isDisabled: false, burnFee});
             // expect(await cryptoPool.mintFee()).to.equal(mintFee);
         });
 
@@ -58,7 +58,7 @@ describe("Testing MintFee", function () {
 
         it("should update fee to 0.1%", async function () {
             mintFee = 10;
-            await cryptoPool.connect(owner).updateSynth(seth.address, {mintFee, isEnabled: true, burnFee});
+            await cryptoPool.connect(owner).updateSynth(seth.address, {mintFee, isActive: true, isDisabled: false, burnFee});
             // expect(await cryptoPool.mintFee()).to.equal(mintFee);
         });
 
@@ -95,7 +95,7 @@ describe("Testing MintFee", function () {
         it("should update fee to 1% + 50% issuer alloc", async function () {
             mintFee = 100;
             issuerAlloc = 5000;
-            await cryptoPool.connect(owner).updateSynth(seth.address, {mintFee, burnFee, isEnabled: true});
+            await cryptoPool.connect(owner).updateSynth(seth.address, {mintFee, burnFee, isActive: true, isDisabled: false});
             await cryptoPool.connect(owner).setIssuerAlloc(issuerAlloc)
         });
 
@@ -117,7 +117,7 @@ describe("Testing MintFee", function () {
         it("should update fee to 0.1% + 80% issuer alloc", async function () {
             mintFee = 10;
             issuerAlloc = 8000;
-            await cryptoPool.connect(owner).updateSynth(seth.address, {mintFee, burnFee, isEnabled: true});
+            await cryptoPool.connect(owner).updateSynth(seth.address, {mintFee, burnFee, isActive: true, isDisabled: false});
             await cryptoPool.connect(owner).setIssuerAlloc(issuerAlloc);
         });
 

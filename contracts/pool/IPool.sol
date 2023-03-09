@@ -49,7 +49,7 @@ abstract contract IPool is PoolStorage {
     /* -------------------------------------------------------------------------- */
     /*                                 Events                                     */
     /* -------------------------------------------------------------------------- */
-    event SynthUpdated(address indexed synth, bool isEnabled, uint mintFee, uint burnFee);
+    event SynthUpdated(address indexed synth, bool isActive, bool isDisabled, uint mintFee, uint burnFee);
     event SynthRemoved(address indexed synth);
     event CollateralParamsUpdated(address indexed asset, uint cap, uint baseLTV, uint liqThreshold, uint liqBonus, bool isEnabled);
     event CollateralEntered(address indexed user, address indexed collateral);

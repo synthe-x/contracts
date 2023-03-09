@@ -8,6 +8,8 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
+import "hardhat/console.sol";
+
 /**
  * @title TokenRedeemer
  * @author SyntheX <prasad@chainscore.finance>
@@ -140,7 +142,7 @@ contract BaseTokenRedeemer {
         require(block.timestamp >= unlockRequest.requestTime.add(lockPeriod), "Unlock period has not passed");
 
         // Calculate amount to unlock
-        // Time since unlock date will give: percentage of total to unlock
+        // Time since unlock date will give percentage of total to unlock, excluding percUnlockAtRelease
         uint timeSinceUnlock = block.timestamp.sub(unlockRequest.requestTime.add(lockPeriod));
         uint percentUnlock = timeSinceUnlock.mul(1e18).div(unlockPeriod);
             
@@ -152,10 +154,10 @@ contract BaseTokenRedeemer {
         percentUnlock = percentUnlock.mul(BASIS_POINTS);
 
         // Calculate amount to unlock
-        // Amount to unlock = (percentUnlock - (percentUnlock * percUnlockAtRelease) + percUnlockAtRelease) * unlockRequest.amount
+        // Amount to unlock = totalAmount * (percentUnlock * (1 - percUnlockAtRelease) + percUnlockAtRelease) - alreadyClaimed
         uint amountToUnlock = unlockRequest.amount
         .mul(
-            percentUnlock.add(percUnlockAtRelease).sub(percentUnlock.mul(percUnlockAtRelease).div(BASIS_POINTS).div(1e18))
+            percentUnlock.add(percUnlockAtRelease.mul(1e18)).sub(percentUnlock.mul(percUnlockAtRelease).div(BASIS_POINTS))
         ).div(1e18).div(BASIS_POINTS)
         .sub(unlockRequest.claimed);
 

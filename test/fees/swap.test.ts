@@ -18,7 +18,7 @@ describe("Testing SwapFee", function () {
 		const deployments = await loadFixture(main);
         vault = deployments.vault;
 		synthex = deployments.synthex;
-        syn = deployments.syn;
+        syn = deployments.SYX;
 		oracle = deployments.pools[0].oracle;
 		cryptoPool = deployments.pools[0].pool;
 		sbtc = deployments.pools[0].synths[0];
@@ -42,8 +42,8 @@ describe("Testing SwapFee", function () {
         })
         it("should update fee to 1%", async function () {
             swapFee = 100;
-            await cryptoPool.connect(owner).updateSynth(seth.address, {mintFee: swapFee/2, isEnabled: true, burnFee: swapFee/2});
-            await cryptoPool.connect(owner).updateSynth(susd.address, {mintFee: swapFee/2, isEnabled: true, burnFee: swapFee/2});
+            await cryptoPool.connect(owner).updateSynth(seth.address, {mintFee: swapFee/2, isActive: true, isDisabled: false, burnFee: swapFee/2});
+            await cryptoPool.connect(owner).updateSynth(susd.address, {mintFee: swapFee/2, isActive: true, isDisabled: false, burnFee: swapFee/2});
         });
 
         it("user should be able to swap 10 sETH to 10000 sUSD with 100 sUSD fee", async function () {
@@ -62,8 +62,8 @@ describe("Testing SwapFee", function () {
 
         it("should update fee to 0.1%", async function () {
             swapFee = 10;
-            await cryptoPool.connect(owner).updateSynth(seth.address, {mintFee: swapFee/2, isEnabled: true, burnFee: swapFee/2});
-            await cryptoPool.connect(owner).updateSynth(susd.address, {mintFee: swapFee/2, isEnabled: true, burnFee: swapFee/2});
+            await cryptoPool.connect(owner).updateSynth(seth.address, {mintFee: swapFee/2, isActive: true, isDisabled: false, burnFee: swapFee/2});
+            await cryptoPool.connect(owner).updateSynth(susd.address, {mintFee: swapFee/2, isActive: true, isDisabled: false, burnFee: swapFee/2});
         });
 
         it("user2 should issue synths", async function () {
@@ -91,8 +91,8 @@ describe("Testing SwapFee", function () {
         it("should update fee to 1% + 50% issuer alloc", async function () {
             issuerAlloc = 5000;
             swapFee = 100;
-            await cryptoPool.connect(owner).updateSynth(seth.address, {mintFee: swapFee/2, isEnabled: true, burnFee: swapFee/2});
-            await cryptoPool.connect(owner).updateSynth(susd.address, {mintFee: swapFee/2, isEnabled: true, burnFee: swapFee/2});
+            await cryptoPool.connect(owner).updateSynth(seth.address, {mintFee: swapFee/2, isActive: true, isDisabled: false, burnFee: swapFee/2});
+            await cryptoPool.connect(owner).updateSynth(susd.address, {mintFee: swapFee/2, isActive: true, isDisabled: false, burnFee: swapFee/2});
             await cryptoPool.setIssuerAlloc(issuerAlloc);
         });
 
@@ -122,8 +122,8 @@ describe("Testing SwapFee", function () {
         it("should update fee to 0.1% + 80% issuer alloc", async function () {
             issuerAlloc = 8000;
             swapFee = 10;
-            await cryptoPool.connect(owner).updateSynth(seth.address, {mintFee: swapFee/2, isEnabled: true, burnFee: swapFee/2});
-            await cryptoPool.connect(owner).updateSynth(susd.address, {mintFee: swapFee/2, isEnabled: true, burnFee: swapFee/2});
+            await cryptoPool.connect(owner).updateSynth(seth.address, {mintFee: swapFee/2, isActive: true, isDisabled: false, burnFee: swapFee/2});
+            await cryptoPool.connect(owner).updateSynth(susd.address, {mintFee: swapFee/2, isActive: true, isDisabled: false, burnFee: swapFee/2});
             await cryptoPool.setIssuerAlloc(issuerAlloc);
         });
 

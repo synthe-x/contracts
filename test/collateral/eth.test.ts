@@ -7,7 +7,6 @@ import main from "../../scripts/main";
 describe("Rewards", function () {
 	let synthex: any,
 		weth: any,
-		sealedSyn: any,
 		oracle: any,
 		cryptoPool: any,
 		eth: any,
@@ -23,7 +22,6 @@ describe("Rewards", function () {
 
 		const deployments = await loadFixture(main);
 		synthex = deployments.synthex;
-		sealedSyn = deployments.sealedSYN;
 		oracle = deployments.pools[0].oracle;
 		cryptoPool = deployments.pools[0].pool;
 		weth = deployments.pools[0].collateralTokens[1];

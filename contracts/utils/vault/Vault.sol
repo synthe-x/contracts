@@ -16,7 +16,6 @@ contract Vault {
     // AddressStorage contract
     SyntheX public synthex;
 
-
     fallback() external payable {}
 
     /**

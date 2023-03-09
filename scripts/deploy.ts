@@ -9,61 +9,55 @@ export async function deploy(deployments: any, config: any, deployer: SignerWith
   const versionSuffix = `${config.version.split(".")[0]}.${config.version.split(".")[1]}.x`
   if(!isTest) console.log("Deploying ", versionSuffix, "🚀");
 
-  
+  let weth;
+  if(config.weth){
+    // attach to existing weth
+    weth = await ethers.getContractAt("WETH9", config.weth);
+  } else {
+    if(!isTest) console.warn("WETH not found, deploying new WETH9 contract...")
+    weth = await _deploy("WETH9", [], deployments);
+  }
+
   // deploy synthex
   const synthex = await _deploy("SyntheX", [deployer.address, deployer.address, deployer.address], deployments, {upgradable: true});
-  // _deployDefender("SyntheX_"+versionSuffix, synthex);
   
   // vault
   const vault = await _deploy("Vault", [synthex.address], deployments);
   await synthex.setAddress(VAULT, vault.address);
 
-  // deploy SYN
-  const syn = await _deploy("SyntheXToken", [synthex.address], deployments);
-  // _deployDefender("SyntheXToken_"+versionSuffix, syn);
+  // deploy SYX
+  const SYX = await _deploy("SyntheXToken", [synthex.address], deployments);
 
-  // deploy Sealed SYN
-  const sealedSYN = await _deploy("EscrowedSYN", [synthex.address], deployments);
-  // _deployDefender("SealedSYN_"+versionSuffix, sealedSYN);
+  // deploy esSYX
+  const esSYX = await _deploy("EscrowedSYX", [
+    synthex.address,
+    SYX.address,
+    weth.address,
+    config.esSYX.initialRewardsDuration,
+    config.esSYX.lockPeriod,
+    config.esSYX.unlockPeriod,
+    config.esSYX.percReleaseAtUnlock
+  ], deployments);
   
-  // deploy staking rewards : get xSYN on staking xSYN
-  const stakingRewards = await _deploy("StakingRewards", [sealedSYN.address, sealedSYN.address, synthex.address, config.stakingRewards.days * 24 * 60 * 60], deployments)
-  // _deployDefender("StakingRewards_"+versionSuffix, stakingRewards);
-  await sealedSYN.grantRole(AUTHORIZED_SENDER, stakingRewards.address);
-  if(Number(config.stakingRewards.reward) > 0) await stakingRewards.notifyReward(ethers.utils.parseEther(config.stakingRewards.reward));
-
-  // deploy unlocker
-  const unlocker = await _deploy(
-    "TokenRedeemer", 
-    [synthex.address, sealedSYN.address, syn.address, config.unlocker.lockupPeriod, config.unlocker.unlockPeriod, ethers.utils.parseEther(config.unlocker.percReleaseAtUnlock)], 
-    deployments
-  );
-
-  /* -------------------------------------------------------------------------- */
-  /*                                    esSYX                                   */
-  /* -------------------------------------------------------------------------- */
-  // mint tokens to unlocker
-  await sealedSYN.grantRole(MINTER_ROLE, deployer.address);
-  await sealedSYN.mint(unlocker.address, ethers.utils.parseEther(config.unlocker.quota));
-  // mint tokens to synthex rewards
-  await sealedSYN.grantRole(AUTHORIZED_SENDER, synthex.address);
-  await sealedSYN.mint(synthex.address, ethers.utils.parseEther(config.debtRewardAlloc));
+  // mint initial reward tokens to synthex
+  await esSYX.grantRole(AUTHORIZED_SENDER, synthex.address);
+  await SYX.mint(deployer.address, ethers.utils.parseEther(config.rewardAlloc));
+  await SYX.increaseAllowance(esSYX.address, ethers.utils.parseEther(config.rewardAlloc));
+  await esSYX.lock(ethers.utils.parseEther(config.rewardAlloc), synthex.address);
 
   /* -------------------------------------------------------------------------- */
   /*                                   Others                                   */
   /* -------------------------------------------------------------------------- */
   // deploy multicall
   await _deploy("Multicall2", [], deployments);
-  await _deploy("WETH9", [], deployments);
 
-  return { synthex, syn, sealedSYN, stakingRewards, vault, unlocker };
+  return { synthex, WETH: weth, SYX, esSYX, vault };
 }
 
 export interface IDeploymentResult {
   synthex: Contract;
-  syn: Contract;
-  sealedSYN: Contract;
-  stakingRewards: Contract;
+  WETH: Contract;
+  SYX: Contract;
+  esSYX: Contract;
   vault: Contract;
-  unlocker: Contract;
 }
