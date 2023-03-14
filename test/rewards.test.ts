@@ -46,10 +46,10 @@ describe("Rewards", function () {
 
 	it("user1 and user2 issue debt", async function () {
 		// user1 issues 10 seth
-        await seth.connect(user1).mint(ethers.utils.parseEther("10")); // $ 10000
+        await seth.connect(user1).mint(ethers.utils.parseEther("10"), user1.address, ethers.constants.AddressZero); // $ 10000
         expect((await cryptoPool.getAccountLiquidity(user1.address))[2]).to.be.equal(ethers.utils.parseEther("10000.00"));
 
-		await seth.connect(user2).mint(ethers.utils.parseEther("20")); // $ 20000
+		await seth.connect(user2).mint(ethers.utils.parseEther("20"), user2.address, ethers.constants.AddressZero); // $ 20000
         expect((await cryptoPool.getAccountLiquidity(user2.address))[2]).to.be.equal(ethers.utils.parseEther("20000.00"));
 	});
 

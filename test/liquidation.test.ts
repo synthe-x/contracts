@@ -47,9 +47,9 @@ describe('Testing liquidation', function () {
         value: ethers.utils.parseEther('100'),
       })
 
-    await seth.connect(user1).mint(ethers.utils.parseEther('80')) // $ 80000
-    await sbtc.connect(user2).mint(ethers.utils.parseEther('8')) // $ 80000
-    await susd.connect(user3).mint(ethers.utils.parseEther('80000')) // $ 80000
+    await seth.connect(user1).mint(ethers.utils.parseEther('80'), user1.address, ethers.constants.AddressZero) // $ 80000
+    await sbtc.connect(user2).mint(ethers.utils.parseEther('8'), user2.address, ethers.constants.AddressZero) // $ 80000
+    await susd.connect(user3).mint(ethers.utils.parseEther('80000'), user3.address, ethers.constants.AddressZero) // $ 80000
   }
 
   describe('Liquidation @ 85', function () {

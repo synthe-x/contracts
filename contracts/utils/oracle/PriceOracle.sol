@@ -84,7 +84,7 @@ contract PriceOracle is IPriceOracle {
    * @param sources The address of the source of each asset
    */
   function _setAssetsSources(address[] memory assets, address[] memory sources) internal {
-    require(assets.length == sources.length, Errors.INVAILD_ARGUMENT);
+    require(assets.length == sources.length, Errors.INVALID_ARGUMENT);
     for (uint256 i = 0; i < assets.length; i++) {
       assetsSources[assets[i]] = AggregatorInterface(sources[i]);
       emit AssetSourceUpdated(assets[i], sources[i]);

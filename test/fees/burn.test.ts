@@ -31,8 +31,8 @@ describe("Testing BurnFee", function () {
         expect((await cryptoPool.getAccountLiquidity(user2.address))[1]).to.be.equal(ethers.utils.parseEther("50000"));
 
         // Mint synths
-        await seth.connect(user1).mint(ethers.utils.parseEther("10")); // $ 10000
-        await seth.connect(user2).mint(ethers.utils.parseEther("10")); // $ 10000
+        await seth.connect(user1).mint(ethers.utils.parseEther("10"), user1.address, ethers.constants.AddressZero); // $ 10000
+        await seth.connect(user2).mint(ethers.utils.parseEther("10"), user2.address, ethers.constants.AddressZero); // $ 10000
 	};
 
     describe('Burn fee', async () => { 

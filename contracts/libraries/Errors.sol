@@ -19,7 +19,7 @@ library Errors {
   string public constant ASSET_NOT_ACTIVE = '10'; // 'The synth is not enabled
   string public constant ASSET_NOT_FOUND = '11'; // 'The synth is not enabled
   string public constant INSUFFICIENT_DEBT = '12'; // 'The account has insufficient debt'
-  string public constant INVAILD_ARGUMENT = '13'; // 'The argument is invalid'
+  string public constant INVALID_ARGUMENT = '13'; // 'The argument is invalid'
   string public constant ASSET_ALREADY_ADDED = '14'; // 'The asset is already added'
   string public constant NOT_AUTHORIZED = '15'; // 'The caller is not authorized'
   string public constant TRANSFER_FAILED = '16'; // 'The transfer failed'
@@ -33,4 +33,6 @@ library Errors {
   string public constant UNLOCK_NOT_STARTED = '22'; // 'Unlock not started'
 
   string public constant TOKEN_NOT_SUPPORTED = '23';
+  string public constant ADDRESS_IS_CONTRACT = '24';
+  string public constant INVALID_MERKLE_PROOF = '25';
 }

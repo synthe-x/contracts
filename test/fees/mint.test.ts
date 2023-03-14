@@ -45,7 +45,7 @@ describe("Testing MintFee", function () {
         it("user should be able to mints synths", async function () {
             // user1 issues 10 seth
             let mintAmount = ethers.utils.parseEther("10");
-            await seth.connect(user1).mint(mintAmount); // $ 10000
+            await seth.connect(user1).mint(mintAmount, user1.address, ethers.constants.AddressZero); // $ 10000
             // 10000 + 100 (1%) fee
             let expectedDebt = ethers.utils.parseEther("10000")
             let fee = expectedDebt.mul(mintFee).div(BASIS_POINTS);
@@ -67,7 +67,7 @@ describe("Testing MintFee", function () {
             let initialVaultBalance = await susd.balanceOf(vault.address);
             // user2 issues 10 seth
             let mintAmount = ethers.utils.parseEther("10");
-            await seth.connect(user2).mint(mintAmount); // $ 10000
+            await seth.connect(user2).mint(mintAmount, user2.address, ethers.constants.AddressZero); // $ 10000
             
             // 10000 + 100 (1%) fee
             let expectedDebt = ethers.utils.parseEther("10000")
@@ -82,7 +82,7 @@ describe("Testing MintFee", function () {
 
         it("user2 should swap 1 seth to sbtc", async function () {
             // user1 exchanges 1 seth to sbtc with no minting fees
-            await seth.connect(user2).swap(ethers.utils.parseEther("1"), sbtc.address);
+            await seth.connect(user2).swap(ethers.utils.parseEther("1"), sbtc.address, user2.address, ethers.constants.AddressZero);
             expect(await sbtc.balanceOf(user2.address)).to.be.equal(ethers.utils.parseEther("0.1")); 
         })
     });
@@ -102,7 +102,7 @@ describe("Testing MintFee", function () {
         it("user should mints synths", async function () {
             // user1 issues 10 seth
             let mintAmount = ethers.utils.parseEther("10");
-            await seth.connect(user1).mint(mintAmount); // $ 10000
+            await seth.connect(user1).mint(mintAmount, user1.address, ethers.constants.AddressZero); // $ 10000
             // 10000 + 100 (1%) fee
             let expectedDebt = ethers.utils.parseEther("10000")
             let fee = expectedDebt.mul(mintFee).div(BASIS_POINTS);
@@ -126,7 +126,7 @@ describe("Testing MintFee", function () {
             let initialVaultBalance = await susd.balanceOf(vault.address);
             // user2 issues 10 seth
             let mintAmount = ethers.utils.parseEther("10");
-            await seth.connect(user2).mint(mintAmount); // $ 10000
+            await seth.connect(user2).mint(mintAmount, user2.address, ethers.constants.AddressZero); // $ 10000
             
             // 10000 + 100 (1%) fee
             let expectedDebt = ethers.utils.parseEther("10000")

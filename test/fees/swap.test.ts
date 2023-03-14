@@ -32,8 +32,8 @@ describe("Testing SwapFee", function () {
         expect((await cryptoPool.getAccountLiquidity(user2.address))[1]).to.be.equal(ethers.utils.parseEther("50000"));
 
         // Mint synths
-        await seth.connect(user1).mint(ethers.utils.parseEther("10")); // $ 10000
-        await seth.connect(user2).mint(ethers.utils.parseEther("10")); // $ 10000
+        await seth.connect(user1).mint(ethers.utils.parseEther("10"), user1.address, ethers.constants.AddressZero); // $ 10000
+        await seth.connect(user2).mint(ethers.utils.parseEther("10"), user2.address, ethers.constants.AddressZero); // $ 10000
 	};
 
     describe('Swap fee', async () => { 
@@ -48,7 +48,7 @@ describe("Testing SwapFee", function () {
 
         it("user should be able to swap 10 sETH to 10000 sUSD with 100 sUSD fee", async function () {
             // user1 swaps 10 seth
-            await seth.connect(user1).swap(ethers.utils.parseEther("10"), susd.address);
+            await seth.connect(user1).swap(ethers.utils.parseEther("10"), susd.address, user1.address, ethers.constants.AddressZero);
             // 10000 = 9900 + 100 (1%) fee
             let initialAmount = ethers.utils.parseEther("10000");
             let fee = initialAmount.mul(swapFee).div(BASIS_POINTS);
@@ -70,7 +70,7 @@ describe("Testing SwapFee", function () {
             // initial vault balance
             let initialVaultBalance = await susd.balanceOf(vault.address);
             // user1 swaps 10 seth
-            await seth.connect(user2).swap(ethers.utils.parseEther("10"), susd.address);
+            await seth.connect(user2).swap(ethers.utils.parseEther("10"), susd.address, user2.address, ethers.constants.AddressZero);
             // 10000 = 9900 + 100 (1%) fee
             let initialAmount = ethers.utils.parseEther("10000");
             let fee = initialAmount.mul(swapFee).div(BASIS_POINTS);
@@ -101,7 +101,7 @@ describe("Testing SwapFee", function () {
             let initialUser1Debt = (await cryptoPool.getAccountLiquidity(user1.address))[2];
             let initialUser2Debt = (await cryptoPool.getAccountLiquidity(user2.address))[2];
             // user1 swaps 10 seth
-            await seth.connect(user1).swap(ethers.utils.parseEther("10"), susd.address);
+            await seth.connect(user1).swap(ethers.utils.parseEther("10"), susd.address, user1.address, ethers.constants.AddressZero);
             // 10000 = 9900 + 100 (1%) fee
             let initialAmount = ethers.utils.parseEther("10000");
             let fee = initialAmount.mul(swapFee).div(BASIS_POINTS);
@@ -134,7 +134,7 @@ describe("Testing SwapFee", function () {
             // initial vault balance
             let initialVaultBalance = await susd.balanceOf(vault.address);
             // user1 swaps 10 seth
-            await seth.connect(user2).swap(ethers.utils.parseEther("10"), susd.address);
+            await seth.connect(user2).swap(ethers.utils.parseEther("10"), susd.address, user2.address, ethers.constants.AddressZero);
             // 10000 = 9900 + 100 (1%) fee
             let initialAmount = ethers.utils.parseEther("10000");
             let fee = initialAmount.mul(swapFee).div(BASIS_POINTS);

@@ -35,6 +35,9 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
     /// @notice Emitted when flash fee is updated
     event FlashFeeUpdated(uint _flashLoanFee);
 
+    event Mint(address indexed referredBy);
+    event Swap(address indexed referredBy);
+
     function initialize(string memory _name, string memory _symbol, address _pool, address _synthex) initializer external {
         __ERC20_init(_name, _symbol);
         __ERC20FlashMint_init();
@@ -55,12 +58,13 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
      * @notice Mint token. Issue debt
      * @param amount Amount of token to mint
      */
-    function mint(uint256 amount) external whenNotPaused {
+    function mint(uint256 amount, address recipient, address referredBy) external whenNotPaused {
         // ensure amount is greater than 0
         require(amount > 0, Errors.ZERO_AMOUNT);
         uint amountToMint = pool.commitMint(msg.sender, amount);
-        // TODO sanity check
-        _mint(msg.sender, amountToMint);
+        // TODO check if amount is correct
+        _mint(recipient, amountToMint);
+        emit Mint(referredBy);
     }
 
     /**
@@ -70,7 +74,7 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
     function burn(uint256 amount) external whenNotPaused {
         require(amount > 0, Errors.ZERO_AMOUNT);
         amount = pool.commitBurn(msg.sender, amount);
-        // TODO sanity check
+        // TODO check if amount is correct
         _burn(msg.sender, amount);
     }
 
@@ -79,11 +83,12 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
      * @param amount Amount of token to swap
      * @param synthTo Synth to swap to
      */
-    function swap(uint256 amount, address synthTo) external whenNotPaused {
+    function swap(uint256 amount, address synthTo, address _recipient, address referredBy) external whenNotPaused {
         require(amount > 0, Errors.ZERO_AMOUNT);
-        amount = pool.commitSwap(msg.sender, amount, synthTo);
-        // TODO sanity check
+        amount = pool.commitSwap(_recipient, amount, synthTo);
+        // TODO check if amount is correct
         _burn(msg.sender, amount);
+        emit Swap(referredBy);
     }
 
     /**
