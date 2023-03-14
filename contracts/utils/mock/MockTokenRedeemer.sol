@@ -117,7 +117,7 @@ contract MockTokenRedeemer is BaseTokenRedeemer, Pausable {
      */
     function unlock(bytes32[] calldata _requestIds) external whenNotPaused {
         for(uint i = 0; i < _requestIds.length; i++){
-            _unlockInternal(_requestIds[i]);
+            _unlockInternal(msg.sender, _requestIds[i]);
         }
     }
 }

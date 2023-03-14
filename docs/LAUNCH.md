@@ -1,39 +1,44 @@
 
 ## Launch Schedule
 
-### Week0 - Week4: Beta Phase
+### Deployment: 1 Apr
 
-Once the contracts are audited. We will launch beta to all users. High esSYX rewards, will start unlocking after TGE
+Beta Launch for whitelisted users
+Once the contracts are audited. We will launch beta to all users. High esSYX rewards
 
-### Week4: Mainnet Launch
+### Mainnet Launch: 14 April
 
-After 4 weeks of beta phase, or reaching $1M in TVL [whichever comes earlier], we will make the beta public and launch start marketing efforts
+After 2 weeks of beta phase, we will make the beta public
 
-### Week8: DAO Launch
+### DAO Launch: 31 May
 
-Will start with Presale in 3 phases
-- Round 1: 5% tokens, $0.02/SYX, 12 weeks cliff, 36 weeks linear release
-- Round 2: 6% tokens, $0.03/SYX, 8 weeks cliff, 24 weeks linear release
-- Round 3: 6% tokens, $0.035/SYX, 8 weeks cliff, 24 weeks linear release
+#### Crowdsale
+Will start with Presale in 2 phases
 
-After 8 weeks, TGE Launching $SYX token. Will have LP rewards
+- Crowdsale 1: 31 May
 
-Launching on-chain governance.
+5% tokens, $0.02/SYX, 12 weeks lockup, 5% release at unlock, 48 weeks linear release
 
-### Week16: User Growth
+- Crowdsale 2: 30 June 
+
+6% tokens, $0.03/SYX, 8 weeks lockup, 5% release at unlock, 24 weeks linear release
+
+
+#### TGE: Public Sale: 31 Aug
+
+TGE launching $SYX token, bootstrapping liquidity with a public sale
+
+6% tokens, $0.045/SYX, 0 lockup, 
+
+- Launch of LP rewards
+Provide LP and earn SYX tokens
+
+#### Governance
+
+Launching on-chain governance. Use esSYX to create proposals and vote on the,
+
+### Growth
 
 - Atomic DEX launch
 - Perps launch
 - Options launch
-
-## Release
-
-We will start releasing esSYX from Week0 from SyntheX contract. esSYX will be scheduled to launch at Week8. Every week we reduce the lockup period by one week, till lockup period is one week.
-
-### TGE
-
-At TGE, esSYX will have 1 month of lockup period, and 1 month of unlock period; So that 
-
-### After TGE
-
-2 months after TGE, when all reward tokens are released, lockup period will be reduced to 1 week, with unlock period of 1 week

@@ -10,6 +10,12 @@ import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
 import "../synthex/SyntheX.sol";
 import "../libraries/Errors.sol";
 
+/**
+ * @title SyntheX Token contract
+ * @author Prasad prasad@chainscore.finance
+ * @notice SyntheX Token contract, based on OpenZeppelin ERC20
+ * @dev Pausable, Burnable, Permit
+ */
 contract SyntheXToken is ERC20, ERC20Burnable, Pausable, ERC20Permit {
     /// @notice System contract to check access control
     SyntheX public synthex;

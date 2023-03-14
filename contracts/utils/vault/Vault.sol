@@ -18,6 +18,8 @@ contract Vault {
 
     fallback() external payable {}
 
+    receive() external payable {}
+
     /**
      * @dev Constructor
      * @param _synthex System contract address

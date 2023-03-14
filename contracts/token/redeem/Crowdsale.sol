@@ -15,9 +15,14 @@ import "@openzeppelin/contracts/security/Pausable.sol";
 // MerkleProof
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 
-// Crowdsale contract that allows users to buy SYN tokens with ETH/ERC20 tokens
-// Token release is based on TokenRedeemer contract
-contract Crowdsale is BaseTokenRedeemer, ReentrancyGuard, Pausable {
+/**
+ * @title Crowdsale contract
+ * @author Prasad prasad@chainscore.finance
+ * @notice Crowdsale contract that allows users to buy SYX tokens with ETH/ERC20 tokens at a fixed rate
+ * @notice Also has whitelisting functionality
+ * @dev Token release is based on TokenRedeemer contract
+ */
+contract Crowdsale is BaseTokenRedeemer, Pausable {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
@@ -29,8 +34,12 @@ contract Crowdsale is BaseTokenRedeemer, ReentrancyGuard, Pausable {
     uint256 public startTime;
     uint256 public endTime;
 
+    // whitelist cap: max amount of SYX tokens that can be purchased by whitelisted users
+    uint256 public whitelistCap;
+
     // exchange rate
     mapping (address => uint) rate;
+    uint public constant RATE_PRECISION = 1e18;
     address public constant ETH_ADDRESS = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
 
     constructor(
@@ -42,7 +51,8 @@ contract Crowdsale is BaseTokenRedeemer, ReentrancyGuard, Pausable {
         uint256 _unlockPeriod,
         uint256 _percUnlockAtRelease,
         bytes32 _merkleRoot,
-        uint256 _whitelistDuration
+        uint256 _whitelistDuration,
+        uint256 _whitelistCap
     )
         BaseTokenRedeemer(
             _token,
@@ -51,17 +61,28 @@ contract Crowdsale is BaseTokenRedeemer, ReentrancyGuard, Pausable {
             _percUnlockAtRelease
         )
     {
-        require(_startTime >= block.timestamp, Errors.INVALID_ARGUMENT);
-        require(_endTime >= _startTime, Errors.INVALID_ARGUMENT);
-        require(_synthex != address(0), Errors.INVALID_ARGUMENT);
-        require(_token != address(0), Errors.INVALID_ARGUMENT);
+        require(_startTime >= block.timestamp, Errors.INVALID_TIME);
+        require(_endTime >= _startTime, Errors.INVALID_TIME);
+        require(_synthex != address(0), Errors.INVALID_ADDRESS);
+        require(_token != address(0), Errors.INVALID_ADDRESS);
 
         whitelistDuration = _whitelistDuration;
         startTime = _startTime;
         endTime = _endTime;
 
+        whitelistCap = _whitelistCap;
+
         synthex = SyntheX(_synthex);
         merkleRoot = _merkleRoot;
+    }
+
+    // Receive ETH
+    receive() external payable {
+        buyWithETH();
+    }
+
+    fallback() external payable {
+        buyWithETH();
     }
 
     /**
@@ -69,12 +90,14 @@ contract Crowdsale is BaseTokenRedeemer, ReentrancyGuard, Pausable {
      * @param _proof Merkle proof
      */
     function buyWithETH_w(bytes32[] calldata _proof) external payable whenNotPaused {
-        require(block.timestamp >= startTime && block.timestamp <= startTime.add(whitelistDuration));
-        // make sure address is not a contract
-        require(!Address.isContract(msg.sender), Errors.ADDRESS_IS_CONTRACT);
+        require(block.timestamp >= startTime && block.timestamp <= startTime.add(whitelistDuration), Errors.INVALID_TIME);
+        // verify merkle proof 
         require(MerkleProof.verify(_proof, merkleRoot, keccak256(abi.encodePacked(msg.sender))), Errors.INVALID_MERKLE_PROOF);
         // start unlock
-        _startUnlock(msg.sender, msg.value.mul(rate[ETH_ADDRESS]));
+        uint amount = msg.value.mul(rate[ETH_ADDRESS]).div(RATE_PRECISION);
+        require(amount > 0, Errors.ZERO_AMOUNT);
+        require(amount < whitelistCap, Errors.EXCEEDED_MAX_CAPACITY); 
+        _startUnlock(msg.sender, amount);
     }
 
     /**
@@ -86,27 +109,31 @@ contract Crowdsale is BaseTokenRedeemer, ReentrancyGuard, Pausable {
     function buyWithToken_w(address _token, uint _amount, bytes32[] calldata _proof) external whenNotPaused {
         require(block.timestamp >= startTime && block.timestamp <= startTime.add(whitelistDuration));
         require(rate[ETH_ADDRESS] > 0, Errors.TOKEN_NOT_SUPPORTED);
-        // make sure address is not a contract
-        require(!Address.isContract(msg.sender), Errors.ADDRESS_IS_CONTRACT);
+        // verify merkle proof
         require(MerkleProof.verify(_proof, merkleRoot, keccak256(abi.encodePacked(msg.sender))), Errors.INVALID_MERKLE_PROOF);
         // Transfer In
         IERC20(_token).safeTransferFrom(
             msg.sender,
             address(this),
             _amount
-        ); 
+        );
         // start unlock
-        _startUnlock(msg.sender, _amount.mul(rate[_token]));
+        uint amount = _amount.mul(rate[_token]).div(RATE_PRECISION);
+        require(amount > 0, Errors.ZERO_AMOUNT);
+        require(amount < whitelistCap, Errors.EXCEEDED_MAX_CAPACITY);
+        _startUnlock(msg.sender, amount);
     }
 
     /**
      * @notice Buy SYX tokens with ETH
      * @dev Only available after whitelist period
      */
-    function buyWithETH() external payable whenNotPaused {
+    function buyWithETH() public payable whenNotPaused {
         require(block.timestamp >= startTime.add(whitelistDuration) && block.timestamp <= endTime);
         // start unlock
-        _startUnlock(msg.sender, msg.value.mul(rate[ETH_ADDRESS]));
+        uint amount = msg.value.mul(rate[ETH_ADDRESS]).div(RATE_PRECISION);
+        require(amount > 0, Errors.ZERO_AMOUNT);
+        _startUnlock(msg.sender, amount);
     }
 
     /**
@@ -123,9 +150,11 @@ contract Crowdsale is BaseTokenRedeemer, ReentrancyGuard, Pausable {
             msg.sender,
             address(this),
             _amount
-        ); 
-        // start unlock
-        _startUnlock(msg.sender, _amount.mul(rate[_token]));
+        );
+        // start unlock 
+        uint amount = _amount.mul(rate[_token]).div(RATE_PRECISION);
+        require(amount > 0, Errors.ZERO_AMOUNT);
+        _startUnlock(msg.sender, amount);
     }
 
     /**
@@ -134,7 +163,7 @@ contract Crowdsale is BaseTokenRedeemer, ReentrancyGuard, Pausable {
      */
     function unlock(bytes32[] calldata _requestIds) external whenNotPaused {
         for (uint256 i = 0; i < _requestIds.length; i++) {
-            _unlockInternal(_requestIds[i]);
+            _unlockInternal(msg.sender, _requestIds[i]);
         }
     }
 
@@ -158,6 +187,19 @@ contract Crowdsale is BaseTokenRedeemer, ReentrancyGuard, Pausable {
     function endSale() external onlyL1Admin {
         require(block.timestamp < endTime);
         endTime = block.timestamp;
+    }
+
+    /**
+     * @notice Withdraw ETH/ERC20 tokens from contract
+     * @param _token Token address
+     * @param _amount Amount of token to withdraw
+     */
+    function withdraw(address _token, uint256 _amount) external onlyL1Admin {
+        if (_token == ETH_ADDRESS) {
+            Address.sendValue(payable(msg.sender), _amount);
+        } else {
+            IERC20(_token).safeTransfer(msg.sender, _amount);
+        }
     }
 
     function pause() external onlyL2Admin {

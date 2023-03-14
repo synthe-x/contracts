@@ -13,16 +13,14 @@ import "./redeem/BaseTokenRedeemer.sol";
 import "../libraries/Errors.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 
-import "hardhat/console.sol";
-
 /**
  * @title Escrowed SYX
  * @author SyntheX
  * @custom:security-contact prasad@chainscore.finance
  * @notice esSYX can only be transferred by authorized senders
- * @notice SNX tokens can be converted to esSYX for earning protocol fees/rewards (in WETH) and governance (ERC20Votes)
- * @notice Protocol rewards are distributed in esSYX tokens
- * @notice esSNX tokens can be redeemed for SYX tokens, with a lock period, unlock period and percentage unlock at release
+ * @notice SNX tokens can be converted to esSYX for earning protocol fees/rewards (in WETH) and participate in governance (ERC20Votes)
+ * @notice Protocol rewards (APR) are distributed in esSYX tokens; and protocol revenue in WETH
+ * @notice esSNX tokens can be redeemed for SYX tokens, release period set by BaseTokenRedeemer
  */
 contract EscrowedSYX is ERC20Votes, ERC20Burnable, IStaking, BaseTokenRedeemer, AccessControl, Pausable {
     using SafeMath for uint256;
@@ -136,7 +134,7 @@ contract EscrowedSYX is ERC20Votes, ERC20Burnable, IStaking, BaseTokenRedeemer, 
      */
     function claimUnlocked(bytes32[] calldata _requestIds) external whenNotPaused {
         for(uint i = 0; i < _requestIds.length; i++){
-            _unlockInternal(_requestIds[i]);
+            _unlockInternal(msg.sender, _requestIds[i]);
         }
     }
 

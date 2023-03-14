@@ -16,8 +16,8 @@ import "../libraries/Errors.sol";
 
 /**
  * @title ERC20X
- * @dev ERC20 for Synthetic Asset with minting and burning thru pool contract
- * @dev ERC20FlashMint for flash loan with charged fee that burns debt
+ * @dev Synthetic token with minting and burning
+ * @dev ERC20FlashMint for flash loan with fee (used to burn debt)
  */
 contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgradeable, PausableUpgradeable, MulticallUpgradeable {
     /// @notice Using SafeMath for uint256 to prevent overflow and underflow
@@ -97,7 +97,7 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
     function liquidate(address account, uint256 amount, address outAsset) external whenNotPaused {
         require(amount > 0, Errors.ZERO_AMOUNT);
         amount = pool.commitLiquidate(msg.sender, account, amount, outAsset);
-        // TODO sanity check
+        // TODO check if amount is correct
         _burn(msg.sender, amount);
     }
 

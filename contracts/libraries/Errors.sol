@@ -26,7 +26,6 @@ library Errors {
   string public constant ACCOUNT_BELOW_LIQ_THRESHOLD = '17'; // 'The account is below the liquidation threshold'
   string public constant ACCOUNT_NOT_ENTERED = '18'; // 'The account has not entered the collateral'
 
-  // Unlocker
   string public constant NOT_ENOUGH_SYX_TO_UNLOCK = '19'; // 'Not enough SYX to unlock'
   string public constant REQUEST_ALREADY_EXISTS = '20'; // 'Request already exists'
   string public constant REQUEST_DOES_NOT_EXIST = '21'; // 'Request does not exist'
@@ -35,4 +34,7 @@ library Errors {
   string public constant TOKEN_NOT_SUPPORTED = '23';
   string public constant ADDRESS_IS_CONTRACT = '24';
   string public constant INVALID_MERKLE_PROOF = '25';
+  string public constant INVALID_TIME = '26';
+  string public constant INVALID_AMOUNT = '27';
+  string public constant INVALID_ADDRESS = '28';
 }

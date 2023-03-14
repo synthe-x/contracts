@@ -18,9 +18,6 @@ import { IPool } from "./IPool.sol";
 import {Errors} from "../libraries/Errors.sol";
 import "../libraries/PriceConvertor.sol";
 
-// debug
-import "hardhat/console.sol";
-
 /**
  * @title Pool
  * @notice Pool contract to manage collaterals and debt
