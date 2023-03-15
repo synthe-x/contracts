@@ -11,8 +11,8 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 /**
  * @title TokenRedeemer
  * @author SyntheX <prasad@chainscore.finance>
- * @notice This contract is used to unlock SYN tokens for users
- * @notice Users can request to unlock their SYN tokens after a lock period
+ * @notice This contract is used to unlock SYX tokens for users
+ * @notice Users can request to unlock their SYX tokens after a lock period
  * @notice Tokens are released linearly over a period of time (unlock period)
  */
 contract BaseTokenRedeemer {
@@ -21,9 +21,9 @@ contract BaseTokenRedeemer {
     /// @notice SafeERC20 library is used for ERC20 operations
     using SafeERC20 for IERC20;
     
-    /// @notice Emitted when user requests to unlock their SYN tokens
+    /// @notice Emitted when user requests to unlock their SYX tokens
     event UnlockRequested(address indexed user, bytes32 requestId, uint amount);
-    /// @notice Emitted when user claims their unlocked SYN tokens
+    /// @notice Emitted when user claims their unlocked SYX tokens
     event Unlocked(address indexed user, bytes32 requestId, uint amount);
     /// @notice Emitted when admin sets the lock period
     event SetLockPeriod(uint _lockPeriod);
@@ -37,15 +37,16 @@ contract BaseTokenRedeemer {
 
     /// @notice TOKEN is the address of token be unlocked
     IERC20 public TOKEN;
-    /// @notice Reserved for unlock is the amount of SYN that is reserved for unlock
+    /// @notice Reserved for unlock is the amount of SYX that is reserved for unlock
     uint public reservedForUnlock;
-    /// @notice Lock period is the time (in sec) that user must wait before they can claim their unlocked SYN
+    /// @notice Lock period is the time (in sec) that user must wait before they can claim their unlocked SYX
     uint public lockPeriod;
     /// @notice Unlock period is the time (in sec) over which tokens are unlocked
     uint public unlockPeriod;
     /// @notice PercUnlockAtRelease is the percentage of tokens that are unlocked at release. In Basis Points
     uint public percUnlockAtRelease;
     uint public constant BASIS_POINTS = 10000;
+    uint public constant SCALER = 1e18;
     /// @notice Request ID to Unlock struct mapping
     /// @notice Request ID is a hash of user address and request index
     mapping(bytes32 => UnlockData) public unlockRequests;
@@ -54,7 +55,7 @@ contract BaseTokenRedeemer {
 
     /**
      * @notice Constructor
-     * @param _TOKEN Address of SYN
+     * @param _TOKEN Address of SYX
      */
     constructor(address _TOKEN, uint _lockPeriod, uint _unlockPeriod, uint _percUnlockAtRelease) {
         TOKEN = IERC20(_TOKEN);
@@ -64,15 +65,14 @@ contract BaseTokenRedeemer {
     }
 
     function _startUnlock(address user, uint _amount) internal virtual {
-        // check if user has enough SYN to unlock
-        require(remainingQuota() >= _amount, "Not enough SYN to unlock");
-        require(_amount > 0, "Amount must be greater than 0");
+        // check if user has enough SYX to unlock
+        require(remainingQuota() >= _amount, Errors.NOT_ENOUGH_SYX_TO_UNLOCK);
 
         // create unlock request
         bytes32 requestId = keccak256(abi.encodePacked(user, unlockRequestCount[user]));
         
         UnlockData storage _unlockRequest = unlockRequests[requestId];
-        require(_unlockRequest.amount == 0, "Unlock request already exists");
+        require(_unlockRequest.amount == 0, Errors.REQUEST_ALREADY_EXISTS);
         _unlockRequest.amount = _amount;
         _unlockRequest.requestTime = block.timestamp;
         _unlockRequest.claimed = 0;
@@ -80,7 +80,7 @@ contract BaseTokenRedeemer {
         // increment request count
         unlockRequestCount[user]++;
 
-        // reserve SYN for unlock
+        // reserve SYX for unlock
         reservedForUnlock = reservedForUnlock.add(_amount);
 
         emit UnlockRequested(user, requestId, _amount);
@@ -90,10 +90,10 @@ contract BaseTokenRedeemer {
     /*                                    Claim                                   */
     /* -------------------------------------------------------------------------- */
     /**
-     * @notice Claim unlocked SYN tokens
+     * @notice Claim unlocked SYX tokens
      * @param _requestId Request ID of unlock request
      */
-    function _unlockInternal(bytes32 _requestId) internal virtual {
+    function _unlockInternal(address _account, bytes32 _requestId) internal virtual {
         // Get amount to unlock
         uint amountToUnlock = unlocked(_requestId);
 
@@ -102,19 +102,19 @@ contract BaseTokenRedeemer {
             return;
         }
         
-        // Check if contract has enough SYN to unlock
+        // Check if contract has enough SYX to unlock
         if(TOKEN.balanceOf(address(this)) < amountToUnlock){
             amountToUnlock = TOKEN.balanceOf(address(this));
         }
-        TOKEN.safeTransfer(msg.sender, amountToUnlock);
+        TOKEN.safeTransfer(_account, amountToUnlock);
 
         // Increment claimed amount
         unlockRequests[_requestId].claimed = unlockRequests[_requestId].claimed.add(amountToUnlock);
 
-        // release reserved SYN
+        // release reserved SYX
         reservedForUnlock = reservedForUnlock.sub(amountToUnlock);
 
-        emit Unlocked(msg.sender, _requestId, amountToUnlock);
+        emit Unlocked(_account, _requestId, amountToUnlock);
     }
 
 
@@ -122,7 +122,7 @@ contract BaseTokenRedeemer {
     /*                               View Functions                               */
     /* -------------------------------------------------------------------------- */
     /**
-     * @notice Gets remaining quota of SYN that can be set to be unlocked
+     * @notice Gets remaining quota of SYX that can be set to be unlocked
      */
     function remainingQuota() public virtual view returns (uint) {
         return TOKEN.balanceOf(address(this)) - reservedForUnlock;
@@ -135,28 +135,28 @@ contract BaseTokenRedeemer {
     function unlocked(bytes32 _requestId) public virtual view returns (uint) {
         // Check if unlock request exists
         UnlockData memory unlockRequest = unlockRequests[_requestId];
-        require(unlockRequest.amount > 0, "Unlock request does not exist");
+        require(unlockRequest.amount > 0, Errors.REQUEST_DOES_NOT_EXIST);
         // Check if unlock period has passed
-        require(block.timestamp >= unlockRequest.requestTime.add(lockPeriod), "Unlock period has not passed");
+        require(block.timestamp >= unlockRequest.requestTime.add(lockPeriod), Errors.UNLOCK_NOT_STARTED);
 
         // Calculate amount to unlock
-        // Time since unlock date will give: percentage of total to unlock
+        // Time since unlock date will give percentage of total to unlock, excluding percUnlockAtRelease
         uint timeSinceUnlock = block.timestamp.sub(unlockRequest.requestTime.add(lockPeriod));
-        uint percentUnlock = timeSinceUnlock.mul(1e18).div(unlockPeriod);
+        uint percentUnlock = timeSinceUnlock.mul(SCALER).div(unlockPeriod);
             
         // If unlock period has passed, unlock 100% of tokens
-        if(percentUnlock > 1e18){
-            percentUnlock = 1e18;
+        if(percentUnlock > SCALER){
+            percentUnlock = SCALER;
         }
 
-        percentUnlock = percentUnlock.mul(BASIS_POINTS);
+        percentUnlock = percentUnlock.mul(BASIS_POINTS); // convert to basis points
 
         // Calculate amount to unlock
-        // Amount to unlock = (percentUnlock - (percentUnlock * percUnlockAtRelease) + percUnlockAtRelease) * unlockRequest.amount
+        // Amount to unlock = totalAmount * (percentUnlock * (1 - percUnlockAtRelease) + percUnlockAtRelease) - alreadyClaimed
         uint amountToUnlock = unlockRequest.amount
         .mul(
-            percentUnlock.add(percUnlockAtRelease).sub(percentUnlock.mul(percUnlockAtRelease).div(BASIS_POINTS).div(1e18))
-        ).div(1e18).div(BASIS_POINTS)
+            percentUnlock.add(percUnlockAtRelease.mul(SCALER)).sub(percentUnlock.mul(percUnlockAtRelease).div(BASIS_POINTS))
+        ).div(SCALER).div(BASIS_POINTS)
         .sub(unlockRequest.claimed);
 
         return amountToUnlock;

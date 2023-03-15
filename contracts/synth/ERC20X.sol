@@ -12,10 +12,12 @@ import "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
 import "../synthex/SyntheX.sol";
 import "../pool/Pool.sol";
 
+import "../libraries/Errors.sol";
+
 /**
  * @title ERC20X
- * @dev ERC20 for Synthetic Asset with minting and burning thru pool contract
- * @dev ERC20FlashMint for flash loan with charged fee that burns debt
+ * @dev Synthetic token with minting and burning
+ * @dev ERC20FlashMint for flash loan with fee (used to burn debt)
  */
 contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgradeable, PausableUpgradeable, MulticallUpgradeable {
     /// @notice Using SafeMath for uint256 to prevent overflow and underflow
@@ -33,6 +35,9 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
     /// @notice Emitted when flash fee is updated
     event FlashFeeUpdated(uint _flashLoanFee);
 
+    event Mint(address indexed referredBy);
+    event Swap(address indexed referredBy);
+
     function initialize(string memory _name, string memory _symbol, address _pool, address _synthex) initializer external {
         __ERC20_init(_name, _symbol);
         __ERC20FlashMint_init();
@@ -42,7 +47,7 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
     }
 
     modifier onlyInternal(){
-        require(msg.sender == address(pool), "SynthERC20: Only pool can call");
+        require(msg.sender == address(pool), Errors.NOT_AUTHORIZED);
         _;
     }
 
@@ -53,13 +58,13 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
      * @notice Mint token. Issue debt
      * @param amount Amount of token to mint
      */
-    function mint(uint256 amount) external whenNotPaused {
+    function mint(uint256 amount, address recipient, address referredBy) external whenNotPaused {
         // ensure amount is greater than 0
-        require(amount > 0, "SynthERC20: Amount must be greater than 0");
+        require(amount > 0, Errors.ZERO_AMOUNT);
         uint amountToMint = pool.commitMint(msg.sender, amount);
-        // ensure amount to mint is less than input amount
-        require(amountToMint < amount);
-        _mint(msg.sender, amountToMint);
+        // TODO check if amount is correct
+        _mint(recipient, amountToMint);
+        emit Mint(referredBy);
     }
 
     /**
@@ -67,9 +72,9 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
      * @param amount Amount of token to burn
      */
     function burn(uint256 amount) external whenNotPaused {
-        require(amount > 0, "SynthERC20: Amount must be greater than 0");
+        require(amount > 0, Errors.ZERO_AMOUNT);
         amount = pool.commitBurn(msg.sender, amount);
-        // TODO sanity check
+        // TODO check if amount is correct
         _burn(msg.sender, amount);
     }
 
@@ -78,20 +83,21 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
      * @param amount Amount of token to swap
      * @param synthTo Synth to swap to
      */
-    function swap(uint256 amount, address synthTo) external whenNotPaused {
-        require(amount > 0, "SynthERC20: Amount must be greater than 0");
-        amount = pool.commitSwap(msg.sender, amount, synthTo);
-        // TODO sanity check
+    function swap(uint256 amount, address synthTo, address _recipient, address referredBy) external whenNotPaused {
+        require(amount > 0, Errors.ZERO_AMOUNT);
+        amount = pool.commitSwap(_recipient, amount, synthTo);
+        // TODO check if amount is correct
         _burn(msg.sender, amount);
+        emit Swap(referredBy);
     }
 
     /**
      * @notice Liquidate with this synth
      */
     function liquidate(address account, uint256 amount, address outAsset) external whenNotPaused {
-        require(amount > 0, "SynthERC20: Amount must be greater than 0");
+        require(amount > 0, Errors.ZERO_AMOUNT);
         amount = pool.commitLiquidate(msg.sender, account, amount, outAsset);
-        // TODO sanity check
+        // TODO check if amount is correct
         _burn(msg.sender, amount);
     }
 
@@ -124,7 +130,7 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
      * @param _flashLoanFee New flash fee
      */
     function updateFlashFee(uint _flashLoanFee) public {
-        require(synthex.isL2Admin(msg.sender), "SynthERC20: Only L2_ADMIN_ROLE can update flash fee");
+        require(synthex.isL1Admin(msg.sender), Errors.CALLER_NOT_L1_ADMIN);
         flashLoanFee = _flashLoanFee;
         emit FlashFeeUpdated(_flashLoanFee);
     }

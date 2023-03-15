@@ -1,130 +1,109 @@
 {
   "contracts": {
-    "SyntheX": {
-      "address": "0x1802D933d441eCeF24719077bb6b2BB134422a14",
-      "abi": "SyntheX",
-      "constructorArguments": [],
-      "block": "10322784",
-      "implementations": {
-        "undefined": {
-          "address": "0xDa89b0cb7aB6A22934FfafC28727F65B906c9ED8",
-          "source": "SyntheX_undefined",
-          "constructorArguments": [],
-          "block": "10322785"
-        }
-      },
-      "latest": "0xDa89b0cb7aB6A22934FfafC28727F65B906c9ED8"
-    },
-    "Vault": {
-      "address": "0x07857bCb4F1EB142d99C6136885Ba941D56F5205",
-      "abi": "Vault",
-      "constructorArguments": [
-        "0x1802D933d441eCeF24719077bb6b2BB134422a14"
-      ],
-      "block": "10322791"
-    },
-    "SyntheXToken": {
-      "address": "0xBac407BD7c985DFEEa0207e823Ce104aD7825507",
-      "abi": "SyntheXToken",
-      "constructorArguments": [
-        "0x1802D933d441eCeF24719077bb6b2BB134422a14"
-      ],
-      "block": "10322800"
-    },
-    "EscrowedSYN": {
-      "address": "0x6e78691E3fb8A79Ea03D9290adC30650B2975261",
-      "abi": "EscrowedSYN",
-      "constructorArguments": [
-        "0x1802D933d441eCeF24719077bb6b2BB134422a14"
-      ],
-      "block": "10322809"
-    },
-    "StakingRewards": {
-      "address": "0x701E3eE275e1876976320BB036862149276C80E5",
-      "abi": "StakingRewards",
-      "constructorArguments": [
-        "0x6e78691E3fb8A79Ea03D9290adC30650B2975261",
-        "0x6e78691E3fb8A79Ea03D9290adC30650B2975261",
-        "0x1802D933d441eCeF24719077bb6b2BB134422a14",
-        2592000
-      ],
-      "block": "10322817"
-    },
-    "TokenRedeemer": {
-      "address": "0xb001F009A2D549B81c08b30AC50299A021245A2D",
-      "abi": "TokenRedeemer",
-      "constructorArguments": [
-        "0x1802D933d441eCeF24719077bb6b2BB134422a14",
-        "0x6e78691E3fb8A79Ea03D9290adC30650B2975261",
-        "0xBac407BD7c985DFEEa0207e823Ce104aD7825507",
-        "15552000",
-        "15552000",
-        {
-          "type": "BigNumber",
-          "hex": "0x1b1ae4d6e2ef500000"
-        }
-      ],
-      "block": "10322837"
-    },
-    "Multicall2": {
-      "address": "0x9fa6C35cfeD81951fACC1C15c28BD036beafC943",
-      "abi": "Multicall2",
-      "constructorArguments": [],
-      "block": "10322855"
-    },
     "WETH9": {
-      "address": "0x7964Bcc63335E101F23da13583CEaD61d75f863b",
+      "address": "0x8d7858144c37086391F670E0D201347a9dFF7BDe",
       "abi": "WETH9",
       "constructorArguments": [],
-      "block": "10322859"
+      "block": "10603869"
     },
-    "POOL_C": {
-      "address": "0xf1EAf38b3F1B2890e7Ef861bBC151AfE83BE564d",
-      "abi": "Pool",
+    "SyntheX": {
+      "address": "0xcaA76743bd21B0093b55e78E1Dd7136bEC8B4890",
+      "abi": "SyntheX",
       "constructorArguments": [],
-      "block": "10322873",
+      "block": "10603879",
       "implementations": {
         "undefined": {
-          "address": "0x1A6a9A3383527E2c1dBc2D10AC381397c81Ed9cf",
-          "source": "POOL_C_undefined",
+          "address": "0x796D430ff5A6DfFB8aa42D6aAA5dd09658a30103",
+          "source": "SyntheX_undefined",
           "constructorArguments": [],
-          "block": "10322873"
+          "block": "10603879"
         }
       },
-      "latest": "0x1A6a9A3383527E2c1dBc2D10AC381397c81Ed9cf"
+      "latest": "0x796D430ff5A6DfFB8aa42D6aAA5dd09658a30103"
+    },
+    "Vault": {
+      "address": "0x157C47C08c8bB73eDD08d20AdD70D70993c3B3cC",
+      "abi": "Vault",
+      "constructorArguments": [
+        "0xcaA76743bd21B0093b55e78E1Dd7136bEC8B4890"
+      ],
+      "block": "10603884"
+    },
+    "SyntheXToken": {
+      "address": "0x27505D3CFBdE3157ec9DB7b82EB7d7044ae8d8a4",
+      "abi": "SyntheXToken",
+      "constructorArguments": [
+        "0xcaA76743bd21B0093b55e78E1Dd7136bEC8B4890"
+      ],
+      "block": "10603899"
+    },
+    "EscrowedSYX": {
+      "address": "0xDBda9EC512104d369Fdf49E3BBA1E754E71f1410",
+      "abi": "EscrowedSYX",
+      "constructorArguments": [
+        "0xcaA76743bd21B0093b55e78E1Dd7136bEC8B4890",
+        "0x27505D3CFBdE3157ec9DB7b82EB7d7044ae8d8a4",
+        "0x8d7858144c37086391F670E0D201347a9dFF7BDe",
+        "30",
+        "15552000",
+        "4838400",
+        "500"
+      ],
+      "block": "10603904"
+    },
+    "Multicall2": {
+      "address": "0x1A8fb7f5Ea3c417Cf7086579850EcAB299Af7700",
+      "abi": "Multicall2",
+      "constructorArguments": [],
+      "block": "10603924"
+    },
+    "POOL_C": {
+      "address": "0x8AC3734A1D2a2C37De95f332833381eEc844F297",
+      "abi": "Pool",
+      "constructorArguments": [],
+      "block": "10603933",
+      "implementations": {
+        "undefined": {
+          "address": "0xa60190bdDaeE5Bf5128f8D23e4c32FD5d1E9f161",
+          "source": "POOL_C_undefined",
+          "constructorArguments": [],
+          "block": "10603935"
+        }
+      },
+      "latest": "0xa60190bdDaeE5Bf5128f8D23e4c32FD5d1E9f161"
     },
     "WBTC": {
-      "address": "0x1B344e5c43dd2c8acf54E4608Dbec1933aBAEb73",
+      "address": "0xa5B30B6ccD8c773e0dB14BF3b58a0873Da763a40",
       "abi": "MockToken",
       "constructorArguments": [
         "Wrapped Bitcoin",
         "WBTC",
         18
       ],
-      "block": "10322888"
+      "block": "10603954"
     },
     "wstETH": {
-      "address": "0xfa4F16a35234Ec16795DA14a86781Acdaa6Dc6Ec",
+      "address": "0x5FC78AE08610F29C3d6068efeb198F0b789c5841",
       "abi": "MockToken",
       "constructorArguments": [
         "Lido wstETH",
         "wstETH",
         18
       ],
-      "block": "10322899"
+      "block": "10603965"
     },
     "AAVE": {
-      "address": "0x8f09710d35bBD194137f9bBF949A398545F7f742",
+      "address": "0x4eC26d14b652f1b797F9F9f7ef1502F69bCf7c1F",
       "abi": "MockToken",
       "constructorArguments": [
         "AAVE",
         "AAVE",
         18
       ],
-      "block": "10322909"
+      "block": "10603974"
     },
     "AAVE_PriceFeed": {
-      "address": "0x869d29E13d5eeb19eA1f8bF477Ffe9C7582003b2",
+      "address": "0x0AEC72D866A7eB329135CB6166ec742031B143b0",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -133,105 +112,105 @@
         },
         8
       ],
-      "block": "10322912"
+      "block": "10603980"
     },
     "LINK": {
-      "address": "0xF402C4651BF47fbA5ca37c231d31e77EEd66C512",
+      "address": "0xEFcc481318802346629ed99E5b6DF10a1C92De51",
       "abi": "MockToken",
       "constructorArguments": [
         "ChainLink",
         "LINK",
         18
       ],
-      "block": "10322922"
+      "block": "10603991"
     },
     "USDC": {
-      "address": "0x9D1abb08Afc49c485d861b03Fb796265F177016E",
+      "address": "0x790abA7A74aFaD506d4D06e04836Da523C66e919",
       "abi": "MockToken",
       "constructorArguments": [
         "USD Coin",
         "USDC",
         18
       ],
-      "block": "10323175"
+      "block": "10604182"
     },
     "cBTC": {
-      "address": "0xf23981100b1801c903c7ceEFaF4D44C72d9e3266",
+      "address": "0x5Dc04c521F2D74D4de1d07b4d635A2C598ae3500",
       "abi": "ERC20X",
       "constructorArguments": [],
-      "block": "10322944",
+      "block": "10604018",
       "implementations": {
         "undefined": {
-          "address": "0x07a3Bf7549Fc840b127C50FD00425487316Bb178",
+          "address": "0x0143a13DcA1885D7250901e17dF54f1EC5383100",
           "source": "cBTC_undefined",
           "constructorArguments": [],
-          "block": "10322945"
+          "block": "10604018"
         }
       },
-      "latest": "0x07a3Bf7549Fc840b127C50FD00425487316Bb178"
+      "latest": "0x0143a13DcA1885D7250901e17dF54f1EC5383100"
     },
     "cETH": {
-      "address": "0x68C641Df18Ae341e7573E2931568caDB41446240",
+      "address": "0x78F290214eA1b1961F60090c75FC9e768ce1DcE7",
       "abi": "ERC20X",
       "constructorArguments": [],
-      "block": "10322968",
+      "block": "10604033",
       "implementations": {
         "undefined": {
-          "address": "0x07a3Bf7549Fc840b127C50FD00425487316Bb178",
+          "address": "0x0143a13DcA1885D7250901e17dF54f1EC5383100",
           "source": "cETH_undefined",
           "constructorArguments": [],
-          "block": "10322969"
+          "block": "10604033"
         }
       },
-      "latest": "0x07a3Bf7549Fc840b127C50FD00425487316Bb178"
+      "latest": "0x0143a13DcA1885D7250901e17dF54f1EC5383100"
     },
     "cUSDC": {
-      "address": "0xE5DA0e2d0e6641bf492b61070bE853E84BFC2465",
+      "address": "0x4a5ff09c5852565635d4cbF5aa74b011017f83f5",
       "abi": "ERC20X",
       "constructorArguments": [],
-      "block": "10322993",
+      "block": "10604047",
       "implementations": {
         "undefined": {
-          "address": "0x07a3Bf7549Fc840b127C50FD00425487316Bb178",
+          "address": "0x0143a13DcA1885D7250901e17dF54f1EC5383100",
           "source": "cUSDC_undefined",
           "constructorArguments": [],
-          "block": "10322994"
+          "block": "10604047"
         }
       },
-      "latest": "0x07a3Bf7549Fc840b127C50FD00425487316Bb178"
+      "latest": "0x0143a13DcA1885D7250901e17dF54f1EC5383100"
     },
     "cLINK": {
-      "address": "0xd2Bf3a2F1cD21b9953Aa7552E95B4a15cFc146b4",
+      "address": "0x74a487fdA61E1C95F8179E660927CFf883F40C69",
       "abi": "ERC20X",
       "constructorArguments": [],
-      "block": "10323013",
+      "block": "10604063",
       "implementations": {
         "undefined": {
-          "address": "0x07a3Bf7549Fc840b127C50FD00425487316Bb178",
+          "address": "0x0143a13DcA1885D7250901e17dF54f1EC5383100",
           "source": "cLINK_undefined",
           "constructorArguments": [],
-          "block": "10323014"
+          "block": "10604063"
         }
       },
-      "latest": "0x07a3Bf7549Fc840b127C50FD00425487316Bb178"
+      "latest": "0x0143a13DcA1885D7250901e17dF54f1EC5383100"
     },
     "cBNB": {
-      "address": "0xb5423C95CF4a32DebC28720B8bDa05Da9B1b84f6",
+      "address": "0x6e6Ae446F48CD10E98450b1181EBC48Eba6d31A9",
       "abi": "ERC20X",
       "constructorArguments": [],
-      "block": "10323036",
+      "block": "10604076",
       "implementations": {
         "undefined": {
-          "address": "0x07a3Bf7549Fc840b127C50FD00425487316Bb178",
+          "address": "0x0143a13DcA1885D7250901e17dF54f1EC5383100",
           "source": "cBNB_undefined",
           "constructorArguments": [],
-          "block": "10323036"
+          "block": "10604076"
         }
       },
-      "latest": "0x07a3Bf7549Fc840b127C50FD00425487316Bb178"
+      "latest": "0x0143a13DcA1885D7250901e17dF54f1EC5383100"
     },
     "cBNB_PriceFeed": {
-      "address": "0x825337aEdaF3bcd099Ff2FF23E0d59CEeFC2b2f8",
+      "address": "0x4862BD5f67187bE7Fcbf3bB3feEa22E96538e8B2",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -240,25 +219,25 @@
         },
         8
       ],
-      "block": "10323043"
+      "block": "10604080"
     },
     "cSOL": {
-      "address": "0xb65d3a22ec9C1000Fc0739E0FDB1470cb698246F",
+      "address": "0x4ebF206F2734Aa39720c29741946307C996372C8",
       "abi": "ERC20X",
       "constructorArguments": [],
-      "block": "10323059",
+      "block": "10604091",
       "implementations": {
         "undefined": {
-          "address": "0x07a3Bf7549Fc840b127C50FD00425487316Bb178",
+          "address": "0x0143a13DcA1885D7250901e17dF54f1EC5383100",
           "source": "cSOL_undefined",
           "constructorArguments": [],
-          "block": "10323060"
+          "block": "10604092"
         }
       },
-      "latest": "0x07a3Bf7549Fc840b127C50FD00425487316Bb178"
+      "latest": "0x0143a13DcA1885D7250901e17dF54f1EC5383100"
     },
     "cSOL_PriceFeed": {
-      "address": "0x7c303B182D406D73b1e40cD9bdAFfc380D7e5FbE",
+      "address": "0x04d3922c2b71FA9aB94b4e3A7fC00b42F8c9A63e",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -267,25 +246,25 @@
         },
         8
       ],
-      "block": "10323065"
+      "block": "10604096"
     },
     "cAPE": {
-      "address": "0xE64B13eb509A471c56BB45122B32d0D9452a1ED8",
+      "address": "0x2400d1aE67fe5Bc1f1CB47720cCf6dF65247bdF4",
       "abi": "ERC20X",
       "constructorArguments": [],
-      "block": "10323077",
+      "block": "10604106",
       "implementations": {
         "undefined": {
-          "address": "0x07a3Bf7549Fc840b127C50FD00425487316Bb178",
+          "address": "0x0143a13DcA1885D7250901e17dF54f1EC5383100",
           "source": "cAPE_undefined",
           "constructorArguments": [],
-          "block": "10323078"
+          "block": "10604106"
         }
       },
-      "latest": "0x07a3Bf7549Fc840b127C50FD00425487316Bb178"
+      "latest": "0x0143a13DcA1885D7250901e17dF54f1EC5383100"
     },
     "cAPE_PriceFeed": {
-      "address": "0xeE5019cD8c2f496a9eBc7Cd82EDAc898DD7859Fd",
+      "address": "0xC999Eb909154F7e93b08c4Fe76F033A68E44F2d5",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -294,25 +273,25 @@
         },
         8
       ],
-      "block": "10323082"
+      "block": "10604113"
     },
     "cMATIC": {
-      "address": "0x7CF5A763E132522Ce37F5eD141A0fEB48ddC6092",
+      "address": "0x9811925f3CC82d812aC32F265c73343244B13949",
       "abi": "ERC20X",
       "constructorArguments": [],
-      "block": "10323097",
+      "block": "10604126",
       "implementations": {
         "undefined": {
-          "address": "0x07a3Bf7549Fc840b127C50FD00425487316Bb178",
+          "address": "0x0143a13DcA1885D7250901e17dF54f1EC5383100",
           "source": "cMATIC_undefined",
           "constructorArguments": [],
-          "block": "10323098"
+          "block": "10604126"
         }
       },
-      "latest": "0x07a3Bf7549Fc840b127C50FD00425487316Bb178"
+      "latest": "0x0143a13DcA1885D7250901e17dF54f1EC5383100"
     },
     "cMATIC_PriceFeed": {
-      "address": "0xa22e20feA46b8D1CBE841b70f3d740fB05B7ccd7",
+      "address": "0x0aD414C6C7214f3A42b43eDd0DF7cB2338e8a279",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -321,98 +300,98 @@
         },
         8
       ],
-      "block": "10323103"
+      "block": "10604132"
     },
     "PriceOracle_C": {
-      "address": "0x70caD3491303e9b291ea57e307Fd6607156e1735",
+      "address": "0x0949b09437660fc87D80330Fd2F2915F45204DDc",
       "abi": "PriceOracle",
       "constructorArguments": [
-        "0x1802D933d441eCeF24719077bb6b2BB134422a14",
+        "0xcaA76743bd21B0093b55e78E1Dd7136bEC8B4890",
         [
           "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-          "0x1B344e5c43dd2c8acf54E4608Dbec1933aBAEb73",
-          "0xfa4F16a35234Ec16795DA14a86781Acdaa6Dc6Ec",
-          "0x8f09710d35bBD194137f9bBF949A398545F7f742",
-          "0xF402C4651BF47fbA5ca37c231d31e77EEd66C512",
-          "0x3C2F6568730a9c3b186a40BC0c367B3b07b0810E",
-          "0xf23981100b1801c903c7ceEFaF4D44C72d9e3266",
-          "0x68C641Df18Ae341e7573E2931568caDB41446240",
-          "0xE5DA0e2d0e6641bf492b61070bE853E84BFC2465",
-          "0xd2Bf3a2F1cD21b9953Aa7552E95B4a15cFc146b4",
-          "0xb5423C95CF4a32DebC28720B8bDa05Da9B1b84f6",
-          "0xb65d3a22ec9C1000Fc0739E0FDB1470cb698246F",
-          "0xE64B13eb509A471c56BB45122B32d0D9452a1ED8",
-          "0x7CF5A763E132522Ce37F5eD141A0fEB48ddC6092"
+          "0xa5B30B6ccD8c773e0dB14BF3b58a0873Da763a40",
+          "0x5FC78AE08610F29C3d6068efeb198F0b789c5841",
+          "0x4eC26d14b652f1b797F9F9f7ef1502F69bCf7c1F",
+          "0xEFcc481318802346629ed99E5b6DF10a1C92De51",
+          "0x91FEf8b89b7Cd7B04A8F7b297defA31c6A97F95c",
+          "0x5Dc04c521F2D74D4de1d07b4d635A2C598ae3500",
+          "0x78F290214eA1b1961F60090c75FC9e768ce1DcE7",
+          "0x4a5ff09c5852565635d4cbF5aa74b011017f83f5",
+          "0x74a487fdA61E1C95F8179E660927CFf883F40C69",
+          "0x6e6Ae446F48CD10E98450b1181EBC48Eba6d31A9",
+          "0x4ebF206F2734Aa39720c29741946307C996372C8",
+          "0x2400d1aE67fe5Bc1f1CB47720cCf6dF65247bdF4",
+          "0x9811925f3CC82d812aC32F265c73343244B13949"
         ],
         [
           "0x62CAe0FA2da220f43a51F86Db2EDb36DcA9A5A08",
           "0x6550bc2301936011c1334555e62A87705A81C12C",
           "0x62CAe0FA2da220f43a51F86Db2EDb36DcA9A5A08",
-          "0x869d29E13d5eeb19eA1f8bF477Ffe9C7582003b2",
+          "0x0AEC72D866A7eB329135CB6166ec742031B143b0",
           "0xd28Ba6CA3bB72bF371b80a2a0a33cBcf9073C954",
           "0x1692Bdd32F31b831caAc1b0c9fAF68613682813b",
           "0x6550bc2301936011c1334555e62A87705A81C12C",
           "0x62CAe0FA2da220f43a51F86Db2EDb36DcA9A5A08",
           "0x1692Bdd32F31b831caAc1b0c9fAF68613682813b",
           "0xd28Ba6CA3bB72bF371b80a2a0a33cBcf9073C954",
-          "0x825337aEdaF3bcd099Ff2FF23E0d59CEeFC2b2f8",
-          "0x7c303B182D406D73b1e40cD9bdAFfc380D7e5FbE",
-          "0xeE5019cD8c2f496a9eBc7Cd82EDAc898DD7859Fd",
-          "0xa22e20feA46b8D1CBE841b70f3d740fB05B7ccd7"
+          "0x4862BD5f67187bE7Fcbf3bB3feEa22E96538e8B2",
+          "0x04d3922c2b71FA9aB94b4e3A7fC00b42F8c9A63e",
+          "0xC999Eb909154F7e93b08c4Fe76F033A68E44F2d5",
+          "0x0aD414C6C7214f3A42b43eDd0DF7cB2338e8a279"
         ],
         "0x0000000000000000000000000000000000000000",
         "0x0000000000000000000000000000000000000000",
         100000000
       ],
-      "block": "10323114"
+      "block": "10604142"
     },
     "POOL_F": {
-      "address": "0xc2106398EF704ce56100e834dE99f265cAe86BDc",
+      "address": "0x7499EA6C7786a6cD913267108f8B69c9e4F02BD1",
       "abi": "Pool",
       "constructorArguments": [],
-      "block": "10323150",
+      "block": "10604167",
       "implementations": {
         "undefined": {
-          "address": "0x1A6a9A3383527E2c1dBc2D10AC381397c81Ed9cf",
+          "address": "0xa60190bdDaeE5Bf5128f8D23e4c32FD5d1E9f161",
           "source": "POOL_F_undefined",
           "constructorArguments": [],
-          "block": "10323152"
+          "block": "10604169"
         }
       },
-      "latest": "0x1A6a9A3383527E2c1dBc2D10AC381397c81Ed9cf"
+      "latest": "0xa60190bdDaeE5Bf5128f8D23e4c32FD5d1E9f161"
     },
     "USDT": {
-      "address": "0xFbb31Bc417dda5D5b6aDdD935143fd13a94bba69",
+      "address": "0xE913df609a7aC39dAF2cC90aF8Cb9D192a7C864F",
       "abi": "MockToken",
       "constructorArguments": [
         "Tether USD",
         "USDT",
         18
       ],
-      "block": "10323191"
+      "block": "10604198"
     },
     "DAI": {
-      "address": "0x46B564DeC8A27799319E6B5aD0514Ba7553af431",
+      "address": "0x13CDA3965b35c31A48CF857f15C1eeAFbdf90Ec5",
       "abi": "MockToken",
       "constructorArguments": [
         "DAI Stablecoin",
         "DAI",
         18
       ],
-      "block": "10323201"
+      "block": "10604209"
     },
     "EUROC": {
-      "address": "0x11261A860f34D0a21748bb57F21465C71a751250",
+      "address": "0x981906D1eaeFB286d6680c4a9ECd9D06d158C595",
       "abi": "MockToken",
       "constructorArguments": [
         "Euro Coin",
         "EUROC",
         18
       ],
-      "block": "10323211"
+      "block": "10604220"
     },
     "EUROC_PriceFeed": {
-      "address": "0x0c0C1391E28860F976D2aB5087770C4Df3AD08ac",
+      "address": "0x0b6F740AAd5788eD9e69d912E3763A69C03b0370",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -421,46 +400,46 @@
         },
         8
       ],
-      "block": "10323218"
+      "block": "10604225"
     },
     "aArbUSDC": {
-      "address": "0xE3CDEaeEF95E5b5411022Ba20E0B32F58CcBB452",
+      "address": "0x955c7Ab2F7BE6dC7006134f3eD6214Ae9284fCF1",
       "abi": "ATokenWrapper",
       "constructorArguments": [
         "Wrapped Aave USDC",
         "waArbUSDC",
         "0xd9933e10d6d9453FFaCF1236aF7ea1a61EA4D2c5"
       ],
-      "block": "10323229"
+      "block": "10604233"
     },
     "aArbUSDC_PriceFeed": {
-      "address": "0x341996ae3Ab7dec5eD92c5487a3c157ac7103D4D",
+      "address": "0xC8525a6B4f9FB0896B06561A6A19EBE7C1f1d763",
       "abi": "AAVEOracle",
       "constructorArguments": [
-        "0xE3CDEaeEF95E5b5411022Ba20E0B32F58CcBB452",
+        "0x955c7Ab2F7BE6dC7006134f3eD6214Ae9284fCF1",
         "0x72A9c57cD5E2Ff20450e409cF6A542f1E6c710fc",
         "0x4eee0bb72c2717310318f27628b3c8a708e4951c",
         6
       ],
-      "block": "10323231"
+      "block": "10604238"
     },
     "fUSD": {
-      "address": "0x34171f5A13FcAFF3ec780562be80695600807845",
+      "address": "0xDa63444278d0e57f81464bfF863cD3415FdB980D",
       "abi": "ERC20X",
       "constructorArguments": [],
-      "block": "10323242",
+      "block": "10604253",
       "implementations": {
         "undefined": {
-          "address": "0x07a3Bf7549Fc840b127C50FD00425487316Bb178",
+          "address": "0x0143a13DcA1885D7250901e17dF54f1EC5383100",
           "source": "fUSD_undefined",
           "constructorArguments": [],
-          "block": "10323242"
+          "block": "10604255"
         }
       },
-      "latest": "0x07a3Bf7549Fc840b127C50FD00425487316Bb178"
+      "latest": "0x0143a13DcA1885D7250901e17dF54f1EC5383100"
     },
     "fUSD_PriceFeed": {
-      "address": "0xb24A4BcE70b6f9f364DE431C6C90F18B4036a745",
+      "address": "0xCc94F3BE0c0C3Bdeb063398f1219a7D6C4a91526",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -469,25 +448,25 @@
         },
         8
       ],
-      "block": "10323249"
+      "block": "10604261"
     },
     "fEUR": {
-      "address": "0x8459a42884548A80215fDe8db373518383c387AB",
+      "address": "0xB7a924F1019A0612DA914AbeaA3e8959dAff896c",
       "abi": "ERC20X",
       "constructorArguments": [],
-      "block": "10323261",
+      "block": "10604271",
       "implementations": {
         "undefined": {
-          "address": "0x07a3Bf7549Fc840b127C50FD00425487316Bb178",
+          "address": "0x0143a13DcA1885D7250901e17dF54f1EC5383100",
           "source": "fEUR_undefined",
           "constructorArguments": [],
-          "block": "10323263"
+          "block": "10604271"
         }
       },
-      "latest": "0x07a3Bf7549Fc840b127C50FD00425487316Bb178"
+      "latest": "0x0143a13DcA1885D7250901e17dF54f1EC5383100"
     },
     "fEUR_PriceFeed": {
-      "address": "0xFEec649351bedcbf3B6E62987C89F5e272c3e6B5",
+      "address": "0xbf13CE5f9DD484050030f46FC9Ab46C31eB4636d",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -496,25 +475,25 @@
         },
         8
       ],
-      "block": "10323269"
+      "block": "10604280"
     },
     "fJPY": {
-      "address": "0x4C762307F679d4eC4d6999E3a6182Fc33b7489df",
+      "address": "0x251581Caa0A1580b380860Cde0698ECA0b077D52",
       "abi": "ERC20X",
       "constructorArguments": [],
-      "block": "10323282",
+      "block": "10604290",
       "implementations": {
         "undefined": {
-          "address": "0x07a3Bf7549Fc840b127C50FD00425487316Bb178",
+          "address": "0x0143a13DcA1885D7250901e17dF54f1EC5383100",
           "source": "fJPY_undefined",
           "constructorArguments": [],
-          "block": "10323282"
+          "block": "10604293"
         }
       },
-      "latest": "0x07a3Bf7549Fc840b127C50FD00425487316Bb178"
+      "latest": "0x0143a13DcA1885D7250901e17dF54f1EC5383100"
     },
     "fJPY_PriceFeed": {
-      "address": "0xA86952aa8975212dCB0C7dB552aeA8608Fe32978",
+      "address": "0xFaEAB8893821C9c85d220C35Dc11AE1ddF11bc59",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -523,25 +502,25 @@
         },
         8
       ],
-      "block": "10323287"
+      "block": "10604296"
     },
     "fCAD": {
-      "address": "0x9e523bbCF1b99C68a41ca2942B9FEC7bcE24C284",
+      "address": "0xD1cDBa47d2C0169b41b702cE4A1CD1cd65C675b4",
       "abi": "ERC20X",
       "constructorArguments": [],
-      "block": "10323307",
+      "block": "10604313",
       "implementations": {
         "undefined": {
-          "address": "0x07a3Bf7549Fc840b127C50FD00425487316Bb178",
+          "address": "0x0143a13DcA1885D7250901e17dF54f1EC5383100",
           "source": "fCAD_undefined",
           "constructorArguments": [],
-          "block": "10323307"
+          "block": "10604314"
         }
       },
-      "latest": "0x07a3Bf7549Fc840b127C50FD00425487316Bb178"
+      "latest": "0x0143a13DcA1885D7250901e17dF54f1EC5383100"
     },
     "fCAD_PriceFeed": {
-      "address": "0xF051b90b80fB32a99FF24DcC7e04ba5FB1146733",
+      "address": "0x11e4b34D48E96eE7D3a22A991dC747D6EA160027",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -550,25 +529,25 @@
         },
         8
       ],
-      "block": "10323315"
+      "block": "10604318"
     },
     "fWON": {
-      "address": "0x238aA3f869020F29F2DB755e03cA53e367FE7b36",
+      "address": "0xE8a13e7C45DE35f6eCCA6380f55940113B8d80a8",
       "abi": "ERC20X",
       "constructorArguments": [],
-      "block": "10323339",
+      "block": "10604333",
       "implementations": {
         "undefined": {
-          "address": "0x07a3Bf7549Fc840b127C50FD00425487316Bb178",
+          "address": "0x0143a13DcA1885D7250901e17dF54f1EC5383100",
           "source": "fWON_undefined",
           "constructorArguments": [],
-          "block": "10323341"
+          "block": "10604333"
         }
       },
-      "latest": "0x07a3Bf7549Fc840b127C50FD00425487316Bb178"
+      "latest": "0x0143a13DcA1885D7250901e17dF54f1EC5383100"
     },
     "fWON_PriceFeed": {
-      "address": "0xFC8010216eAC0Eb6478885Cbc190f95319Ac6552",
+      "address": "0x7aAa558c269C0D4D0CC963D6535BED2797f42b58",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -577,25 +556,25 @@
         },
         8
       ],
-      "block": "10323349"
+      "block": "10604339"
     },
     "fAED": {
-      "address": "0x2A4215664BCEF0652C7b521F22d1E852AE33ed45",
+      "address": "0x60Ce7B3dfa3b710Abb7e8eb7fB0a9c6754CBA9CB",
       "abi": "ERC20X",
       "constructorArguments": [],
-      "block": "10323367",
+      "block": "10604358",
       "implementations": {
         "undefined": {
-          "address": "0x07a3Bf7549Fc840b127C50FD00425487316Bb178",
+          "address": "0x0143a13DcA1885D7250901e17dF54f1EC5383100",
           "source": "fAED_undefined",
           "constructorArguments": [],
-          "block": "10323368"
+          "block": "10604359"
         }
       },
-      "latest": "0x07a3Bf7549Fc840b127C50FD00425487316Bb178"
+      "latest": "0x0143a13DcA1885D7250901e17dF54f1EC5383100"
     },
     "fAED_PriceFeed": {
-      "address": "0x50c6610Bd7Ac6Cac17C63A9Edb827Da963d71309",
+      "address": "0xD46e7176eEDfBF68952d7c327Ab3C7D2Ab3cc2F9",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -604,25 +583,25 @@
         },
         8
       ],
-      "block": "10323374"
+      "block": "10604361"
     },
     "fINR": {
-      "address": "0x0FDd4d83c6be1464a89c95b5855C6de73be50385",
+      "address": "0x02A2C4365376b190c93d7a4eF80F2ee95b8d804E",
       "abi": "ERC20X",
       "constructorArguments": [],
-      "block": "10323391",
+      "block": "10604378",
       "implementations": {
         "undefined": {
-          "address": "0x07a3Bf7549Fc840b127C50FD00425487316Bb178",
+          "address": "0x0143a13DcA1885D7250901e17dF54f1EC5383100",
           "source": "fINR_undefined",
           "constructorArguments": [],
-          "block": "10323392"
+          "block": "10604380"
         }
       },
-      "latest": "0x07a3Bf7549Fc840b127C50FD00425487316Bb178"
+      "latest": "0x0143a13DcA1885D7250901e17dF54f1EC5383100"
     },
     "fINR_PriceFeed": {
-      "address": "0xDEC47fd0ab0A40C93D4770101fA81681B8520a37",
+      "address": "0x0EdF934a3fBe0C070AD5c5DA89470C7C9919570F",
       "abi": "MockPriceFeed",
       "constructorArguments": [
         {
@@ -631,49 +610,307 @@
         },
         8
       ],
-      "block": "10323395"
+      "block": "10604384"
     },
     "PriceOracle_F": {
-      "address": "0xE24B9bE4d6823FD84895D42750d31ECE38Ba9e4b",
+      "address": "0x4753C420863bf24708d09FDAC1fBaf0C2AF71d87",
       "abi": "PriceOracle",
       "constructorArguments": [
-        "0x1802D933d441eCeF24719077bb6b2BB134422a14",
+        "0xcaA76743bd21B0093b55e78E1Dd7136bEC8B4890",
         [
-          "0x9D1abb08Afc49c485d861b03Fb796265F177016E",
-          "0xFbb31Bc417dda5D5b6aDdD935143fd13a94bba69",
-          "0x46B564DeC8A27799319E6B5aD0514Ba7553af431",
-          "0x11261A860f34D0a21748bb57F21465C71a751250",
-          "0xE3CDEaeEF95E5b5411022Ba20E0B32F58CcBB452",
-          "0x34171f5A13FcAFF3ec780562be80695600807845",
-          "0x8459a42884548A80215fDe8db373518383c387AB",
-          "0x4C762307F679d4eC4d6999E3a6182Fc33b7489df",
-          "0x9e523bbCF1b99C68a41ca2942B9FEC7bcE24C284",
-          "0x238aA3f869020F29F2DB755e03cA53e367FE7b36",
-          "0x2A4215664BCEF0652C7b521F22d1E852AE33ed45",
-          "0x0FDd4d83c6be1464a89c95b5855C6de73be50385"
+          "0x790abA7A74aFaD506d4D06e04836Da523C66e919",
+          "0xE913df609a7aC39dAF2cC90aF8Cb9D192a7C864F",
+          "0x13CDA3965b35c31A48CF857f15C1eeAFbdf90Ec5",
+          "0x981906D1eaeFB286d6680c4a9ECd9D06d158C595",
+          "0x955c7Ab2F7BE6dC7006134f3eD6214Ae9284fCF1",
+          "0xDa63444278d0e57f81464bfF863cD3415FdB980D",
+          "0xB7a924F1019A0612DA914AbeaA3e8959dAff896c",
+          "0x251581Caa0A1580b380860Cde0698ECA0b077D52",
+          "0xD1cDBa47d2C0169b41b702cE4A1CD1cd65C675b4",
+          "0xE8a13e7C45DE35f6eCCA6380f55940113B8d80a8",
+          "0x60Ce7B3dfa3b710Abb7e8eb7fB0a9c6754CBA9CB",
+          "0x02A2C4365376b190c93d7a4eF80F2ee95b8d804E"
         ],
         [
           "0x1692Bdd32F31b831caAc1b0c9fAF68613682813b",
           "0x0a023a3423D9b27A0BE48c768CCF2dD7877fEf5E",
           "0x103b53E977DA6E4Fa92f76369c8b7e20E7fb7fe1",
-          "0x0c0C1391E28860F976D2aB5087770C4Df3AD08ac",
-          "0x341996ae3Ab7dec5eD92c5487a3c157ac7103D4D",
-          "0xb24A4BcE70b6f9f364DE431C6C90F18B4036a745",
-          "0xFEec649351bedcbf3B6E62987C89F5e272c3e6B5",
-          "0xA86952aa8975212dCB0C7dB552aeA8608Fe32978",
-          "0xF051b90b80fB32a99FF24DcC7e04ba5FB1146733",
-          "0xFC8010216eAC0Eb6478885Cbc190f95319Ac6552",
-          "0x50c6610Bd7Ac6Cac17C63A9Edb827Da963d71309",
-          "0xDEC47fd0ab0A40C93D4770101fA81681B8520a37"
+          "0x0b6F740AAd5788eD9e69d912E3763A69C03b0370",
+          "0xC8525a6B4f9FB0896B06561A6A19EBE7C1f1d763",
+          "0xCc94F3BE0c0C3Bdeb063398f1219a7D6C4a91526",
+          "0xbf13CE5f9DD484050030f46FC9Ab46C31eB4636d",
+          "0xFaEAB8893821C9c85d220C35Dc11AE1ddF11bc59",
+          "0x11e4b34D48E96eE7D3a22A991dC747D6EA160027",
+          "0x7aAa558c269C0D4D0CC963D6535BED2797f42b58",
+          "0xD46e7176eEDfBF68952d7c327Ab3C7D2Ab3cc2F9",
+          "0x0EdF934a3fBe0C070AD5c5DA89470C7C9919570F"
         ],
         "0x0000000000000000000000000000000000000000",
         "0x0000000000000000000000000000000000000000",
         100000000
       ],
-      "block": "10323408"
+      "block": "10604393"
     }
   },
   "sources": {
+    "WETH9": [
+      {
+        "type": "function",
+        "name": "name",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "approve",
+        "constant": false,
+        "payable": false,
+        "inputs": [
+          {
+            "type": "address",
+            "name": "guy"
+          },
+          {
+            "type": "uint256",
+            "name": "wad"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "bool"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "totalSupply",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "uint256"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "transferFrom",
+        "constant": false,
+        "payable": false,
+        "inputs": [
+          {
+            "type": "address",
+            "name": "src"
+          },
+          {
+            "type": "address",
+            "name": "dst"
+          },
+          {
+            "type": "uint256",
+            "name": "wad"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "bool"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "withdraw",
+        "constant": false,
+        "payable": false,
+        "inputs": [
+          {
+            "type": "uint256",
+            "name": "wad"
+          }
+        ],
+        "outputs": []
+      },
+      {
+        "type": "function",
+        "name": "decimals",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "uint8"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "balanceOf",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [
+          {
+            "type": "address"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "uint256"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "symbol",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "string"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "transfer",
+        "constant": false,
+        "payable": false,
+        "inputs": [
+          {
+            "type": "address",
+            "name": "dst"
+          },
+          {
+            "type": "uint256",
+            "name": "wad"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "bool"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "deposit",
+        "constant": false,
+        "stateMutability": "payable",
+        "payable": true,
+        "inputs": [],
+        "outputs": []
+      },
+      {
+        "type": "function",
+        "name": "allowance",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [
+          {
+            "type": "address"
+          },
+          {
+            "type": "address"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "uint256"
+          }
+        ]
+      },
+      {
+        "type": "event",
+        "anonymous": false,
+        "name": "Approval",
+        "inputs": [
+          {
+            "type": "address",
+            "name": "src",
+            "indexed": true
+          },
+          {
+            "type": "address",
+            "name": "guy",
+            "indexed": true
+          },
+          {
+            "type": "uint256",
+            "name": "wad",
+            "indexed": false
+          }
+        ]
+      },
+      {
+        "type": "event",
+        "anonymous": false,
+        "name": "Transfer",
+        "inputs": [
+          {
+            "type": "address",
+            "name": "src",
+            "indexed": true
+          },
+          {
+            "type": "address",
+            "name": "dst",
+            "indexed": true
+          },
+          {
+            "type": "uint256",
+            "name": "wad",
+            "indexed": false
+          }
+        ]
+      },
+      {
+        "type": "event",
+        "anonymous": false,
+        "name": "Deposit",
+        "inputs": [
+          {
+            "type": "address",
+            "name": "dst",
+            "indexed": true
+          },
+          {
+            "type": "uint256",
+            "name": "wad",
+            "indexed": false
+          }
+        ]
+      },
+      {
+        "type": "event",
+        "anonymous": false,
+        "name": "Withdrawal",
+        "inputs": [
+          {
+            "type": "address",
+            "name": "src",
+            "indexed": true
+          },
+          {
+            "type": "uint256",
+            "name": "wad",
+            "indexed": false
+          }
+        ]
+      }
+    ],
     "SyntheX": [
       {
         "type": "event",
@@ -2013,7 +2250,7 @@
         "outputs": []
       }
     ],
-    "EscrowedSYN": [
+    "EscrowedSYX": [
       {
         "type": "constructor",
         "payable": false,
@@ -2021,6 +2258,30 @@
           {
             "type": "address",
             "name": "_synthex"
+          },
+          {
+            "type": "address",
+            "name": "_TOKEN"
+          },
+          {
+            "type": "address",
+            "name": "_REWARD_TOKEN"
+          },
+          {
+            "type": "uint256",
+            "name": "initialRewardsDuration"
+          },
+          {
+            "type": "uint256",
+            "name": "_lockPeriod"
+          },
+          {
+            "type": "uint256",
+            "name": "_unlockPeriod"
+          },
+          {
+            "type": "uint256",
+            "name": "_percUnlockAtRelease"
           }
         ]
       },
@@ -2042,6 +2303,120 @@
           {
             "type": "uint256",
             "name": "value",
+            "indexed": false
+          }
+        ]
+      },
+      {
+        "type": "event",
+        "anonymous": false,
+        "name": "DelegateChanged",
+        "inputs": [
+          {
+            "type": "address",
+            "name": "delegator",
+            "indexed": true
+          },
+          {
+            "type": "address",
+            "name": "fromDelegate",
+            "indexed": true
+          },
+          {
+            "type": "address",
+            "name": "toDelegate",
+            "indexed": true
+          }
+        ]
+      },
+      {
+        "type": "event",
+        "anonymous": false,
+        "name": "DelegateVotesChanged",
+        "inputs": [
+          {
+            "type": "address",
+            "name": "delegate",
+            "indexed": true
+          },
+          {
+            "type": "uint256",
+            "name": "previousBalance",
+            "indexed": false
+          },
+          {
+            "type": "uint256",
+            "name": "newBalance",
+            "indexed": false
+          }
+        ]
+      },
+      {
+        "type": "event",
+        "anonymous": false,
+        "name": "Paused",
+        "inputs": [
+          {
+            "type": "address",
+            "name": "account",
+            "indexed": false
+          }
+        ]
+      },
+      {
+        "type": "event",
+        "anonymous": false,
+        "name": "Recovered",
+        "inputs": [
+          {
+            "type": "address",
+            "name": "token",
+            "indexed": false
+          },
+          {
+            "type": "uint256",
+            "name": "amount",
+            "indexed": false
+          }
+        ]
+      },
+      {
+        "type": "event",
+        "anonymous": false,
+        "name": "RewardAdded",
+        "inputs": [
+          {
+            "type": "uint256",
+            "name": "reward",
+            "indexed": false
+          }
+        ]
+      },
+      {
+        "type": "event",
+        "anonymous": false,
+        "name": "RewardPaid",
+        "inputs": [
+          {
+            "type": "address",
+            "name": "user",
+            "indexed": true
+          },
+          {
+            "type": "uint256",
+            "name": "reward",
+            "indexed": false
+          }
+        ]
+      },
+      {
+        "type": "event",
+        "anonymous": false,
+        "name": "RewardsDurationUpdated",
+        "inputs": [
+          {
+            "type": "uint256",
+            "name": "newDuration",
             "indexed": false
           }
         ]
@@ -2115,6 +2490,35 @@
       {
         "type": "event",
         "anonymous": false,
+        "name": "SetLockPeriod",
+        "inputs": [
+          {
+            "type": "uint256",
+            "name": "_lockPeriod",
+            "indexed": false
+          }
+        ]
+      },
+      {
+        "type": "event",
+        "anonymous": false,
+        "name": "Staked",
+        "inputs": [
+          {
+            "type": "address",
+            "name": "user",
+            "indexed": true
+          },
+          {
+            "type": "uint256",
+            "name": "amount",
+            "indexed": false
+          }
+        ]
+      },
+      {
+        "type": "event",
+        "anonymous": false,
         "name": "Transfer",
         "inputs": [
           {
@@ -2135,6 +2539,79 @@
         ]
       },
       {
+        "type": "event",
+        "anonymous": false,
+        "name": "UnlockRequested",
+        "inputs": [
+          {
+            "type": "address",
+            "name": "user",
+            "indexed": true
+          },
+          {
+            "type": "bytes32",
+            "name": "requestId",
+            "indexed": false
+          },
+          {
+            "type": "uint256",
+            "name": "amount",
+            "indexed": false
+          }
+        ]
+      },
+      {
+        "type": "event",
+        "anonymous": false,
+        "name": "Unlocked",
+        "inputs": [
+          {
+            "type": "address",
+            "name": "user",
+            "indexed": true
+          },
+          {
+            "type": "bytes32",
+            "name": "requestId",
+            "indexed": false
+          },
+          {
+            "type": "uint256",
+            "name": "amount",
+            "indexed": false
+          }
+        ]
+      },
+      {
+        "type": "event",
+        "anonymous": false,
+        "name": "Unpaused",
+        "inputs": [
+          {
+            "type": "address",
+            "name": "account",
+            "indexed": false
+          }
+        ]
+      },
+      {
+        "type": "event",
+        "anonymous": false,
+        "name": "Withdrawn",
+        "inputs": [
+          {
+            "type": "address",
+            "name": "user",
+            "indexed": true
+          },
+          {
+            "type": "uint256",
+            "name": "amount",
+            "indexed": false
+          }
+        ]
+      },
+      {
         "type": "function",
         "name": "AUTHORIZED_SENDER",
         "constant": true,
@@ -2144,6 +2621,19 @@
         "outputs": [
           {
             "type": "bytes32"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "BASIS_POINTS",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "uint256"
           }
         ]
       },
@@ -2170,6 +2660,45 @@
         "outputs": [
           {
             "type": "bytes32"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "REWARD_TOKEN",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "address"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "SCALER",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "uint256"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "TOKEN",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "address"
           }
         ]
       },
@@ -2249,23 +2778,6 @@
       },
       {
         "type": "function",
-        "name": "burn",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-          {
-            "type": "address",
-            "name": "from"
-          },
-          {
-            "type": "uint256",
-            "name": "amount"
-          }
-        ],
-        "outputs": []
-      },
-      {
-        "type": "function",
         "name": "burnFrom",
         "constant": false,
         "payable": false,
@@ -2277,6 +2789,51 @@
           {
             "type": "uint256",
             "name": "amount"
+          }
+        ],
+        "outputs": []
+      },
+      {
+        "type": "function",
+        "name": "checkpoints",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [
+          {
+            "type": "address",
+            "name": "account"
+          },
+          {
+            "type": "uint32",
+            "name": "pos"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "tuple",
+            "components": [
+              {
+                "type": "uint32",
+                "name": "fromBlock"
+              },
+              {
+                "type": "uint224",
+                "name": "votes"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "claimUnlocked",
+        "constant": false,
+        "payable": false,
+        "inputs": [
+          {
+            "type": "bytes32[]",
+            "name": "_requestIds"
           }
         ],
         "outputs": []
@@ -2317,6 +2874,171 @@
       },
       {
         "type": "function",
+        "name": "delegate",
+        "constant": false,
+        "payable": false,
+        "inputs": [
+          {
+            "type": "address",
+            "name": "delegatee"
+          }
+        ],
+        "outputs": []
+      },
+      {
+        "type": "function",
+        "name": "delegateBySig",
+        "constant": false,
+        "payable": false,
+        "inputs": [
+          {
+            "type": "address",
+            "name": "delegatee"
+          },
+          {
+            "type": "uint256",
+            "name": "nonce"
+          },
+          {
+            "type": "uint256",
+            "name": "expiry"
+          },
+          {
+            "type": "uint8",
+            "name": "v"
+          },
+          {
+            "type": "bytes32",
+            "name": "r"
+          },
+          {
+            "type": "bytes32",
+            "name": "s"
+          }
+        ],
+        "outputs": []
+      },
+      {
+        "type": "function",
+        "name": "delegates",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [
+          {
+            "type": "address",
+            "name": "account"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "address"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "earned",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [
+          {
+            "type": "address",
+            "name": "account"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "uint256"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "getPastTotalSupply",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [
+          {
+            "type": "uint256",
+            "name": "blockNumber"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "uint256"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "getPastVotes",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [
+          {
+            "type": "address",
+            "name": "account"
+          },
+          {
+            "type": "uint256",
+            "name": "blockNumber"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "uint256"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "getRequestId",
+        "constant": true,
+        "stateMutability": "pure",
+        "payable": false,
+        "inputs": [
+          {
+            "type": "address",
+            "name": "_user"
+          },
+          {
+            "type": "uint256",
+            "name": "_unlockIndex"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "bytes32"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "getReward",
+        "constant": false,
+        "payable": false,
+        "inputs": [],
+        "outputs": []
+      },
+      {
+        "type": "function",
+        "name": "getRewardForDuration",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "uint256"
+          }
+        ]
+      },
+      {
+        "type": "function",
         "name": "getRoleAdmin",
         "constant": true,
         "stateMutability": "view",
@@ -2330,6 +3052,24 @@
         "outputs": [
           {
             "type": "bytes32"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "getVotes",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [
+          {
+            "type": "address",
+            "name": "account"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "uint256"
           }
         ]
       },
@@ -2395,20 +3135,59 @@
       },
       {
         "type": "function",
-        "name": "mint",
+        "name": "lastTimeRewardApplicable",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "uint256"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "lastUpdateTime",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "uint256"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "lock",
         "constant": false,
         "payable": false,
         "inputs": [
           {
-            "type": "address",
-            "name": "to"
+            "type": "uint256",
+            "name": "_amount"
           },
           {
-            "type": "uint256",
-            "name": "amount"
+            "type": "address",
+            "name": "_receiver"
           }
         ],
         "outputs": []
+      },
+      {
+        "type": "function",
+        "name": "lockPeriod",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "uint256"
+          }
+        ]
       },
       {
         "type": "function",
@@ -2435,6 +3214,84 @@
             "name": "owner"
           }
         ],
+        "outputs": [
+          {
+            "type": "uint256"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "notifyReward",
+        "constant": false,
+        "payable": false,
+        "inputs": [
+          {
+            "type": "uint256",
+            "name": "reward"
+          }
+        ],
+        "outputs": []
+      },
+      {
+        "type": "function",
+        "name": "numCheckpoints",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [
+          {
+            "type": "address",
+            "name": "account"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "uint32"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "pause",
+        "constant": false,
+        "payable": false,
+        "inputs": [],
+        "outputs": []
+      },
+      {
+        "type": "function",
+        "name": "paused",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "bool"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "percUnlockAtRelease",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "uint256"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "periodFinish",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [],
         "outputs": [
           {
             "type": "uint256"
@@ -2480,6 +3337,19 @@
       },
       {
         "type": "function",
+        "name": "remainingQuota",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "uint256"
+          }
+        ]
+      },
+      {
+        "type": "function",
         "name": "renounceRole",
         "constant": false,
         "payable": false,
@@ -2497,6 +3367,19 @@
       },
       {
         "type": "function",
+        "name": "reservedForUnlock",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "uint256"
+          }
+        ]
+      },
+      {
+        "type": "function",
         "name": "revokeRole",
         "constant": false,
         "payable": false,
@@ -2508,6 +3391,114 @@
           {
             "type": "address",
             "name": "account"
+          }
+        ],
+        "outputs": []
+      },
+      {
+        "type": "function",
+        "name": "rewardPerToken",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "uint256"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "rewardPerTokenStored",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "uint256"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "rewardRate",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "uint256"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "rewards",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [
+          {
+            "type": "address"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "uint256"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "rewardsDuration",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "uint256"
+          }
+        ]
+      },
+      {
+        "type": "function",
+        "name": "setLockPeriod",
+        "constant": false,
+        "payable": false,
+        "inputs": [
+          {
+            "type": "uint256",
+            "name": "_lockPeriod"
+          }
+        ],
+        "outputs": []
+      },
+      {
+        "type": "function",
+        "name": "setRewardsDuration",
+        "constant": false,
+        "payable": false,
+        "inputs": [
+          {
+            "type": "uint256",
+            "name": "_rewardsDuration"
+          }
+        ],
+        "outputs": []
+      },
+      {
+        "type": "function",
+        "name": "startUnlock",
+        "constant": false,
+        "payable": false,
+        "inputs": [
+          {
+            "type": "uint256",
+            "name": "_amount"
           }
         ],
         "outputs": []
@@ -2614,750 +3605,6 @@
             "type": "bool"
           }
         ]
-      }
-    ],
-    "StakingRewards": [
-      {
-        "type": "constructor",
-        "payable": false,
-        "inputs": [
-          {
-            "type": "address",
-            "name": "_rewardsToken"
-          },
-          {
-            "type": "address",
-            "name": "_stakingToken"
-          },
-          {
-            "type": "address",
-            "name": "_system"
-          },
-          {
-            "type": "uint256",
-            "name": "initialRewardsDuration"
-          }
-        ]
-      },
-      {
-        "type": "event",
-        "anonymous": false,
-        "name": "Paused",
-        "inputs": [
-          {
-            "type": "address",
-            "name": "account",
-            "indexed": false
-          }
-        ]
-      },
-      {
-        "type": "event",
-        "anonymous": false,
-        "name": "Recovered",
-        "inputs": [
-          {
-            "type": "address",
-            "name": "token",
-            "indexed": false
-          },
-          {
-            "type": "uint256",
-            "name": "amount",
-            "indexed": false
-          }
-        ]
-      },
-      {
-        "type": "event",
-        "anonymous": false,
-        "name": "RewardAdded",
-        "inputs": [
-          {
-            "type": "uint256",
-            "name": "reward",
-            "indexed": false
-          }
-        ]
-      },
-      {
-        "type": "event",
-        "anonymous": false,
-        "name": "RewardPaid",
-        "inputs": [
-          {
-            "type": "address",
-            "name": "user",
-            "indexed": true
-          },
-          {
-            "type": "uint256",
-            "name": "reward",
-            "indexed": false
-          }
-        ]
-      },
-      {
-        "type": "event",
-        "anonymous": false,
-        "name": "RewardsDurationUpdated",
-        "inputs": [
-          {
-            "type": "uint256",
-            "name": "newDuration",
-            "indexed": false
-          }
-        ]
-      },
-      {
-        "type": "event",
-        "anonymous": false,
-        "name": "Staked",
-        "inputs": [
-          {
-            "type": "address",
-            "name": "user",
-            "indexed": true
-          },
-          {
-            "type": "uint256",
-            "name": "amount",
-            "indexed": false
-          }
-        ]
-      },
-      {
-        "type": "event",
-        "anonymous": false,
-        "name": "Unpaused",
-        "inputs": [
-          {
-            "type": "address",
-            "name": "account",
-            "indexed": false
-          }
-        ]
-      },
-      {
-        "type": "event",
-        "anonymous": false,
-        "name": "Withdrawn",
-        "inputs": [
-          {
-            "type": "address",
-            "name": "user",
-            "indexed": true
-          },
-          {
-            "type": "uint256",
-            "name": "amount",
-            "indexed": false
-          }
-        ]
-      },
-      {
-        "type": "function",
-        "name": "balanceOf",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-          {
-            "type": "address"
-          }
-        ],
-        "outputs": [
-          {
-            "type": "uint256"
-          }
-        ]
-      },
-      {
-        "type": "function",
-        "name": "earned",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-          {
-            "type": "address",
-            "name": "account"
-          }
-        ],
-        "outputs": [
-          {
-            "type": "uint256"
-          }
-        ]
-      },
-      {
-        "type": "function",
-        "name": "exit",
-        "constant": false,
-        "payable": false,
-        "inputs": [],
-        "outputs": []
-      },
-      {
-        "type": "function",
-        "name": "getReward",
-        "constant": false,
-        "payable": false,
-        "inputs": [],
-        "outputs": []
-      },
-      {
-        "type": "function",
-        "name": "getRewardForDuration",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
-        "outputs": [
-          {
-            "type": "uint256"
-          }
-        ]
-      },
-      {
-        "type": "function",
-        "name": "lastTimeRewardApplicable",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
-        "outputs": [
-          {
-            "type": "uint256"
-          }
-        ]
-      },
-      {
-        "type": "function",
-        "name": "lastUpdateTime",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
-        "outputs": [
-          {
-            "type": "uint256"
-          }
-        ]
-      },
-      {
-        "type": "function",
-        "name": "notifyReward",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-          {
-            "type": "uint256",
-            "name": "reward"
-          }
-        ],
-        "outputs": []
-      },
-      {
-        "type": "function",
-        "name": "paused",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
-        "outputs": [
-          {
-            "type": "bool"
-          }
-        ]
-      },
-      {
-        "type": "function",
-        "name": "periodFinish",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
-        "outputs": [
-          {
-            "type": "uint256"
-          }
-        ]
-      },
-      {
-        "type": "function",
-        "name": "rewardPerToken",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
-        "outputs": [
-          {
-            "type": "uint256"
-          }
-        ]
-      },
-      {
-        "type": "function",
-        "name": "rewardPerTokenStored",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
-        "outputs": [
-          {
-            "type": "uint256"
-          }
-        ]
-      },
-      {
-        "type": "function",
-        "name": "rewardRate",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
-        "outputs": [
-          {
-            "type": "uint256"
-          }
-        ]
-      },
-      {
-        "type": "function",
-        "name": "rewards",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-          {
-            "type": "address"
-          }
-        ],
-        "outputs": [
-          {
-            "type": "uint256"
-          }
-        ]
-      },
-      {
-        "type": "function",
-        "name": "rewardsDuration",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
-        "outputs": [
-          {
-            "type": "uint256"
-          }
-        ]
-      },
-      {
-        "type": "function",
-        "name": "rewardsToken",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
-        "outputs": [
-          {
-            "type": "address"
-          }
-        ]
-      },
-      {
-        "type": "function",
-        "name": "setRewardsDuration",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-          {
-            "type": "uint256",
-            "name": "_rewardsDuration"
-          }
-        ],
-        "outputs": []
-      },
-      {
-        "type": "function",
-        "name": "stake",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-          {
-            "type": "uint256",
-            "name": "amount"
-          }
-        ],
-        "outputs": []
-      },
-      {
-        "type": "function",
-        "name": "stakingToken",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
-        "outputs": [
-          {
-            "type": "address"
-          }
-        ]
-      },
-      {
-        "type": "function",
-        "name": "synthex",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
-        "outputs": [
-          {
-            "type": "address"
-          }
-        ]
-      },
-      {
-        "type": "function",
-        "name": "totalSupply",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
-        "outputs": [
-          {
-            "type": "uint256"
-          }
-        ]
-      },
-      {
-        "type": "function",
-        "name": "userRewardPerTokenPaid",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-          {
-            "type": "address"
-          }
-        ],
-        "outputs": [
-          {
-            "type": "uint256"
-          }
-        ]
-      },
-      {
-        "type": "function",
-        "name": "withdraw",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-          {
-            "type": "uint256",
-            "name": "amount"
-          }
-        ],
-        "outputs": []
-      }
-    ],
-    "TokenRedeemer": [
-      {
-        "type": "constructor",
-        "payable": false,
-        "inputs": [
-          {
-            "type": "address",
-            "name": "_system"
-          },
-          {
-            "type": "address",
-            "name": "_LOCKED_TOKEN"
-          },
-          {
-            "type": "address",
-            "name": "_TOKEN"
-          },
-          {
-            "type": "uint256",
-            "name": "_lockPeriod"
-          },
-          {
-            "type": "uint256",
-            "name": "_unlockPeriod"
-          },
-          {
-            "type": "uint256",
-            "name": "_percUnlockAtRelease"
-          }
-        ]
-      },
-      {
-        "type": "event",
-        "anonymous": false,
-        "name": "Paused",
-        "inputs": [
-          {
-            "type": "address",
-            "name": "account",
-            "indexed": false
-          }
-        ]
-      },
-      {
-        "type": "event",
-        "anonymous": false,
-        "name": "SetLockPeriod",
-        "inputs": [
-          {
-            "type": "uint256",
-            "name": "_lockPeriod",
-            "indexed": false
-          }
-        ]
-      },
-      {
-        "type": "event",
-        "anonymous": false,
-        "name": "UnlockRequested",
-        "inputs": [
-          {
-            "type": "address",
-            "name": "user",
-            "indexed": true
-          },
-          {
-            "type": "bytes32",
-            "name": "requestId",
-            "indexed": false
-          },
-          {
-            "type": "uint256",
-            "name": "amount",
-            "indexed": false
-          }
-        ]
-      },
-      {
-        "type": "event",
-        "anonymous": false,
-        "name": "Unlocked",
-        "inputs": [
-          {
-            "type": "address",
-            "name": "user",
-            "indexed": true
-          },
-          {
-            "type": "bytes32",
-            "name": "requestId",
-            "indexed": false
-          },
-          {
-            "type": "uint256",
-            "name": "amount",
-            "indexed": false
-          }
-        ]
-      },
-      {
-        "type": "event",
-        "anonymous": false,
-        "name": "Unpaused",
-        "inputs": [
-          {
-            "type": "address",
-            "name": "account",
-            "indexed": false
-          }
-        ]
-      },
-      {
-        "type": "function",
-        "name": "BASIS_POINTS",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
-        "outputs": [
-          {
-            "type": "uint256"
-          }
-        ]
-      },
-      {
-        "type": "function",
-        "name": "LOCKED_TOKEN",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
-        "outputs": [
-          {
-            "type": "address"
-          }
-        ]
-      },
-      {
-        "type": "function",
-        "name": "TOKEN",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
-        "outputs": [
-          {
-            "type": "address"
-          }
-        ]
-      },
-      {
-        "type": "function",
-        "name": "getRequestId",
-        "constant": true,
-        "stateMutability": "pure",
-        "payable": false,
-        "inputs": [
-          {
-            "type": "address",
-            "name": "_user"
-          },
-          {
-            "type": "uint256",
-            "name": "_unlockIndex"
-          }
-        ],
-        "outputs": [
-          {
-            "type": "bytes32"
-          }
-        ]
-      },
-      {
-        "type": "function",
-        "name": "lockPeriod",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
-        "outputs": [
-          {
-            "type": "uint256"
-          }
-        ]
-      },
-      {
-        "type": "function",
-        "name": "pause",
-        "constant": false,
-        "payable": false,
-        "inputs": [],
-        "outputs": []
-      },
-      {
-        "type": "function",
-        "name": "paused",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
-        "outputs": [
-          {
-            "type": "bool"
-          }
-        ]
-      },
-      {
-        "type": "function",
-        "name": "percUnlockAtRelease",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
-        "outputs": [
-          {
-            "type": "uint256"
-          }
-        ]
-      },
-      {
-        "type": "function",
-        "name": "remainingQuota",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
-        "outputs": [
-          {
-            "type": "uint256"
-          }
-        ]
-      },
-      {
-        "type": "function",
-        "name": "reservedForUnlock",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
-        "outputs": [
-          {
-            "type": "uint256"
-          }
-        ]
-      },
-      {
-        "type": "function",
-        "name": "setLockPeriod",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-          {
-            "type": "uint256",
-            "name": "_lockPeriod"
-          }
-        ],
-        "outputs": []
-      },
-      {
-        "type": "function",
-        "name": "startUnlock",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-          {
-            "type": "uint256",
-            "name": "_amount"
-          }
-        ],
-        "outputs": []
-      },
-      {
-        "type": "function",
-        "name": "synthex",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
-        "outputs": [
-          {
-            "type": "address"
-          }
-        ]
-      },
-      {
-        "type": "function",
-        "name": "unlock",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-          {
-            "type": "bytes32[]",
-            "name": "_requestIds"
-          }
-        ],
-        "outputs": []
       },
       {
         "type": "function",
@@ -3443,16 +3690,20 @@
       },
       {
         "type": "function",
-        "name": "withdraw",
-        "constant": false,
+        "name": "userRewardPerTokenPaid",
+        "constant": true,
+        "stateMutability": "view",
         "payable": false,
         "inputs": [
           {
-            "type": "uint256",
-            "name": "_amount"
+            "type": "address"
           }
         ],
-        "outputs": []
+        "outputs": [
+          {
+            "type": "uint256"
+          }
+        ]
       }
     ],
     "Multicall2": [
@@ -3749,264 +4000,6 @@
         ]
       }
     ],
-    "WETH9": [
-      {
-        "type": "function",
-        "name": "name",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
-        "outputs": [
-          {
-            "type": "string"
-          }
-        ]
-      },
-      {
-        "type": "function",
-        "name": "approve",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-          {
-            "type": "address",
-            "name": "guy"
-          },
-          {
-            "type": "uint256",
-            "name": "wad"
-          }
-        ],
-        "outputs": [
-          {
-            "type": "bool"
-          }
-        ]
-      },
-      {
-        "type": "function",
-        "name": "totalSupply",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
-        "outputs": [
-          {
-            "type": "uint256"
-          }
-        ]
-      },
-      {
-        "type": "function",
-        "name": "transferFrom",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-          {
-            "type": "address",
-            "name": "src"
-          },
-          {
-            "type": "address",
-            "name": "dst"
-          },
-          {
-            "type": "uint256",
-            "name": "wad"
-          }
-        ],
-        "outputs": [
-          {
-            "type": "bool"
-          }
-        ]
-      },
-      {
-        "type": "function",
-        "name": "withdraw",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-          {
-            "type": "uint256",
-            "name": "wad"
-          }
-        ],
-        "outputs": []
-      },
-      {
-        "type": "function",
-        "name": "decimals",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
-        "outputs": [
-          {
-            "type": "uint8"
-          }
-        ]
-      },
-      {
-        "type": "function",
-        "name": "balanceOf",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-          {
-            "type": "address"
-          }
-        ],
-        "outputs": [
-          {
-            "type": "uint256"
-          }
-        ]
-      },
-      {
-        "type": "function",
-        "name": "symbol",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [],
-        "outputs": [
-          {
-            "type": "string"
-          }
-        ]
-      },
-      {
-        "type": "function",
-        "name": "transfer",
-        "constant": false,
-        "payable": false,
-        "inputs": [
-          {
-            "type": "address",
-            "name": "dst"
-          },
-          {
-            "type": "uint256",
-            "name": "wad"
-          }
-        ],
-        "outputs": [
-          {
-            "type": "bool"
-          }
-        ]
-      },
-      {
-        "type": "function",
-        "name": "deposit",
-        "constant": false,
-        "stateMutability": "payable",
-        "payable": true,
-        "inputs": [],
-        "outputs": []
-      },
-      {
-        "type": "function",
-        "name": "allowance",
-        "constant": true,
-        "stateMutability": "view",
-        "payable": false,
-        "inputs": [
-          {
-            "type": "address"
-          },
-          {
-            "type": "address"
-          }
-        ],
-        "outputs": [
-          {
-            "type": "uint256"
-          }
-        ]
-      },
-      {
-        "type": "event",
-        "anonymous": false,
-        "name": "Approval",
-        "inputs": [
-          {
-            "type": "address",
-            "name": "src",
-            "indexed": true
-          },
-          {
-            "type": "address",
-            "name": "guy",
-            "indexed": true
-          },
-          {
-            "type": "uint256",
-            "name": "wad",
-            "indexed": false
-          }
-        ]
-      },
-      {
-        "type": "event",
-        "anonymous": false,
-        "name": "Transfer",
-        "inputs": [
-          {
-            "type": "address",
-            "name": "src",
-            "indexed": true
-          },
-          {
-            "type": "address",
-            "name": "dst",
-            "indexed": true
-          },
-          {
-            "type": "uint256",
-            "name": "wad",
-            "indexed": false
-          }
-        ]
-      },
-      {
-        "type": "event",
-        "anonymous": false,
-        "name": "Deposit",
-        "inputs": [
-          {
-            "type": "address",
-            "name": "dst",
-            "indexed": true
-          },
-          {
-            "type": "uint256",
-            "name": "wad",
-            "indexed": false
-          }
-        ]
-      },
-      {
-        "type": "event",
-        "anonymous": false,
-        "name": "Withdrawal",
-        "inputs": [
-          {
-            "type": "address",
-            "name": "src",
-            "indexed": true
-          },
-          {
-            "type": "uint256",
-            "name": "wad",
-            "indexed": false
-          }
-        ]
-      }
-    ],
     "Pool": [
       {
         "type": "event",
@@ -4162,6 +4155,43 @@
       {
         "type": "event",
         "anonymous": false,
+        "name": "Liquidate",
+        "inputs": [
+          {
+            "type": "address",
+            "name": "liquidator",
+            "indexed": true
+          },
+          {
+            "type": "address",
+            "name": "account",
+            "indexed": true
+          },
+          {
+            "type": "address",
+            "name": "outAsset",
+            "indexed": true
+          },
+          {
+            "type": "uint256",
+            "name": "outAmount",
+            "indexed": false
+          },
+          {
+            "type": "uint256",
+            "name": "outPenalty",
+            "indexed": false
+          },
+          {
+            "type": "uint256",
+            "name": "outRefund",
+            "indexed": false
+          }
+        ]
+      },
+      {
+        "type": "event",
+        "anonymous": false,
         "name": "Paused",
         "inputs": [
           {
@@ -4207,7 +4237,12 @@
           },
           {
             "type": "bool",
-            "name": "isEnabled",
+            "name": "isActive",
+            "indexed": false
+          },
+          {
+            "type": "bool",
+            "name": "isDisabled",
             "indexed": false
           },
           {
@@ -4473,7 +4508,7 @@
         "outputs": [
           {
             "type": "bool",
-            "name": "isEnabled"
+            "name": "isActive"
           },
           {
             "type": "uint256",
@@ -4997,7 +5032,11 @@
         "outputs": [
           {
             "type": "bool",
-            "name": "isEnabled"
+            "name": "isActive"
+          },
+          {
+            "type": "bool",
+            "name": "isDisabled"
           },
           {
             "type": "uint256",
@@ -5109,7 +5148,7 @@
             "components": [
               {
                 "type": "bool",
-                "name": "isEnabled"
+                "name": "isActive"
               },
               {
                 "type": "uint256",
@@ -5152,7 +5191,11 @@
             "components": [
               {
                 "type": "bool",
-                "name": "isEnabled"
+                "name": "isActive"
+              },
+              {
+                "type": "bool",
+                "name": "isDisabled"
               },
               {
                 "type": "uint256",
@@ -5198,7 +5241,7 @@
         "outputs": []
       }
     ],
-    "POOL_C_undefined": "[{\"type\":\"event\",\"anonymous\":false,\"name\":\"Approval\",\"inputs\":[{\"type\":\"address\",\"name\":\"owner\",\"indexed\":true},{\"type\":\"address\",\"name\":\"spender\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"value\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"CollateralEntered\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"collateral\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"CollateralExited\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"collateral\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"CollateralParamsUpdated\",\"inputs\":[{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"cap\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"baseLTV\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"liqThreshold\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"liqBonus\",\"indexed\":false},{\"type\":\"bool\",\"name\":\"isEnabled\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Deposit\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"amount\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"FeeTokenUpdated\",\"inputs\":[{\"type\":\"address\",\"name\":\"feeToken\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Initialized\",\"inputs\":[{\"type\":\"uint8\",\"name\":\"version\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"IssuerAllocUpdated\",\"inputs\":[{\"type\":\"uint256\",\"name\":\"issuerAlloc\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Paused\",\"inputs\":[{\"type\":\"address\",\"name\":\"account\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"PriceOracleUpdated\",\"inputs\":[{\"type\":\"address\",\"name\":\"priceOracle\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"SynthRemoved\",\"inputs\":[{\"type\":\"address\",\"name\":\"synth\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"SynthUpdated\",\"inputs\":[{\"type\":\"address\",\"name\":\"synth\",\"indexed\":true},{\"type\":\"bool\",\"name\":\"isEnabled\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"mintFee\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"burnFee\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Transfer\",\"inputs\":[{\"type\":\"address\",\"name\":\"from\",\"indexed\":true},{\"type\":\"address\",\"name\":\"to\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"value\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Unpaused\",\"inputs\":[{\"type\":\"address\",\"name\":\"account\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Withdraw\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"amount\",\"indexed\":false}]},{\"type\":\"function\",\"name\":\"BASIS_POINTS\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"ETH_ADDRESS\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"SCALER\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"accountCollateralBalance\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\"},{\"type\":\"address\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"accountCollaterals\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\"},{\"type\":\"uint256\"}],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"accountMembership\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\"},{\"type\":\"address\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"addSynth\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_synth\"},{\"type\":\"uint256\",\"name\":\"mintFee\"},{\"type\":\"uint256\",\"name\":\"burnFee\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"allowance\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"owner\"},{\"type\":\"address\",\"name\":\"spender\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"approve\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"spender\"},{\"type\":\"uint256\",\"name\":\"amount\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"balanceOf\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"collaterals\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\"}],\"outputs\":[{\"type\":\"bool\",\"name\":\"isEnabled\"},{\"type\":\"uint256\",\"name\":\"cap\"},{\"type\":\"uint256\",\"name\":\"totalDeposits\"},{\"type\":\"uint256\",\"name\":\"baseLTV\"},{\"type\":\"uint256\",\"name\":\"liqThreshold\"},{\"type\":\"uint256\",\"name\":\"liqBonus\"}]},{\"type\":\"function\",\"name\":\"commitBurn\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"commitLiquidate\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_liquidator\"},{\"type\":\"address\",\"name\":\"_account\"},{\"type\":\"uint256\",\"name\":\"_amount\"},{\"type\":\"address\",\"name\":\"_outAsset\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"commitMint\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"commitSwap\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"},{\"type\":\"uint256\",\"name\":\"_amount\"},{\"type\":\"address\",\"name\":\"_synthTo\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"decimals\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"uint8\"}]},{\"type\":\"function\",\"name\":\"decreaseAllowance\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"spender\"},{\"type\":\"uint256\",\"name\":\"subtractedValue\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"deposit\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"depositETH\",\"constant\":false,\"stateMutability\":\"payable\",\"payable\":true,\"inputs\":[],\"outputs\":[]},{\"type\":\"function\",\"name\":\"depositWithPermit\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"},{\"type\":\"uint256\",\"name\":\"_amount\"},{\"type\":\"uint256\",\"name\":\"_deadline\"},{\"type\":\"uint8\",\"name\":\"_v\"},{\"type\":\"bytes32\",\"name\":\"_r\"},{\"type\":\"bytes32\",\"name\":\"_s\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"enterCollateral\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"exitCollateral\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"feeToken\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"getAccountLiquidity\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"tuple\",\"name\":\"liq\",\"components\":[{\"type\":\"int256\",\"name\":\"liquidity\"},{\"type\":\"uint256\",\"name\":\"collateral\"},{\"type\":\"uint256\",\"name\":\"debt\"}]}]},{\"type\":\"function\",\"name\":\"getSynths\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"address[]\"}]},{\"type\":\"function\",\"name\":\"getTotalDebtUSD\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\",\"name\":\"totalDebt\"}]},{\"type\":\"function\",\"name\":\"getUserDebtUSD\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"increaseAllowance\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"spender\"},{\"type\":\"uint256\",\"name\":\"addedValue\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"initialize\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"string\",\"name\":\"_name\"},{\"type\":\"string\",\"name\":\"_symbol\"},{\"type\":\"address\",\"name\":\"_synthex\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"issuerAlloc\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"name\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"string\"}]},{\"type\":\"function\",\"name\":\"pause\",\"constant\":false,\"payable\":false,\"inputs\":[],\"outputs\":[]},{\"type\":\"function\",\"name\":\"paused\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"priceOracle\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"removeSynth\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_synth\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"setFeeToken\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_feeToken\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"setIssuerAlloc\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"uint256\",\"name\":\"_issuerAlloc\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"setPriceOracle\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_priceOracle\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"symbol\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"string\"}]},{\"type\":\"function\",\"name\":\"synthex\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"synths\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\"}],\"outputs\":[{\"type\":\"bool\",\"name\":\"isEnabled\"},{\"type\":\"uint256\",\"name\":\"mintFee\"},{\"type\":\"uint256\",\"name\":\"burnFee\"}]},{\"type\":\"function\",\"name\":\"synthsList\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"uint256\"}],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"totalSupply\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"transfer\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"to\"},{\"type\":\"uint256\",\"name\":\"amount\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"transferFrom\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"from\"},{\"type\":\"address\",\"name\":\"to\"},{\"type\":\"uint256\",\"name\":\"amount\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"unpause\",\"constant\":false,\"payable\":false,\"inputs\":[],\"outputs\":[]},{\"type\":\"function\",\"name\":\"updateCollateral\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"},{\"type\":\"tuple\",\"name\":\"_params\",\"components\":[{\"type\":\"bool\",\"name\":\"isEnabled\"},{\"type\":\"uint256\",\"name\":\"cap\"},{\"type\":\"uint256\",\"name\":\"totalDeposits\"},{\"type\":\"uint256\",\"name\":\"baseLTV\"},{\"type\":\"uint256\",\"name\":\"liqThreshold\"},{\"type\":\"uint256\",\"name\":\"liqBonus\"}]}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"updateSynth\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_synth\"},{\"type\":\"tuple\",\"name\":\"_params\",\"components\":[{\"type\":\"bool\",\"name\":\"isEnabled\"},{\"type\":\"uint256\",\"name\":\"mintFee\"},{\"type\":\"uint256\",\"name\":\"burnFee\"}]}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"withdraw\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"withdrawETH\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]}]",
+    "POOL_C_undefined": "[{\"type\":\"event\",\"anonymous\":false,\"name\":\"Approval\",\"inputs\":[{\"type\":\"address\",\"name\":\"owner\",\"indexed\":true},{\"type\":\"address\",\"name\":\"spender\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"value\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"CollateralEntered\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"collateral\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"CollateralExited\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"collateral\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"CollateralParamsUpdated\",\"inputs\":[{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"cap\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"baseLTV\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"liqThreshold\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"liqBonus\",\"indexed\":false},{\"type\":\"bool\",\"name\":\"isEnabled\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Deposit\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"amount\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"FeeTokenUpdated\",\"inputs\":[{\"type\":\"address\",\"name\":\"feeToken\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Initialized\",\"inputs\":[{\"type\":\"uint8\",\"name\":\"version\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"IssuerAllocUpdated\",\"inputs\":[{\"type\":\"uint256\",\"name\":\"issuerAlloc\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Liquidate\",\"inputs\":[{\"type\":\"address\",\"name\":\"liquidator\",\"indexed\":true},{\"type\":\"address\",\"name\":\"account\",\"indexed\":true},{\"type\":\"address\",\"name\":\"outAsset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"outAmount\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"outPenalty\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"outRefund\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Paused\",\"inputs\":[{\"type\":\"address\",\"name\":\"account\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"PriceOracleUpdated\",\"inputs\":[{\"type\":\"address\",\"name\":\"priceOracle\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"SynthRemoved\",\"inputs\":[{\"type\":\"address\",\"name\":\"synth\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"SynthUpdated\",\"inputs\":[{\"type\":\"address\",\"name\":\"synth\",\"indexed\":true},{\"type\":\"bool\",\"name\":\"isActive\",\"indexed\":false},{\"type\":\"bool\",\"name\":\"isDisabled\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"mintFee\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"burnFee\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Transfer\",\"inputs\":[{\"type\":\"address\",\"name\":\"from\",\"indexed\":true},{\"type\":\"address\",\"name\":\"to\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"value\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Unpaused\",\"inputs\":[{\"type\":\"address\",\"name\":\"account\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Withdraw\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"amount\",\"indexed\":false}]},{\"type\":\"function\",\"name\":\"BASIS_POINTS\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"ETH_ADDRESS\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"SCALER\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"accountCollateralBalance\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\"},{\"type\":\"address\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"accountCollaterals\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\"},{\"type\":\"uint256\"}],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"accountMembership\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\"},{\"type\":\"address\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"addSynth\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_synth\"},{\"type\":\"uint256\",\"name\":\"mintFee\"},{\"type\":\"uint256\",\"name\":\"burnFee\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"allowance\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"owner\"},{\"type\":\"address\",\"name\":\"spender\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"approve\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"spender\"},{\"type\":\"uint256\",\"name\":\"amount\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"balanceOf\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"collaterals\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\"}],\"outputs\":[{\"type\":\"bool\",\"name\":\"isActive\"},{\"type\":\"uint256\",\"name\":\"cap\"},{\"type\":\"uint256\",\"name\":\"totalDeposits\"},{\"type\":\"uint256\",\"name\":\"baseLTV\"},{\"type\":\"uint256\",\"name\":\"liqThreshold\"},{\"type\":\"uint256\",\"name\":\"liqBonus\"}]},{\"type\":\"function\",\"name\":\"commitBurn\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"commitLiquidate\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_liquidator\"},{\"type\":\"address\",\"name\":\"_account\"},{\"type\":\"uint256\",\"name\":\"_amount\"},{\"type\":\"address\",\"name\":\"_outAsset\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"commitMint\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"commitSwap\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"},{\"type\":\"uint256\",\"name\":\"_amount\"},{\"type\":\"address\",\"name\":\"_synthTo\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"decimals\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"uint8\"}]},{\"type\":\"function\",\"name\":\"decreaseAllowance\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"spender\"},{\"type\":\"uint256\",\"name\":\"subtractedValue\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"deposit\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"depositETH\",\"constant\":false,\"stateMutability\":\"payable\",\"payable\":true,\"inputs\":[],\"outputs\":[]},{\"type\":\"function\",\"name\":\"depositWithPermit\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"},{\"type\":\"uint256\",\"name\":\"_amount\"},{\"type\":\"uint256\",\"name\":\"_deadline\"},{\"type\":\"uint8\",\"name\":\"_v\"},{\"type\":\"bytes32\",\"name\":\"_r\"},{\"type\":\"bytes32\",\"name\":\"_s\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"enterCollateral\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"exitCollateral\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"feeToken\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"getAccountLiquidity\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"tuple\",\"name\":\"liq\",\"components\":[{\"type\":\"int256\",\"name\":\"liquidity\"},{\"type\":\"uint256\",\"name\":\"collateral\"},{\"type\":\"uint256\",\"name\":\"debt\"}]}]},{\"type\":\"function\",\"name\":\"getSynths\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"address[]\"}]},{\"type\":\"function\",\"name\":\"getTotalDebtUSD\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\",\"name\":\"totalDebt\"}]},{\"type\":\"function\",\"name\":\"getUserDebtUSD\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"increaseAllowance\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"spender\"},{\"type\":\"uint256\",\"name\":\"addedValue\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"initialize\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"string\",\"name\":\"_name\"},{\"type\":\"string\",\"name\":\"_symbol\"},{\"type\":\"address\",\"name\":\"_synthex\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"issuerAlloc\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"name\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"string\"}]},{\"type\":\"function\",\"name\":\"pause\",\"constant\":false,\"payable\":false,\"inputs\":[],\"outputs\":[]},{\"type\":\"function\",\"name\":\"paused\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"priceOracle\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"removeSynth\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_synth\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"setFeeToken\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_feeToken\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"setIssuerAlloc\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"uint256\",\"name\":\"_issuerAlloc\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"setPriceOracle\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_priceOracle\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"symbol\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"string\"}]},{\"type\":\"function\",\"name\":\"synthex\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"synths\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\"}],\"outputs\":[{\"type\":\"bool\",\"name\":\"isActive\"},{\"type\":\"bool\",\"name\":\"isDisabled\"},{\"type\":\"uint256\",\"name\":\"mintFee\"},{\"type\":\"uint256\",\"name\":\"burnFee\"}]},{\"type\":\"function\",\"name\":\"synthsList\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"uint256\"}],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"totalSupply\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"transfer\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"to\"},{\"type\":\"uint256\",\"name\":\"amount\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"transferFrom\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"from\"},{\"type\":\"address\",\"name\":\"to\"},{\"type\":\"uint256\",\"name\":\"amount\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"unpause\",\"constant\":false,\"payable\":false,\"inputs\":[],\"outputs\":[]},{\"type\":\"function\",\"name\":\"updateCollateral\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"},{\"type\":\"tuple\",\"name\":\"_params\",\"components\":[{\"type\":\"bool\",\"name\":\"isActive\"},{\"type\":\"uint256\",\"name\":\"cap\"},{\"type\":\"uint256\",\"name\":\"totalDeposits\"},{\"type\":\"uint256\",\"name\":\"baseLTV\"},{\"type\":\"uint256\",\"name\":\"liqThreshold\"},{\"type\":\"uint256\",\"name\":\"liqBonus\"}]}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"updateSynth\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_synth\"},{\"type\":\"tuple\",\"name\":\"_params\",\"components\":[{\"type\":\"bool\",\"name\":\"isActive\"},{\"type\":\"bool\",\"name\":\"isDisabled\"},{\"type\":\"uint256\",\"name\":\"mintFee\"},{\"type\":\"uint256\",\"name\":\"burnFee\"}]}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"withdraw\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"withdrawETH\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]}]",
     "MockToken": [
       {
         "type": "constructor",
@@ -5578,6 +5621,23 @@
         ]
       },
       {
+        "type": "event",
+        "anonymous": false,
+        "name": "OwnershipTransferred",
+        "inputs": [
+          {
+            "type": "address",
+            "name": "previousOwner",
+            "indexed": true
+          },
+          {
+            "type": "address",
+            "name": "newOwner",
+            "indexed": true
+          }
+        ]
+      },
+      {
         "type": "function",
         "name": "decimals",
         "constant": true,
@@ -5618,6 +5678,19 @@
       },
       {
         "type": "function",
+        "name": "owner",
+        "constant": true,
+        "stateMutability": "view",
+        "payable": false,
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "address"
+          }
+        ]
+      },
+      {
+        "type": "function",
         "name": "price",
         "constant": true,
         "stateMutability": "view",
@@ -5628,6 +5701,14 @@
             "type": "int256"
           }
         ]
+      },
+      {
+        "type": "function",
+        "name": "renounceOwnership",
+        "constant": false,
+        "payable": false,
+        "inputs": [],
+        "outputs": []
       },
       {
         "type": "function",
@@ -5642,6 +5723,19 @@
           {
             "type": "uint8",
             "name": "__decimals"
+          }
+        ],
+        "outputs": []
+      },
+      {
+        "type": "function",
+        "name": "transferOwnership",
+        "constant": false,
+        "payable": false,
+        "inputs": [
+          {
+            "type": "address",
+            "name": "newOwner"
           }
         ],
         "outputs": []
@@ -6520,7 +6614,7 @@
         ]
       }
     ],
-    "POOL_F_undefined": "[{\"type\":\"event\",\"anonymous\":false,\"name\":\"Approval\",\"inputs\":[{\"type\":\"address\",\"name\":\"owner\",\"indexed\":true},{\"type\":\"address\",\"name\":\"spender\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"value\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"CollateralEntered\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"collateral\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"CollateralExited\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"collateral\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"CollateralParamsUpdated\",\"inputs\":[{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"cap\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"baseLTV\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"liqThreshold\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"liqBonus\",\"indexed\":false},{\"type\":\"bool\",\"name\":\"isEnabled\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Deposit\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"amount\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"FeeTokenUpdated\",\"inputs\":[{\"type\":\"address\",\"name\":\"feeToken\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Initialized\",\"inputs\":[{\"type\":\"uint8\",\"name\":\"version\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"IssuerAllocUpdated\",\"inputs\":[{\"type\":\"uint256\",\"name\":\"issuerAlloc\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Paused\",\"inputs\":[{\"type\":\"address\",\"name\":\"account\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"PriceOracleUpdated\",\"inputs\":[{\"type\":\"address\",\"name\":\"priceOracle\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"SynthRemoved\",\"inputs\":[{\"type\":\"address\",\"name\":\"synth\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"SynthUpdated\",\"inputs\":[{\"type\":\"address\",\"name\":\"synth\",\"indexed\":true},{\"type\":\"bool\",\"name\":\"isEnabled\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"mintFee\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"burnFee\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Transfer\",\"inputs\":[{\"type\":\"address\",\"name\":\"from\",\"indexed\":true},{\"type\":\"address\",\"name\":\"to\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"value\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Unpaused\",\"inputs\":[{\"type\":\"address\",\"name\":\"account\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Withdraw\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"amount\",\"indexed\":false}]},{\"type\":\"function\",\"name\":\"BASIS_POINTS\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"ETH_ADDRESS\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"SCALER\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"accountCollateralBalance\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\"},{\"type\":\"address\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"accountCollaterals\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\"},{\"type\":\"uint256\"}],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"accountMembership\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\"},{\"type\":\"address\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"addSynth\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_synth\"},{\"type\":\"uint256\",\"name\":\"mintFee\"},{\"type\":\"uint256\",\"name\":\"burnFee\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"allowance\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"owner\"},{\"type\":\"address\",\"name\":\"spender\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"approve\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"spender\"},{\"type\":\"uint256\",\"name\":\"amount\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"balanceOf\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"collaterals\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\"}],\"outputs\":[{\"type\":\"bool\",\"name\":\"isEnabled\"},{\"type\":\"uint256\",\"name\":\"cap\"},{\"type\":\"uint256\",\"name\":\"totalDeposits\"},{\"type\":\"uint256\",\"name\":\"baseLTV\"},{\"type\":\"uint256\",\"name\":\"liqThreshold\"},{\"type\":\"uint256\",\"name\":\"liqBonus\"}]},{\"type\":\"function\",\"name\":\"commitBurn\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"commitLiquidate\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_liquidator\"},{\"type\":\"address\",\"name\":\"_account\"},{\"type\":\"uint256\",\"name\":\"_amount\"},{\"type\":\"address\",\"name\":\"_outAsset\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"commitMint\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"commitSwap\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"},{\"type\":\"uint256\",\"name\":\"_amount\"},{\"type\":\"address\",\"name\":\"_synthTo\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"decimals\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"uint8\"}]},{\"type\":\"function\",\"name\":\"decreaseAllowance\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"spender\"},{\"type\":\"uint256\",\"name\":\"subtractedValue\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"deposit\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"depositETH\",\"constant\":false,\"stateMutability\":\"payable\",\"payable\":true,\"inputs\":[],\"outputs\":[]},{\"type\":\"function\",\"name\":\"depositWithPermit\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"},{\"type\":\"uint256\",\"name\":\"_amount\"},{\"type\":\"uint256\",\"name\":\"_deadline\"},{\"type\":\"uint8\",\"name\":\"_v\"},{\"type\":\"bytes32\",\"name\":\"_r\"},{\"type\":\"bytes32\",\"name\":\"_s\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"enterCollateral\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"exitCollateral\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"feeToken\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"getAccountLiquidity\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"tuple\",\"name\":\"liq\",\"components\":[{\"type\":\"int256\",\"name\":\"liquidity\"},{\"type\":\"uint256\",\"name\":\"collateral\"},{\"type\":\"uint256\",\"name\":\"debt\"}]}]},{\"type\":\"function\",\"name\":\"getSynths\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"address[]\"}]},{\"type\":\"function\",\"name\":\"getTotalDebtUSD\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\",\"name\":\"totalDebt\"}]},{\"type\":\"function\",\"name\":\"getUserDebtUSD\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"increaseAllowance\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"spender\"},{\"type\":\"uint256\",\"name\":\"addedValue\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"initialize\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"string\",\"name\":\"_name\"},{\"type\":\"string\",\"name\":\"_symbol\"},{\"type\":\"address\",\"name\":\"_synthex\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"issuerAlloc\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"name\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"string\"}]},{\"type\":\"function\",\"name\":\"pause\",\"constant\":false,\"payable\":false,\"inputs\":[],\"outputs\":[]},{\"type\":\"function\",\"name\":\"paused\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"priceOracle\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"removeSynth\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_synth\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"setFeeToken\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_feeToken\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"setIssuerAlloc\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"uint256\",\"name\":\"_issuerAlloc\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"setPriceOracle\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_priceOracle\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"symbol\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"string\"}]},{\"type\":\"function\",\"name\":\"synthex\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"synths\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\"}],\"outputs\":[{\"type\":\"bool\",\"name\":\"isEnabled\"},{\"type\":\"uint256\",\"name\":\"mintFee\"},{\"type\":\"uint256\",\"name\":\"burnFee\"}]},{\"type\":\"function\",\"name\":\"synthsList\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"uint256\"}],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"totalSupply\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"transfer\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"to\"},{\"type\":\"uint256\",\"name\":\"amount\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"transferFrom\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"from\"},{\"type\":\"address\",\"name\":\"to\"},{\"type\":\"uint256\",\"name\":\"amount\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"unpause\",\"constant\":false,\"payable\":false,\"inputs\":[],\"outputs\":[]},{\"type\":\"function\",\"name\":\"updateCollateral\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"},{\"type\":\"tuple\",\"name\":\"_params\",\"components\":[{\"type\":\"bool\",\"name\":\"isEnabled\"},{\"type\":\"uint256\",\"name\":\"cap\"},{\"type\":\"uint256\",\"name\":\"totalDeposits\"},{\"type\":\"uint256\",\"name\":\"baseLTV\"},{\"type\":\"uint256\",\"name\":\"liqThreshold\"},{\"type\":\"uint256\",\"name\":\"liqBonus\"}]}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"updateSynth\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_synth\"},{\"type\":\"tuple\",\"name\":\"_params\",\"components\":[{\"type\":\"bool\",\"name\":\"isEnabled\"},{\"type\":\"uint256\",\"name\":\"mintFee\"},{\"type\":\"uint256\",\"name\":\"burnFee\"}]}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"withdraw\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"withdrawETH\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]}]",
+    "POOL_F_undefined": "[{\"type\":\"event\",\"anonymous\":false,\"name\":\"Approval\",\"inputs\":[{\"type\":\"address\",\"name\":\"owner\",\"indexed\":true},{\"type\":\"address\",\"name\":\"spender\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"value\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"CollateralEntered\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"collateral\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"CollateralExited\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"collateral\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"CollateralParamsUpdated\",\"inputs\":[{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"cap\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"baseLTV\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"liqThreshold\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"liqBonus\",\"indexed\":false},{\"type\":\"bool\",\"name\":\"isEnabled\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Deposit\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"amount\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"FeeTokenUpdated\",\"inputs\":[{\"type\":\"address\",\"name\":\"feeToken\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Initialized\",\"inputs\":[{\"type\":\"uint8\",\"name\":\"version\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"IssuerAllocUpdated\",\"inputs\":[{\"type\":\"uint256\",\"name\":\"issuerAlloc\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Liquidate\",\"inputs\":[{\"type\":\"address\",\"name\":\"liquidator\",\"indexed\":true},{\"type\":\"address\",\"name\":\"account\",\"indexed\":true},{\"type\":\"address\",\"name\":\"outAsset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"outAmount\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"outPenalty\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"outRefund\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Paused\",\"inputs\":[{\"type\":\"address\",\"name\":\"account\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"PriceOracleUpdated\",\"inputs\":[{\"type\":\"address\",\"name\":\"priceOracle\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"SynthRemoved\",\"inputs\":[{\"type\":\"address\",\"name\":\"synth\",\"indexed\":true}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"SynthUpdated\",\"inputs\":[{\"type\":\"address\",\"name\":\"synth\",\"indexed\":true},{\"type\":\"bool\",\"name\":\"isActive\",\"indexed\":false},{\"type\":\"bool\",\"name\":\"isDisabled\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"mintFee\",\"indexed\":false},{\"type\":\"uint256\",\"name\":\"burnFee\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Transfer\",\"inputs\":[{\"type\":\"address\",\"name\":\"from\",\"indexed\":true},{\"type\":\"address\",\"name\":\"to\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"value\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Unpaused\",\"inputs\":[{\"type\":\"address\",\"name\":\"account\",\"indexed\":false}]},{\"type\":\"event\",\"anonymous\":false,\"name\":\"Withdraw\",\"inputs\":[{\"type\":\"address\",\"name\":\"user\",\"indexed\":true},{\"type\":\"address\",\"name\":\"asset\",\"indexed\":true},{\"type\":\"uint256\",\"name\":\"amount\",\"indexed\":false}]},{\"type\":\"function\",\"name\":\"BASIS_POINTS\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"ETH_ADDRESS\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"SCALER\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"accountCollateralBalance\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\"},{\"type\":\"address\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"accountCollaterals\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\"},{\"type\":\"uint256\"}],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"accountMembership\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\"},{\"type\":\"address\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"addSynth\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_synth\"},{\"type\":\"uint256\",\"name\":\"mintFee\"},{\"type\":\"uint256\",\"name\":\"burnFee\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"allowance\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"owner\"},{\"type\":\"address\",\"name\":\"spender\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"approve\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"spender\"},{\"type\":\"uint256\",\"name\":\"amount\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"balanceOf\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"collaterals\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\"}],\"outputs\":[{\"type\":\"bool\",\"name\":\"isActive\"},{\"type\":\"uint256\",\"name\":\"cap\"},{\"type\":\"uint256\",\"name\":\"totalDeposits\"},{\"type\":\"uint256\",\"name\":\"baseLTV\"},{\"type\":\"uint256\",\"name\":\"liqThreshold\"},{\"type\":\"uint256\",\"name\":\"liqBonus\"}]},{\"type\":\"function\",\"name\":\"commitBurn\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"commitLiquidate\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_liquidator\"},{\"type\":\"address\",\"name\":\"_account\"},{\"type\":\"uint256\",\"name\":\"_amount\"},{\"type\":\"address\",\"name\":\"_outAsset\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"commitMint\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"commitSwap\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"},{\"type\":\"uint256\",\"name\":\"_amount\"},{\"type\":\"address\",\"name\":\"_synthTo\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"decimals\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"uint8\"}]},{\"type\":\"function\",\"name\":\"decreaseAllowance\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"spender\"},{\"type\":\"uint256\",\"name\":\"subtractedValue\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"deposit\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"depositETH\",\"constant\":false,\"stateMutability\":\"payable\",\"payable\":true,\"inputs\":[],\"outputs\":[]},{\"type\":\"function\",\"name\":\"depositWithPermit\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"},{\"type\":\"uint256\",\"name\":\"_amount\"},{\"type\":\"uint256\",\"name\":\"_deadline\"},{\"type\":\"uint8\",\"name\":\"_v\"},{\"type\":\"bytes32\",\"name\":\"_r\"},{\"type\":\"bytes32\",\"name\":\"_s\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"enterCollateral\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"exitCollateral\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"feeToken\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"getAccountLiquidity\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"tuple\",\"name\":\"liq\",\"components\":[{\"type\":\"int256\",\"name\":\"liquidity\"},{\"type\":\"uint256\",\"name\":\"collateral\"},{\"type\":\"uint256\",\"name\":\"debt\"}]}]},{\"type\":\"function\",\"name\":\"getSynths\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"address[]\"}]},{\"type\":\"function\",\"name\":\"getTotalDebtUSD\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\",\"name\":\"totalDebt\"}]},{\"type\":\"function\",\"name\":\"getUserDebtUSD\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_account\"}],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"increaseAllowance\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"spender\"},{\"type\":\"uint256\",\"name\":\"addedValue\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"initialize\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"string\",\"name\":\"_name\"},{\"type\":\"string\",\"name\":\"_symbol\"},{\"type\":\"address\",\"name\":\"_synthex\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"issuerAlloc\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"name\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"string\"}]},{\"type\":\"function\",\"name\":\"pause\",\"constant\":false,\"payable\":false,\"inputs\":[],\"outputs\":[]},{\"type\":\"function\",\"name\":\"paused\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"priceOracle\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"removeSynth\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_synth\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"setFeeToken\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_feeToken\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"setIssuerAlloc\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"uint256\",\"name\":\"_issuerAlloc\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"setPriceOracle\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_priceOracle\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"symbol\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"string\"}]},{\"type\":\"function\",\"name\":\"synthex\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"synths\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"address\"}],\"outputs\":[{\"type\":\"bool\",\"name\":\"isActive\"},{\"type\":\"bool\",\"name\":\"isDisabled\"},{\"type\":\"uint256\",\"name\":\"mintFee\"},{\"type\":\"uint256\",\"name\":\"burnFee\"}]},{\"type\":\"function\",\"name\":\"synthsList\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[{\"type\":\"uint256\"}],\"outputs\":[{\"type\":\"address\"}]},{\"type\":\"function\",\"name\":\"totalSupply\",\"constant\":true,\"stateMutability\":\"view\",\"payable\":false,\"inputs\":[],\"outputs\":[{\"type\":\"uint256\"}]},{\"type\":\"function\",\"name\":\"transfer\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"to\"},{\"type\":\"uint256\",\"name\":\"amount\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"transferFrom\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"from\"},{\"type\":\"address\",\"name\":\"to\"},{\"type\":\"uint256\",\"name\":\"amount\"}],\"outputs\":[{\"type\":\"bool\"}]},{\"type\":\"function\",\"name\":\"unpause\",\"constant\":false,\"payable\":false,\"inputs\":[],\"outputs\":[]},{\"type\":\"function\",\"name\":\"updateCollateral\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"},{\"type\":\"tuple\",\"name\":\"_params\",\"components\":[{\"type\":\"bool\",\"name\":\"isActive\"},{\"type\":\"uint256\",\"name\":\"cap\"},{\"type\":\"uint256\",\"name\":\"totalDeposits\"},{\"type\":\"uint256\",\"name\":\"baseLTV\"},{\"type\":\"uint256\",\"name\":\"liqThreshold\"},{\"type\":\"uint256\",\"name\":\"liqBonus\"}]}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"updateSynth\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_synth\"},{\"type\":\"tuple\",\"name\":\"_params\",\"components\":[{\"type\":\"bool\",\"name\":\"isActive\"},{\"type\":\"bool\",\"name\":\"isDisabled\"},{\"type\":\"uint256\",\"name\":\"mintFee\"},{\"type\":\"uint256\",\"name\":\"burnFee\"}]}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"withdraw\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"address\",\"name\":\"_collateral\"},{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]},{\"type\":\"function\",\"name\":\"withdrawETH\",\"constant\":false,\"payable\":false,\"inputs\":[{\"type\":\"uint256\",\"name\":\"_amount\"}],\"outputs\":[]}]",
     "ATokenWrapper": [
       {
         "type": "constructor",

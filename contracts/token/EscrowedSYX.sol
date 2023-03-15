@@ -10,19 +10,17 @@ import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
 import "../synthex/SyntheX.sol";
 import "../utils/interfaces/IStaking.sol";
 import "./redeem/BaseTokenRedeemer.sol";
-
+import "../libraries/Errors.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
-
-import "hardhat/console.sol";
 
 /**
  * @title Escrowed SYX
  * @author SyntheX
  * @custom:security-contact prasad@chainscore.finance
- * @notice Sealed tokens can only be transferred by authorized senders
- * @notice SNX tokens can be converted to esSYX for earning protocol fees/rewards (in WETH) and governance (ERC20Votes)
- * @notice Protocol rewards are distributed in esSYX tokens
- * @notice esSNX tokens can be redeemed for SYX tokens, with a lock period, unlock period and percentage unlock at release
+ * @notice esSYX can only be transferred by authorized senders
+ * @notice SNX tokens can be converted to esSYX for earning protocol fees/rewards (in WETH) and participate in governance (ERC20Votes)
+ * @notice Protocol rewards (APR) are distributed in esSYX tokens; and protocol revenue in WETH
+ * @notice esSNX tokens can be redeemed for SYX tokens, release period set by BaseTokenRedeemer
  */
 contract EscrowedSYX is ERC20Votes, ERC20Burnable, IStaking, BaseTokenRedeemer, AccessControl, Pausable {
     using SafeMath for uint256;
@@ -32,8 +30,6 @@ contract EscrowedSYX is ERC20Votes, ERC20Burnable, IStaking, BaseTokenRedeemer, 
     SyntheX public synthex;
     /// @notice Address of the rewards token
     address public REWARD_TOKEN;
-    /// @notice Address of the staking token
-    address public stakingToken;
     /// @notice Timestamp when the rewards period ends
     uint256 public periodFinish;
     /// @notice Reward rate per second
@@ -69,42 +65,6 @@ contract EscrowedSYX is ERC20Votes, ERC20Burnable, IStaking, BaseTokenRedeemer, 
         periodFinish = 0;
         rewardRate = 0;
         rewardsDuration = initialRewardsDuration;
-    }
-
-    function _afterTokenTransfer(address from, address to, uint256 amount)
-        internal
-        override(ERC20, ERC20Votes)
-    {
-        super._afterTokenTransfer(from, to, amount);
-    }
-
-    function _mint(address to, uint256 amount)
-        internal
-        override(ERC20, ERC20Votes)
-    {
-        super._mint(to, amount);
-    }
-
-    function _burn(address account, uint256 amount)
-        internal
-        override(ERC20, ERC20Votes)
-    {
-        super._burn(account, amount);
-    }
-
-    /**
-     * @notice Sealed tokens can be transferred only by authorized senders
-     */
-    function _transfer(
-        address from,
-        address to,
-        uint256 amount
-    ) internal virtual override updateReward(from) updateReward(to) {
-        require(
-            hasRole(AUTHORIZED_SENDER, msg.sender), 
-            "Not authorized to transfer"
-        );
-        super._transfer(from, to, amount);
     }
     
     /* -------------------------------------------------------------------------- */
@@ -149,24 +109,12 @@ contract EscrowedSYX is ERC20Votes, ERC20Burnable, IStaking, BaseTokenRedeemer, 
     /* -------------------------------------------------------------------------- */
     /*                              Public Functions                              */
     /* -------------------------------------------------------------------------- */
-    /**
-     * @notice Withdraws reward tokens
-     * @dev Updates reward Per Token Stored and store reward amount AND userRewardPerTokenPaid for msg.sender
-     */
-    function getReward() public override updateReward(msg.sender) {
-        uint256 reward = rewards[msg.sender];
-        if (reward > 0) {
-            rewards[msg.sender] = 0;
-            IERC20(REWARD_TOKEN).safeTransfer(msg.sender, reward);
-            emit RewardPaid(msg.sender, reward);       
-        }
-    }
 
-    function lock(uint _amount) external whenNotPaused {
+    function lock(uint _amount, address _receiver) external whenNotPaused {
         // transfer tokens from user to contract
         TOKEN.safeTransferFrom(msg.sender, address(this), _amount);
         // mint escrowed tokens
-        _mint(msg.sender, _amount);
+        _mint(_receiver, _amount);
     }
 
     /**
@@ -184,9 +132,22 @@ contract EscrowedSYX is ERC20Votes, ERC20Burnable, IStaking, BaseTokenRedeemer, 
      * @notice Claim all unlocked SYN tokens
      * @param _requestIds Request IDs of unlock requests
      */
-    function unlock(bytes32[] calldata _requestIds) external whenNotPaused {
+    function claimUnlocked(bytes32[] calldata _requestIds) external whenNotPaused {
         for(uint i = 0; i < _requestIds.length; i++){
-            _unlockInternal(_requestIds[i]);
+            _unlockInternal(msg.sender, _requestIds[i]);
+        }
+    }
+
+    /**
+     * @notice Withdraws reward tokens
+     * @dev Updates reward Per Token Stored and store reward amount AND userRewardPerTokenPaid for msg.sender
+     */
+    function getReward() public whenNotPaused override updateReward(msg.sender) {
+        uint256 reward = rewards[msg.sender];
+        if (reward > 0) {
+            rewards[msg.sender] = 0;
+            IERC20(REWARD_TOKEN).safeTransfer(msg.sender, reward);
+            emit RewardPaid(msg.sender, reward);       
         }
     }
 
@@ -196,8 +157,7 @@ contract EscrowedSYX is ERC20Votes, ERC20Burnable, IStaking, BaseTokenRedeemer, 
     /**
      * @notice Adds rewards to staking contract
      */
-    function notifyReward(uint256 reward) external updateReward(address(0)) {
-        require(synthex.isL2Admin(msg.sender), "Caller is not an admin");
+    function notifyReward(uint256 reward) external onlyL1Admin updateReward(address(0)) {
         if (block.timestamp >= periodFinish) {
           rewardRate = reward.div(rewardsDuration);
         }
@@ -215,8 +175,7 @@ contract EscrowedSYX is ERC20Votes, ERC20Burnable, IStaking, BaseTokenRedeemer, 
     /**
      * @notice Adds reward duration once previous duration is completed
      */
-    function setRewardsDuration(uint256 _rewardsDuration) external {
-        require(synthex.isL2Admin(msg.sender), "Caller is not an admin");
+    function setRewardsDuration(uint256 _rewardsDuration) onlyL1Admin external {
         require(
             block.timestamp > periodFinish,
             "Previous rewards period must be complete before changing the duration for the new period"
@@ -228,16 +187,14 @@ contract EscrowedSYX is ERC20Votes, ERC20Burnable, IStaking, BaseTokenRedeemer, 
     /**
      * @notice L1_ADMIN can grant MINTER_ROLE to any address
      */
-    function grantRole(bytes32 role, address account) public override {
-        require(synthex.isL1Admin(msg.sender), "EscrowedSYN: Only L1_ADMIN can grant roles");
+    function grantRole(bytes32 role, address account) onlyL1Admin public override {
         _grantRole(role, account);
     }
 
     /**
      * @notice L1_ADMIN can revoke MINTER_ROLE from any address
      */
-    function revokeRole(bytes32 role, address account) public override {
-        require(synthex.isL1Admin(msg.sender), "EscrowedSYN: Only L1_ADMIN can revoke roles");
+    function revokeRole(bytes32 role, address account) onlyL1Admin public override {
         _revokeRole(role, account);
     }
 
@@ -247,12 +204,26 @@ contract EscrowedSYX is ERC20Votes, ERC20Burnable, IStaking, BaseTokenRedeemer, 
      * @notice Default lock period is 30 days. This function can be used to change the lock period in case delay/early is needed
      * @param _lockPeriod New lock period
      */
-    function setLockPeriod(uint _lockPeriod) external {
-        require(synthex.isL1Admin(msg.sender), "EscrowedSYN: Only L1_ADMIN set lock period");
+    function setLockPeriod(uint _lockPeriod) onlyL1Admin external {
         lockPeriod = _lockPeriod;
         emit SetLockPeriod(_lockPeriod);
     }
 
+    function pause() external onlyL2Admin {
+        _pause();
+    }
+
+    /**
+     * @notice Unpause the contract
+     * @dev This function is used to unpause the contract in case of emergency
+     */
+    function unpause() external onlyL2Admin {
+        _unpause();
+    }
+
+    /* -------------------------------------------------------------------------- */
+    /*                                  Modifiers                                 */
+    /* -------------------------------------------------------------------------- */
     /**
      * @notice Updates reward Per Token Stored and store reward amount AND userRewardPerTokenPaid for msg.sender
      */
@@ -266,29 +237,50 @@ contract EscrowedSYX is ERC20Votes, ERC20Burnable, IStaking, BaseTokenRedeemer, 
         _;
     }
 
-    function pause() external {
-        require(synthex.isL2Admin(msg.sender), "Caller is not an admin");
-        _pause();
+    modifier onlyL2Admin() {
+        require(synthex.isL2Admin(msg.sender), Errors.CALLER_NOT_L2_ADMIN);
+        _;
+    }
+
+    modifier onlyL1Admin() {
+        require(synthex.isL1Admin(msg.sender), Errors.CALLER_NOT_L1_ADMIN);
+        _;
+    }
+
+    // ERC20 overrides
+    function _afterTokenTransfer(address from, address to, uint256 amount)
+        internal
+        override(ERC20, ERC20Votes)
+    {
+        super._afterTokenTransfer(from, to, amount);
+    }
+
+    function _mint(address to, uint256 amount)
+        internal
+        override(ERC20, ERC20Votes)
+    {
+        super._mint(to, amount);
+    }
+
+    function _burn(address account, uint256 amount)
+        internal
+        override(ERC20, ERC20Votes)
+    {
+        super._burn(account, amount);
     }
 
     /**
-     * @notice Unpause the contract
-     * @dev This function is used to unpause the contract in case of emergency
+     * @notice Sealed tokens can be transferred only by authorized senders
      */
-    function unpause() external {
-        require(synthex.isL2Admin(msg.sender), "Caller is not an admin");
-        _unpause();
-    }
-
-    /**
-     * @notice Withdraw SYN from the contract
-     * @param _amount Amount of SYN to withdraw
-     * @dev This function is only used to withdraw extra SYN from the contract
-     * @dev Reserved amount for unlock will not be withdrawn
-     */
-    function withdraw(uint _amount) external {
-        require(synthex.isL1Admin(msg.sender), "EscrowedSYN: Only L1_ADMIN can withdraw");
-        require(_amount <= remainingQuota(), "Not enough SYN to withdraw");
-        TOKEN.safeTransfer(msg.sender, _amount);
+    function _transfer(
+        address from,
+        address to,
+        uint256 amount
+    ) internal virtual override updateReward(from) updateReward(to) {
+        require(
+            hasRole(AUTHORIZED_SENDER, msg.sender), 
+            Errors.TRANSFER_FAILED
+        );
+        super._transfer(from, to, amount);
     }
 }

@@ -15,10 +15,8 @@ import "@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol";
 
 import "../synth/ERC20X.sol";
 import { IPool } from "./IPool.sol";
+import {Errors} from "../libraries/Errors.sol";
 import "../libraries/PriceConvertor.sol";
-
-// debug
-import "hardhat/console.sol";
 
 /**
  * @title Pool
@@ -29,7 +27,7 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
     /// @notice Using SafeMath for uint256 to prevent overflows and underflows
     using SafeMathUpgradeable for uint256;
     /// @notice Using Math for uint256 to calculate minimum and maximum
-    using MathUpgradeable for uint256; 
+    using MathUpgradeable for uint256;
     /// @notice for converting token prices
     using PriceConvertor for uint256;
     /// @notice Using SafeERC20 for IERC20 to prevent reverts
@@ -52,7 +50,7 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
 
     /// @dev Override to disable transfer
     function _transfer(address, address, uint256) internal virtual override {
-        revert("DebtPool: Cannot transfer debt");
+        revert(Errors.TRANSFER_FAILED);
     }
 
     /* -------------------------------------------------------------------------- */
@@ -75,10 +73,10 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
         // get collateral pool
         Collateral storage collateral = collaterals[_collateral];
 
-        require(collateral.isEnabled, "SyntheX: Collateral not enabled");
+        require(collateral.isActive, Errors.ASSET_NOT_ACTIVE);
 
         // ensure that the user is not already in the pool
-        require(!accountMembership[_collateral][msg.sender], "SyntheX: Already in collateral");
+        require(!accountMembership[_collateral][msg.sender], Errors.ACCOUNT_ALREADY_ENTERED);
         // enable account's collateral membership
         accountMembership[_collateral][msg.sender] = true;
         // add to account's collateral list
@@ -104,7 +102,7 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
             }
         }
 
-        require(getAccountLiquidity(msg.sender).liquidity > 0, "SyntheX: Insufficient liquidity");
+        require(getAccountLiquidity(msg.sender).liquidity > 0, Errors.INSUFFICIENT_COLLATERAL);
     }
 
     /**
@@ -112,7 +110,7 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
      */
     function depositETH() virtual override public payable {
         // check if param _amount == msg.value sent with tx
-        require(msg.value > 0, "Zero ETH amount");
+        require(msg.value > 0, Errors.ZERO_AMOUNT);
         depositInternal(msg.sender, ETH_ADDRESS, msg.value);
     }
 
@@ -156,7 +154,7 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
         // get collateral market
         Collateral storage collateral = collaterals[_collateral];
         // ensure collateral is globally enabled
-        require(collateral.isEnabled, "Collateral not enabled");
+        require(collateral.isActive, Errors.ASSET_NOT_ACTIVE);
 
         // ensure user has entered the market
         if(!accountMembership[_collateral][_account]){
@@ -170,7 +168,7 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
 
         // Update collateral supply
         supply.totalDeposits = supply.totalDeposits.add(_amount);
-        require(supply.totalDeposits <= supply.cap, "Collateral supply exceeded");
+        require(supply.totalDeposits <= supply.cap, Errors.EXCEEDED_MAX_CAPACITY);
 
         // emit event
         emit Deposit(_account, _collateral, _amount);
@@ -200,21 +198,34 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
     }
 
     function withdrawInternal(address _account, address _collateral, uint _amount) internal whenNotPaused {
+        Collateral storage supply = collaterals[_collateral];
         // check deposit balance
-        uint depositBalance = accountCollateralBalance[msg.sender][_collateral];
-        // ensure user has enough deposit balance
-        require(depositBalance >= _amount, "Insufficient balance");
+        uint depositBalance = accountCollateralBalance[_account][_collateral];
+        // allow only upto their deposit balance
+        if(depositBalance < _amount){
+            // withdraw all
+            _amount = depositBalance;
+        }
+
+        int liquidity = getAccountLiquidity(_account).liquidity;
+        if(liquidity < 0){
+            _amount = 0;
+        } else {
+            uint max = uint(liquidity).mul(BASIS_POINTS).div(supply.baseLTV);
+            if(_amount > max){
+                _amount = max;
+            }
+        }
 
         // Update balance
         accountCollateralBalance[_account][_collateral] = depositBalance.sub(_amount);
 
-        Collateral storage supply = collaterals[_collateral];
-        require(supply.isEnabled, "Collateral not enabled");
+        // require(supply.isActive, "Collateral not enabled");
         // Update collateral supply
         supply.totalDeposits = supply.totalDeposits.sub(_amount);
 
         // Check health after withdrawal
-        require(getAccountLiquidity(_account).liquidity >= 0, "Withdrawing more than allowed");
+        // require( >= 0, Errors.INSUFFICIENT_COLLATERAL);
 
         // Emit successful event
         emit Withdraw(_account, _collateral, _amount);
@@ -264,7 +275,7 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
     function commitMint(address _account, uint _amount) virtual override whenNotPaused external returns(uint) {
         Vars_Mint memory vars;
         // check if synth is enabled
-        require(synths[msg.sender].isEnabled, "SyntheXPool: Synth not enabled");
+        require(synths[msg.sender].isActive, Errors.ASSET_NOT_ACTIVE);
 
         vars.tokens = new address[](2);
         vars.tokens[0] = msg.sender;
@@ -273,7 +284,7 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
 
         int _borrowCapacity = getAccountLiquidity(_account).liquidity;
         
-        require(_borrowCapacity > 0, "SyntheXPool: Insufficient liquidity");
+        require(_borrowCapacity > 0, Errors.INSUFFICIENT_COLLATERAL);
 
         // amount of debt to issue (in usd, including mintFee)
         uint amountUSD = _amount.toUSD(vars.prices[0]);
@@ -336,13 +347,7 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
     function commitBurn(address _account, uint _amount) virtual override whenNotPaused external returns(uint) {
         Vars_Burn memory vars;
         // check if synth is valid
-        for(uint i = 0; i < synthsList.length; i++){
-            if(synthsList[i] == msg.sender){
-                break;
-            } else if(i == synthsList.length - 1){
-                revert("SyntheXPool: Synth not found");
-            }
-        }
+        if(!synths[msg.sender].isActive) require(synths[msg.sender].isDisabled, Errors.ASSET_NOT_ENABLED);
 
         vars.tokens = new address[](2);
         vars.tokens[0] = msg.sender;
@@ -382,12 +387,13 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
      * @param _amount The amount of synthetic asset to exchange
      * @param _synthTo The address of the synthetic asset to receive
      */
-    function commitSwap(address _account, uint _amount, address _synthTo) virtual override whenNotPaused external returns(uint) {
+    function commitSwap(address _recipient, uint _amount, address _synthTo) virtual override whenNotPaused external returns(uint) {
         // check if enabled synth is calling
-        require(synths[msg.sender].isEnabled, "DebtPool: SynthFrom not enabled");
-        require(synths[_synthTo].isEnabled, "DebtPool: SynthTo not enabled");
+        // should be able to swap out of disabled (inactive) synths
+        if(!synths[msg.sender].isActive) require(synths[msg.sender].isDisabled, Errors.ASSET_NOT_ENABLED);
+        require(synths[_synthTo].isActive, Errors.ASSET_NOT_ACTIVE);
         // ensure exchange is not to same synth
-        require(msg.sender != _synthTo, "DebtPool: Synths are the same");
+        require(msg.sender != _synthTo, Errors.INVALID_ARGUMENT);
 
         address[] memory t = new address[](3);
         t[0] = msg.sender;
@@ -398,8 +404,8 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
         uint amountUSD = _amount.toUSD(prices[0]);
         uint fee = amountUSD.mul(synths[_synthTo].mintFee.add(synths[msg.sender].burnFee)).div(BASIS_POINTS);
 
-        // 1. Mint (amount - fee) toSynth to user
-        ERC20X(_synthTo).mintInternal(_account, amountUSD.sub(fee).toToken(prices[1]));
+        // 1. Mint (amount - fee) toSynth to recipient
+        ERC20X(_synthTo).mintInternal(_recipient, amountUSD.sub(fee).toToken(prices[1]));
         // 2. Mint fee * (1 - issuerAlloc) (in feeToken) to vault
         ERC20X(feeToken).mintInternal(
             synthex.vault(),
@@ -408,19 +414,17 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
             .toToken(prices[2])
         );
         // 3. Burn all fromSynth
-        return _amount;
+        return _amount; 
     }
 
     struct Vars_Liquidate {
         AccountLiquidity liq;
         Collateral collateral;
         uint ltv;
-
         address[] tokens;
         uint[] prices;
         uint amountUSD;
         uint debtUSD;
-
         uint amountOut;
         uint penalty;
         uint refundOut;
@@ -434,18 +438,17 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
 
         Vars_Liquidate memory vars;
         // check if synth is enabled
-        require(synths[msg.sender].isEnabled, "DebtPool: SynthFrom not enabled");
+        if(!synths[msg.sender].isActive) require(synths[msg.sender].isDisabled, Errors.ASSET_NOT_ENABLED);
 
         // Get account liquidity
         vars.liq = getAccountLiquidity(_account);
         vars.collateral = collaterals[_outAsset];
-        require(vars.liq.debt > 0, "Account has no debt");
-        require(vars.liq.collateral > 0, "Account has no collateral");
+        require(vars.liq.debt > 0, Errors.INSUFFICIENT_DEBT);
+        require(vars.liq.collateral > 0, Errors.INSUFFICIENT_COLLATERAL);
         vars.ltv = vars.liq.debt.mul(SCALER).div(vars.liq.collateral);
-        require(vars.ltv > vars.collateral.liqThreshold, "Account health factor below liquidation threshold");
-        require(vars.liq.liquidity < 0, "Account has no shortfall");
+        require(vars.ltv > vars.collateral.liqThreshold.mul(SCALER).div(BASIS_POINTS), Errors.ACCOUNT_BELOW_LIQ_THRESHOLD);
         // Ensure user has entered the collateral market
-        require(accountMembership[_outAsset][_account], "Account not in collateral");
+        require(accountMembership[_outAsset][_account], Errors.ACCOUNT_NOT_ENTERED);
 
         vars.tokens = new address[](3);
         vars.tokens[0] = msg.sender;
@@ -497,7 +500,7 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
 
         // Transfer refund to user
         if(vars.refundOut > 0){
-            require(transferOut(_outAsset, _account, vars.refundOut) == vars.refundOut, "refund transfer failed");
+            require(transferOut(_outAsset, _account, vars.refundOut) == vars.refundOut, Errors.TRANSFER_FAILED);
         }
 
         vars.amountUSD = vars.amountOut.toUSD(vars.prices[1]);
@@ -599,12 +602,12 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
     /* -------------------------------------------------------------------------- */
 
     modifier onlyL1Admin() {
-        require(synthex.isL1Admin(msg.sender), "Only callable by L1 admin");
+        require(synthex.isL1Admin(msg.sender), Errors.CALLER_NOT_L1_ADMIN);
         _;
     }
 
     modifier onlyL2Admin() {
-        require(synthex.isL2Admin(msg.sender), "Only callable by L2 admin");
+        require(synthex.isL2Admin(msg.sender), Errors.CALLER_NOT_L2_ADMIN);
         _;
     }
     /**
@@ -655,16 +658,16 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
         }
         // update collateral params
         collateral.cap = _params.cap;
-        require(_params.baseLTV >= 0 && _params.baseLTV <= BASIS_POINTS, "SyntheX: Invalid baseLTV");
+        require(_params.baseLTV >= 0 && _params.baseLTV <= BASIS_POINTS, Errors.INVALID_ARGUMENT);
         collateral.baseLTV = _params.baseLTV;
-        require(_params.liqThreshold >= _params.baseLTV && _params.liqThreshold <= BASIS_POINTS, "SyntheX: Invalid liquidationThreshold");
+        require(_params.liqThreshold >= _params.baseLTV && _params.liqThreshold <= BASIS_POINTS, Errors.INVALID_ARGUMENT);
         collateral.liqThreshold = _params.liqThreshold;
-        require(_params.liqBonus >= BASIS_POINTS && _params.liqBonus <= BASIS_POINTS.add(BASIS_POINTS.sub(_params.liqThreshold)), "SyntheX: Invalid liquidationBonus");
+        require(_params.liqBonus >= BASIS_POINTS && _params.liqBonus <= BASIS_POINTS.add(BASIS_POINTS.sub(_params.liqThreshold)), Errors.INVALID_ARGUMENT);
         collateral.liqBonus = _params.liqBonus;
 
-        collateral.isEnabled = _params.isEnabled;
+        collateral.isActive = _params.isActive;
 
-        emit CollateralParamsUpdated(_collateral, _params.cap, _params.baseLTV, _params.liqThreshold, _params.liqBonus, _params.isEnabled);
+        emit CollateralParamsUpdated(_collateral, _params.cap, _params.baseLTV, _params.liqThreshold, _params.liqBonus, _params.isActive);
     } 
 
     /**
@@ -673,12 +676,12 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
      */
     function addSynth(address _synth, uint mintFee, uint burnFee) external onlyL1Admin {
         for(uint i = 0; i < synthsList.length; i++){
-            require(synthsList[i] != _synth, "SyntheX: Synth already added");
+            require(synthsList[i] != _synth, Errors.ASSET_NOT_ACTIVE);
         }
         // Add the synth to the list of synths
         synthsList.push(_synth);
         // Update synth params
-        updateSynth(_synth, Synth(true, mintFee, burnFee));
+        updateSynth(_synth, Synth(true, false, mintFee, burnFee));
     }
 
      /**
@@ -686,14 +689,15 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
       */
     function updateSynth(address _synth, Synth memory _params) virtual override public onlyL1Admin {
         // Update synth params
-        synths[_synth].isEnabled = _params.isEnabled;
-        require(_params.mintFee < BASIS_POINTS, "SyntheX: Invalid mintFee");
+        synths[_synth].isActive = _params.isActive;
+        synths[_synth].isDisabled = _params.isDisabled;
+        require(_params.mintFee < BASIS_POINTS, Errors.INVALID_ARGUMENT);
         synths[_synth].mintFee = _params.mintFee;
-        require(_params.burnFee < BASIS_POINTS, "SyntheX: Invalid burnFee");
+        require(_params.burnFee < BASIS_POINTS, Errors.INVALID_ARGUMENT);
         synths[_synth].burnFee = _params.burnFee;
 
         // Emit event on synth enabled
-        emit SynthUpdated(_synth, _params.isEnabled, _params.mintFee, _params.burnFee);
+        emit SynthUpdated(_synth, _params.isActive, _params.isDisabled, _params.mintFee, _params.burnFee);
     }
 
     /**
@@ -702,7 +706,7 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
      * @notice Removes from synthList => would not contribute to pool debt
      */
     function removeSynth(address _synth) virtual override public onlyL1Admin {
-        synths[_synth].isEnabled = false;
+        synths[_synth].isActive = false;
         for (uint i = 0; i < synthsList.length; i++) {
             if (synthsList[i] == _synth) {
                 synthsList[i] = synthsList[synthsList.length - 1];

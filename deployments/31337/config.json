@@ -1,18 +1,15 @@
 {
   "name": "synthex",
-  "version": "0.35.0",
-  "latest": "0.35.0",
+  "version": "0.39.0",
+  "latest": "0.39.0",
   "l0Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
   "l1Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
   "l2Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-  "governanceModule": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-  "rewardAlloc": "100000000000",
-  "stakingRewards": {
-    "reward": "0",
-    "days": "0"
-  },
-  "unlocker": {
-    "lockupPeriod": "15552000",
+  "rewardAlloc": "0",
+  "esSYX": {
+    "initialRewardsDuration": "30",
+    "reward": "6000",
+    "lockPeriod": "15552000",
     "unlockPeriod": "15552000",
     "percReleaseAtUnlock": "500",
     "quota": "1000000"
@@ -22,7 +19,7 @@
       "name": "Crypto Market",
       "symbol": "C",
       "rewardSpeed": "1",
-      "issuerAlloc": "5000",
+      "issuerAlloc": "0",
       "collaterals": [
         {
           "name": "Ethereum",
@@ -96,44 +93,44 @@
           "name": "Bitcoin",
           "symbol": "BTC",
           "price": "10000",
-          "mintFee": "6",
-          "burnFee": "6"
+          "mintFee": "0",
+          "burnFee": "0"
         },
         {
           "name": "Ethereum",
           "symbol": "ETH",
           "price": "1000",
-          "mintFee": "3",
-          "burnFee": "3"
+          "mintFee": "0",
+          "burnFee": "0"
         },
         {
           "name": "USD Coin",
           "symbol": "USDC",
           "price": "1.00",
           "isFeeToken": true,
-          "mintFee": "2",
-          "burnFee": "2"
+          "mintFee": "0",
+          "burnFee": "0"
         },
         {
           "name": "ChainLink",
           "symbol": "LINK",
           "price": "7.38",
-          "mintFee": "10",
-          "burnFee": "10"
+          "mintFee": "0",
+          "burnFee": "0"
         },
         {
           "name": "Solana",
           "symbol": "SOL",
           "price": "22.56",
-          "mintFee": "10",
-          "burnFee": "10"
+          "mintFee": "0",
+          "burnFee": "0"
         },
         {
           "name": "Optimism",
           "symbol": "OP",
           "price": "2.76",
-          "mintFee": "10",
-          "burnFee": "10"
+          "mintFee": "0",
+          "burnFee": "0"
         }
       ]
     },
