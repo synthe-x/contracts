@@ -3,14 +3,13 @@ import { expect } from "chai";
 import { ethers } from "hardhat";
 import { ETH_ADDRESS } from "../../scripts/utils/const";
 import main from "../../scripts/main";
+import hre from 'hardhat';
 
 describe("Rewards", function () {
 	let synthex: any,
 		weth: any,
-		sealedSyn: any,
 		oracle: any,
 		cryptoPool: any,
-		eth: any,
 		susd: any,
 		sbtc: any,
 		seth: any,
@@ -23,7 +22,6 @@ describe("Rewards", function () {
 
 		const deployments = await loadFixture(main);
 		synthex = deployments.synthex;
-		sealedSyn = deployments.sealedSYN;
 		oracle = deployments.pools[0].oracle;
 		cryptoPool = deployments.pools[0].pool;
 		weth = deployments.pools[0].collateralTokens[1];
@@ -52,7 +50,7 @@ describe("Rewards", function () {
 		const domain = {
 			name: await weth.name(),
 			version: "1",
-			chainId: 31337,
+			chainId: hre.network.config.chainId,
 			verifyingContract: weth.address,
 		};
 

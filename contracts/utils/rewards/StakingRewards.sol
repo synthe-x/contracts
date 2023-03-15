@@ -124,7 +124,7 @@ contract StakingRewards is IStaking, ReentrancyGuard, Pausable {
      * @notice Stakes tokens and updates balances of msg.sender
      * @dev Updates reward Per Token Stored and store reward amount AND userRewardPerTokenPaid for msg.sender
      */
-    function stake(uint256 amount) external override nonReentrant whenNotPaused updateReward(msg.sender) {
+    function stake(uint256 amount) external nonReentrant whenNotPaused updateReward(msg.sender) {
         require(amount > 0, "Cannot stake 0");
         totalSupply = totalSupply.add(amount);
         balanceOf[msg.sender] = balanceOf[msg.sender].add(amount);
@@ -136,7 +136,7 @@ contract StakingRewards is IStaking, ReentrancyGuard, Pausable {
      * @notice Withdraws tokens and updates balances of msg.sender
      * @dev Updates reward Per Token Stored and store reward amount AND userRewardPerTokenPaid for msg.sender
      */
-    function withdraw(uint256 amount) public override nonReentrant updateReward(msg.sender) {
+    function withdraw(uint256 amount) public nonReentrant updateReward(msg.sender) {
         require(amount > 0, "Cannot withdraw 0");
         totalSupply = totalSupply.sub(amount);
         balanceOf[msg.sender] = balanceOf[msg.sender].sub(amount);
@@ -161,7 +161,7 @@ contract StakingRewards is IStaking, ReentrancyGuard, Pausable {
     /**
      * @notice Withdraws staked token and reward tokens
      */
-    function exit() override external {
+    function exit() external {
         withdraw(balanceOf[msg.sender]);
         getReward();
     }

@@ -1,19 +1,17 @@
 {
   "name": "synthex",
-  "version": "0.14.0",
-  "latest": "0.14.0",
+  "version": "0.15.0",
+  "latest": "0.15.0",
   "l0Admin": "0x084cD22eA15E4C262408e561a5AFa8431Bd7fa5d",
   "l1Admin": "0x2646306d3191AEE905bf9065bD1B7cC71c9036D0",
   "l2Admin": "0x46c18c6d5526E17B34a3deB43e5E9Ba2A659c23a",
-  "governanceModule": "0x780580fd8AEa47b93414Fa6693123049EC7aED55",
-  "debtRewardAlloc": "1000000000",
-  "stakingRewards": {
+  "rewardAlloc": "1000000000",
+  "WETH": "0x7964Bcc63335E101F23da13583CEaD61d75f863b",
+  "esSYX": {
+    "initialRewardsDuration": "30",
     "reward": "6000",
-    "days": "30"
-  },
-  "unlocker": {
-    "lockupPeriod": "15552000",
-    "unlockPeriod": "15552000",
+    "lockPeriod": "15552000",
+    "unlockPeriod": "4838400",
     "percReleaseAtUnlock": "500",
     "quota": "1000000"
   },
@@ -21,7 +19,7 @@
     {
       "name": "Crypto Market",
       "symbol": "C",
-      "rewardSpeed": "1",
+      "rewardSpeed": "100000000000000000",
       "issuerAlloc": "5000",
       "collaterals": [
         {
@@ -161,7 +159,7 @@
     {
       "name": "Foreign Exchange",
       "symbol": "F",
-      "rewardSpeed": "1",
+      "rewardSpeed": "100000000000000000",
       "issuerAlloc": "5000",
       "collaterals": [
         {

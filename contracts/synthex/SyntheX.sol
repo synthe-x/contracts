@@ -12,11 +12,8 @@ import "./AddressStorage.sol";
 import "./AccessControlList.sol";
 
 import "../pool/Pool.sol";
-import "../token/SyntheXToken.sol";
-import "../utils/oracle/IPriceOracle.sol";
-import "../utils/vault/FeeVault.sol";
 import "./ISyntheX.sol";
-import "../libraries/PriceConvertor.sol";
+import "../libraries/Errors.sol";
 
 // debug
 import "hardhat/console.sol";
@@ -63,7 +60,7 @@ contract SyntheX is ISyntheX, AccessControlList, UUPSUpgradeable, AddressStorage
      * @dev Only callable by L2 admin
      */
     function pause() public {
-        require(isL2Admin(msg.sender), "SyntheX: Not authorized");
+        require(isL2Admin(msg.sender), Errors.CALLER_NOT_L2_ADMIN);
         _pause();
     }
 
@@ -72,7 +69,7 @@ contract SyntheX is ISyntheX, AccessControlList, UUPSUpgradeable, AddressStorage
      * @dev Only callable by L2 admin
      */
     function unpause() public {
-        require(isL2Admin(msg.sender), "SyntheX: Not authorized");
+        require(isL2Admin(msg.sender), Errors.CALLER_NOT_L2_ADMIN);
         _unpause();
     }
 
@@ -116,7 +113,7 @@ contract SyntheX is ISyntheX, AccessControlList, UUPSUpgradeable, AddressStorage
             address[] memory _rewardTokens = rewardTokens[_pool];
             // make sure it doesn't already exist
             for(uint i = 0; i < _rewardTokens.length; i++) {
-                require(_rewardTokens[i] != _rewardToken, "SyntheX: Reward token already added to list");
+                require(_rewardTokens[i] != _rewardToken, Errors.ASSET_ALREADY_ADDED);
             }
             rewardTokens[_pool].push(_rewardToken);
         }

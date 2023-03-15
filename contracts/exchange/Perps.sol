@@ -150,8 +150,8 @@ contract Perps is BaseMargin, IERC3156FlashBorrower {
         
         IERC20(params.token0).safeIncreaseAllowance(address(POOL), params.token0Amount);
         
-        (, uint mintFee,) = DEBT_POOL.synths(params.token1);
-        (, uint burnFee,) = DEBT_POOL.synths(params.token0);
+        (,, uint mintFee,) = DEBT_POOL.synths(params.token1);
+        (,, uint burnFee,) = DEBT_POOL.synths(params.token0);
 
         // supply synth 
         POOL.supply(
@@ -175,8 +175,8 @@ contract Perps is BaseMargin, IERC3156FlashBorrower {
         // repay borrowed asset
         IERC20(params.token0).safeIncreaseAllowance(address(POOL), params.token0Amount);
 
-        (, uint mintFee,) = DEBT_POOL.synths(params.token1);
-        (, uint burnFee,) = DEBT_POOL.synths(params.token0);
+        (,, uint mintFee,) = DEBT_POOL.synths(params.token1);
+        (,, uint burnFee,) = DEBT_POOL.synths(params.token0);
 
 
         POOL.repay(

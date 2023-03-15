@@ -40,9 +40,9 @@ describe("Testing the complete flow", function () {
 
 	it("issue synths", async function () {
 		// user1 issues 10 seth
-        await seth.connect(user1).mint(ethers.utils.parseEther("10")); // $ 10000
+        await seth.connect(user1).mint(ethers.utils.parseEther("10"), user1.address, ethers.constants.AddressZero); // $ 10000
         // user3 issues 100000 susd
-        await susd.connect(user3).mint(ethers.utils.parseEther("90000")); // $ 90000
+        await susd.connect(user3).mint(ethers.utils.parseEther("90000"), user3.address, ethers.constants.AddressZero); // $ 90000
 
 		// balance
 		expect(await seth.balanceOf(user1.address)).to.equal(ethers.utils.parseEther("10"));
@@ -56,7 +56,7 @@ describe("Testing the complete flow", function () {
 
     it("swap em", async () => {
         // user1 exchanges 10 seth for 1 sbtc
-        await seth.connect(user1).swap(ethers.utils.parseEther("10"), sbtc.address);
+        await seth.connect(user1).swap(ethers.utils.parseEther("10"), sbtc.address, user1.address, ethers.constants.AddressZero);
         // check balances
 		const user1Liquidity = await pool.getAccountLiquidity(user1.address);
 		const user3Liquidity = await pool.getAccountLiquidity(user3.address);

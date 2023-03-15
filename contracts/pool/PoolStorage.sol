@@ -21,7 +21,8 @@ contract PoolStorage {
     address public feeToken;
 
     struct Synth {
-        bool isEnabled;
+        bool isActive; 
+        bool isDisabled;
         uint256 mintFee;
         uint256 burnFee;
     }
@@ -40,7 +41,7 @@ contract PoolStorage {
 
     /// @notice Collateral data structure
     struct Collateral {
-        bool isEnabled;         // Checks if collateral is enabled
+        bool isActive;         // Checks if collateral is enabled
         uint256 cap;            // Maximum amount of collateral that can be deposited
         uint256 totalDeposits;  // Total amount of collateral deposited
         uint256 baseLTV;        // Base loan to value ratio (in bps) 80% = 8000

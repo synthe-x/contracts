@@ -18,7 +18,7 @@ describe("Testing SwapFee", function () {
 		const deployments = await loadFixture(main);
         vault = deployments.vault;
 		synthex = deployments.synthex;
-        syn = deployments.syn;
+        syn = deployments.SYX;
 		oracle = deployments.pools[0].oracle;
 		cryptoPool = deployments.pools[0].pool;
 		sbtc = deployments.pools[0].synths[0];
@@ -32,8 +32,8 @@ describe("Testing SwapFee", function () {
         expect((await cryptoPool.getAccountLiquidity(user2.address))[1]).to.be.equal(ethers.utils.parseEther("50000"));
 
         // Mint synths
-        await seth.connect(user1).mint(ethers.utils.parseEther("10")); // $ 10000
-        await seth.connect(user2).mint(ethers.utils.parseEther("10")); // $ 10000
+        await seth.connect(user1).mint(ethers.utils.parseEther("10"), user1.address, ethers.constants.AddressZero); // $ 10000
+        await seth.connect(user2).mint(ethers.utils.parseEther("10"), user2.address, ethers.constants.AddressZero); // $ 10000
 	};
 
     describe('Swap fee', async () => { 
@@ -42,13 +42,13 @@ describe("Testing SwapFee", function () {
         })
         it("should update fee to 1%", async function () {
             swapFee = 100;
-            await cryptoPool.connect(owner).updateSynth(seth.address, {mintFee: swapFee/2, isEnabled: true, burnFee: swapFee/2});
-            await cryptoPool.connect(owner).updateSynth(susd.address, {mintFee: swapFee/2, isEnabled: true, burnFee: swapFee/2});
+            await cryptoPool.connect(owner).updateSynth(seth.address, {mintFee: swapFee/2, isActive: true, isDisabled: false, burnFee: swapFee/2});
+            await cryptoPool.connect(owner).updateSynth(susd.address, {mintFee: swapFee/2, isActive: true, isDisabled: false, burnFee: swapFee/2});
         });
 
         it("user should be able to swap 10 sETH to 10000 sUSD with 100 sUSD fee", async function () {
             // user1 swaps 10 seth
-            await seth.connect(user1).swap(ethers.utils.parseEther("10"), susd.address);
+            await seth.connect(user1).swap(ethers.utils.parseEther("10"), susd.address, user1.address, ethers.constants.AddressZero);
             // 10000 = 9900 + 100 (1%) fee
             let initialAmount = ethers.utils.parseEther("10000");
             let fee = initialAmount.mul(swapFee).div(BASIS_POINTS);
@@ -62,15 +62,15 @@ describe("Testing SwapFee", function () {
 
         it("should update fee to 0.1%", async function () {
             swapFee = 10;
-            await cryptoPool.connect(owner).updateSynth(seth.address, {mintFee: swapFee/2, isEnabled: true, burnFee: swapFee/2});
-            await cryptoPool.connect(owner).updateSynth(susd.address, {mintFee: swapFee/2, isEnabled: true, burnFee: swapFee/2});
+            await cryptoPool.connect(owner).updateSynth(seth.address, {mintFee: swapFee/2, isActive: true, isDisabled: false, burnFee: swapFee/2});
+            await cryptoPool.connect(owner).updateSynth(susd.address, {mintFee: swapFee/2, isActive: true, isDisabled: false, burnFee: swapFee/2});
         });
 
         it("user2 should issue synths", async function () {
             // initial vault balance
             let initialVaultBalance = await susd.balanceOf(vault.address);
             // user1 swaps 10 seth
-            await seth.connect(user2).swap(ethers.utils.parseEther("10"), susd.address);
+            await seth.connect(user2).swap(ethers.utils.parseEther("10"), susd.address, user2.address, ethers.constants.AddressZero);
             // 10000 = 9900 + 100 (1%) fee
             let initialAmount = ethers.utils.parseEther("10000");
             let fee = initialAmount.mul(swapFee).div(BASIS_POINTS);
@@ -91,8 +91,8 @@ describe("Testing SwapFee", function () {
         it("should update fee to 1% + 50% issuer alloc", async function () {
             issuerAlloc = 5000;
             swapFee = 100;
-            await cryptoPool.connect(owner).updateSynth(seth.address, {mintFee: swapFee/2, isEnabled: true, burnFee: swapFee/2});
-            await cryptoPool.connect(owner).updateSynth(susd.address, {mintFee: swapFee/2, isEnabled: true, burnFee: swapFee/2});
+            await cryptoPool.connect(owner).updateSynth(seth.address, {mintFee: swapFee/2, isActive: true, isDisabled: false, burnFee: swapFee/2});
+            await cryptoPool.connect(owner).updateSynth(susd.address, {mintFee: swapFee/2, isActive: true, isDisabled: false, burnFee: swapFee/2});
             await cryptoPool.setIssuerAlloc(issuerAlloc);
         });
 
@@ -101,7 +101,7 @@ describe("Testing SwapFee", function () {
             let initialUser1Debt = (await cryptoPool.getAccountLiquidity(user1.address))[2];
             let initialUser2Debt = (await cryptoPool.getAccountLiquidity(user2.address))[2];
             // user1 swaps 10 seth
-            await seth.connect(user1).swap(ethers.utils.parseEther("10"), susd.address);
+            await seth.connect(user1).swap(ethers.utils.parseEther("10"), susd.address, user1.address, ethers.constants.AddressZero);
             // 10000 = 9900 + 100 (1%) fee
             let initialAmount = ethers.utils.parseEther("10000");
             let fee = initialAmount.mul(swapFee).div(BASIS_POINTS);
@@ -122,8 +122,8 @@ describe("Testing SwapFee", function () {
         it("should update fee to 0.1% + 80% issuer alloc", async function () {
             issuerAlloc = 8000;
             swapFee = 10;
-            await cryptoPool.connect(owner).updateSynth(seth.address, {mintFee: swapFee/2, isEnabled: true, burnFee: swapFee/2});
-            await cryptoPool.connect(owner).updateSynth(susd.address, {mintFee: swapFee/2, isEnabled: true, burnFee: swapFee/2});
+            await cryptoPool.connect(owner).updateSynth(seth.address, {mintFee: swapFee/2, isActive: true, isDisabled: false, burnFee: swapFee/2});
+            await cryptoPool.connect(owner).updateSynth(susd.address, {mintFee: swapFee/2, isActive: true, isDisabled: false, burnFee: swapFee/2});
             await cryptoPool.setIssuerAlloc(issuerAlloc);
         });
 
@@ -134,7 +134,7 @@ describe("Testing SwapFee", function () {
             // initial vault balance
             let initialVaultBalance = await susd.balanceOf(vault.address);
             // user1 swaps 10 seth
-            await seth.connect(user2).swap(ethers.utils.parseEther("10"), susd.address);
+            await seth.connect(user2).swap(ethers.utils.parseEther("10"), susd.address, user2.address, ethers.constants.AddressZero);
             // 10000 = 9900 + 100 (1%) fee
             let initialAmount = ethers.utils.parseEther("10000");
             let fee = initialAmount.mul(swapFee).div(BASIS_POINTS);

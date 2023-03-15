@@ -4,6 +4,8 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
+import "../libraries/Errors.sol";
+
 contract AccessControlList is Initializable, AccessControlUpgradeable {
     /// @notice Roles for access control
     bytes32 public constant L1_ADMIN_ROLE = keccak256("L1_ADMIN_ROLE");
@@ -39,12 +41,12 @@ contract AccessControlList is Initializable, AccessControlUpgradeable {
     }
 
     modifier onlyL1Admin() {
-        require(isL1Admin(msg.sender), "SyntheX: Not authorized");
+        require(isL1Admin(msg.sender), Errors.NOT_AUTHORIZED);
         _;
     }
 
     modifier onlyL2Admin() {
-        require(isL2Admin(msg.sender), "SyntheX: Not authorized");
+        require(isL2Admin(msg.sender), Errors.NOT_AUTHORIZED);
         _;
     }
 }

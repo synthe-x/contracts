@@ -1,0 +1,14 @@
+{
+    "synthex": "",
+    "syx": "",
+    "startTime": 0,
+    "endTime": 0,
+    "lockPeriod": 0,
+    "unlockPeriod": 0,
+    "percUnlockAtRelease": 0,
+    "whitelisted": [
+        "0x0000"
+    ],
+    "whitelistDuration": 0,
+    "whitelistCap": 0
+}

@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "../EscrowedSYN.sol";
-import "./BaseTokenRedeemer.sol";
+import "../../token/redeem/BaseTokenRedeemer.sol";
 
 import "../../synthex/SyntheX.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -17,14 +16,15 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
  * @notice Users can request to unlock their SYN tokens after a lock period
  * @notice Tokens are released linearly over a period of time (unlock period)
  */
-contract TokenRedeemer is BaseTokenRedeemer, Pausable {
+contract MockTokenRedeemer is BaseTokenRedeemer, Pausable {
     /// @notice SafeMath library is used for uint operations
     using SafeMath for uint;
     /// @notice SafeERC20 library is used for ERC20 operations
     using SafeERC20 for IERC20;
 
     /// @notice LOCKED_TOKEN is the token to be unlocked
-    EscrowedSYN public LOCKED_TOKEN;
+    IERC20 public LOCKED_TOKEN;
+    /// @notice System contract
     SyntheX public synthex;
 
     /**
@@ -41,7 +41,7 @@ contract TokenRedeemer is BaseTokenRedeemer, Pausable {
         uint _percUnlockAtRelease
     ) BaseTokenRedeemer(_TOKEN, _lockPeriod, _unlockPeriod, _percUnlockAtRelease) {
         synthex = SyntheX(_system);
-        LOCKED_TOKEN = EscrowedSYN(_LOCKED_TOKEN);
+        LOCKED_TOKEN = IERC20(_LOCKED_TOKEN);
     }
 
     /* -------------------------------------------------------------------------- */
@@ -93,14 +93,20 @@ contract TokenRedeemer is BaseTokenRedeemer, Pausable {
     /* -------------------------------------------------------------------------- */
     /*                             Unlock and Claim                               */
     /* -------------------------------------------------------------------------- */
+    function lock(uint _amount) external whenNotPaused {
+        // transfer tokens from user to contract
+        TOKEN.safeTransferFrom(msg.sender, address(this), _amount);
+        // mint sealed tokens
+        LOCKED_TOKEN.safeTransfer(msg.sender, _amount);
+    }
+
     /**
      * @notice Start unlocking of SYN tokens
      * @param _amount Amount of SYN to unlock
      */
     function startUnlock(uint _amount) external whenNotPaused {
         // burn sealed tokens from user
-        LOCKED_TOKEN.burnFrom(msg.sender, _amount);
-
+        LOCKED_TOKEN.safeTransferFrom(msg.sender, address(this), _amount);
         // start unlock
         _startUnlock(msg.sender, _amount);
     }
@@ -109,9 +115,9 @@ contract TokenRedeemer is BaseTokenRedeemer, Pausable {
      * @notice Claim all unlocked SYN tokens
      * @param _requestIds Request IDs of unlock requests
      */
-    function unlock(bytes32[] calldata _requestIds) external {
+    function unlock(bytes32[] calldata _requestIds) external whenNotPaused {
         for(uint i = 0; i < _requestIds.length; i++){
-            _unlockInternal(_requestIds[i]);
+            _unlockInternal(msg.sender, _requestIds[i]);
         }
     }
 }

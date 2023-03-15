@@ -3,12 +3,6 @@ pragma solidity ^0.8.0;
 
 interface IStaking {
 
-    function stake(uint256 amount) external;
-
-    function withdraw(uint256 amount) external;
-
-    function exit() external;
-
     function getReward() external;
 
     //View
@@ -28,6 +22,4 @@ interface IStaking {
     event RewardPaid(address indexed user, uint256 reward);
     event RewardsDurationUpdated(uint256 newDuration);
     event Recovered(address token, uint256 amount);
-
-
 }

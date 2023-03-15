@@ -53,7 +53,7 @@ export async function initiate(
     ], deployments, {upgradable: true, name: 'POOL_'+poolConfig.symbol});
 
     await poolResult.pool.setIssuerAlloc(poolConfig.issuerAlloc);
-    await contracts.synthex.setPoolSpeed(contracts.sealedSYN.address, poolResult.pool.address, poolConfig.rewardSpeed, true)
+    await contracts.synthex.setPoolSpeed(contracts.esSYX.address, poolResult.pool.address, poolConfig.rewardSpeed, true)
 
     for(let i = 0; i < poolConfig.collaterals.length; i++){
       let cConfig = poolConfig.collaterals[i];
@@ -97,7 +97,7 @@ export async function initiate(
       }
 
       // Enabling collateral
-      await poolResult.pool.updateCollateral(collateral.address, {...cConfig.params, isEnabled: true, totalDeposits: 0});
+      await poolResult.pool.updateCollateral(collateral.address, {...cConfig.params, isActive: true, totalDeposits: 0});
       if(!isTest) console.log(`\t Collateral ${cConfig.symbol} ($${parseFloat(ethers.utils.formatUnits(await feed.latestAnswer(), await feed.decimals())).toFixed(4)}) added successfully ✅`);
   
       poolResult.collateralTokens.push(collateral);

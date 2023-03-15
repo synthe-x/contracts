@@ -16,8 +16,9 @@ contract Vault {
     // AddressStorage contract
     SyntheX public synthex;
 
-
     fallback() external payable {}
+
+    receive() external payable {}
 
     /**
      * @dev Constructor
@@ -36,7 +37,7 @@ contract Vault {
     function withdraw(address _tokenAddress, uint256 amount)
         external
     {
-        require(synthex.isL1Admin(msg.sender), "Vault: Only fee collector can withdraw");
+        require(synthex.isL1Admin(msg.sender), Errors.CALLER_NOT_L1_ADMIN);
         ERC20(_tokenAddress).safeTransfer(msg.sender, amount);
     }
 }
