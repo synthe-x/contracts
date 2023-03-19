@@ -1,12 +1,12 @@
 {
   "name": "synthex",
-  "version": "0.15.0",
-  "latest": "0.15.0",
+  "version": "0.16.0",
+  "latest": "0.16.0",
   "l0Admin": "0x084cD22eA15E4C262408e561a5AFa8431Bd7fa5d",
   "l1Admin": "0x2646306d3191AEE905bf9065bD1B7cC71c9036D0",
   "l2Admin": "0x46c18c6d5526E17B34a3deB43e5E9Ba2A659c23a",
-  "rewardAlloc": "1000000000",
-  "WETH": "0x7964Bcc63335E101F23da13583CEaD61d75f863b",
+  "rewardAlloc": "10000000",
+  "weth": "0x7964Bcc63335E101F23da13583CEaD61d75f863b",
   "esSYX": {
     "initialRewardsDuration": "30",
     "reward": "6000",
@@ -48,42 +48,6 @@
           }
         },
         {
-          "name": "Lido wstETH",
-          "symbol": "wstETH",
-          "decimals": 18,
-          "feed": "0x62CAe0FA2da220f43a51F86Db2EDb36DcA9A5A08",
-          "params": {
-            "cap": "10000000000000000000000",
-            "baseLTV": "8000",
-            "liqThreshold": "9000",
-            "liqBonus": "10500"
-          }
-        },
-        {
-          "name": "AAVE",
-          "symbol": "AAVE",
-          "decimals": 18,
-          "price": "100",
-          "params": {
-            "cap": "100000000000000000000000",
-            "baseLTV": "7000",
-            "liqThreshold": "9000",
-            "liqBonus": "10500"
-          }
-        },
-        {
-          "name": "ChainLink",
-          "symbol": "LINK",
-          "decimals": 18,
-          "feed": "0xd28Ba6CA3bB72bF371b80a2a0a33cBcf9073C954",
-          "params": {
-            "cap": "100000000000000000000000",
-            "baseLTV": "7500",
-            "liqThreshold": "9000",
-            "liqBonus": "10500"
-          }
-        },
-        {
           "name": "USD Coin",
           "symbol": "USDC",
           "decimals": 18,
@@ -112,8 +76,8 @@
           "burnFee": "6"
         },
         {
-          "name": "USD Coin",
-          "symbol": "USDC",
+          "name": "US Dollar",
+          "symbol": "USD",
           "feed": "0x1692Bdd32F31b831caAc1b0c9fAF68613682813b",
           "isFeeToken": true,
           "mintFee": "4",
@@ -141,8 +105,29 @@
           "burnFee": "10"
         },
         {
-          "name": "Ape Coin",
-          "symbol": "APE",
+          "name": "Ripple",
+          "symbol": "XRP",
+          "price": "5.1",
+          "mintFee": "8",
+          "burnFee": "10"
+        },
+        {
+          "name": "Polkadot",
+          "symbol": "DOT",
+          "price": "5.1",
+          "mintFee": "8",
+          "burnFee": "10"
+        },
+        {
+          "name": "Near Protocol",
+          "symbol": "NEAR",
+          "price": "5.1",
+          "mintFee": "8",
+          "burnFee": "10"
+        },
+        {
+          "name": "Cardano",
+          "symbol": "ADA",
           "price": "5.1",
           "mintFee": "8",
           "burnFee": "10"
@@ -150,6 +135,13 @@
         {
           "name": "Polygon",
           "symbol": "MATIC",
+          "price": "1.76",
+          "mintFee": "8",
+          "burnFee": "10"
+        },
+        {
+          "name": "DogeCoin",
+          "symbol": "DOGE",
           "price": "1.76",
           "mintFee": "8",
           "burnFee": "10"
@@ -197,32 +189,6 @@
             "liqThreshold": "9000",
             "liqBonus": "10100"
           }
-        },
-        {
-          "name": "Euro Coin",
-          "symbol": "EUROC",
-          "decimals": 18,
-          "price": "1.06",
-          "params": {
-            "cap": "100000000000000000000000",
-            "baseLTV": "8000",
-            "liqThreshold": "9000",
-            "liqBonus": "10400"
-          }
-        },
-        {
-          "name": "Aave USDC",
-          "symbol": "aArbUSDC",
-          "decimals": 6,
-          "address": "0xd9933e10d6d9453FFaCF1236aF7ea1a61EA4D2c5",
-          "isAToken": true,
-          "poolAddressesProvider": "0x4eee0bb72c2717310318f27628b3c8a708e4951c",
-          "params": {
-            "cap": "1000000000000000000000",
-            "baseLTV": "8000",
-            "liqThreshold": "9000",
-            "liqBonus": "10100"
-          }
         }
       ],
       "synths": [
@@ -257,22 +223,43 @@
         },
         {
           "name": "Korean Republic won",
-          "symbol": "WON",
+          "symbol": "KRW",
           "price": "0.0009",
           "mintFee": "5",
           "burnFee": "7"
         },
         {
-          "name": "UAE Dirham",
-          "symbol": "AED",
-          "price": "0.27",
+          "name": "Singapore Dollar",
+          "symbol": "SGD",
+          "price": "0.75",
           "mintFee": "5",
           "burnFee": "7"
         },
         {
-          "name": "Indian Rupee",
-          "symbol": "INR",
-          "price": "0.013",
+          "name": "Swedish Krona",
+          "symbol": "SEK",
+          "price": "0.094",
+          "mintFee": "3",
+          "burnFee": "4"
+        },
+        {
+          "name": "Pound sterling",
+          "symbol": "GBP",
+          "price": "1.22",
+          "mintFee": "3",
+          "burnFee": "4"
+        },
+        {
+          "name": "Swiss Franc",
+          "symbol": "CHF",
+          "price": "1.08",
+          "mintFee": "3",
+          "burnFee": "4"
+        },
+        {
+          "name": "Chinese Yuan",
+          "symbol": "CNY",
+          "price": "1.08",
           "mintFee": "3",
           "burnFee": "4"
         }
