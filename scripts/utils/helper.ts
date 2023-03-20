@@ -13,7 +13,7 @@ export const _deploy = async (
 	let contract;
 	if (upgradable) {
 		// wrap it
-		const deployProxyParams: DeployProxyOptions = { type: 'uups' } as DeployProxyOptions;
+		const deployProxyParams: DeployProxyOptions = { type: 'uups', unsafeAllow: ['delegatecall']} as DeployProxyOptions;
 		// deploy
 		contract = await upgrades.deployProxy(Contract, args, deployProxyParams);
 		args = [];
