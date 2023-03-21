@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity ^0.8.0;
+pragma solidity 0.8.10;
 
 /**
  * @title Errors library
@@ -37,4 +37,7 @@ library Errors {
   string public constant INVALID_TIME = '26';
   string public constant INVALID_AMOUNT = '27';
   string public constant INVALID_ADDRESS = '28';
+
+  string public constant TIME_NOT_STARTED = '29';
+  string public constant TIME_ENDED = '30';
 }
