@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity 0.8.10;
 
 import "../SyntheXToken.sol";
 import "../../synthex/SyntheX.sol";
@@ -93,11 +93,8 @@ contract Crowdsale is BaseTokenRedeemer, Pausable {
         require(block.timestamp >= startTime && block.timestamp <= startTime.add(whitelistDuration), Errors.INVALID_TIME);
         // verify merkle proof 
         require(MerkleProof.verify(_proof, merkleRoot, keccak256(abi.encodePacked(msg.sender))), Errors.INVALID_MERKLE_PROOF);
-        // start unlock
-        uint amount = msg.value.mul(rate[ETH_ADDRESS]).div(RATE_PRECISION);
-        require(amount > 0, Errors.ZERO_AMOUNT);
-        require(amount < whitelistCap, Errors.EXCEEDED_MAX_CAPACITY); 
-        _startUnlock(msg.sender, amount);
+        
+        require(buyWithETHInternal() < whitelistCap, Errors.EXCEEDED_MAX_CAPACITY);
     }
 
     /**
@@ -107,21 +104,12 @@ contract Crowdsale is BaseTokenRedeemer, Pausable {
      * @param _proof Merkle proof
      */
     function buyWithToken_w(address _token, uint _amount, bytes32[] calldata _proof) external whenNotPaused {
-        require(block.timestamp >= startTime && block.timestamp <= startTime.add(whitelistDuration));
+        require(block.timestamp >= startTime && block.timestamp <= startTime.add(whitelistDuration), Errors.INVALID_TIME);
         require(rate[ETH_ADDRESS] > 0, Errors.TOKEN_NOT_SUPPORTED);
         // verify merkle proof
         require(MerkleProof.verify(_proof, merkleRoot, keccak256(abi.encodePacked(msg.sender))), Errors.INVALID_MERKLE_PROOF);
-        // Transfer In
-        IERC20(_token).safeTransferFrom(
-            msg.sender,
-            address(this),
-            _amount
-        );
-        // start unlock
-        uint amount = _amount.mul(rate[_token]).div(RATE_PRECISION);
-        require(amount > 0, Errors.ZERO_AMOUNT);
-        require(amount < whitelistCap, Errors.EXCEEDED_MAX_CAPACITY);
-        _startUnlock(msg.sender, amount);
+
+        require(buyWithTokenInternal(_token, _amount) < whitelistCap, Errors.EXCEEDED_MAX_CAPACITY);
     }
 
     /**
@@ -129,9 +117,17 @@ contract Crowdsale is BaseTokenRedeemer, Pausable {
      * @dev Only available after whitelist period
      */
     function buyWithETH() public payable whenNotPaused {
-        require(block.timestamp >= startTime.add(whitelistDuration) && block.timestamp <= endTime);
+        require(block.timestamp >= startTime.add(whitelistDuration) && block.timestamp <= endTime, Errors.INVALID_TIME);
+        buyWithETHInternal();
+    }
+
+    /**
+     * @notice Internal function to buy SYX tokens with ETH
+     * @dev Returns amount of SYX tokens bought
+     */
+    function buyWithETHInternal() internal returns (uint amount) {
         // start unlock
-        uint amount = msg.value.mul(rate[ETH_ADDRESS]).div(RATE_PRECISION);
+        amount = msg.value.mul(rate[ETH_ADDRESS]).div(RATE_PRECISION);
         require(amount > 0, Errors.ZERO_AMOUNT);
         _startUnlock(msg.sender, amount);
     }
@@ -143,16 +139,24 @@ contract Crowdsale is BaseTokenRedeemer, Pausable {
      * @param _amount Amount of token to spend for buying SYX
      */
     function buyWithToken(address _token, uint _amount) external whenNotPaused {
-        require(block.timestamp >= startTime && block.timestamp <= endTime);
-        require(rate[ETH_ADDRESS] > 0, Errors.TOKEN_NOT_SUPPORTED);
+        require(block.timestamp >= startTime && block.timestamp <= endTime, Errors.INVALID_TIME);
+        buyWithTokenInternal(_token, _amount);
+    }
+
+    /**
+     * @notice Internal function to buy SYX tokens with ERC20 token
+     * @dev Returns amount of SYX tokens bought
+     */
+    function buyWithTokenInternal(address _token, uint _amount) internal returns (uint amount) {
+        require(rate[_token] > 0, Errors.TOKEN_NOT_SUPPORTED);
         // Transfer In
         IERC20(_token).safeTransferFrom(
             msg.sender,
             address(this),
             _amount
         );
-        // start unlock 
-        uint amount = _amount.mul(rate[_token]).div(RATE_PRECISION);
+        // start unlock
+        amount = _amount.mul(rate[_token]).div(RATE_PRECISION);
         require(amount > 0, Errors.ZERO_AMOUNT);
         _startUnlock(msg.sender, amount);
     }
@@ -185,7 +189,7 @@ contract Crowdsale is BaseTokenRedeemer, Pausable {
     }
 
     function endSale() external onlyL1Admin {
-        require(block.timestamp < endTime);
+        require(block.timestamp < endTime, Errors.INVALID_TIME);
         endTime = block.timestamp;
     }
 
