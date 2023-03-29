@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity 0.8.10;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
@@ -270,7 +270,7 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
      * @notice Issue synths to the user
      * @param _account The address of the user to issue synths to
      * @param _amount Amount of synth
-     * @notice Only SyntheX can call this function
+     * @dev Only Active Synth (ERC20X) contract can call this function
      */
     function commitMint(address _account, uint _amount) virtual override whenNotPaused external returns(uint) {
         Vars_Mint memory vars;
@@ -343,6 +343,7 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
      * @param _amount The amount of synths to burn
      * @return The amount of synth burned
      * @notice The amount of synths to burn is calculated based on the amount of debt tokens burned
+     * @dev Only Active/Disabled Synth (ERC20X) contract can call this function
      */
     function commitBurn(address _account, uint _amount) virtual override whenNotPaused external returns(uint) {
         Vars_Burn memory vars;
@@ -386,6 +387,7 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
      * @notice Exchange a synthetic asset for another
      * @param _amount The amount of synthetic asset to exchange
      * @param _synthTo The address of the synthetic asset to receive
+     * @dev Only Active/Disabled Synth (ERC20X) contract can call this function
      */
     function commitSwap(address _recipient, uint _amount, address _synthTo) virtual override whenNotPaused external returns(uint) {
         // check if enabled synth is calling
@@ -432,6 +434,11 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
 
     /**
      * @notice Liquidate a user's debt
+     * @param _liquidator The address of the liquidator
+     * @param _account The address of the account to liquidate
+     * @param _amount The amount of debt (in outAsset) to liquidate
+     * @param _outAsset The address of the collateral asset to receive
+     * @dev Only Active/Disabled Synth (ERC20X) contract can call this function
      */
     function commitLiquidate(address _liquidator, address _account, uint _amount, address _outAsset) virtual override whenNotPaused external returns(uint) {
         require(_amount > 0);
