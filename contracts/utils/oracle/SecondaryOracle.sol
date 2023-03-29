@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity 0.8.10;
 
 import "@aave/core-v3/contracts/dependencies/chainlink/AggregatorInterface.sol";
+import "@openzeppelin/contracts/utils/math/SignedSafeMath.sol";
 
 /**
  * @title Secondary oracle 
@@ -9,6 +10,7 @@ import "@aave/core-v3/contracts/dependencies/chainlink/AggregatorInterface.sol";
  * @notice Eg. COMP/USD, from COMP/ETH (18) and ETH/USD (8)
  */
 contract SecondaryOracle {
+    using SignedSafeMath for int;
     // COMP/ETH oracle
     address PRIMARY_ORACLE;
     // ETH/USD oracle
@@ -20,10 +22,10 @@ contract SecondaryOracle {
     }
 
     function latestAnswer() external view returns (int256) {
-        return int(AggregatorInterface(PRIMARY_ORACLE).latestAnswer() * AggregatorInterface(SECONDARY_ORACLE).latestAnswer()) / 10**18;
+        return AggregatorInterface(PRIMARY_ORACLE).latestAnswer().mul(AggregatorInterface(SECONDARY_ORACLE).latestAnswer()).div(10**18);
     }
 
-    function decimals() external view returns (uint8) {
+    function decimals() external pure returns (uint8) {
         return 8;
     }
 }

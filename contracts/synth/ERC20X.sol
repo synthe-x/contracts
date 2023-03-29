@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity 0.8.10;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
@@ -35,8 +35,7 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
     /// @notice Emitted when flash fee is updated
     event FlashFeeUpdated(uint _flashLoanFee);
 
-    event Mint(address indexed referredBy);
-    event Swap(address indexed referredBy);
+    event Referred(address indexed referredBy, address indexed account);
 
     function initialize(string memory _name, string memory _symbol, address _pool, address _synthex) initializer external {
         __ERC20_init(_name, _symbol);
@@ -64,7 +63,9 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
         uint amountToMint = pool.commitMint(msg.sender, amount);
         // TODO check if amount is correct
         _mint(recipient, amountToMint);
-        emit Mint(referredBy);
+        if(referredBy != address(0)){
+            emit Referred(referredBy, msg.sender);
+        }
     }
 
     /**
@@ -88,7 +89,9 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
         amount = pool.commitSwap(_recipient, amount, synthTo);
         // TODO check if amount is correct
         _burn(msg.sender, amount);
-        emit Swap(referredBy);
+        if(referredBy != address(0)){
+            emit Referred(referredBy, msg.sender);
+        }
     }
 
     /**
