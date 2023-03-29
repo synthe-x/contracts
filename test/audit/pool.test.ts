@@ -11,6 +11,7 @@ import type { Pool } from "../typechain-types";
 import type { ERC20Mock } from "../typechain-types";
 import type { SyntexMock } from "../typechain-types";
 import type { OracleMock } from "../typechain-types";
+import type { ERC20X } from "../typechain-types";
 import { parseEther } from "ethers/lib/utils";
 import { BigNumber } from "ethers";
 
@@ -25,12 +26,14 @@ describe.only("Pool", function () {
     let snapshotA: SnapshotRestorer;
 
     // Signers.
-    let deployer: SignerWithAddress, owner: SignerWithAddress, user: SignerWithAddress;
-
+    let deployer: SignerWithAddress, owner: SignerWithAddress;
+    let user_1: SignerWithAddress;
+    let user_2: SignerWithAddress;
     let pool: Pool;
     let erc20: ERC20Mock;
     let erc20_2: ERC20Mock;
     let paymentToken: ERC20Mock;
+    let erc20X: ERC20X
     let syntex: SyntexMock;
     let oracle: OracleMock;
 
@@ -38,19 +41,21 @@ describe.only("Pool", function () {
 
     let usersMerkleProofs, leaves, usersAddresses
     
-    const ERC_20_PRICE = 100e8 // 1 USD
+    const ERC_20_PRICE = 1e8 // 1 USD
     const USD_DECIMALS = 1e8
     const BASE_POINTS = 10000
     
 
     before(async () => {
         // Getting of signers.
-        [deployer, user] = await ethers.getSigners();
-        //
+        
         const USER_NUMBER = 10
         signers = await ethers.getSigners();
         deployer = signers[0]
         users = signers.slice(1,USER_NUMBER + 1)
+        user_1 = users[0]
+        user_2 = users[1]
+
         //
     
         const ERC20Mock = await ethers.getContractFactory("ERC20Mock", deployer);
@@ -71,6 +76,7 @@ describe.only("Pool", function () {
         syntex = await SyntexMock.deploy()
         await syntex.deployed();
 
+
         //
         const Pool = await ethers.getContractFactory("Pool", deployer)
         pool = await upgrades.deployProxy(Pool, [
@@ -78,6 +84,18 @@ describe.only("Pool", function () {
             "SMBL",// string memory _symbol,
             syntex.address// address _synthex
         ])
+
+        const ERC20X = await ethers.getContractFactory("ERC20X", deployer)
+        erc20X = await upgrades.deployProxy( ERC20X,
+            [
+                "ERC20X", // string memory _name,
+                "ERC20x",// string memory _symbol,
+                pool.address,// address _pool,
+                syntex.address// address _synthex
+            ],
+            { unsafeAllow: ['delegatecall'] }
+
+        )
 
         await pool.setPriceOracle(oracle.address)
         
@@ -104,11 +122,11 @@ describe.only("Pool", function () {
                     }
                 )   
 
-                expect(await pool.connect(user).enterCollateral(erc20.address))
+                expect(await pool.connect(user_1).enterCollateral(erc20.address))
                     .to.emit(pool, "CollateralEntered")
-                    .withArgs(user.address, erc20.address)
+                    .withArgs(user_1.address, erc20.address)
 
-                expect(await pool.accountMembership(erc20.address, user.address))
+                expect(await pool.accountMembership(erc20.address, user_1.address))
                     .to.be.true
             })
             it("user cannot enter collateral twice", async () =>{
@@ -123,14 +141,14 @@ describe.only("Pool", function () {
                         liqBonus : 10000 // 0
                     }
                 )   
-                await pool.connect(user).enterCollateral(erc20.address)
+                await pool.connect(user_1).enterCollateral(erc20.address)
                  
-                await expect(pool.connect(user).enterCollateral(erc20.address))
+                await expect(pool.connect(user_1).enterCollateral(erc20.address))
                     .to.be.revertedWith("5")
                  
             })
             it("cannot enter not acitve  collateral", async() =>{
-                await expect( pool.connect(user).enterCollateral(erc20.address))
+                await expect( pool.connect(user_1).enterCollateral(erc20.address))
                     .to.be.revertedWith("10")
             
             })
@@ -146,9 +164,9 @@ describe.only("Pool", function () {
                         liqBonus : 10000 // 0
                     }
                 )   
-                await pool.connect(user).enterCollateral(erc20.address)
+                await pool.connect(user_1).enterCollateral(erc20.address)
 
-                await pool.connect(user).exitCollateral(erc20.address)
+                await pool.connect(user_1).exitCollateral(erc20.address)
     
             })
         })
@@ -166,21 +184,21 @@ describe.only("Pool", function () {
                     }
                 )   
     
-                await pool.connect(user).enterCollateral(erc20.address)
+                await pool.connect(user_1).enterCollateral(erc20.address)
                 
                 const AMOUNT = parseEther("1")
-                await erc20.mint(user.address, AMOUNT )
-                await erc20.connect(user).increaseAllowance(pool.address, AMOUNT)
+                await erc20.mint(user_1.address, AMOUNT )
+                await erc20.connect(user_1).increaseAllowance(pool.address, AMOUNT)
                 await pool.unpause()
     
-                expect(await pool.connect(user).deposit(erc20.address, AMOUNT))
-                    .to.emit(pool, "Deposit").withArgs(user.address, erc20.address, AMOUNT)
+                expect(await pool.connect(user_1).deposit(erc20.address, AMOUNT))
+                    .to.emit(pool, "Deposit").withArgs(user_1.address, erc20.address, AMOUNT)
             })
             it("user cannot deposit while contract on pause", async() =>{
                 const AMOUNT = parseEther("1")
-                await erc20.mint(user.address, AMOUNT )
-                await erc20.connect(user).increaseAllowance(pool.address, AMOUNT)
-                await expect(pool.connect(user).deposit(erc20.address, AMOUNT))
+                await erc20.mint(user_1.address, AMOUNT )
+                await erc20.connect(user_1).increaseAllowance(pool.address, AMOUNT)
+                await expect(pool.connect(user_1).deposit(erc20.address, AMOUNT))
                     .to.be.revertedWith("Pausable: paused") 
             })
             it("user can deposit collateral he hasn't entered", async() =>{
@@ -197,12 +215,12 @@ describe.only("Pool", function () {
                 )   
     
                 const AMOUNT = parseEther("1")
-                await erc20.mint(user.address, AMOUNT )
-                await erc20.connect(user).increaseAllowance(pool.address, AMOUNT)
+                await erc20.mint(user_1.address, AMOUNT )
+                await erc20.connect(user_1).increaseAllowance(pool.address, AMOUNT)
                 await pool.unpause()
     
-                expect(await pool.connect(user).deposit(erc20.address, AMOUNT))
-                    .to.emit(pool, "Deposit").withArgs(user.address, erc20.address, AMOUNT)
+                expect(await pool.connect(user_1).deposit(erc20.address, AMOUNT))
+                    .to.emit(pool, "Deposit").withArgs(user_1.address, erc20.address, AMOUNT)
             })
             it("user cannot deposit when collateral has exceeded capacity", async() =>{
                 await pool.updateCollateral(
@@ -218,13 +236,115 @@ describe.only("Pool", function () {
                 )   
     
                 const AMOUNT = parseEther("2")
-                await erc20.mint(user.address, AMOUNT )
-                await erc20.connect(user).increaseAllowance(pool.address, AMOUNT)
+                await erc20.mint(user_1.address, AMOUNT )
+                await erc20.connect(user_1).increaseAllowance(pool.address, AMOUNT)
                 await pool.unpause()
-                await expect(pool.connect(user).deposit(erc20.address, AMOUNT))
+                await expect(pool.connect(user_1).deposit(erc20.address, AMOUNT))
                     .to.be.revertedWith("8")
             })
     
+        })
+        describe("withdraw", function () {
+            it("user can withdraw collateral", async() =>{
+                await pool.updateCollateral(
+                    erc20.address, 
+                    {
+                        isActive : true,
+                        cap : parseEther("1000"),
+                        totalDeposits : parseEther("1000"),
+                        baseLTV : 8000,
+                        liqThreshold : 9000,
+                        liqBonus : 10000 // 0
+                    }
+                )   
+    
+                await pool.connect(user_1).enterCollateral(erc20.address)
+                
+                const AMOUNT = parseEther("1")
+                await erc20.mint(user_1.address, AMOUNT )
+                await erc20.connect(user_1).increaseAllowance(pool.address, AMOUNT)
+                await pool.unpause()
+    
+                await pool.connect(user_1).deposit(erc20.address, AMOUNT)
+                //
+                await pool.connect(user_1).withdraw(erc20.address, AMOUNT)
+
+                expect(await erc20.balanceOf(user_1.address)).to.be.eq(AMOUNT)
+
+            })
+            it("!!!CRITICAL!!! user cannot withdraw collateral he doesn't own", async() =>{
+                await pool.updateCollateral(
+                    erc20.address, 
+                    {
+                        isActive : true,
+                        cap : parseEther("1000"),
+                        totalDeposits : parseEther("1000"),
+                        baseLTV : 8000,
+                        liqThreshold : 9000,
+                        liqBonus : 10000 // 0
+                    }
+                )   
+                await pool.connect(user_1).enterCollateral(erc20.address)
+                
+                const AMOUNT = parseEther("1")
+                await erc20.mint(user_1.address, AMOUNT )
+                await erc20.connect(user_1).increaseAllowance(pool.address, AMOUNT)
+                await pool.unpause()
+    
+                await pool.connect(user_1).deposit(erc20.address, AMOUNT)
+                //
+                await pool.connect(user_2).withdraw(erc20.address, AMOUNT)
+                // await expect(pool.connect(user_2).withdraw(erc20.address, AMOUNT))
+                //     .to.be.reverted
+                console.log("HAS TO BE ZERO", await erc20.balanceOf(user_2.address))
+            })
+        })
+        describe.only("mint", function () {
+            it("user can mint", async() =>{
+                // await pool.unpause()
+                //deposit collateral
+                await pool.updateCollateral(
+                    erc20.address, 
+                    {
+                        isActive : true,
+                        cap : parseEther("1000"),
+                        totalDeposits : parseEther("1000"),
+                        baseLTV : 8000,
+                        liqThreshold : 9000,
+                        liqBonus : 10000 // 0
+                    }
+                )   
+                await pool.connect(user_1).enterCollateral(erc20.address)
+                const AMOUNT_TO_DEPOSIT = parseEther("1")
+                await erc20.mint(user_1.address, AMOUNT_TO_DEPOSIT )
+                await erc20.connect(user_1).increaseAllowance(pool.address, AMOUNT_TO_DEPOSIT)
+                await pool.unpause()
+                await pool.connect(user_1).deposit(erc20.address, AMOUNT_TO_DEPOSIT)
+                    
+                const MINT_FEE = 0
+                const BURN_FEE = 0
+                await pool.addSynth(erc20X.address, MINT_FEE, BURN_FEE)
+
+                const AMOUNT = parseEther("1")
+                const RECIPIENT = user_1.address
+                const REFERED_BY = ethers.constants.AddressZero
+                
+                await erc20X.connect(user_1).mint(AMOUNT, RECIPIENT, REFERED_BY)
+
+            })
+            it("cannot mint with insufficient  user collateral", async() =>{
+                await pool.unpause()
+                const MINT_FEE = 0
+                const BURN_FEE = 0
+                await pool.addSynth(erc20X.address, MINT_FEE, BURN_FEE)
+
+                const AMOUNT = parseEther("1")
+                const RECIPIENT = user_1.address
+                const REFERED_BY = ethers.constants.AddressZero
+                
+                await expect(erc20X.connect(user_1).mint(AMOUNT, RECIPIENT, REFERED_BY))
+                    .to.be.revertedWith("6") 
+            })
         })
         describe("getAccountLiquidity", function() {
             it("getAccountLiquidity", async() =>{
@@ -242,14 +362,14 @@ describe.only("Pool", function () {
                     }
                 )   
     
-                await pool.connect(user).enterCollateral(erc20.address)
+                await pool.connect(user_1).enterCollateral(erc20.address)
                 
                 const AMOUNT = parseEther("1")
-                await erc20.mint(user.address, AMOUNT )
-                await erc20.connect(user).increaseAllowance(pool.address, AMOUNT)
+                await erc20.mint(user_1.address, AMOUNT )
+                await erc20.connect(user_1).increaseAllowance(pool.address, AMOUNT)
                 await pool.unpause()
     
-                await pool.connect(user).deposit(erc20.address, AMOUNT)
+                await pool.connect(user_1).deposit(erc20.address, AMOUNT)
                     
                 // console.log("accountCollateralBalance",
                 //     ethers.utils.formatEther(await pool.accountCollateralBalance(user.address, erc20.address))
@@ -259,7 +379,7 @@ describe.only("Pool", function () {
                 //     ethers.utils.formatEther(AMOUNT.mul(ERC_20_PRICE).div(USD_DECIMALS))
                 // )
 
-                let res = await pool.getAccountLiquidity(user.address)
+                let res = await pool.getAccountLiquidity(user_1.address)
                 
                 expect(ethers.utils.formatEther(res.collateral))
                     .to.be.eq(ethers.utils.formatEther(
@@ -279,5 +399,6 @@ describe.only("Pool", function () {
                 // uint256 debt;
             })
         })
+
     })
 })
