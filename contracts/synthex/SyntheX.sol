@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity 0.8.10;
 
 import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
@@ -14,9 +13,6 @@ import "./AccessControlList.sol";
 import "../pool/Pool.sol";
 import "./ISyntheX.sol";
 import "../libraries/Errors.sol";
-
-// debug
-import "hardhat/console.sol";
 
 /**
  * @title SyntheX
@@ -59,8 +55,7 @@ contract SyntheX is ISyntheX, AccessControlList, UUPSUpgradeable, AddressStorage
      * @notice Pause the contract
      * @dev Only callable by L2 admin
      */
-    function pause() public {
-        require(isL2Admin(msg.sender), Errors.CALLER_NOT_L2_ADMIN);
+    function pause() public onlyL2Admin {
         _pause();
     }
 
@@ -68,8 +63,7 @@ contract SyntheX is ISyntheX, AccessControlList, UUPSUpgradeable, AddressStorage
      * @notice Unpause the contract
      * @dev Only callable by L2 admin
      */
-    function unpause() public {
-        require(isL2Admin(msg.sender), Errors.CALLER_NOT_L2_ADMIN);
+    function unpause() public onlyL2Admin {
         _unpause();
     }
 
