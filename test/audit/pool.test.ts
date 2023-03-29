@@ -299,8 +299,8 @@ describe.only("Pool", function () {
                 console.log("HAS TO BE ZERO", await erc20.balanceOf(user_2.address))
             })
         })
-        describe.only("mint", function () {
-            it("user can mint", async() =>{
+        describe("mint", function () {
+            it.skip("user can mint", async() =>{
                 // await pool.unpause()
                 //deposit collateral
                 await pool.updateCollateral(

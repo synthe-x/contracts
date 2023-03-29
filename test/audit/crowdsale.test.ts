@@ -28,7 +28,7 @@ const INVALID_PROOF =
 ]
 let ROOT: any
 
-describe("Crowdsale", function () {
+describe.only("Crowdsale", function () {
     let snapshotA: SnapshotRestorer;
 
     // Signers.
@@ -436,6 +436,7 @@ describe("Crowdsale", function () {
         
             let tx = await crowdsale.withdraw(ETHER_ADDRESS, AMOUNT_TO_WITHDRAW)
             const GAS_PAID = (await tx.wait()).cumulativeGasUsed
+            console.log(GAS_PAID)
             const BALANCE_AFTER = await ethers.provider.getBalance(deployer.address)
 
             expect(BALANCE_AFTER.sub(BALANCE_BEFORE).add(GAS_PAID)).to.be.eq(AMOUNT_TO_WITHDRAW)
