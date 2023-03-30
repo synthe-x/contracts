@@ -1499,103 +1499,103 @@ Impact: Informational
 Confidence: High
  - [ ] ID-152
 Different versions of Solidity are used:
-	- Version used: ['>=0.4.22<0.9.0', '0.8.10', '^0.8.1', '^0.8.10', '^0.8.2']
+	- Version used: ['>=0.4.22<0.9.0', '0.8.19', '^0.8.1', '^0.8.19', '^0.8.2']
 	- [>=0.4.22<0.9.0](node_modules/hardhat/console.sol#L2)
 	- [ABIEncoderV2](contracts/utils/Multicall2.sol#L3)
-	- [0.8.10](node_modules/@aave/core-v3/contracts/dependencies/openzeppelin/contracts/IERC20.sol#L2)
-	- [0.8.10](node_modules/@aave/core-v3/contracts/interfaces/IAToken.sol#L2)
-	- [0.8.10](node_modules/@aave/core-v3/contracts/interfaces/IAaveIncentivesController.sol#L2)
-	- [0.8.10](node_modules/@aave/core-v3/contracts/interfaces/IInitializableAToken.sol#L2)
-	- [0.8.10](node_modules/@aave/core-v3/contracts/interfaces/IPool.sol#L2)
-	- [0.8.10](node_modules/@aave/core-v3/contracts/interfaces/IPoolAddressesProvider.sol#L2)
-	- [0.8.10](node_modules/@aave/core-v3/contracts/interfaces/IPriceOracle.sol#L2)
-	- [0.8.10](node_modules/@aave/core-v3/contracts/interfaces/IScaledBalanceToken.sol#L2)
-	- [0.8.10](node_modules/@aave/core-v3/contracts/protocol/libraries/types/DataTypes.sol#L2)
-	- [0.8.10](node_modules/@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts-upgradeable/access/IAccessControlUpgradeable.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts-upgradeable/interfaces/IERC3156FlashBorrowerUpgradeable.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts-upgradeable/interfaces/IERC3156FlashLenderUpgradeable.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts-upgradeable/interfaces/draft-IERC1822Upgradeable.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts-upgradeable/proxy/beacon/IBeaconUpgradeable.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20FlashMintUpgradeable.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-IERC20PermitUpgradeable.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts-upgradeable/utils/StorageSlotUpgradeable.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts-upgradeable/utils/math/SignedSafeMathUpgradeable.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts/access/AccessControl.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts/access/IAccessControl.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts/access/Ownable.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts/governance/utils/IVotes.sol#L3)
-	- [0.8.10](node_modules/@openzeppelin/contracts/interfaces/IERC3156FlashBorrower.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts/interfaces/IERC3156FlashLender.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts/security/Pausable.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts/security/ReentrancyGuard.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts/token/ERC20/extensions/ERC20FlashMint.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts/utils/Context.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts/utils/Counters.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts/utils/Strings.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts/utils/cryptography/ECDSA.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts/utils/cryptography/EIP712.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts/utils/introspection/ERC165.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts/utils/introspection/IERC165.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts/utils/math/Math.sol#L4)
-	- [0.8.10](node_modules/@openzeppelin/contracts/utils/math/SafeCast.sol#L5)
-	- [0.8.10](node_modules/@openzeppelin/contracts/utils/math/SafeMath.sol#L4)
-	- [0.8.10](contracts/DebtPool.sol#L2)
-	- [0.8.10](contracts/ERC20X.sol#L2)
-	- [0.8.10](contracts/SyntheX.sol#L2)
-	- [0.8.10](contracts/System.sol#L2)
-	- [0.8.10](contracts/interfaces/IChainlinkAggregator.sol#L2)
-	- [0.8.10](contracts/interfaces/IDebtPool.sol#L2)
-	- [0.8.10](contracts/interfaces/IPriceOracle.sol#L2)
-	- [0.8.10](contracts/interfaces/IStaking.sol#L2)
-	- [0.8.10](contracts/interfaces/ISyntheX.sol#L2)
-	- [0.8.10](contracts/mock/MockPriceFeed.sol#L2)
-	- [0.8.10](contracts/mock/MockToken.sol#L2)
-	- [0.8.10](contracts/oracle/AAVEOracle.sol#L2)
-	- [0.8.10](contracts/oracle/CompOracle.sol#L2)
-	- [0.8.10](contracts/oracle/PriceOracle.sol#L2)
-	- [0.8.10](contracts/oracle/SecondaryOracle.sol#L2)
-	- [0.8.10](contracts/storage/DebtPoolStorage.sol#L2)
-	- [0.8.10](contracts/storage/ERC20XStorage.sol#L2)
-	- [0.8.10](contracts/storage/SyntheXStorage.sol#L2)
-	- [0.8.10](contracts/token/Crowdsale.sol#L2)
-	- [0.8.10](contracts/token/ERC20Locked.sol#L2)
-	- [0.8.10](contracts/token/LockedSYN.sol#L2)
-	- [0.8.10](contracts/token/StakingRewards.sol#L2)
-	- [0.8.10](contracts/token/SyntheXToken.sol#L2)
-	- [0.8.10](contracts/token/TokenUnlocker.sol#L2)
-	- [0.8.10](contracts/utils/ATokenWrapper.sol#L2)
-	- [0.8.10](contracts/utils/AddressStorage.sol#L2)
-	- [0.8.10](contracts/utils/FeeVault.sol#L2)
-	- [0.8.10](contracts/utils/Multicall2.sol#L2)
-	- [0.8.10](contracts/utils/PriceConvertor.sol#L2)
+	- [0.8.19](node_modules/@aave/core-v3/contracts/dependencies/openzeppelin/contracts/IERC20.sol#L2)
+	- [0.8.19](node_modules/@aave/core-v3/contracts/interfaces/IAToken.sol#L2)
+	- [0.8.19](node_modules/@aave/core-v3/contracts/interfaces/IAaveIncentivesController.sol#L2)
+	- [0.8.19](node_modules/@aave/core-v3/contracts/interfaces/IInitializableAToken.sol#L2)
+	- [0.8.19](node_modules/@aave/core-v3/contracts/interfaces/IPool.sol#L2)
+	- [0.8.19](node_modules/@aave/core-v3/contracts/interfaces/IPoolAddressesProvider.sol#L2)
+	- [0.8.19](node_modules/@aave/core-v3/contracts/interfaces/IPriceOracle.sol#L2)
+	- [0.8.19](node_modules/@aave/core-v3/contracts/interfaces/IScaledBalanceToken.sol#L2)
+	- [0.8.19](node_modules/@aave/core-v3/contracts/protocol/libraries/types/DataTypes.sol#L2)
+	- [0.8.19](node_modules/@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts-upgradeable/access/IAccessControlUpgradeable.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts-upgradeable/interfaces/IERC3156FlashBorrowerUpgradeable.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts-upgradeable/interfaces/IERC3156FlashLenderUpgradeable.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts-upgradeable/interfaces/draft-IERC1822Upgradeable.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts-upgradeable/proxy/beacon/IBeaconUpgradeable.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20FlashMintUpgradeable.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-IERC20PermitUpgradeable.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts-upgradeable/utils/StorageSlotUpgradeable.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts-upgradeable/utils/math/SignedSafeMathUpgradeable.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts/access/AccessControl.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts/access/IAccessControl.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts/access/Ownable.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts/governance/utils/IVotes.sol#L3)
+	- [0.8.19](node_modules/@openzeppelin/contracts/interfaces/IERC3156FlashBorrower.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts/interfaces/IERC3156FlashLender.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts/security/Pausable.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts/security/ReentrancyGuard.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts/token/ERC20/extensions/ERC20FlashMint.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts/utils/Context.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts/utils/Counters.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts/utils/Strings.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts/utils/cryptography/ECDSA.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts/utils/cryptography/EIP712.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts/utils/introspection/ERC165.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts/utils/introspection/IERC165.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts/utils/math/Math.sol#L4)
+	- [0.8.19](node_modules/@openzeppelin/contracts/utils/math/SafeCast.sol#L5)
+	- [0.8.19](node_modules/@openzeppelin/contracts/utils/math/SafeMath.sol#L4)
+	- [0.8.19](contracts/DebtPool.sol#L2)
+	- [0.8.19](contracts/ERC20X.sol#L2)
+	- [0.8.19](contracts/SyntheX.sol#L2)
+	- [0.8.19](contracts/System.sol#L2)
+	- [0.8.19](contracts/interfaces/IChainlinkAggregator.sol#L2)
+	- [0.8.19](contracts/interfaces/IDebtPool.sol#L2)
+	- [0.8.19](contracts/interfaces/IPriceOracle.sol#L2)
+	- [0.8.19](contracts/interfaces/IStaking.sol#L2)
+	- [0.8.19](contracts/interfaces/ISyntheX.sol#L2)
+	- [0.8.19](contracts/mock/MockPriceFeed.sol#L2)
+	- [0.8.19](contracts/mock/MockToken.sol#L2)
+	- [0.8.19](contracts/oracle/AAVEOracle.sol#L2)
+	- [0.8.19](contracts/oracle/CompOracle.sol#L2)
+	- [0.8.19](contracts/oracle/PriceOracle.sol#L2)
+	- [0.8.19](contracts/oracle/SecondaryOracle.sol#L2)
+	- [0.8.19](contracts/storage/DebtPoolStorage.sol#L2)
+	- [0.8.19](contracts/storage/ERC20XStorage.sol#L2)
+	- [0.8.19](contracts/storage/SyntheXStorage.sol#L2)
+	- [0.8.19](contracts/token/Crowdsale.sol#L2)
+	- [0.8.19](contracts/token/ERC20Locked.sol#L2)
+	- [0.8.19](contracts/token/LockedSYN.sol#L2)
+	- [0.8.19](contracts/token/StakingRewards.sol#L2)
+	- [0.8.19](contracts/token/SyntheXToken.sol#L2)
+	- [0.8.19](contracts/token/TokenUnlocker.sol#L2)
+	- [0.8.19](contracts/utils/ATokenWrapper.sol#L2)
+	- [0.8.19](contracts/utils/AddressStorage.sol#L2)
+	- [0.8.19](contracts/utils/FeeVault.sol#L2)
+	- [0.8.19](contracts/utils/Multicall2.sol#L2)
+	- [0.8.19](contracts/utils/PriceConvertor.sol#L2)
 	- [^0.8.1](node_modules/@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol#L4)
 	- [^0.8.1](node_modules/@openzeppelin/contracts/utils/Address.sol#L4)
-	- [^0.8.10](contracts/interfaces/compound/CTokenInterface.sol#L2)
-	- [^0.8.10](contracts/interfaces/compound/ComptrollerInterface.sol#L2)
-	- [^0.8.10](contracts/interfaces/compound/IPriceOracle.sol#L2)
+	- [^0.8.19](contracts/interfaces/compound/CTokenInterface.sol#L2)
+	- [^0.8.19](contracts/interfaces/compound/ComptrollerInterface.sol#L2)
+	- [^0.8.19](contracts/interfaces/compound/IPriceOracle.sol#L2)
 	- [^0.8.2](node_modules/@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpgradeable.sol#L4)
 	- [^0.8.2](node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol#L4)
 
@@ -1646,196 +1646,196 @@ contracts/utils/WETH9.sol#L20
 
 
  - [ ] ID-159
-Pragma version[0.8.10](contracts/mock/MockToken.sol#L2) allows old versions
+Pragma version[0.8.19](contracts/mock/MockToken.sol#L2) allows old versions
 
 contracts/mock/MockToken.sol#L2
 
 
  - [ ] ID-160
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol#L4
 
 
  - [ ] ID-161
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts/utils/cryptography/ECDSA.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts/utils/cryptography/ECDSA.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts/utils/cryptography/ECDSA.sol#L4
 
 
  - [ ] ID-162
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol#L4
 
 
  - [ ] ID-163
-Pragma version[0.8.10](contracts/System.sol#L2) allows old versions
+Pragma version[0.8.19](contracts/System.sol#L2) allows old versions
 
 contracts/System.sol#L2
 
 
  - [ ] ID-164
-Pragma version[0.8.10](contracts/utils/FeeVault.sol#L2) allows old versions
+Pragma version[0.8.19](contracts/utils/FeeVault.sol#L2) allows old versions
 
 contracts/utils/FeeVault.sol#L2
 
 
  - [ ] ID-165
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol#L4
 
 
  - [ ] ID-166
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol#L4
 
 
  - [ ] ID-167
-Pragma version[0.8.10](contracts/SyntheX.sol#L2) allows old versions
+Pragma version[0.8.19](contracts/SyntheX.sol#L2) allows old versions
 
 contracts/SyntheX.sol#L2
 
 
  - [ ] ID-168
-Pragma version[0.8.10](contracts/token/TokenUnlocker.sol#L2) allows old versions
+Pragma version[0.8.19](contracts/token/TokenUnlocker.sol#L2) allows old versions
 
 contracts/token/TokenUnlocker.sol#L2
 
 
  - [ ] ID-169
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts-upgradeable/utils/math/SignedSafeMathUpgradeable.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts-upgradeable/utils/math/SignedSafeMathUpgradeable.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts-upgradeable/utils/math/SignedSafeMathUpgradeable.sol#L4
 
 
  - [ ] ID-170
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts/utils/math/Math.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts/utils/math/Math.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts/utils/math/Math.sol#L4
 
 
  - [ ] ID-171
-Pragma version[0.8.10](contracts/interfaces/IDebtPool.sol#L2) allows old versions
+Pragma version[0.8.19](contracts/interfaces/IDebtPool.sol#L2) allows old versions
 
 contracts/interfaces/IDebtPool.sol#L2
 
 
  - [ ] ID-172
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol#L4
 
 
  - [ ] ID-173
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts/utils/Context.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts/utils/Context.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts/utils/Context.sol#L4
 
 
  - [ ] ID-174
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts/utils/cryptography/EIP712.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts/utils/cryptography/EIP712.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts/utils/cryptography/EIP712.sol#L4
 
 
  - [ ] ID-175
-Pragma version[0.8.10](contracts/utils/Multicall2.sol#L2) allows old versions
+Pragma version[0.8.19](contracts/utils/Multicall2.sol#L2) allows old versions
 
 contracts/utils/Multicall2.sol#L2
 
 
  - [ ] ID-176
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts/security/ReentrancyGuard.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts/security/ReentrancyGuard.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts/security/ReentrancyGuard.sol#L4
 
 
  - [ ] ID-177
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts/interfaces/IERC3156FlashBorrower.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts/interfaces/IERC3156FlashBorrower.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts/interfaces/IERC3156FlashBorrower.sol#L4
 
 
  - [ ] ID-178
-Pragma version[0.8.10](contracts/mock/MockPriceFeed.sol#L2) allows old versions
+Pragma version[0.8.19](contracts/mock/MockPriceFeed.sol#L2) allows old versions
 
 contracts/mock/MockPriceFeed.sol#L2
 
 
  - [ ] ID-179
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts/utils/Strings.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts/utils/Strings.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts/utils/Strings.sol#L4
 
 
  - [ ] ID-180
-Pragma version[0.8.10](contracts/token/LockedSYN.sol#L2) allows old versions
+Pragma version[0.8.19](contracts/token/LockedSYN.sol#L2) allows old versions
 
 contracts/token/LockedSYN.sol#L2
 
 
  - [ ] ID-181
-Pragma version[0.8.10](contracts/utils/PriceConvertor.sol#L2) allows old versions
+Pragma version[0.8.19](contracts/utils/PriceConvertor.sol#L2) allows old versions
 
 contracts/utils/PriceConvertor.sol#L2
 
 
  - [ ] ID-182
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol#L4
 
 
  - [ ] ID-183
-Pragma version[0.8.10](contracts/oracle/AAVEOracle.sol#L2) allows old versions
+Pragma version[0.8.19](contracts/oracle/AAVEOracle.sol#L2) allows old versions
 
 contracts/oracle/AAVEOracle.sol#L2
 
 
  - [ ] ID-184
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts-upgradeable/utils/StorageSlotUpgradeable.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts-upgradeable/utils/StorageSlotUpgradeable.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts-upgradeable/utils/StorageSlotUpgradeable.sol#L4
 
 
  - [ ] ID-185
-Pragma version[0.8.10](contracts/storage/DebtPoolStorage.sol#L2) allows old versions
+Pragma version[0.8.19](contracts/storage/DebtPoolStorage.sol#L2) allows old versions
 
 contracts/storage/DebtPoolStorage.sol#L2
 
 
  - [ ] ID-186
-solc-0.8.10 is not recommended for deployment
+solc-0.8.19 is not recommended for deployment
 
  - [ ] ID-187
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol#L4
 
 
  - [ ] ID-188
-Pragma version[0.8.10](contracts/oracle/PriceOracle.sol#L2) allows old versions
+Pragma version[0.8.19](contracts/oracle/PriceOracle.sol#L2) allows old versions
 
 contracts/oracle/PriceOracle.sol#L2
 
 
  - [ ] ID-189
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/extensions/IERC20MetadataUpgradeable.sol#L4
 
 
  - [ ] ID-190
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20FlashMintUpgradeable.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20FlashMintUpgradeable.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20FlashMintUpgradeable.sol#L4
 
 
  - [ ] ID-191
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol#L4
 
@@ -1847,265 +1847,265 @@ node_modules/@openzeppelin/contracts/utils/Address.sol#L4
 
 
  - [ ] ID-193
-Pragma version[0.8.10](contracts/interfaces/IStaking.sol#L2) allows old versions
+Pragma version[0.8.19](contracts/interfaces/IStaking.sol#L2) allows old versions
 
 contracts/interfaces/IStaking.sol#L2
 
 
  - [ ] ID-194
-Pragma version[0.8.10](contracts/token/Crowdsale.sol#L2) allows old versions
+Pragma version[0.8.19](contracts/token/Crowdsale.sol#L2) allows old versions
 
 contracts/token/Crowdsale.sol#L2
 
 
  - [ ] ID-195
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol#L4
 
 
  - [ ] ID-196
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol#L4
 
 
  - [ ] ID-197
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol#L4
 
 
  - [ ] ID-198
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol#L4
 
 
  - [ ] ID-199
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol#L4
 
 
  - [ ] ID-200
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol#L4
 
 
  - [ ] ID-201
-Pragma version[0.8.10](contracts/utils/ATokenWrapper.sol#L2) allows old versions
+Pragma version[0.8.19](contracts/utils/ATokenWrapper.sol#L2) allows old versions
 
 contracts/utils/ATokenWrapper.sol#L2
 
 
  - [ ] ID-202
-Pragma version[0.8.10](node_modules/@aave/core-v3/contracts/interfaces/IPriceOracle.sol#L2) allows old versions
+Pragma version[0.8.19](node_modules/@aave/core-v3/contracts/interfaces/IPriceOracle.sol#L2) allows old versions
 
 node_modules/@aave/core-v3/contracts/interfaces/IPriceOracle.sol#L2
 
 
  - [ ] ID-203
-Pragma version[0.8.10](contracts/utils/AddressStorage.sol#L2) allows old versions
+Pragma version[0.8.19](contracts/utils/AddressStorage.sol#L2) allows old versions
 
 contracts/utils/AddressStorage.sol#L2
 
 
  - [ ] ID-204
-Pragma version[0.8.10](contracts/oracle/CompOracle.sol#L2) allows old versions
+Pragma version[0.8.19](contracts/oracle/CompOracle.sol#L2) allows old versions
 
 contracts/oracle/CompOracle.sol#L2
 
 
  - [ ] ID-205
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts/utils/math/SafeMath.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts/utils/math/SafeMath.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts/utils/math/SafeMath.sol#L4
 
 
  - [ ] ID-206
-Pragma version[0.8.10](contracts/token/SyntheXToken.sol#L2) allows old versions
+Pragma version[0.8.19](contracts/token/SyntheXToken.sol#L2) allows old versions
 
 contracts/token/SyntheXToken.sol#L2
 
 
  - [ ] ID-207
-Pragma version[0.8.10](node_modules/@aave/core-v3/contracts/dependencies/openzeppelin/contracts/IERC20.sol#L2) allows old versions
+Pragma version[0.8.19](node_modules/@aave/core-v3/contracts/dependencies/openzeppelin/contracts/IERC20.sol#L2) allows old versions
 
 node_modules/@aave/core-v3/contracts/dependencies/openzeppelin/contracts/IERC20.sol#L2
 
 
  - [ ] ID-208
-Pragma version[0.8.10](node_modules/@aave/core-v3/contracts/interfaces/IInitializableAToken.sol#L2) allows old versions
+Pragma version[0.8.19](node_modules/@aave/core-v3/contracts/interfaces/IInitializableAToken.sol#L2) allows old versions
 
 node_modules/@aave/core-v3/contracts/interfaces/IInitializableAToken.sol#L2
 
 
  - [ ] ID-209
-Pragma version[0.8.10](node_modules/@aave/core-v3/contracts/protocol/libraries/types/DataTypes.sol#L2) allows old versions
+Pragma version[0.8.19](node_modules/@aave/core-v3/contracts/protocol/libraries/types/DataTypes.sol#L2) allows old versions
 
 node_modules/@aave/core-v3/contracts/protocol/libraries/types/DataTypes.sol#L2
 
 
  - [ ] ID-210
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts/utils/Counters.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts/utils/Counters.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts/utils/Counters.sol#L4
 
 
  - [ ] ID-211
-Pragma version[0.8.10](contracts/interfaces/IChainlinkAggregator.sol#L2) allows old versions
+Pragma version[0.8.19](contracts/interfaces/IChainlinkAggregator.sol#L2) allows old versions
 
 contracts/interfaces/IChainlinkAggregator.sol#L2
 
 
  - [ ] ID-212
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts/token/ERC20/IERC20.sol#L4
 
 
  - [ ] ID-213
-Pragma version[0.8.10](node_modules/@aave/core-v3/contracts/interfaces/IAToken.sol#L2) allows old versions
+Pragma version[0.8.19](node_modules/@aave/core-v3/contracts/interfaces/IAToken.sol#L2) allows old versions
 
 node_modules/@aave/core-v3/contracts/interfaces/IAToken.sol#L2
 
 
  - [ ] ID-214
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts/token/ERC20/extensions/ERC20FlashMint.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts/token/ERC20/extensions/ERC20FlashMint.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts/token/ERC20/extensions/ERC20FlashMint.sol#L4
 
 
  - [ ] ID-215
-Pragma version[0.8.10](contracts/storage/ERC20XStorage.sol#L2) allows old versions
+Pragma version[0.8.19](contracts/storage/ERC20XStorage.sol#L2) allows old versions
 
 contracts/storage/ERC20XStorage.sol#L2
 
 
  - [ ] ID-216
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts/access/IAccessControl.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts/access/IAccessControl.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts/access/IAccessControl.sol#L4
 
 
  - [ ] ID-217
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts/governance/utils/IVotes.sol#L3) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts/governance/utils/IVotes.sol#L3) allows old versions
 
 node_modules/@openzeppelin/contracts/governance/utils/IVotes.sol#L3
 
 
  - [ ] ID-218
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts/access/AccessControl.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts/access/AccessControl.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts/access/AccessControl.sol#L4
 
 
  - [ ] ID-219
-Pragma version[0.8.10](contracts/storage/SyntheXStorage.sol#L2) allows old versions
+Pragma version[0.8.19](contracts/storage/SyntheXStorage.sol#L2) allows old versions
 
 contracts/storage/SyntheXStorage.sol#L2
 
 
  - [ ] ID-220
-Pragma version[0.8.10](node_modules/@aave/core-v3/contracts/interfaces/IScaledBalanceToken.sol#L2) allows old versions
+Pragma version[0.8.19](node_modules/@aave/core-v3/contracts/interfaces/IScaledBalanceToken.sol#L2) allows old versions
 
 node_modules/@aave/core-v3/contracts/interfaces/IScaledBalanceToken.sol#L2
 
 
  - [ ] ID-221
-Pragma version[0.8.10](contracts/token/StakingRewards.sol#L2) allows old versions
+Pragma version[0.8.19](contracts/token/StakingRewards.sol#L2) allows old versions
 
 contracts/token/StakingRewards.sol#L2
 
 
  - [ ] ID-222
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts/utils/introspection/ERC165.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts/utils/introspection/ERC165.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts/utils/introspection/ERC165.sol#L4
 
 
  - [ ] ID-223
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts/token/ERC20/ERC20.sol#L4
 
 
  - [ ] ID-224
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts-upgradeable/proxy/beacon/IBeaconUpgradeable.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts-upgradeable/proxy/beacon/IBeaconUpgradeable.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts-upgradeable/proxy/beacon/IBeaconUpgradeable.sol#L4
 
 
  - [ ] ID-225
-Pragma version[0.8.10](contracts/ERC20X.sol#L2) allows old versions
+Pragma version[0.8.19](contracts/ERC20X.sol#L2) allows old versions
 
 contracts/ERC20X.sol#L2
 
 
  - [ ] ID-226
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol#L4
 
 
  - [ ] ID-227
-Pragma version[^0.8.10](contracts/interfaces/compound/ComptrollerInterface.sol#L2) allows old versions
+Pragma version[^0.8.19](contracts/interfaces/compound/ComptrollerInterface.sol#L2) allows old versions
 
 contracts/interfaces/compound/ComptrollerInterface.sol#L2
 
 
  - [ ] ID-228
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol#L4
 
 
  - [ ] ID-229
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol#L4
 
 
  - [ ] ID-230
-Pragma version[0.8.10](node_modules/@aave/core-v3/contracts/interfaces/IAaveIncentivesController.sol#L2) allows old versions
+Pragma version[0.8.19](node_modules/@aave/core-v3/contracts/interfaces/IAaveIncentivesController.sol#L2) allows old versions
 
 node_modules/@aave/core-v3/contracts/interfaces/IAaveIncentivesController.sol#L2
 
 
  - [ ] ID-231
-Pragma version[0.8.10](contracts/DebtPool.sol#L2) allows old versions
+Pragma version[0.8.19](contracts/DebtPool.sol#L2) allows old versions
 
 contracts/DebtPool.sol#L2
 
 
  - [ ] ID-232
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts/interfaces/IERC3156FlashLender.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts/interfaces/IERC3156FlashLender.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts/interfaces/IERC3156FlashLender.sol#L4
 
 
  - [ ] ID-233
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts/security/Pausable.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts/security/Pausable.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts/security/Pausable.sol#L4
 
 
  - [ ] ID-234
-Pragma version[0.8.10](contracts/token/ERC20Locked.sol#L2) allows old versions
+Pragma version[0.8.19](contracts/token/ERC20Locked.sol#L2) allows old versions
 
 contracts/token/ERC20Locked.sol#L2
 
 
  - [ ] ID-235
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts-upgradeable/utils/introspection/IERC165Upgradeable.sol#L4
 
 
  - [ ] ID-236
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts-upgradeable/access/IAccessControlUpgradeable.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts-upgradeable/access/IAccessControlUpgradeable.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts-upgradeable/access/IAccessControlUpgradeable.sol#L4
 
@@ -2117,49 +2117,49 @@ node_modules/@openzeppelin/contracts-upgradeable/proxy/ERC1967/ERC1967UpgradeUpg
 
 
  - [ ] ID-238
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol#L4
 
 
  - [ ] ID-239
-Pragma version[0.8.10](contracts/interfaces/ISyntheX.sol#L2) allows old versions
+Pragma version[0.8.19](contracts/interfaces/ISyntheX.sol#L2) allows old versions
 
 contracts/interfaces/ISyntheX.sol#L2
 
 
  - [ ] ID-240
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts/utils/math/SafeCast.sol#L5) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts/utils/math/SafeCast.sol#L5) allows old versions
 
 node_modules/@openzeppelin/contracts/utils/math/SafeCast.sol#L5
 
 
  - [ ] ID-241
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts-upgradeable/interfaces/IERC3156FlashBorrowerUpgradeable.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts-upgradeable/interfaces/IERC3156FlashBorrowerUpgradeable.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts-upgradeable/interfaces/IERC3156FlashBorrowerUpgradeable.sol#L4
 
 
  - [ ] ID-242
-Pragma version[0.8.10](node_modules/@aave/core-v3/contracts/interfaces/IPoolAddressesProvider.sol#L2) allows old versions
+Pragma version[0.8.19](node_modules/@aave/core-v3/contracts/interfaces/IPoolAddressesProvider.sol#L2) allows old versions
 
 node_modules/@aave/core-v3/contracts/interfaces/IPoolAddressesProvider.sol#L2
 
 
  - [ ] ID-243
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-IERC20PermitUpgradeable.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-IERC20PermitUpgradeable.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-IERC20PermitUpgradeable.sol#L4
 
 
  - [ ] ID-244
-Pragma version[^0.8.10](contracts/interfaces/compound/IPriceOracle.sol#L2) allows old versions
+Pragma version[^0.8.19](contracts/interfaces/compound/IPriceOracle.sol#L2) allows old versions
 
 contracts/interfaces/compound/IPriceOracle.sol#L2
 
 
  - [ ] ID-245
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts/access/Ownable.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts/access/Ownable.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts/access/Ownable.sol#L4
 
@@ -2171,7 +2171,7 @@ node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol#L
 
 
  - [ ] ID-247
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts/utils/introspection/IERC165.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts/utils/introspection/IERC165.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts/utils/introspection/IERC165.sol#L4
 
@@ -2183,25 +2183,25 @@ node_modules/@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol#L4
 
 
  - [ ] ID-249
-Pragma version[^0.8.10](contracts/interfaces/compound/CTokenInterface.sol#L2) allows old versions
+Pragma version[^0.8.19](contracts/interfaces/compound/CTokenInterface.sol#L2) allows old versions
 
 contracts/interfaces/compound/CTokenInterface.sol#L2
 
 
  - [ ] ID-250
-Pragma version[0.8.10](contracts/interfaces/IPriceOracle.sol#L2) allows old versions
+Pragma version[0.8.19](contracts/interfaces/IPriceOracle.sol#L2) allows old versions
 
 contracts/interfaces/IPriceOracle.sol#L2
 
 
  - [ ] ID-251
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol#L4
 
 
  - [ ] ID-252
-Pragma version[0.8.10](node_modules/@aave/core-v3/contracts/interfaces/IPool.sol#L2) allows old versions
+Pragma version[0.8.19](node_modules/@aave/core-v3/contracts/interfaces/IPool.sol#L2) allows old versions
 
 node_modules/@aave/core-v3/contracts/interfaces/IPool.sol#L2
 
@@ -2213,19 +2213,19 @@ node_modules/hardhat/console.sol#L2
 
 
  - [ ] ID-254
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts-upgradeable/interfaces/draft-IERC1822Upgradeable.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts-upgradeable/interfaces/draft-IERC1822Upgradeable.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts-upgradeable/interfaces/draft-IERC1822Upgradeable.sol#L4
 
 
  - [ ] ID-255
-Pragma version[0.8.10](node_modules/@openzeppelin/contracts-upgradeable/interfaces/IERC3156FlashLenderUpgradeable.sol#L4) allows old versions
+Pragma version[0.8.19](node_modules/@openzeppelin/contracts-upgradeable/interfaces/IERC3156FlashLenderUpgradeable.sol#L4) allows old versions
 
 node_modules/@openzeppelin/contracts-upgradeable/interfaces/IERC3156FlashLenderUpgradeable.sol#L4
 
 
  - [ ] ID-256
-Pragma version[0.8.10](contracts/oracle/SecondaryOracle.sol#L2) allows old versions
+Pragma version[0.8.19](contracts/oracle/SecondaryOracle.sol#L2) allows old versions
 
 contracts/oracle/SecondaryOracle.sol#L2
 

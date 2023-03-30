@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.10;
+pragma solidity 0.8.19;
 
 import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
@@ -8,11 +8,14 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeab
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 import "./AddressStorage.sol";
-import "./AccessControlList.sol";
 
 import "../pool/Pool.sol";
 import "./ISyntheX.sol";
 import "../libraries/Errors.sol";
+
+// ERC165Upgradeable
+import "@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 
 /**
  * @title SyntheX
@@ -23,9 +26,7 @@ import "../libraries/Errors.sol";
  * @dev Handle collateral: deposit/withdraw, enable/disable collateral, set collateral cap, volatility ratio
  * @dev Enable/disale trading pool, volatility ratio 
  */
-contract SyntheX is ISyntheX, AccessControlList, UUPSUpgradeable, AddressStorage, PausableUpgradeable {
-    /// @notice Using SafeMath for uint256 to avoid overflow/underflow
-    using SafeMathUpgradeable for uint256;
+contract SyntheX is ISyntheX, AccessControlUpgradeable, UUPSUpgradeable, AddressStorage, PausableUpgradeable {
     /// @notice Using SafeERC20 for ERC20 to avoid reverts
     using SafeERC20Upgradeable for ERC20Upgradeable;
 
@@ -38,10 +39,48 @@ contract SyntheX is ISyntheX, AccessControlList, UUPSUpgradeable, AddressStorage
     function initialize(
         address _l0Admin, address _l1Admin, address _l2Admin
     ) public initializer {
-        __AccessControl_init();
-        __AccessControlList_init(_l0Admin, _l1Admin, _l2Admin);
         __Pausable_init();
         __UUPSUpgradeable_init();
+
+        __AccessControl_init();
+        _setupRole(DEFAULT_ADMIN_ROLE, _l0Admin);
+        _setupRole(L1_ADMIN_ROLE, _l1Admin);
+        _setupRole(L2_ADMIN_ROLE, _l2Admin);
+        _setRoleAdmin(L2_ADMIN_ROLE, L1_ADMIN_ROLE);
+    }
+
+    function isL0Admin(address _account) public override view returns (bool) {
+        return hasRole(DEFAULT_ADMIN_ROLE, _account);
+    }
+
+    function isL1Admin(address _account) public override view returns (bool) {
+        return hasRole(L1_ADMIN_ROLE, _account);
+    }
+
+    function isL2Admin(address _account) public override view returns (bool) {
+        return hasRole(L2_ADMIN_ROLE, _account);
+    }
+
+    modifier onlyL1Admin() {
+        require(isL1Admin(msg.sender), Errors.NOT_AUTHORIZED);
+        _;
+    }
+
+    modifier onlyL2Admin() {
+        require(isL2Admin(msg.sender), Errors.NOT_AUTHORIZED);
+        _;
+    }
+
+    // Supports ISyntheX interface
+    function supportsInterface(bytes4 interfaceId) public view virtual override(ISyntheX, AccessControlUpgradeable) returns (bool) {
+        return interfaceId == type(ISyntheX).interfaceId || super.supportsInterface(interfaceId);
+    }
+
+    /// @notice Addresses of contracts
+    bytes32 public constant VAULT = keccak256("VAULT");
+
+    function vault() external override view returns(address) {
+        return getAddress(VAULT);
     }
 
     /* -------------------------------------------------------------------------- */
@@ -76,13 +115,22 @@ contract SyntheX is ISyntheX, AccessControlList, UUPSUpgradeable, AddressStorage
     /* -------------------------------------------------------------------------- */
     /*                             Reward Distribution                            */
     /* -------------------------------------------------------------------------- */
-
+    /**
+     * @dev Update pool reward index, And distribute rewards to the account
+     * @param _account The account to distribute rewards for
+     * @param _totalSupply The total debt supply of the pool
+     * @param _balance The debt balance of the account in the pool
+     */
     function distribute(address _account, uint _totalSupply, uint _balance) external override whenNotPaused {
         address[] memory _rewardTokens = rewardTokens[msg.sender];
         _updatePoolRewardIndex(_rewardTokens, msg.sender, _totalSupply);
         _distributeAccountReward(_rewardTokens, msg.sender,  _account, _balance);
     }
 
+    /**
+     * @dev Update pool reward index only
+     * @param _totalSupply The total debt supply of the pool
+     */
     function distribute(uint _totalSupply) external override whenNotPaused {
         address[] memory _rewardTokens = rewardTokens[msg.sender];
         _updatePoolRewardIndex(_rewardTokens, msg.sender, _totalSupply);
@@ -178,12 +226,12 @@ contract SyntheX is ISyntheX, AccessControlList, UUPSUpgradeable, AddressStorage
             }
 
             // Calculate change in the cumulative sum of the esSYX per debt token accrued
-            uint deltaIndex = borrowIndex.sub(accountIndex);
+            uint deltaIndex = borrowIndex - accountIndex;
 
             // Calculate reward accrued: cTokenAmount * accruedPerCToken
-            uint accountDelta = _balance * deltaIndex / 1e36;
+            uint accountDelta = _balance * deltaIndex / rewardInitialIndex;
 
-            uint accountAccrued = rewardAccrued[_rewardToken][_account].add(accountDelta);
+            uint accountAccrued = rewardAccrued[_rewardToken][_account] + (accountDelta);
             rewardAccrued[_rewardToken][_account] = accountAccrued;
 
             accountDeltas[i] = accountDelta;
@@ -208,7 +256,7 @@ contract SyntheX is ISyntheX, AccessControlList, UUPSUpgradeable, AddressStorage
         } 
         for (uint i = 0; i < _rewardTokens.length; i++) {
             uint amount = rewardAccrued[_rewardTokens[i]][holder];
-            rewardAccrued[_rewardTokens[i]][holder] = amount.sub(transferOut(_rewardTokens[i], holder, amount));
+            rewardAccrued[_rewardTokens[i]][holder] = amount - (transferOut(_rewardTokens[i], holder, amount));
         }
     }
 

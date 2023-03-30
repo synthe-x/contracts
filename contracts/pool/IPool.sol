@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.10;
+pragma solidity 0.8.19;
 
 import "../utils/oracle/IPriceOracle.sol";
 import "./PoolStorage.sol";
 
-abstract contract IPool is PoolStorage {
+abstract contract IPool {
 
     function enterCollateral(address _collateral) external virtual;
     function exitCollateral(address _collateral) external virtual;
@@ -26,17 +26,19 @@ abstract contract IPool is PoolStorage {
     /* -------------------------------------------------------------------------- */
     /*                               Admin Functions                              */
     /* -------------------------------------------------------------------------- */
-    function updateSynth(address _synth, Synth memory _params) external virtual;
-    function updateCollateral(address _collateral, Collateral memory _params) external virtual;
+    function updateSynth(address _synth, PoolStorage.Synth memory _params) external virtual;
+    function updateCollateral(address _collateral, PoolStorage.Collateral memory _params) external virtual;
     function removeSynth(address _synth) external virtual;
+    function addSynth(address _synth, uint mintFee, uint burnFee) external virtual;
 
     /* -------------------------------------------------------------------------- */
     /*                               View Functions                               */
     /* -------------------------------------------------------------------------- */
-    function getAccountLiquidity(address _account) external virtual view returns(AccountLiquidity memory liq);
+    function getAccountLiquidity(address _account) external virtual view returns(PoolStorage.AccountLiquidity memory liq);
     function getSynths() external virtual view returns (address[] memory);
     function getTotalDebtUSD() external virtual view returns(uint totalDebt);
     function getUserDebtUSD(address _account) external virtual view returns(uint);
+    function supportsInterface(bytes4 interfaceId) external virtual view returns (bool);
 
     /* -------------------------------------------------------------------------- */
     /*                              Internal Functions                            */

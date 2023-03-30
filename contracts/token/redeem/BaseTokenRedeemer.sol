@@ -1,12 +1,11 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.10;
+pragma solidity 0.8.19;
 
 import "../SyntheXToken.sol";
 
 import "../../synthex/SyntheX.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 
 /**
  * @title TokenRedeemer
@@ -17,9 +16,9 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
  */
 contract BaseTokenRedeemer {
     /// @notice SafeMath library is used for uint operations
-    using SafeMath for uint;
+    using SafeMathUpgradeable for uint;
     /// @notice SafeERC20 library is used for ERC20 operations
-    using SafeERC20 for IERC20;
+    using SafeERC20Upgradeable for IERC20Upgradeable;
     
     /// @notice Emitted when user requests to unlock their SYX tokens
     event UnlockRequested(address indexed user, bytes32 requestId, uint amount);
@@ -36,7 +35,7 @@ contract BaseTokenRedeemer {
     }
 
     /// @notice TOKEN is the address of token be unlocked
-    IERC20 public TOKEN;
+    IERC20Upgradeable public TOKEN;
     /// @notice Reserved for unlock is the amount of SYX that is reserved for unlock
     uint public reservedForUnlock;
     /// @notice Lock period is the time (in sec) that user must wait before they can claim their unlocked SYX
@@ -57,8 +56,12 @@ contract BaseTokenRedeemer {
      * @notice Constructor
      * @param _TOKEN Address of SYX
      */
-    constructor(address _TOKEN, uint _lockPeriod, uint _unlockPeriod, uint _percUnlockAtRelease) {
-        TOKEN = IERC20(_TOKEN);
+    function __BaseTokenRedeemer_init(address _TOKEN, uint _lockPeriod, uint _unlockPeriod, uint _percUnlockAtRelease) internal {
+         // validate _TOKEN address
+        require(_TOKEN != address(0), Errors.INVALID_ADDRESS);
+        // check if contract
+        require(AddressUpgradeable.isContract(_TOKEN), Errors.ADDRESS_IS_NOT_CONTRACT);
+        TOKEN = IERC20Upgradeable(_TOKEN);
         lockPeriod = _lockPeriod;
         unlockPeriod = _unlockPeriod;
         percUnlockAtRelease = _percUnlockAtRelease;

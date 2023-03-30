@@ -3,7 +3,6 @@ import hre, { OpenzeppelinDefender } from 'hardhat';
 import { AbiInterfaceParams } from "hardhat-openzeppelin-defender/dist/src/OpenzeppelinDefender/Utils/models/types";
 
 export const _deploy = async (contractName: string, contract: Contract) => {
-	return;
     if(!hre.network.config.chainId) throw new Error('ChainId not found in network config');
     if(hre.network.name == "hardhat") return;
     // Add contract to openzeppelin defender
@@ -26,10 +25,13 @@ export const _deploy = async (contractName: string, contract: Contract) => {
         abi: AbiJsonString as string,
     };
 
-    await OpenzeppelinDefender.AdminClient.addContract(option);
-    console.log(
-        `\t${contractName} added to openzeppelin defender! 🎉`
-    );
+    OpenzeppelinDefender.AdminClient.addContract(option)
+		.then(() => {
+			console.log(`\t${contractName} added to openzeppelin defender! 🎉`);
+		})
+		.catch((err) => {
+			console.log(err);
+		});
 }
 
 export const _propose = async (

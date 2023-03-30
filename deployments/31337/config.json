@@ -1,7 +1,7 @@
 {
   "name": "synthex",
-  "version": "0.40.0",
-  "latest": "0.40.0",
+  "version": "0.57.0",
+  "latest": "0.57.0",
   "l0Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
   "l1Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
   "l2Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
@@ -18,7 +18,7 @@
     {
       "name": "Crypto Market",
       "symbol": "C",
-      "rewardSpeed": "1",
+      "rewardSpeed": "1000000000000000000",
       "issuerAlloc": "0",
       "collaterals": [
         {
@@ -137,8 +137,8 @@
     {
       "name": "Foreign Exchange",
       "symbol": "F",
-      "rewardSpeed": "1",
-      "issuerAlloc": "5000",
+      "rewardSpeed": "1000000000000000000",
+      "issuerAlloc": "0",
       "collaterals": [
         {
           "name": "USD Coin",

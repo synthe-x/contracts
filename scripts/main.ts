@@ -1,63 +1,31 @@
-import hre, { ethers, OpenzeppelinDefender } from "hardhat";
-import { deploy } from "./deploy";
+import hre from "hardhat";
 import { initiate } from "./initiate";
-import fs from "fs";
+import newDeployment from "../tasks/new";
 
-import { DEFAULT_ADMIN_ROLE, L1_ADMIN_ROLE, L2_ADMIN_ROLE, GOVERNANCE_MODULE_ROLE } from "./utils/const";
+import deploySynthex from '../tasks/synthex/main'
+import deployVault from '../tasks/vault/main'
+import deployToken from '../tasks/syx/main'
+import resetAdmins from '../tasks/admins/main'
 
 export default async function main(isTest: boolean = true) {
+	if(!isTest) console.log(`Deploying to ${hre.network.name} (${hre.network.config.chainId}) ...`);
 
-	console.log(`Deploying to ${hre.network.name} (${hre.network.config.chainId}) ...`);
-
-	// read deployments and config
-	const deployments = JSON.parse(fs.readFileSync(process.cwd() + `/deployments/${hre.network.config.chainId}/deployments.json`, "utf8"));
-	const config = JSON.parse(fs.readFileSync(process.cwd() + `/deployments/${hre.network.config.chainId}/config.json`, "utf8"));
-	
-	// override existing deployments
-	deployments.contracts = {};
-	deployments.sources = {};
-
-	const [deployer] = await ethers.getSigners();
-
-	// increment version
-	const version =
-		config.version.split(".")[0] +
-		"." +
-		(parseInt(config.version.split(".")[1]) + 1) +
-		".0";
-
-	// update version
-	config.version = version;
-	config.latest = version;
+	await newDeployment(isTest);
 
 	// deploy main contracts
-	const contracts = await deploy(deployments, config, deployer, isTest);
+	let contracts: any = {};
+	contracts.synthex = await deploySynthex(isTest);
+	contracts.vault = await deployVault(isTest);
+	let tokenDeployments = await deployToken(isTest)
+	contracts.SYX = tokenDeployments.SYX;
+	contracts.esSYX = tokenDeployments.esSYX;
+	contracts.WETH = tokenDeployments.WETH;
+	
 	// initiate the contracts
-	const initiates = await initiate(deployments, config, contracts, isTest);
+	const initiates = await initiate(isTest);
 
-	// set admins
-	if(!isTest) console.log("Setting admins... 💬")
-
-	await contracts.synthex.grantRole(DEFAULT_ADMIN_ROLE, config.l0Admin);
-	await contracts.synthex.grantRole(L1_ADMIN_ROLE, config.l1Admin);
-	await contracts.synthex.grantRole(L2_ADMIN_ROLE, config.l2Admin);
-
-	if(deployer.address !== config.l0Admin) await contracts.synthex.renounceRole(DEFAULT_ADMIN_ROLE, deployer.address);
-	if(deployer.address !== config.l1Admin) await contracts.synthex.renounceRole(L1_ADMIN_ROLE, deployer.address);
-	if(deployer.address !== config.l2Admin) await contracts.synthex.renounceRole(L2_ADMIN_ROLE, deployer.address);
-	if(!isTest) console.log("Admins set! 🎉")
-
-	// save deployments
-    if(!isTest){
-        fs.writeFileSync(
-            process.cwd() + `/deployments/${hre.network.config.chainId}/config.json`,
-            JSON.stringify(config, null, 2)
-        );
-        fs.writeFileSync(
-            process.cwd() + `/deployments/${hre.network.config.chainId}/deployments.json`,
-            JSON.stringify(deployments, null, 2)
-        );
-    }
+	// reset admins
+	if(!isTest) resetAdmins(isTest)
 
 	if(!isTest) console.log("Deployment complete! 🎉")
 	return { ...contracts, ...initiates };

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.10;
+pragma solidity 0.8.19;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
@@ -10,7 +10,7 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
 
 import "../synthex/SyntheX.sol";
-import "../pool/Pool.sol";
+import "../pool/IPool.sol";
 
 import "../libraries/Errors.sol";
 
@@ -20,13 +20,10 @@ import "../libraries/Errors.sol";
  * @dev ERC20FlashMint for flash loan with fee (used to burn debt)
  */
 contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgradeable, PausableUpgradeable, MulticallUpgradeable {
-    /// @notice Using SafeMath for uint256 to prevent overflow and underflow
-    using SafeMathUpgradeable for uint256;
-
-    // TradingPool that owns this token
-    Pool public pool; 
-    // System contract 
-    SyntheX public synthex;
+    // Pool that this token belong to
+    IPool public pool; 
+    // SyntheX contract 
+    ISyntheX public synthex;
     /// @notice Fee charged for flash loan % in BASIS_POINTS
     uint public flashLoanFee;
     /// @notice Basis points: 1e4 * 1e18 = 100%
@@ -41,7 +38,13 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
         __ERC20_init(_name, _symbol);
         __ERC20FlashMint_init();
         __Pausable_init();
-        pool = Pool(payable(_pool));
+        __Multicall_init();
+
+        // check if supports interface
+        require(IPool(_pool).supportsInterface(type(IPool).interfaceId), Errors.INVALID_ADDRESS);
+        pool = IPool(payable(_pool));
+        // check if supports interface
+        require(ISyntheX(_synthex).supportsInterface(type(ISyntheX).interfaceId), Errors.INVALID_ADDRESS);
         synthex = SyntheX(_synthex);
     }
 
@@ -61,7 +64,8 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
         // ensure amount is greater than 0
         require(amount > 0, Errors.ZERO_AMOUNT);
         uint amountToMint = pool.commitMint(msg.sender, amount);
-        // TODO check if amount is correct
+        // check if amount is correct
+        require(amountToMint <= amount, Errors.INVALID_AMOUNT);
         _mint(recipient, amountToMint);
         if(referredBy != address(0)){
             emit Referred(referredBy, msg.sender);
@@ -74,9 +78,10 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
      */
     function burn(uint256 amount) external whenNotPaused {
         require(amount > 0, Errors.ZERO_AMOUNT);
-        amount = pool.commitBurn(msg.sender, amount);
-        // TODO check if amount is correct
-        _burn(msg.sender, amount);
+        uint amountToBurn = pool.commitBurn(msg.sender, amount);
+        // check if amount is correct
+        require(amountToBurn <= amount, Errors.INVALID_AMOUNT);
+        _burn(msg.sender, amountToBurn);
     }
 
     /**
@@ -86,9 +91,10 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
      */
     function swap(uint256 amount, address synthTo, address _recipient, address referredBy) external whenNotPaused {
         require(amount > 0, Errors.ZERO_AMOUNT);
-        amount = pool.commitSwap(_recipient, amount, synthTo);
-        // TODO check if amount is correct
-        _burn(msg.sender, amount);
+        uint amountToSwap = pool.commitSwap(_recipient, amount, synthTo);
+        // check if amount is correct
+        require(amountToSwap <= amount, Errors.INVALID_AMOUNT);
+        _burn(msg.sender, amountToSwap);
         if(referredBy != address(0)){
             emit Referred(referredBy, msg.sender);
         }
@@ -99,9 +105,10 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
      */
     function liquidate(address account, uint256 amount, address outAsset) external whenNotPaused {
         require(amount > 0, Errors.ZERO_AMOUNT);
-        amount = pool.commitLiquidate(msg.sender, account, amount, outAsset);
-        // TODO check if amount is correct
-        _burn(msg.sender, amount);
+        uint amountToBurn = pool.commitLiquidate(msg.sender, account, amount, outAsset);
+        // check if amount is correct
+        require(amountToBurn <= amount, Errors.INVALID_AMOUNT);
+        _burn(msg.sender, amountToBurn);
     }
 
     /* -------------------------------------------------------------------------- */
@@ -126,6 +133,27 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
     }
 
     /* -------------------------------------------------------------------------- */
+    /*                               Admin Functions                              */
+    /* -------------------------------------------------------------------------- */
+    /**
+     * @dev Pause the token
+     * @dev Only callable by L2 admin
+     */
+    function pause() external {
+        require(synthex.isL2Admin(msg.sender), Errors.CALLER_NOT_L1_ADMIN);
+        _pause();
+    }
+
+    /**
+     * @dev Unpause the token
+     * @dev Only callable by L2 admin
+     */
+    function unpause() external {
+        require(synthex.isL2Admin(msg.sender), Errors.CALLER_NOT_L1_ADMIN);
+        _unpause();
+    }
+
+    /* -------------------------------------------------------------------------- */
     /*                                 Flash Mint                                 */
     /* -------------------------------------------------------------------------- */
     /**
@@ -134,6 +162,7 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
      */
     function updateFlashFee(uint _flashLoanFee) public {
         require(synthex.isL1Admin(msg.sender), Errors.CALLER_NOT_L1_ADMIN);
+        require(_flashLoanFee <= BASIS_POINTS, Errors.INVALID_AMOUNT);
         flashLoanFee = _flashLoanFee;
         emit FlashFeeUpdated(_flashLoanFee);
     }
@@ -146,7 +175,7 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
     function _flashFee(address token, uint256 amount) internal view override returns (uint256) {
         // silence warning about unused variable without the addition of bytecode.
         token;
-        return amount.mul(flashLoanFee).div(BASIS_POINTS);
+        return amount * (flashLoanFee) / (BASIS_POINTS);
     }    
 
     function _flashFeeReceiver() internal view override returns (address) {

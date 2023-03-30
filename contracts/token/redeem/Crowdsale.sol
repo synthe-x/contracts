@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.10;
+pragma solidity 0.8.19;
 
 import "../SyntheXToken.sol";
 import "../../synthex/SyntheX.sol";
 import "./BaseTokenRedeemer.sol";
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
-import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/security/Pausable.sol";
-
+// Address
+import "@openzeppelin/contracts/utils/Address.sol";
 // MerkleProof
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 
@@ -22,12 +22,12 @@ import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
  * @notice Also has whitelisting functionality
  * @dev Token release is based on TokenRedeemer contract
  */
-contract Crowdsale is BaseTokenRedeemer, Pausable {
-    using SafeMath for uint256;
-    using SafeERC20 for IERC20;
+contract Crowdsale is BaseTokenRedeemer, PausableUpgradeable {
+    using SafeMathUpgradeable for uint256;
+    using SafeERC20Upgradeable for IERC20Upgradeable;
 
     SyntheX public synthex;
-    bytes32 public immutable merkleRoot;
+    bytes32 public merkleRoot;
 
     // start and end timestamps
     uint256 public whitelistDuration;
@@ -42,7 +42,7 @@ contract Crowdsale is BaseTokenRedeemer, Pausable {
     uint public constant RATE_PRECISION = 1e18;
     address public constant ETH_ADDRESS = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
 
-    constructor(
+    function initialize(
         address _synthex,
         address _token,
         uint256 _startTime,
@@ -54,17 +54,19 @@ contract Crowdsale is BaseTokenRedeemer, Pausable {
         uint256 _whitelistDuration,
         uint256 _whitelistCap
     )
-        BaseTokenRedeemer(
-            _token,
-            _lockPeriod,
-            _unlockPeriod,
-            _percUnlockAtRelease
-        )
+        public initializer
     {
         require(_startTime >= block.timestamp, Errors.INVALID_TIME);
         require(_endTime >= _startTime, Errors.INVALID_TIME);
         require(_synthex != address(0), Errors.INVALID_ADDRESS);
         require(_token != address(0), Errors.INVALID_ADDRESS);
+
+        __BaseTokenRedeemer_init(
+            _token,
+            _lockPeriod,
+            _unlockPeriod,
+            _percUnlockAtRelease
+        );
 
         whitelistDuration = _whitelistDuration;
         startTime = _startTime;
@@ -150,7 +152,7 @@ contract Crowdsale is BaseTokenRedeemer, Pausable {
     function buyWithTokenInternal(address _token, uint _amount) internal returns (uint amount) {
         require(rate[_token] > 0, Errors.TOKEN_NOT_SUPPORTED);
         // Transfer In
-        IERC20(_token).safeTransferFrom(
+        IERC20Upgradeable(_token).safeTransferFrom(
             msg.sender,
             address(this),
             _amount
@@ -202,7 +204,7 @@ contract Crowdsale is BaseTokenRedeemer, Pausable {
         if (_token == ETH_ADDRESS) {
             Address.sendValue(payable(msg.sender), _amount);
         } else {
-            IERC20(_token).safeTransfer(msg.sender, _amount);
+            IERC20Upgradeable(_token).safeTransfer(msg.sender, _amount);
         }
     }
 
