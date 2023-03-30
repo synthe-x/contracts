@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.10;
+pragma solidity 0.8.19;
 
 import "../SyntheXToken.sol";
 
@@ -57,6 +57,10 @@ contract BaseTokenRedeemer {
      * @param _TOKEN Address of SYX
      */
     function __BaseTokenRedeemer_init(address _TOKEN, uint _lockPeriod, uint _unlockPeriod, uint _percUnlockAtRelease) internal {
+         // validate _TOKEN address
+        require(_TOKEN != address(0), Errors.INVALID_ADDRESS);
+        // check if contract
+        require(AddressUpgradeable.isContract(_TOKEN), Errors.ADDRESS_IS_NOT_CONTRACT);
         TOKEN = IERC20Upgradeable(_TOKEN);
         lockPeriod = _lockPeriod;
         unlockPeriod = _unlockPeriod;

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.10;
+pragma solidity 0.8.19;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20VotesUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20BurnableUpgradeable.sol";
@@ -25,7 +25,7 @@ contract EscrowedSYX is UUPSUpgradeable, ERC20VotesUpgradeable, ERC20BurnableUpg
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
     /// @notice System contract
-    SyntheX public synthex;
+    ISyntheX public synthex;
     /// @notice Address of the rewards token
     address public REWARD_TOKEN;
     /// @notice Timestamp when the rewards period ends
@@ -63,7 +63,14 @@ contract EscrowedSYX is UUPSUpgradeable, ERC20VotesUpgradeable, ERC20BurnableUpg
 
         __BaseTokenRedeemer_init(_TOKEN, _lockPeriod, _unlockPeriod, _percUnlockAtRelease);
 
-        synthex = SyntheX(_synthex);
+        // check if valid address
+        require(ISyntheX(_synthex).supportsInterface(type(ISyntheX).interfaceId), Errors.INVALID_ADDRESS);
+        synthex = ISyntheX(_synthex);
+
+        // validate reward token address
+        require(_REWARD_TOKEN != address(0), Errors.INVALID_ADDRESS);
+        // check if contract
+        require(AddressUpgradeable.isContract(_REWARD_TOKEN), Errors.ADDRESS_IS_NOT_CONTRACT);
         REWARD_TOKEN = _REWARD_TOKEN;
         periodFinish = 0;
         rewardRate = 0;

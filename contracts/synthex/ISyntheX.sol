@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.10;
+pragma solidity 0.8.19;
 import "../utils/oracle/IPriceOracle.sol";
 import "./SyntheXStorage.sol";
 
@@ -27,6 +27,13 @@ abstract contract ISyntheX is SyntheXStorage {
         uint256 _balance
     ) external virtual;
 
+    // ERC165
+    function supportsInterface(bytes4 interfaceId)
+        external
+        virtual
+        view
+        returns (bool);
+
     event SetPoolRewardSpeed(
         address indexed rewardToken,
         address indexed pool,
@@ -39,4 +46,12 @@ abstract contract ISyntheX is SyntheXStorage {
         uint256[] accountDelta,
         uint256[] rewardIndex
     );
+
+    function vault() external virtual view returns(address);
+
+    function isL0Admin(address _account) external virtual view returns (bool);
+
+    function isL1Admin(address _account) external virtual view returns (bool);
+
+    function isL2Admin(address _account) external virtual view returns (bool);
 }

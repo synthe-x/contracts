@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.10;
+pragma solidity 0.8.19;
 
 import "../utils/oracle/IPriceOracle.sol";
 import "../token/SyntheXToken.sol";
@@ -37,6 +37,10 @@ abstract contract SyntheXStorage {
     
     /// @notice The reward accrued but not yet transferred to each user
     mapping(address => mapping(address => uint)) public rewardAccrued;
+    
+    /// @notice Roles for access control
+    bytes32 public constant L1_ADMIN_ROLE = keccak256("L1_ADMIN_ROLE");
+    bytes32 public constant L2_ADMIN_ROLE = keccak256("L2_ADMIN_ROLE");
 
     uint256[100] private __gap;
 }

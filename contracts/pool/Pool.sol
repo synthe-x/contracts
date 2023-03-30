@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.10;
+pragma solidity 0.8.19;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
@@ -12,21 +12,22 @@ import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol";
 
+//IERC165Upgradeable
+import "@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol";
 
 import "../synth/ERC20X.sol";
-import { IPool } from "./IPool.sol";
+import "./IPool.sol";
 import {Errors} from "../libraries/Errors.sol";
 import "../libraries/PriceConvertor.sol";
+import "./PoolStorage.sol";
+import "../synthex/ISyntheX.sol";
 
-import "hardhat/console.sol";
 /**
  * @title Pool
  * @notice Pool contract to manage collaterals and debt
  * @author Prasad <prasad@chainscore.finance>
  */
-contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUpgradeable {
-    /// @notice Using SafeMath for uint256 to prevent overflows and underflows
-    using SafeMathUpgradeable for uint256;
+contract Pool is IPool, PoolStorage, ERC20Upgradeable, ERC165Upgradeable, PausableUpgradeable, ReentrancyGuardUpgradeable {
     /// @notice Using Math for uint256 to calculate minimum and maximum
     using MathUpgradeable for uint256;
     /// @notice for converting token prices
@@ -35,18 +36,26 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
     /// @notice The address of the address storage contract
-    SyntheX public synthex;
+    ISyntheX public synthex;
     
     /// @dev Initialize the contract
     function initialize(string memory _name, string memory _symbol, address _synthex) public initializer {
         __ERC20_init(_name, _symbol);
         __Pausable_init();
-        __ReentrancyGuard_init(); 
+        __ReentrancyGuard_init();
 
+        // check if valid address
+        require(ISyntheX(_synthex).supportsInterface(type(ISyntheX).interfaceId), Errors.INVALID_ADDRESS);
         // set addresses
-        synthex = SyntheX(_synthex);
+        synthex = ISyntheX(_synthex);
+        
         // paused till (1) collaterals are added, (2) synths are added and (3) feeToken is set
-        pause();
+        _pause();
+    }
+
+    // Support IPool interface
+    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165Upgradeable, IPool) returns (bool) {
+        return interfaceId == type(IPool).interfaceId || super.supportsInterface(interfaceId);
     }
 
     /// @dev Override to disable transfer
@@ -163,10 +172,10 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
         }
         
         // Update balance
-        accountCollateralBalance[_account][_collateral] = accountCollateralBalance[_account][_collateral].add(_amount);
+        accountCollateralBalance[_account][_collateral] += _amount;
 
         // Update collateral supply
-        collateral.totalDeposits = collateral.totalDeposits.add(_amount);
+        collateral.totalDeposits += _amount;
         require(collateral.totalDeposits <= collateral.cap, Errors.EXCEEDED_MAX_CAPACITY);
 
         // emit event
@@ -201,11 +210,11 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
         // check deposit balance
         uint depositBalance = accountCollateralBalance[_account][_collateral];
         // allow only upto their deposit balance
-        require(depositBalance >= _amount, Errors.INSUFFICIENT_COLLATERAL);
+        require(depositBalance >= _amount, Errors.INSUFFICIENT_BALANCE);
         // Update balance
-        accountCollateralBalance[_account][_collateral] = depositBalance.sub(_amount);
+        accountCollateralBalance[_account][_collateral] = depositBalance - (_amount);
         // Update collateral supply
-        supply.totalDeposits = supply.totalDeposits.sub(_amount);
+        supply.totalDeposits -= (_amount);
         // check for positive liquidity
         require(getAccountLiquidity(_account).liquidity >= 0, Errors.INSUFFICIENT_COLLATERAL);
         // Emit successful event
@@ -220,18 +229,11 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
      */
     function transferOut(address _asset, address recipient, uint _amount) internal nonReentrant {
         if(_asset == ETH_ADDRESS){
-            require(address(this).balance >= _amount, Errors.INSUFFICIENT_BALANCE);
-            payable(recipient).transfer(_amount);
+            (bool sent,) = payable(recipient).call{value: msg.value}("");
+            require(sent, "Failed to send Ether");
         } else {
             IERC20Upgradeable(_asset).safeTransfer(recipient, _amount);
         }
-    }
-
-    struct Vars_Mint {
-        uint amountPlusFeeUSD;
-        uint _borrowCapacity;
-        address[] tokens;
-        uint[] prices;
     }
 
     /**
@@ -254,9 +256,15 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
         
         require(_borrowCapacity > 0, Errors.INSUFFICIENT_COLLATERAL);
 
-        // amount of debt to issue (in usd, including mintFee)
+        // 10 cETH * 1000 = 10000 USD
+        // +10% fee = 11 cETH debt to issue (11000 USD)
+        // 10 cETH minted to user (10000 USD)
+        // 1 cETH fee (1000 USD) = 0.5 cETH minted to vault (1-issuerAlloc) + 0.5 cETH not minted (burned) 
+        // This would result in net -0.5 cETH ($500) worth of debt issued; i.e. $500 of debt is reduced from pool (for all users)
+        
+        // Amount of debt to issue (in usd, including mintFee)
         uint amountUSD = _amount.toUSD(vars.prices[0]);
-        uint amountPlusFeeUSD = amountUSD.add(amountUSD.mul(synths[msg.sender].mintFee).div(BASIS_POINTS));
+        uint amountPlusFeeUSD = amountUSD + (amountUSD * (synths[msg.sender].mintFee) / (BASIS_POINTS));
         if(_borrowCapacity < int(amountPlusFeeUSD)){
             amountPlusFeeUSD = uint(_borrowCapacity);
         }
@@ -271,7 +279,7 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
             // Calculate the amount of debt tokens to mint
             // debtSharePrice = totalDebt / totalSupply
             // mintAmount = amountUSD / debtSharePrice 
-            uint mintAmount = amountPlusFeeUSD.mul(totalSupply()).div(getTotalDebtUSD());
+            uint mintAmount = amountPlusFeeUSD * totalSupply() / getTotalDebtUSD();
             // Mint the debt tokens
             _mint(_account, mintAmount);
         }
@@ -279,13 +287,15 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
         // Amount * (fee * issuerAlloc) is burned from global debt
         // Amount * (fee * (1 - issuerAlloc)) to vault
         // Fee amount of feeToken: amountUSD * fee * (1 - issuerAlloc) / feeTokenPrice
-        amountUSD = amountPlusFeeUSD.mul(BASIS_POINTS).div(BASIS_POINTS.add(synths[msg.sender].mintFee));
+        amountUSD = amountPlusFeeUSD * (BASIS_POINTS) / (BASIS_POINTS + (synths[msg.sender].mintFee));
         _amount = amountUSD.toToken(vars.prices[0]);
 
-        uint feeAmount = amountPlusFeeUSD.sub(amountUSD)        // total fee amount in USD
-            .mul(uint(BASIS_POINTS).sub(issuerAlloc))           // multiplying (1 - issuerAlloc)
-            .div(BASIS_POINTS)                                  // for multiplying issuerAlloc
-            .toToken(vars.prices[1]);                           // to feeToken amount
+        uint feeAmount = (
+            (amountPlusFeeUSD - amountUSD)      // total fee amount in USD
+            * (BASIS_POINTS - issuerAlloc)      // multiplying (1 - issuerAlloc)
+            / (BASIS_POINTS))                   // for multiplying issuerAlloc
+            .toToken(vars.prices[1]             // to feeToken amount
+        );                           
         
         // Mint FEE tokens to vault
         address vault = synthex.vault();
@@ -300,14 +310,6 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
         return _amount;
     }
 
-
-    struct Vars_Burn {
-        uint amountUSD;
-        uint debt;
-        address[] tokens;
-        uint[] prices;
-    }
-
     /**
      * @notice Burn synths from the user
      * @param _account User whose debt is being burned
@@ -318,8 +320,9 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
      */
     function commitBurn(address _account, uint _amount) virtual override whenNotPaused external returns(uint) {
         Vars_Burn memory vars;
+        Synth memory synth = synths[msg.sender];
         // check if synth is valid
-        if(!synths[msg.sender].isActive) require(synths[msg.sender].isDisabled, Errors.ASSET_NOT_ENABLED);
+        if(!synth.isActive) require(synth.isDisabled, Errors.ASSET_NOT_ENABLED);
 
         vars.tokens = new address[](2);
         vars.tokens[0] = msg.sender;
@@ -328,12 +331,12 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
 
         // amount of debt to burn (in usd, including burnFee)
         // amountUSD = amount * price / (1 + burnFee)
-        uint amountUSD = _amount.toUSD(vars.prices[0]).mul(BASIS_POINTS).div(BASIS_POINTS.add(synths[msg.sender].burnFee));
+        uint amountUSD = _amount.toUSD(vars.prices[0]) * (BASIS_POINTS) / (BASIS_POINTS + synth.burnFee);
         // ensure user has enough debt to burn
         uint debt = getUserDebtUSD(_account);
         if(debt < amountUSD){
             // amount = debt + debt * burnFee / BASIS_POINTS
-            _amount = debt.add(debt.mul(synths[msg.sender].burnFee).div(BASIS_POINTS)).toToken(vars.prices[0]);
+            _amount = (debt + (debt * (synth.burnFee) / (BASIS_POINTS))).toToken(vars.prices[0]);
             amountUSD = debt;
         }
 
@@ -343,14 +346,19 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
         // call for reward distribution
         synthex.distribute(_account, totalSupply(), balanceOf(_account));
 
-        _burn(_account, totalSupply().mul(amountUSD).div(getTotalDebtUSD()));
+        _burn(_account, totalSupply() * amountUSD / getTotalDebtUSD());
 
         // Mint fee * (1 - issuerAlloc) to vault
+        uint feeAmount = (
+            (amountUSD * synth.burnFee * (BASIS_POINTS - issuerAlloc) / (BASIS_POINTS)) 
+            / BASIS_POINTS          // for multiplying burnFee
+        ).toToken(vars.prices[1]);  // to feeToken amount
+
         address vault = synthex.vault();
         if(vault != address(0)) {
             ERC20X(feeToken).mintInternal(
                 vault,
-                amountUSD.mul(synths[msg.sender].burnFee).mul(uint(BASIS_POINTS).sub(issuerAlloc)).div(BASIS_POINTS).div(BASIS_POINTS).toToken(vars.prices[1])
+                feeAmount
             );
         }
 
@@ -378,35 +386,22 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
         uint[] memory prices = priceOracle.getAssetsPrices(t);
 
         uint amountUSD = _amount.toUSD(prices[0]);
-        uint fee = amountUSD.mul(synths[_synthTo].mintFee.add(synths[msg.sender].burnFee)).div(BASIS_POINTS);
+        uint fee = amountUSD * (synths[_synthTo].mintFee + synths[msg.sender].burnFee) / BASIS_POINTS;
 
         // 1. Mint (amount - fee) toSynth to recipient
-        ERC20X(_synthTo).mintInternal(_recipient, amountUSD.sub(fee).toToken(prices[1]));
+        ERC20X(_synthTo).mintInternal(_recipient, (amountUSD - fee).toToken(prices[1]));
         // 2. Mint fee * (1 - issuerAlloc) (in feeToken) to vault
         address vault = synthex.vault();
         if(vault != address(0)) {
             ERC20X(feeToken).mintInternal(
                 vault,
-                fee.mul(uint(BASIS_POINTS).sub(issuerAlloc))        // multiplying (1 - issuerAlloc)
-                .div(BASIS_POINTS)                                  // for multiplying issuerAlloc
+                (fee * (BASIS_POINTS - issuerAlloc)        // multiplying (1 - issuerAlloc)
+                / (BASIS_POINTS))                           // for multiplying issuerAlloc
                 .toToken(prices[2])
             );
         }
         // 3. Burn all fromSynth
         return _amount; 
-    }
-
-    struct Vars_Liquidate {
-        AccountLiquidity liq;
-        Collateral collateral;
-        uint ltv;
-        address[] tokens;
-        uint[] prices;
-        uint amountUSD;
-        uint debtUSD;
-        uint amountOut;
-        uint penalty;
-        uint refundOut;
     }
 
     /**
@@ -429,8 +424,8 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
         vars.collateral = collaterals[_outAsset];
         require(vars.liq.debt > 0, Errors.INSUFFICIENT_DEBT);
         require(vars.liq.collateral > 0, Errors.INSUFFICIENT_COLLATERAL);
-        vars.ltv = vars.liq.debt.mul(SCALER).div(vars.liq.collateral);
-        require(vars.ltv > vars.collateral.liqThreshold.mul(SCALER).div(BASIS_POINTS), Errors.ACCOUNT_BELOW_LIQ_THRESHOLD);
+        vars.ltv = vars.liq.debt * (SCALER) / (vars.liq.collateral);
+        require(vars.ltv > vars.collateral.liqThreshold * SCALER / BASIS_POINTS, Errors.ACCOUNT_BELOW_LIQ_THRESHOLD);
         // Ensure user has entered the collateral market
         require(accountMembership[_outAsset][_account], Errors.ACCOUNT_NOT_ENTERED);
 
@@ -440,7 +435,7 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
         vars.tokens[2] = feeToken;
         vars.prices = priceOracle.getAssetsPrices(vars.tokens);
 
-        vars.amountUSD = _amount.toUSD(vars.prices[0]).mul(BASIS_POINTS).div(BASIS_POINTS.sub(synths[msg.sender].burnFee));
+        vars.amountUSD = _amount.toUSD(vars.prices[0]) * (BASIS_POINTS)/(BASIS_POINTS - synths[msg.sender].burnFee);
         if(vars.liq.debt < vars.amountUSD) {
             vars.amountUSD = vars.liq.debt;
         }
@@ -459,28 +454,28 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
             }
         } else {
             // take collateral based on ltv, and apply penalty
-            balanceOut = balanceOut.mul(vars.ltv).div(SCALER);
+            balanceOut = balanceOut * vars.ltv / SCALER;
             if(vars.amountOut > balanceOut){
                 vars.amountOut = balanceOut;
             }
             // penalty = amountOut * liqBonus
-            vars.penalty = vars.amountOut.mul(vars.collateral.liqBonus.sub(BASIS_POINTS)).div(BASIS_POINTS);
+            vars.penalty = vars.amountOut * (vars.collateral.liqBonus - BASIS_POINTS) / (BASIS_POINTS);
 
             // if we don't have enough for [complete] bonus, take partial bonus
             // and refund the rest
-            if(vars.ltv.mul(vars.collateral.liqBonus).div(BASIS_POINTS) > SCALER){
+            if(vars.ltv * vars.collateral.liqBonus / BASIS_POINTS > SCALER){
                 // penalty = amountOut * (1 - ltv)/ltv 
-                vars.penalty = vars.amountOut.mul(SCALER.sub(vars.ltv)).div(vars.ltv);
+                vars.penalty = vars.amountOut * (SCALER - vars.ltv) / (vars.ltv);
             } else {
                 // refundOut = amountOut * (1 - ltv * liqBonus)
-                vars.refundOut = vars.amountOut.mul(SCALER.sub(vars.ltv.mul(vars.collateral.liqBonus).div(BASIS_POINTS))).div(SCALER);
+                vars.refundOut = vars.amountOut * (SCALER - (vars.ltv * vars.collateral.liqBonus / BASIS_POINTS)) / SCALER;
             }
         }
 
-        accountCollateralBalance[_account][_outAsset] = accountCollateralBalance[_account][_outAsset].sub(vars.amountOut.add(vars.penalty).add(vars.refundOut));
+        accountCollateralBalance[_account][_outAsset] -= (vars.amountOut + vars.penalty + vars.refundOut);
 
         // Add collateral to liquidator
-        accountCollateralBalance[_liquidator][_outAsset] = accountCollateralBalance[_liquidator][_outAsset].add(vars.amountOut.add(vars.penalty));
+        accountCollateralBalance[_liquidator][_outAsset]+= (vars.amountOut + vars.penalty);
 
         // Transfer refund to user
         if(vars.refundOut > 0){
@@ -488,16 +483,16 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
         }
 
         vars.amountUSD = vars.amountOut.toUSD(vars.prices[1]);
-        _burn(_account, totalSupply().mul(vars.amountUSD).div(getTotalDebtUSD()));
+        _burn(_account, totalSupply() * vars.amountUSD / getTotalDebtUSD());
 
         // send (burn fee - issuerAlloc) in feeToken to vault
-        uint fee = vars.amountUSD.mul(synths[msg.sender].burnFee).div(BASIS_POINTS);
+        uint fee = vars.amountUSD * (synths[msg.sender].burnFee) / (BASIS_POINTS);
         address vault = synthex.vault();
         if(vault != address(0)) {
             ERC20X(feeToken).mintInternal(
-                synthex.vault(),
-                fee.mul(uint(BASIS_POINTS).sub(issuerAlloc))        // multiplying (1 - issuerAlloc)
-                .div(BASIS_POINTS)                                  // for multiplying issuerAlloc
+                vault,
+                (fee * (BASIS_POINTS - issuerAlloc)        // multiplying (1 - issuerAlloc)
+                / BASIS_POINTS)                            // for multiplying issuerAlloc
                 .toToken(vars.prices[2])
             );
         }
@@ -505,7 +500,7 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
         emit Liquidate(_liquidator, _account, _outAsset, vars.amountOut, vars.penalty, vars.refundOut);
 
         // amount (in synth) plus burn fee
-        return vars.amountUSD.toToken(vars.prices[0]).mul(BASIS_POINTS.add(synths[msg.sender].burnFee)).div(BASIS_POINTS);
+        return vars.amountUSD.toToken(vars.prices[0]) * (BASIS_POINTS + synths[msg.sender].burnFee) / (BASIS_POINTS);
     }
 
     /* -------------------------------------------------------------------------- */
@@ -534,12 +529,13 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
             vars.price = vars.oracle.getAssetPrice(vars.collateral);
             // Add the collateral amount
             // AdjustedCollateralAmountUSD = CollateralAmount * Price * volatilityRatio
-            liq.liquidity += int(accountCollateralBalance[_account][vars.collateral]
-                .mul(collaterals[vars.collateral].baseLTV)
-                .div(BASIS_POINTS)                      // adjust for volatility ratio
+            liq.liquidity += int(
+                (accountCollateralBalance[_account][vars.collateral]
+                 * (collaterals[vars.collateral].baseLTV)
+                 / (BASIS_POINTS))                      // adjust for volatility ratio
                 .toUSD(vars.price));
             // collateralAmountUSD = CollateralAmount * Price 
-            liq.collateral = liq.collateral.add(
+            liq.collateral += (
                 accountCollateralBalance[_account][vars.collateral]
                 .toUSD(vars.price)
             );
@@ -564,7 +560,7 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
         for(uint i = 0; i < _synths.length; i++){
             address synth = _synths[i];
             // synthDebt = synthSupply * price
-            totalDebt = totalDebt.add(
+            totalDebt += (
                 ERC20X(synth).totalSupply().toUSD(_oracle.getAssetPrice(synth))
             );
         }
@@ -581,7 +577,7 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
             return 0;
         }
         // Get the debt of the account in the trading pool, based on its debt share balance
-        return balanceOf(_account).mul(getTotalDebtUSD()).div(totalSupply()); 
+        return balanceOf(_account) * getTotalDebtUSD() / totalSupply(); 
     }
 
     /* -------------------------------------------------------------------------- */
@@ -597,6 +593,23 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
         require(synthex.isL2Admin(msg.sender), Errors.CALLER_NOT_L2_ADMIN);
         _;
     }
+
+    /**
+     * @notice Pause the contract 
+     * @dev Only callable by L2 admin
+     */
+    function pause() public onlyL2Admin {
+        _pause();
+    }
+
+    /**
+     * @notice Unpause the contract
+     * @dev Only callable by L2 admin
+     */
+    function unpause() public onlyL2Admin {
+        _unpause();
+    }
+
     /**
      * @notice Set the price oracle
      * @param _priceOracle The address of the price oracle
@@ -616,26 +629,10 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
         feeToken = _feeToken;
         emit FeeTokenUpdated(_feeToken);
     }
-    /**
-     * @notice Pause the contract 
-     * @dev Only callable by L2 admin
-     */
-    function pause() public onlyL2Admin {
-        _pause();
-    }
-
-    /**
-     * @notice Unpause the contract
-     * @dev Only callable by L2 admin
-     */
-    function unpause() public onlyL2Admin {
-        _unpause();
-    }
-
     
     /**
      * @notice Update collateral params
-     * @notice Only governance module or l2Admin (in case of emergency) can update collateral params
+     * @notice Only L1Admin can call this function 
      */
     function updateCollateral(address _collateral, Collateral memory _params) virtual override public onlyL1Admin {
         Collateral storage collateral = collaterals[_collateral];
@@ -649,19 +646,20 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
         collateral.baseLTV = _params.baseLTV;
         require(_params.liqThreshold >= _params.baseLTV && _params.liqThreshold <= BASIS_POINTS, Errors.INVALID_ARGUMENT);
         collateral.liqThreshold = _params.liqThreshold;
-        require(_params.liqBonus >= BASIS_POINTS && _params.liqBonus <= BASIS_POINTS.add(BASIS_POINTS.sub(_params.liqThreshold)), Errors.INVALID_ARGUMENT);
+        // TODO: CHECK THIS
+        require(_params.liqBonus >= BASIS_POINTS && _params.liqBonus <= BASIS_POINTS + (BASIS_POINTS - (_params.liqThreshold)), Errors.INVALID_ARGUMENT);
         collateral.liqBonus = _params.liqBonus;
 
         collateral.isActive = _params.isActive;
 
         emit CollateralParamsUpdated(_collateral, _params.cap, _params.baseLTV, _params.liqThreshold, _params.liqBonus, _params.isActive);
-    } 
+    }
 
     /**
      * @dev Add a new synth to the pool
-     * @notice Only the owner can call this function
+     * @notice Only L1Admin can call this function
      */
-    function addSynth(address _synth, uint mintFee, uint burnFee) external onlyL1Admin {
+    function addSynth(address _synth, uint mintFee, uint burnFee) external override onlyL1Admin {
         for(uint i = 0; i < synthsList.length; i++){
             require(synthsList[i] != _synth, Errors.ASSET_NOT_ACTIVE);
         }
@@ -671,9 +669,10 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
         updateSynth(_synth, Synth(true, false, mintFee, burnFee));
     }
 
-     /**
-        * @dev Update synth params
-      */
+    /**
+     * @dev Update synth params
+     * @notice Only L1Admin can call this function
+     */
     function updateSynth(address _synth, Synth memory _params) virtual override public onlyL1Admin {
         // Update synth params
         synths[_synth].isActive = _params.isActive;
@@ -691,6 +690,7 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
      * @dev Removes the synth from the pool
      * @param _synth The address of the synth to remove
      * @notice Removes from synthList => would not contribute to pool debt
+     * @notice Only L1Admin can call this function
      */
     function removeSynth(address _synth) virtual override public onlyL1Admin {
         synths[_synth].isActive = false;

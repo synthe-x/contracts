@@ -1,14 +1,17 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.10;
+pragma solidity 0.8.19;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/ERC20FlashMint.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
 
 import "../synthex/SyntheX.sol";
 import "../libraries/Errors.sol";
+
+// erc165
+import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 
 /**
  * @title SyntheX Token contract
@@ -16,12 +19,22 @@ import "../libraries/Errors.sol";
  * @notice SyntheX Token contract, based on OpenZeppelin ERC20
  * @dev Pausable, Burnable, Permit
  */
-contract SyntheXToken is ERC20, ERC20Burnable, Pausable, ERC20Permit {
+contract SyntheXToken is ERC20Permit, ERC165, ERC20Burnable, Pausable {
     /// @notice System contract to check access control
     SyntheX public synthex;
 
     constructor(address _synthex) ERC20("SyntheX Token", "SYX") ERC20Permit("SyntheX Token") {
+        // validate synthex address
+        require(_synthex != address(0), Errors.INVALID_ADDRESS);
+        // check if contract
+        require(Address.isContract(_synthex), Errors.ADDRESS_IS_NOT_CONTRACT);
+        // set synthex
         synthex = SyntheX(_synthex);
+    }
+
+    // support interface
+    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165) returns (bool) {
+        return interfaceId == type(IERC20).interfaceId || interfaceId == type(IERC20Metadata).interfaceId || super.supportsInterface(interfaceId);
     }
 
     /**

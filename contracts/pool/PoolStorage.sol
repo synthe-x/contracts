@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.10;
+pragma solidity 0.8.19;
 
 import "../utils/oracle/IPriceOracle.sol";
 
 contract PoolStorage {
-
+    
     /// @notice The address of the price oracle
     IPriceOracle public priceOracle;
 
@@ -63,6 +63,33 @@ contract PoolStorage {
         address collateral;
         uint price;
         address[] _accountPools;
+    }
+
+    struct Vars_Mint {
+        uint amountPlusFeeUSD;
+        uint _borrowCapacity;
+        address[] tokens;
+        uint[] prices;
+    }
+
+    struct Vars_Burn {
+        uint amountUSD;
+        uint debt;
+        address[] tokens;
+        uint[] prices;
+    }
+
+    struct Vars_Liquidate {
+        AccountLiquidity liq;
+        Collateral collateral;
+        uint ltv;
+        address[] tokens;
+        uint[] prices;
+        uint amountUSD;
+        uint debtUSD;
+        uint amountOut;
+        uint penalty;
+        uint refundOut;
     }
 
     uint256[50] private __gap;
