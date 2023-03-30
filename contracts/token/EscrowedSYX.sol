@@ -1,14 +1,15 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.10;
+pragma solidity ^0.8.10;
 
-import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20VotesUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20BurnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "../synthex/SyntheX.sol";
 import "../utils/interfaces/IStaking.sol";
 import "./redeem/BaseTokenRedeemer.sol";
 import "../libraries/Errors.sol";
-import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 /**
  * @title Escrowed SYX
@@ -19,9 +20,9 @@ import "@openzeppelin/contracts/security/Pausable.sol";
  * @notice Protocol rewards (APR) are distributed in esSYX tokens; and protocol revenue in WETH
  * @notice esSNX tokens can be redeemed for SYX tokens, release period set by BaseTokenRedeemer
  */
-contract EscrowedSYX is ERC20Votes, ERC20Burnable, IStaking, BaseTokenRedeemer, AccessControl, Pausable {
-    using SafeMath for uint256;
-    using SafeERC20 for IERC20;
+contract EscrowedSYX is UUPSUpgradeable, ERC20VotesUpgradeable, ERC20BurnableUpgradeable, IStaking, BaseTokenRedeemer, AccessControlUpgradeable, PausableUpgradeable {
+    using SafeMathUpgradeable for uint256;
+    using SafeERC20Upgradeable for IERC20Upgradeable;
 
     /// @notice System contract
     SyntheX public synthex;
@@ -30,7 +31,7 @@ contract EscrowedSYX is ERC20Votes, ERC20Burnable, IStaking, BaseTokenRedeemer, 
     /// @notice Timestamp when the rewards period ends
     uint256 public periodFinish;
     /// @notice Reward rate per second
-    uint256 public rewardRate; 
+    uint256 public rewardRate;
     /// @notice Rewards duration in seconds
     uint256 public rewardsDuration;
     /// @notice Last time reward was updated 
@@ -44,7 +45,7 @@ contract EscrowedSYX is ERC20Votes, ERC20Burnable, IStaking, BaseTokenRedeemer, 
     // This role can transfer tokens
     bytes32 public constant AUTHORIZED_SENDER = keccak256("AUTHORIZED_SENDER");
 
-    constructor(
+    function initialize(
         address _synthex, 
         address _TOKEN, 
         address _REWARD_TOKEN, 
@@ -52,17 +53,25 @@ contract EscrowedSYX is ERC20Votes, ERC20Burnable, IStaking, BaseTokenRedeemer, 
         uint _lockPeriod,
         uint _unlockPeriod,
         uint _percUnlockAtRelease
-    ) 
-        ERC20("Escrowed SYX", "esSYX") 
-        ERC20Permit("Escrowed SYX") 
-        BaseTokenRedeemer(_TOKEN, _lockPeriod, _unlockPeriod, _percUnlockAtRelease)
-    {
+    ) public initializer {
+        __ERC20_init("Escrowed SYX", "esSYX");
+        __ERC20Burnable_init();
+        __ERC20Votes_init();
+        __ERC20Permit_init("Escrowed SYX");
+        __AccessControl_init();
+        __Pausable_init();
+
+        __BaseTokenRedeemer_init(_TOKEN, _lockPeriod, _unlockPeriod, _percUnlockAtRelease);
+
         synthex = SyntheX(_synthex);
         REWARD_TOKEN = _REWARD_TOKEN;
         periodFinish = 0;
         rewardRate = 0;
         rewardsDuration = initialRewardsDuration;
     }
+
+    ///@notice required by the OZ UUPS module
+    function _authorizeUpgrade(address) internal override onlyL1Admin {}
     
     /* -------------------------------------------------------------------------- */
     /*                               View Functions                               */
@@ -143,7 +152,7 @@ contract EscrowedSYX is ERC20Votes, ERC20Burnable, IStaking, BaseTokenRedeemer, 
         uint256 reward = rewards[msg.sender];
         if (reward > 0) {
             rewards[msg.sender] = 0;
-            IERC20(REWARD_TOKEN).safeTransfer(msg.sender, reward);
+            IERC20Upgradeable(REWARD_TOKEN).safeTransfer(msg.sender, reward);
             emit RewardPaid(msg.sender, reward);       
         }
     }
@@ -247,21 +256,21 @@ contract EscrowedSYX is ERC20Votes, ERC20Burnable, IStaking, BaseTokenRedeemer, 
     // ERC20 overrides
     function _afterTokenTransfer(address from, address to, uint256 amount)
         internal
-        override(ERC20, ERC20Votes)
+        override(ERC20Upgradeable, ERC20VotesUpgradeable)
     {
         super._afterTokenTransfer(from, to, amount);
     }
 
     function _mint(address to, uint256 amount)
         internal
-        override(ERC20, ERC20Votes)
+        override(ERC20Upgradeable, ERC20VotesUpgradeable)
     {
         super._mint(to, amount);
     }
 
     function _burn(address account, uint256 amount)
         internal
-        override(ERC20, ERC20Votes)
+        override(ERC20Upgradeable, ERC20VotesUpgradeable)
     {
         super._burn(account, amount);
     }

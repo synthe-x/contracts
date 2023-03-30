@@ -43,4 +43,12 @@ describe("Rewards", function () {
             ethers.utils.parseEther("10000")
         );
 	});
+
+	it('withdraw all', async () => {
+		await cryptoPool.connect(user1).depositETH({value: ethers.utils.parseEther("10")});
+		await cryptoPool.connect(user1).withdrawETH(ethers.utils.parseEther("10"));
+		expect((await cryptoPool.getAccountLiquidity(user1.address))[1]).eq(
+			ethers.utils.parseEther("0")
+		);
+	});
 });

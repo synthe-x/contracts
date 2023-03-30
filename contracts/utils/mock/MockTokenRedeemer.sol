@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.10;
+pragma solidity ^0.8.10;
 
 import "../../token/redeem/BaseTokenRedeemer.sol";
 
@@ -39,7 +39,8 @@ contract MockTokenRedeemer is BaseTokenRedeemer, Pausable {
         uint _lockPeriod, 
         uint _unlockPeriod, 
         uint _percUnlockAtRelease
-    ) BaseTokenRedeemer(_TOKEN, _lockPeriod, _unlockPeriod, _percUnlockAtRelease) {
+    ) {
+        __BaseTokenRedeemer_init(_TOKEN, _lockPeriod, _unlockPeriod, _percUnlockAtRelease);
         synthex = SyntheX(_system);
         LOCKED_TOKEN = IERC20(_LOCKED_TOKEN);
     }
@@ -71,7 +72,7 @@ contract MockTokenRedeemer is BaseTokenRedeemer, Pausable {
      */
     function withdraw(uint _amount) external onlyAdmin {
         require(_amount <= remainingQuota(), "Not enough SYN to withdraw");
-        TOKEN.safeTransfer(msg.sender, _amount);
+        IERC20(address(TOKEN)).safeTransfer(msg.sender, _amount);
     }
 
     /**
@@ -95,7 +96,7 @@ contract MockTokenRedeemer is BaseTokenRedeemer, Pausable {
     /* -------------------------------------------------------------------------- */
     function lock(uint _amount) external whenNotPaused {
         // transfer tokens from user to contract
-        TOKEN.safeTransferFrom(msg.sender, address(this), _amount);
+        IERC20(address(TOKEN)).safeTransferFrom(msg.sender, address(this), _amount);
         // mint sealed tokens
         LOCKED_TOKEN.safeTransfer(msg.sender, _amount);
     }

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity 0.8.10;
+pragma solidity ^0.8.10;
 
 /**
  * @title Errors library
@@ -40,4 +40,5 @@ library Errors {
 
   string public constant TIME_NOT_STARTED = '29';
   string public constant TIME_ENDED = '30';
+  string public constant WITHDRAWING_MORE_THAN_ALLOWED = '31';
 }

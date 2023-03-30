@@ -1,18 +1,17 @@
-import { HardhatUserConfig } from "hardhat/config";
+import { HardhatUserConfig, task } from "hardhat/config";
 import '@openzeppelin/hardhat-upgrades';
 import "@nomicfoundation/hardhat-toolbox";
 import "hardhat-gas-reporter"
 import "@openzeppelin/hardhat-defender"
 import "hardhat-openzeppelin-defender";
 import 'solidity-docgen';
-
 require('dotenv').config();
 
 const PRIVATE_KEY = process.env.PRIVATE_KEY ?? 'ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80';
 const ARBITRUM_GOERLI_RPC = process.env.ARBITRUM_GOERLI_RPC ?? 'https://goerli.arbitrum.io/rpc';
 
 
-const config: HardhatUserConfig = {
+const config: any = {
   docgen: {},
   defender: {
     apiKey: process.env.DEFENDER_TEAM_API_KEY!,
@@ -42,10 +41,15 @@ const config: HardhatUserConfig = {
     timeout: 100000000
   },
   networks: {
+    hardhat: {
+      isLive: false,
+    },
     arbitrumGoerli: {
       url: ARBITRUM_GOERLI_RPC,
       accounts: [`0x${PRIVATE_KEY}`],
       chainId: 421613,
+      gasLimit: 1000000000,
+      isLive: true,
     },
     goerli: {
       url: "https://rpc.ankr.com/eth_goerli",
@@ -55,7 +59,8 @@ const config: HardhatUserConfig = {
     },
     localhost: {
       url: "http://localhost:8545",
-      chainId: 31337
+      chainId: 31337,
+      isLive: false
     },
   },
   gasReporter: {

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.10;
+pragma solidity ^0.8.10;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
@@ -18,6 +18,7 @@ import { IPool } from "./IPool.sol";
 import {Errors} from "../libraries/Errors.sol";
 import "../libraries/PriceConvertor.sol";
 
+import "hardhat/console.sol";
 /**
  * @title Pool
  * @notice Pool contract to manage collaterals and debt
@@ -161,14 +162,12 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
             enterCollateral(_collateral);
         }
         
-        Collateral storage supply = collaterals[_collateral];
-
         // Update balance
         accountCollateralBalance[_account][_collateral] = accountCollateralBalance[_account][_collateral].add(_amount);
 
         // Update collateral supply
-        supply.totalDeposits = supply.totalDeposits.add(_amount);
-        require(supply.totalDeposits <= supply.cap, Errors.EXCEEDED_MAX_CAPACITY);
+        collateral.totalDeposits = collateral.totalDeposits.add(_amount);
+        require(collateral.totalDeposits <= collateral.cap, Errors.EXCEEDED_MAX_CAPACITY);
 
         // emit event
         emit Deposit(_account, _collateral, _amount);
@@ -180,10 +179,10 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
      * @param _amount The amount of collateral to withdraw
      */
     function withdraw(address _collateral, uint _amount) virtual override public {
-        // Transfer collateral to user
-        _amount = transferOut(_collateral, msg.sender, _amount);
         // Process withdraw
         withdrawInternal(msg.sender, _collateral, _amount);
+        // Transfer collateral to user
+        transferOut(_collateral, msg.sender, _amount);
     }
 
     /**
@@ -191,10 +190,10 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
      * @param _amount The amount of eth to withdraw
      */
     function withdrawETH(uint _amount) virtual override public {
-        // Transfer ETH to user
-        _amount = transferETH(msg.sender, _amount);
         // Process withdraw
         withdrawInternal(msg.sender, ETH_ADDRESS, _amount);
+        // Transfer ETH to user
+        transferOut(ETH_ADDRESS, msg.sender, _amount); 
     }
 
     function withdrawInternal(address _account, address _collateral, uint _amount) internal whenNotPaused {
@@ -202,31 +201,13 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
         // check deposit balance
         uint depositBalance = accountCollateralBalance[_account][_collateral];
         // allow only upto their deposit balance
-        if(depositBalance < _amount){
-            // withdraw all
-            _amount = depositBalance;
-        }
-
-        int liquidity = getAccountLiquidity(_account).liquidity;
-        if(liquidity < 0){
-            _amount = 0;
-        } else {
-            uint max = uint(liquidity).mul(BASIS_POINTS).div(supply.baseLTV);
-            if(_amount > max){
-                _amount = max;
-            }
-        }
-
+        require(depositBalance >= _amount, Errors.INSUFFICIENT_COLLATERAL);
         // Update balance
         accountCollateralBalance[_account][_collateral] = depositBalance.sub(_amount);
-
-        // require(supply.isActive, "Collateral not enabled");
         // Update collateral supply
         supply.totalDeposits = supply.totalDeposits.sub(_amount);
-
-        // Check health after withdrawal
-        // require( >= 0, Errors.INSUFFICIENT_COLLATERAL);
-
+        // check for positive liquidity
+        require(getAccountLiquidity(_account).liquidity >= 0, Errors.INSUFFICIENT_COLLATERAL);
         // Emit successful event
         emit Withdraw(_account, _collateral, _amount);
     }
@@ -236,27 +217,14 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
      * @param _asset The address of the asset
      * @param recipient The address of the recipient
      * @param _amount Amount
-     * @return The amount transferred
      */
-    function transferOut(address _asset, address recipient, uint _amount) internal returns(uint) {
+    function transferOut(address _asset, address recipient, uint _amount) internal nonReentrant {
         if(_asset == ETH_ADDRESS){
-            return transferETH(recipient, _amount);
+            require(address(this).balance >= _amount, Errors.INSUFFICIENT_BALANCE);
+            payable(recipient).transfer(_amount);
+        } else {
+            IERC20Upgradeable(_asset).safeTransfer(recipient, _amount);
         }
-        if(ERC20Upgradeable(_asset).balanceOf(address(this)) < _amount){
-            _amount = ERC20Upgradeable(_asset).balanceOf(address(this));
-        }
-        IERC20Upgradeable(_asset).safeTransfer(recipient, _amount);
-
-        return _amount;
-    }
-
-    function transferETH(address recipient, uint _amount) internal nonReentrant returns(uint) {
-        if(address(this).balance < _amount){
-            _amount = address(this).balance;
-        }
-        payable(recipient).transfer(_amount);
-
-        return _amount;
     }
 
     struct Vars_Mint {
@@ -293,7 +261,7 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
             amountPlusFeeUSD = uint(_borrowCapacity);
         }
 
-        // call for reward distribution
+        // call for reward distribution before minting
         synthex.distribute(_account, totalSupply(), balanceOf(_account));
 
         if(totalSupply() == 0){
@@ -314,16 +282,19 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
         amountUSD = amountPlusFeeUSD.mul(BASIS_POINTS).div(BASIS_POINTS.add(synths[msg.sender].mintFee));
         _amount = amountUSD.toToken(vars.prices[0]);
 
-        uint feeAmount = amountPlusFeeUSD.sub(amountUSD) // total fee amount in USD
+        uint feeAmount = amountPlusFeeUSD.sub(amountUSD)        // total fee amount in USD
             .mul(uint(BASIS_POINTS).sub(issuerAlloc))           // multiplying (1 - issuerAlloc)
             .div(BASIS_POINTS)                                  // for multiplying issuerAlloc
-            .toToken(vars.prices[1]);                                // to feeToken amount
+            .toToken(vars.prices[1]);                           // to feeToken amount
         
         // Mint FEE tokens to vault
-        ERC20X(feeToken).mintInternal(
-            synthex.vault(),
-            feeAmount
-        );
+        address vault = synthex.vault();
+        if(vault != address(0)) {
+            ERC20X(feeToken).mintInternal(
+                vault,
+                feeAmount
+            );
+        }
 
         // return the amount of synths to issue
         return _amount;
@@ -375,10 +346,13 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
         _burn(_account, totalSupply().mul(amountUSD).div(getTotalDebtUSD()));
 
         // Mint fee * (1 - issuerAlloc) to vault
-        ERC20X(feeToken).mintInternal(
-            synthex.vault(),
-            amountUSD.mul(synths[msg.sender].burnFee).mul(uint(BASIS_POINTS).sub(issuerAlloc)).div(BASIS_POINTS).div(BASIS_POINTS).toToken(vars.prices[1])
-        );
+        address vault = synthex.vault();
+        if(vault != address(0)) {
+            ERC20X(feeToken).mintInternal(
+                vault,
+                amountUSD.mul(synths[msg.sender].burnFee).mul(uint(BASIS_POINTS).sub(issuerAlloc)).div(BASIS_POINTS).div(BASIS_POINTS).toToken(vars.prices[1])
+            );
+        }
 
         return _amount;
     }
@@ -409,12 +383,15 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
         // 1. Mint (amount - fee) toSynth to recipient
         ERC20X(_synthTo).mintInternal(_recipient, amountUSD.sub(fee).toToken(prices[1]));
         // 2. Mint fee * (1 - issuerAlloc) (in feeToken) to vault
-        ERC20X(feeToken).mintInternal(
-            synthex.vault(),
-            fee.mul(uint(BASIS_POINTS).sub(issuerAlloc))        // multiplying (1 - issuerAlloc)
-            .div(BASIS_POINTS)                                  // for multiplying issuerAlloc
-            .toToken(prices[2])
-        );
+        address vault = synthex.vault();
+        if(vault != address(0)) {
+            ERC20X(feeToken).mintInternal(
+                vault,
+                fee.mul(uint(BASIS_POINTS).sub(issuerAlloc))        // multiplying (1 - issuerAlloc)
+                .div(BASIS_POINTS)                                  // for multiplying issuerAlloc
+                .toToken(prices[2])
+            );
+        }
         // 3. Burn all fromSynth
         return _amount; 
     }
@@ -507,7 +484,7 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
 
         // Transfer refund to user
         if(vars.refundOut > 0){
-            require(transferOut(_outAsset, _account, vars.refundOut) == vars.refundOut, Errors.TRANSFER_FAILED);
+            transferOut(_outAsset, _account, vars.refundOut);
         }
 
         vars.amountUSD = vars.amountOut.toUSD(vars.prices[1]);
@@ -515,12 +492,15 @@ contract Pool is IPool, ERC20Upgradeable, PausableUpgradeable, ReentrancyGuardUp
 
         // send (burn fee - issuerAlloc) in feeToken to vault
         uint fee = vars.amountUSD.mul(synths[msg.sender].burnFee).div(BASIS_POINTS);
-        ERC20X(feeToken).mintInternal(
-            synthex.vault(),
-            fee.mul(uint(BASIS_POINTS).sub(issuerAlloc))        // multiplying (1 - issuerAlloc)
-            .div(BASIS_POINTS)                                  // for multiplying issuerAlloc
-            .toToken(vars.prices[2])
-        );
+        address vault = synthex.vault();
+        if(vault != address(0)) {
+            ERC20X(feeToken).mintInternal(
+                synthex.vault(),
+                fee.mul(uint(BASIS_POINTS).sub(issuerAlloc))        // multiplying (1 - issuerAlloc)
+                .div(BASIS_POINTS)                                  // for multiplying issuerAlloc
+                .toToken(vars.prices[2])
+            );
+        }
 
         emit Liquidate(_liquidator, _account, _outAsset, vars.amountOut, vars.penalty, vars.refundOut);
 

@@ -16,7 +16,7 @@ describe("Rewards", function () {
 		pool2;
 	let owner: any, user1: any, user2: any, user3: any;
 
-	beforeEach(async () => {
+	before(async () => {
 		// Contracts are deployed using the first signer/account by default
 		[owner, user1, user2] = await ethers.getSigners();
 
@@ -79,7 +79,15 @@ describe("Rewards", function () {
         await cryptoPool.connect(user1).depositWithPermit(weth.address, value, deadline, v, r, s);
 
         expect((await cryptoPool.getAccountLiquidity(user1.address))[1]).eq(
-            ethers.utils.parseEther("10000")
+            ethers.utils.parseEther("20000")
         );
+	});
+
+	it("withdraw all", async function () {
+		await cryptoPool.connect(user1).withdraw(weth.address, ethers.utils.parseEther('20'));
+
+		expect(await weth.balanceOf(user1.address)).eq(
+			ethers.utils.parseEther("20")
+		);
 	});
 });
