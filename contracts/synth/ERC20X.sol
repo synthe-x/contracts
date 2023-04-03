@@ -48,7 +48,7 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
         synthex = ISyntheX(_synthex);
     }
 
-    modifier onlyInternal(){
+    modifier onlyInternal() {
         require(msg.sender == address(pool), Errors.NOT_AUTHORIZED);
         _;
     }
