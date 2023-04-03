@@ -4,7 +4,7 @@ pragma solidity 0.8.19;
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20VotesUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20BurnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
-import "../synthex/SyntheX.sol";
+import "../synthex/ISyntheX.sol";
 import "../utils/interfaces/IStaking.sol";
 import "./redeem/BaseTokenRedeemer.sol";
 import "../libraries/Errors.sol";
@@ -21,7 +21,6 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
  * @notice esSNX tokens can be redeemed for SYX tokens, release period set by BaseTokenRedeemer
  */
 contract EscrowedSYX is UUPSUpgradeable, ERC20VotesUpgradeable, ERC20BurnableUpgradeable, IStaking, BaseTokenRedeemer, AccessControlUpgradeable, PausableUpgradeable {
-    using SafeMathUpgradeable for uint256;
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
     /// @notice System contract
@@ -100,8 +99,8 @@ contract EscrowedSYX is UUPSUpgradeable, ERC20VotesUpgradeable, ERC20BurnableUpg
             return rewardPerTokenStored;
         }
         return
-            rewardPerTokenStored.add(
-                lastTimeRewardApplicable().sub(lastUpdateTime).mul(rewardRate).mul(1e18).div(totalSupply())
+            rewardPerTokenStored + (
+                (lastTimeRewardApplicable() - lastUpdateTime) * (rewardRate) * (1e18) / (totalSupply())
             );
     }
 
@@ -109,14 +108,16 @@ contract EscrowedSYX is UUPSUpgradeable, ERC20VotesUpgradeable, ERC20BurnableUpg
      * @notice Returns the earned rewards for the given account
      */
     function earned(address account) public override view returns (uint256) {
-        return balanceOf(account).mul(rewardPerToken().sub(userRewardPerTokenPaid[account])).div(1e18).add(rewards[account]);
+        // return balanceOf(account).mul(rewardPerToken().sub(userRewardPerTokenPaid[account])).div(1e18).add(rewards[account]);
+        return (balanceOf(account) * (rewardPerToken() - (userRewardPerTokenPaid[account])) / (1e18)) + (rewards[account]);
+
     }
 
     /**
      * @notice Returns rewards for the reward duration
      */
     function getRewardForDuration() external override view returns (uint256) {
-        return rewardRate.mul(rewardsDuration);
+        return rewardRate * rewardsDuration;
     }
 
     /* -------------------------------------------------------------------------- */
@@ -172,16 +173,16 @@ contract EscrowedSYX is UUPSUpgradeable, ERC20VotesUpgradeable, ERC20BurnableUpg
      */
     function notifyReward(uint256 reward) external onlyL1Admin updateReward(address(0)) {
         if (block.timestamp >= periodFinish) {
-          rewardRate = reward.div(rewardsDuration);
+          rewardRate = reward / rewardsDuration;
         }
         else {
-            uint256 remaining = periodFinish.sub(block.timestamp);
-            uint256 leftover = remaining.mul(rewardRate);
-            rewardRate = reward.add(leftover).div(rewardsDuration);
+            uint256 remaining = periodFinish - block.timestamp;
+            uint256 leftover = remaining * rewardRate;
+            rewardRate = (reward + leftover) / (rewardsDuration);
         }
 
         lastUpdateTime = block.timestamp;
-        periodFinish = block.timestamp.add(rewardsDuration);
+        periodFinish = block.timestamp + rewardsDuration;
         emit RewardAdded(reward);
     }
     

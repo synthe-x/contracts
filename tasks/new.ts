@@ -33,5 +33,5 @@ export default async function main(isTest: boolean = false) {
         );
     }
 
-	if(!isTest) console.log(`Started new deployment ${config.version} 🚀`)
+	if(!isTest) console.log(`Started new deployment ${config.version} 🚀`);
 }

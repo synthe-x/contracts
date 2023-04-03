@@ -9,7 +9,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-ERC20Pe
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
 
-import "../synthex/SyntheX.sol";
+import "../synthex/ISyntheX.sol";
 import "../pool/IPool.sol";
 
 import "../libraries/Errors.sol";
@@ -45,7 +45,7 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
         pool = IPool(payable(_pool));
         // check if supports interface
         require(ISyntheX(_synthex).supportsInterface(type(ISyntheX).interfaceId), Errors.INVALID_ADDRESS);
-        synthex = SyntheX(_synthex);
+        synthex = ISyntheX(_synthex);
     }
 
     modifier onlyInternal(){
@@ -140,7 +140,7 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
      * @dev Only callable by L2 admin
      */
     function pause() external {
-        require(synthex.isL2Admin(msg.sender), Errors.CALLER_NOT_L1_ADMIN);
+        require(synthex.isL2Admin(msg.sender), Errors.CALLER_NOT_L2_ADMIN);
         _pause();
     }
 
@@ -149,7 +149,7 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
      * @dev Only callable by L2 admin
      */
     function unpause() external {
-        require(synthex.isL2Admin(msg.sender), Errors.CALLER_NOT_L1_ADMIN);
+        require(synthex.isL2Admin(msg.sender), Errors.CALLER_NOT_L2_ADMIN);
         _unpause();
     }
 

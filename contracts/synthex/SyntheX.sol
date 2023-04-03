@@ -9,10 +9,13 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 import "./AddressStorage.sol";
 
-import "../pool/Pool.sol";
+// Pool
+import "../pool/IPool.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
 import "./ISyntheX.sol";
 import "../libraries/Errors.sol";
-
+import "./SyntheXStorage.sol";
 // ERC165Upgradeable
 import "@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
@@ -26,7 +29,7 @@ import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol"
  * @dev Handle collateral: deposit/withdraw, enable/disable collateral, set collateral cap, volatility ratio
  * @dev Enable/disale trading pool, volatility ratio 
  */
-contract SyntheX is ISyntheX, AccessControlUpgradeable, UUPSUpgradeable, AddressStorage, PausableUpgradeable {
+contract SyntheX is ISyntheX, SyntheXStorage, AccessControlUpgradeable, UUPSUpgradeable, AddressStorage, PausableUpgradeable {
     /// @notice Using SafeERC20 for ERC20 to avoid reverts
     using SafeERC20Upgradeable for ERC20Upgradeable;
 
@@ -76,9 +79,6 @@ contract SyntheX is ISyntheX, AccessControlUpgradeable, UUPSUpgradeable, Address
         return interfaceId == type(ISyntheX).interfaceId || super.supportsInterface(interfaceId);
     }
 
-    /// @notice Addresses of contracts
-    bytes32 public constant VAULT = keccak256("VAULT");
-
     function vault() external override view returns(address) {
         return getAddress(VAULT);
     }
@@ -120,6 +120,7 @@ contract SyntheX is ISyntheX, AccessControlUpgradeable, UUPSUpgradeable, Address
      * @param _account The account to distribute rewards for
      * @param _totalSupply The total debt supply of the pool
      * @param _balance The debt balance of the account in the pool
+     * @dev This function is called by the trading pool
      */
     function distribute(address _account, uint _totalSupply, uint _balance) external override whenNotPaused {
         address[] memory _rewardTokens = rewardTokens[msg.sender];
@@ -130,6 +131,7 @@ contract SyntheX is ISyntheX, AccessControlUpgradeable, UUPSUpgradeable, Address
     /**
      * @dev Update pool reward index only
      * @param _totalSupply The total debt supply of the pool
+     * @dev This function is called by the trading pool
      */
     function distribute(uint _totalSupply) external override whenNotPaused {
         address[] memory _rewardTokens = rewardTokens[msg.sender];
@@ -146,7 +148,7 @@ contract SyntheX is ISyntheX, AccessControlUpgradeable, UUPSUpgradeable, Address
         // update existing rewards
         address[] memory _rewardTokens = new address[](1);
         _rewardTokens[0] = _rewardToken;
-        _updatePoolRewardIndex(_rewardTokens, _pool, Pool(payable(_pool)).totalSupply());
+        _updatePoolRewardIndex(_rewardTokens, _pool, IERC20(payable(_pool)).totalSupply());
         // set speed
         rewardSpeeds[_rewardToken][_pool] = _speed;
         // add to list
@@ -251,8 +253,8 @@ contract SyntheX is ISyntheX, AccessControlUpgradeable, UUPSUpgradeable, Address
         // Iterate through all holders and trading pools
         for (uint i = 0; i < _pools.length; i++) {
             // Iterate thru all reward tokens
-            _updatePoolRewardIndex(_rewardTokens, _pools[i], Pool(payable(_pools[i])).totalSupply());
-            _distributeAccountReward(_rewardTokens, _pools[i], holder, Pool(payable(_pools[i])).balanceOf(holder));
+            _updatePoolRewardIndex(_rewardTokens, _pools[i], IERC20(payable(_pools[i])).totalSupply());
+            _distributeAccountReward(_rewardTokens, _pools[i], holder, IERC20(payable(_pools[i])).balanceOf(holder));
         } 
         for (uint i = 0; i < _rewardTokens.length; i++) {
             uint amount = rewardAccrued[_rewardTokens[i]][holder];
@@ -268,8 +270,8 @@ contract SyntheX is ISyntheX, AccessControlUpgradeable, UUPSUpgradeable, Address
         // Iterate over all the trading pools and update the reward index and account's reward amount
         for (uint i = 0; i < _pools.length; i++) {
             // Iterate thru all reward tokens
-            _updatePoolRewardIndex(_rewardTokens, _pools[i], Pool(payable(_pools[i])).totalSupply());
-            _distributeAccountReward(_rewardTokens, _pools[i], holder, Pool(payable(_pools[i])).balanceOf(holder));
+            _updatePoolRewardIndex(_rewardTokens, _pools[i], IERC20(payable(_pools[i])).totalSupply());
+            _distributeAccountReward(_rewardTokens, _pools[i], holder, IERC20(payable(_pools[i])).balanceOf(holder));
         }
         // Get the rewards accrued
         uint[] memory rewardsAccrued = new uint[](_rewardTokens.length); 

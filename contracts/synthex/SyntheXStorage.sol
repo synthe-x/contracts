@@ -42,5 +42,8 @@ abstract contract SyntheXStorage {
     bytes32 public constant L1_ADMIN_ROLE = keccak256("L1_ADMIN_ROLE");
     bytes32 public constant L2_ADMIN_ROLE = keccak256("L2_ADMIN_ROLE");
 
+    /// @notice Addresses of contracts
+    bytes32 public constant VAULT = keccak256("VAULT");
+
     uint256[100] private __gap;
 }

@@ -14,7 +14,7 @@ export default async function main(isTest: boolean = false): Promise<Contract> {
 	
 	const [deployer] = await ethers.getSigners();
 
-    const args = [deployer.address, deployer.address, deployer.address]
+    const args = [deployer.address, deployer.address, deployer.address];
 
     // deploy synthex
     const synthex = await _deploy("SyntheX", args, deployments, {upgradable: true}, config) as Contract;

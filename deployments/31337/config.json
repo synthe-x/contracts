@@ -1,7 +1,7 @@
 {
   "name": "synthex",
-  "version": "0.57.0",
-  "latest": "0.57.0",
+  "version": "0.81.0",
+  "latest": "0.81.0",
   "l0Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
   "l1Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
   "l2Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
@@ -36,23 +36,10 @@
           }
         },
         {
-          "name": "Wrapped Ethereum",
-          "symbol": "WETH",
-          "decimals": 18,
-          "price": "1000",
-          "params": {
-            "cap": "100000000000000000000000",
-            "baseLTV": "8000",
-            "liqThreshold": "9000",
-            "liqBonus": "10500",
-            "liqProtocolFee": "1000"
-          }
-        },
-        {
           "name": "AAVE",
           "symbol": "AAVE",
           "decimals": 18,
-          "price": "100",
+          "price": "1000",
           "params": {
             "cap": "100000000000000000000000",
             "baseLTV": "7000",

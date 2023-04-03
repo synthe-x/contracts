@@ -1,18 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-import "../SyntheXToken.sol";
-import "../../synthex/SyntheX.sol";
+import "../../synthex/ISyntheX.sol";
 import "./BaseTokenRedeemer.sol";
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
-
-// Address
 import "@openzeppelin/contracts/utils/Address.sol";
-// MerkleProof
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 
 /**
@@ -23,10 +18,9 @@ import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
  * @dev Token release is based on TokenRedeemer contract
  */
 contract Crowdsale is BaseTokenRedeemer, PausableUpgradeable {
-    using SafeMathUpgradeable for uint256;
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
-    SyntheX public synthex;
+    ISyntheX public synthex;
     bytes32 public merkleRoot;
 
     // start and end timestamps
@@ -74,7 +68,7 @@ contract Crowdsale is BaseTokenRedeemer, PausableUpgradeable {
 
         whitelistCap = _whitelistCap;
 
-        synthex = SyntheX(_synthex);
+        synthex = ISyntheX(_synthex);
         merkleRoot = _merkleRoot;
     }
 
@@ -92,7 +86,7 @@ contract Crowdsale is BaseTokenRedeemer, PausableUpgradeable {
      * @param _proof Merkle proof
      */
     function buyWithETH_w(bytes32[] calldata _proof) external payable whenNotPaused {
-        require(block.timestamp >= startTime && block.timestamp <= startTime.add(whitelistDuration), Errors.INVALID_TIME);
+        require(block.timestamp >= startTime && block.timestamp <= startTime + whitelistDuration, Errors.INVALID_TIME);
         // verify merkle proof 
         require(MerkleProof.verify(_proof, merkleRoot, keccak256(abi.encodePacked(msg.sender))), Errors.INVALID_MERKLE_PROOF);
         
@@ -106,7 +100,7 @@ contract Crowdsale is BaseTokenRedeemer, PausableUpgradeable {
      * @param _proof Merkle proof
      */
     function buyWithToken_w(address _token, uint _amount, bytes32[] calldata _proof) external whenNotPaused {
-        require(block.timestamp >= startTime && block.timestamp <= startTime.add(whitelistDuration), Errors.INVALID_TIME);
+        require(block.timestamp >= startTime && block.timestamp <= startTime + whitelistDuration, Errors.INVALID_TIME);
         require(rate[ETH_ADDRESS] > 0, Errors.TOKEN_NOT_SUPPORTED);
         // verify merkle proof
         require(MerkleProof.verify(_proof, merkleRoot, keccak256(abi.encodePacked(msg.sender))), Errors.INVALID_MERKLE_PROOF);
@@ -119,7 +113,7 @@ contract Crowdsale is BaseTokenRedeemer, PausableUpgradeable {
      * @dev Only available after whitelist period
      */
     function buyWithETH() public payable whenNotPaused {
-        require(block.timestamp >= startTime.add(whitelistDuration) && block.timestamp <= endTime, Errors.INVALID_TIME);
+        require(block.timestamp >= startTime + whitelistDuration && block.timestamp <= endTime, Errors.INVALID_TIME);
         buyWithETHInternal();
     }
 
@@ -129,7 +123,7 @@ contract Crowdsale is BaseTokenRedeemer, PausableUpgradeable {
      */
     function buyWithETHInternal() internal returns (uint amount) {
         // start unlock
-        amount = msg.value.mul(rate[ETH_ADDRESS]).div(RATE_PRECISION);
+        amount = msg.value * rate[ETH_ADDRESS] / RATE_PRECISION;
         require(amount > 0, Errors.ZERO_AMOUNT);
         _startUnlock(msg.sender, amount);
     }
@@ -158,7 +152,7 @@ contract Crowdsale is BaseTokenRedeemer, PausableUpgradeable {
             _amount
         );
         // start unlock
-        amount = _amount.mul(rate[_token]).div(RATE_PRECISION);
+        amount = _amount * rate[_token] / RATE_PRECISION;
         require(amount > 0, Errors.ZERO_AMOUNT);
         _startUnlock(msg.sender, amount);
     }

@@ -28,7 +28,7 @@ export default async function main(poolAddress: string, oracleAddress: string, i
     await pool.setIssuerAlloc(issuerAlloc);
     if(!isTest) console.log(`Issuer allocation set to ${Number(issuerAlloc)/100}%`);
     await synthex.setPoolSpeed(esSYXAddress, pool.address, rewardSpeed, true)
-    if(!isTest) console.log(`Reward speed set to ${ethers.utils.formatEther(rewardSpeed)} SYX per second`);
+    if(!isTest) console.log(`Reward speed set to ${ethers.utils.formatEther(rewardSpeed)} esSYX per second`);
 
     if(!isTest) console.log(`Pool initialized!`);
 }

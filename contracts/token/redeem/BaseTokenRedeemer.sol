@@ -1,10 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-import "../SyntheXToken.sol";
-
-import "../../synthex/SyntheX.sol";
-import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
+import "../../libraries/Errors.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 
 /**
@@ -15,18 +12,16 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeab
  * @notice Tokens are released linearly over a period of time (unlock period)
  */
 contract BaseTokenRedeemer {
-    /// @notice SafeMath library is used for uint operations
-    using SafeMathUpgradeable for uint;
     /// @notice SafeERC20 library is used for ERC20 operations
     using SafeERC20Upgradeable for IERC20Upgradeable;
-    
+
     /// @notice Emitted when user requests to unlock their SYX tokens
     event UnlockRequested(address indexed user, bytes32 requestId, uint amount);
     /// @notice Emitted when user claims their unlocked SYX tokens
     event Unlocked(address indexed user, bytes32 requestId, uint amount);
     /// @notice Emitted when admin sets the lock period
     event SetLockPeriod(uint _lockPeriod);
-    
+
     /// @notice Unlock data struct
     struct UnlockData {
         uint amount;
@@ -56,12 +51,27 @@ contract BaseTokenRedeemer {
      * @notice Constructor
      * @param _TOKEN Address of SYX
      */
-    function __BaseTokenRedeemer_init(address _TOKEN, uint _lockPeriod, uint _unlockPeriod, uint _percUnlockAtRelease) internal {
-         // validate _TOKEN address
+    function __BaseTokenRedeemer_init(
+        address _TOKEN,
+        uint _lockPeriod,
+        uint _unlockPeriod,
+        uint _percUnlockAtRelease
+    ) internal {
+        // validate _TOKEN address
         require(_TOKEN != address(0), Errors.INVALID_ADDRESS);
         // check if contract
-        require(AddressUpgradeable.isContract(_TOKEN), Errors.ADDRESS_IS_NOT_CONTRACT);
+        require(
+            AddressUpgradeable.isContract(_TOKEN),
+            Errors.ADDRESS_IS_NOT_CONTRACT
+        );
         TOKEN = IERC20Upgradeable(_TOKEN);
+
+        // validate lock/unlock period
+        require(_unlockPeriod > 0, Errors.INVALID_ARGUMENT);
+        require(
+            _percUnlockAtRelease <= BASIS_POINTS,
+            Errors.INVALID_ARGUMENT
+        );
         lockPeriod = _lockPeriod;
         unlockPeriod = _unlockPeriod;
         percUnlockAtRelease = _percUnlockAtRelease;
@@ -72,8 +82,10 @@ contract BaseTokenRedeemer {
         require(remainingQuota() >= _amount, Errors.NOT_ENOUGH_SYX_TO_UNLOCK);
 
         // create unlock request
-        bytes32 requestId = keccak256(abi.encodePacked(user, unlockRequestCount[user]));
-        
+        bytes32 requestId = keccak256(
+            abi.encodePacked(user, unlockRequestCount[user])
+        );
+
         UnlockData storage _unlockRequest = unlockRequests[requestId];
         require(_unlockRequest.amount == 0, Errors.REQUEST_ALREADY_EXISTS);
         _unlockRequest.amount = _amount;
@@ -84,7 +96,7 @@ contract BaseTokenRedeemer {
         unlockRequestCount[user]++;
 
         // reserve SYX for unlock
-        reservedForUnlock = reservedForUnlock.add(_amount);
+        reservedForUnlock += _amount;
 
         emit UnlockRequested(user, requestId, _amount);
     }
@@ -96,30 +108,32 @@ contract BaseTokenRedeemer {
      * @notice Claim unlocked SYX tokens
      * @param _requestId Request ID of unlock request
      */
-    function _unlockInternal(address _account, bytes32 _requestId) internal virtual {
+    function _unlockInternal(
+        address _account,
+        bytes32 _requestId
+    ) internal virtual {
         // Get amount to unlock
         uint amountToUnlock = unlocked(_requestId);
 
         // If total amount to unlock is 0, return
-        if(amountToUnlock == 0){
+        if (amountToUnlock == 0) {
             return;
         }
-        
+
         // Check if contract has enough SYX to unlock
-        if(TOKEN.balanceOf(address(this)) < amountToUnlock){
+        if (TOKEN.balanceOf(address(this)) < amountToUnlock) {
             amountToUnlock = TOKEN.balanceOf(address(this));
         }
         TOKEN.safeTransfer(_account, amountToUnlock);
 
         // Increment claimed amount
-        unlockRequests[_requestId].claimed = unlockRequests[_requestId].claimed.add(amountToUnlock);
+        unlockRequests[_requestId].claimed += amountToUnlock;
 
         // release reserved SYX
-        reservedForUnlock = reservedForUnlock.sub(amountToUnlock);
+        reservedForUnlock -= amountToUnlock;
 
         emit Unlocked(_account, _requestId, amountToUnlock);
     }
-
 
     /* -------------------------------------------------------------------------- */
     /*                               View Functions                               */
@@ -127,40 +141,47 @@ contract BaseTokenRedeemer {
     /**
      * @notice Gets remaining quota of SYX that can be set to be unlocked
      */
-    function remainingQuota() public virtual view returns (uint) {
+    function remainingQuota() public view virtual returns (uint) {
         return TOKEN.balanceOf(address(this)) - reservedForUnlock;
     }
+
     /**
      * @notice Returns the amount of tokens that can be claimed by user
      * @dev Calculates the amount based on request data and current time
      * @param _requestId Request ID
      */
-    function unlocked(bytes32 _requestId) public virtual view returns (uint) {
+    function unlocked(bytes32 _requestId) public view virtual returns (uint) {
         // Check if unlock request exists
         UnlockData memory unlockRequest = unlockRequests[_requestId];
         require(unlockRequest.amount > 0, Errors.REQUEST_DOES_NOT_EXIST);
         // Check if unlock period has passed
-        require(block.timestamp >= unlockRequest.requestTime.add(lockPeriod), Errors.UNLOCK_NOT_STARTED);
+        require(
+            block.timestamp >= unlockRequest.requestTime + lockPeriod,
+            Errors.UNLOCK_NOT_STARTED
+        );
 
         // Calculate amount to unlock
         // Time since unlock date will give percentage of total to unlock, excluding percUnlockAtRelease
-        uint timeSinceUnlock = block.timestamp.sub(unlockRequest.requestTime.add(lockPeriod));
-        uint percentUnlock = timeSinceUnlock.mul(SCALER).div(unlockPeriod);
-            
+        uint timeSinceUnlock = block.timestamp -
+            (unlockRequest.requestTime + lockPeriod);
+        uint percentUnlock = (timeSinceUnlock * (SCALER)) / (unlockPeriod);
+
         // If unlock period has passed, unlock 100% of tokens
-        if(percentUnlock > SCALER){
+        if (percentUnlock > SCALER) {
             percentUnlock = SCALER;
         }
 
-        percentUnlock = percentUnlock.mul(BASIS_POINTS); // convert to basis points
+        percentUnlock = percentUnlock * (BASIS_POINTS); // convert to basis points
 
         // Calculate amount to unlock
         // Amount to unlock = totalAmount * (percentUnlock * (1 - percUnlockAtRelease) + percUnlockAtRelease) - alreadyClaimed
-        uint amountToUnlock = unlockRequest.amount
-        .mul(
-            percentUnlock.add(percUnlockAtRelease.mul(SCALER)).sub(percentUnlock.mul(percUnlockAtRelease).div(BASIS_POINTS))
-        ).div(SCALER).div(BASIS_POINTS)
-        .sub(unlockRequest.claimed);
+        uint amountToUnlock = ((unlockRequest.amount *
+            (percentUnlock +
+                (percUnlockAtRelease * SCALER) -
+                (percentUnlock * percUnlockAtRelease) /
+                (BASIS_POINTS))) /
+            (SCALER) /
+            (BASIS_POINTS)) - (unlockRequest.claimed);
 
         return amountToUnlock;
     }
@@ -168,7 +189,10 @@ contract BaseTokenRedeemer {
     /**
      * @notice Get request ID
      */
-    function getRequestId(address _user, uint _unlockIndex) external virtual pure returns (bytes32) {
+    function getRequestId(
+        address _user,
+        uint _unlockIndex
+    ) external pure virtual returns (bytes32) {
         return keccak256(abi.encodePacked(_user, _unlockIndex));
     }
 }

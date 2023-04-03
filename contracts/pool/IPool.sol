@@ -20,9 +20,8 @@ abstract contract IPool {
     ) external virtual;
     function depositETH() external virtual payable;
     
-    function withdraw(address _collateral, uint _amount) external virtual;
-    function withdrawETH(uint _amount) external virtual;
-    
+    function withdraw(address _collateral, uint _amount, bool unwrap) external virtual;
+
     /* -------------------------------------------------------------------------- */
     /*                               Admin Functions                              */
     /* -------------------------------------------------------------------------- */
