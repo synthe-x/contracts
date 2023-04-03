@@ -15,7 +15,7 @@ const toBN = ethers.BigNumber.from;
 const ZERO_ADDRESS = ethers.constants.AddressZero;
 const provider = ethers.provider;
 
-describe.only("PoolScenarios", function () {
+describe("PoolScenarios", function () {
     let owner: SignerWithAddress;
     let alice: SignerWithAddress;
     let bob: SignerWithAddress;

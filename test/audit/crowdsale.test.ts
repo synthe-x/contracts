@@ -28,7 +28,7 @@ const INVALID_PROOF =
     ]
 let ROOT: any
 
-describe.only("Crowdsale", function () {
+describe("Crowdsale", function () {
     let snapshotA: SnapshotRestorer;
 
     // Signers.

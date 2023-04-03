@@ -19,7 +19,7 @@ import { BigNumber } from "ethers";
 const DAY = 24*60*60
 const toEther = ethers.utils.formatEther
 
-describe.only("Pool", function () {
+describe("Pool", function () {
     let snapshotA: SnapshotRestorer;
 
     // Signers.
