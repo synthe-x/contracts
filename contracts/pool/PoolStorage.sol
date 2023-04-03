@@ -3,8 +3,9 @@ pragma solidity 0.8.19;
 
 import "../utils/oracle/IPriceOracle.sol";
 
-contract PoolStorage {
-    
+// import "../synthex/ISyntheX.sol";
+
+abstract contract PoolStorage {
     /// @notice The address of the price oracle
     IPriceOracle public priceOracle;
 
@@ -15,13 +16,13 @@ contract PoolStorage {
     uint public constant BASIS_POINTS = 10000;
     uint public constant SCALER = 1e18;
 
-    address public constant ETH_ADDRESS = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
+    address public WETH_ADDRESS;
 
     /// @notice The synth token used to pass on to vault as fee
     address public feeToken;
 
     struct Synth {
-        bool isActive; 
+        bool isActive;
         bool isDisabled;
         uint256 mintFee;
         uint256 burnFee;

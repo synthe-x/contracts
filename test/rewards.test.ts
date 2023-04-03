@@ -31,6 +31,7 @@ describe("Rewards", function () {
 	});
 
 	it("set pool speed", async function () {
+		await synthex.setPoolSpeed(esSYX.address, cryptoPool.address, ethers.utils.parseEther("10"), true)
 		// expect to revert, as it is already added to list
 		await expect(synthex.setPoolSpeed(esSYX.address, cryptoPool.address, ethers.utils.parseEther("10"), true)).to.be.revertedWith(ERRORS.ASSET_ALREADY_ADDED);
 		await synthex.setPoolSpeed(esSYX.address, cryptoPool.address, ethers.utils.parseEther("10"), false);

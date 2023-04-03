@@ -1,9 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 import "../utils/oracle/IPriceOracle.sol";
-import "./SyntheXStorage.sol";
 
-abstract contract ISyntheX is SyntheXStorage {
+abstract contract ISyntheX {
 
     function claimReward(
         address[] memory _rewardTokens,

@@ -3,7 +3,6 @@ pragma solidity 0.8.19;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
-
 import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
@@ -11,20 +10,21 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol";
-
-//IERC165Upgradeable
 import "@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol";
 
 import "../synth/ERC20X.sol";
 import "./IPool.sol";
-import {Errors} from "../libraries/Errors.sol";
+import "../libraries/Errors.sol";
 import "../libraries/PriceConvertor.sol";
 import "./PoolStorage.sol";
 import "../synthex/ISyntheX.sol";
+import "../utils/interfaces/IWETH.sol";
+
+import "hardhat/console.sol";
 
 /**
  * @title Pool
- * @notice Pool contract to manage collaterals and debt
+ * @notice Pool contract to manage collaterals and debt 
  * @author Prasad <prasad@chainscore.finance>
  */
 contract Pool is IPool, PoolStorage, ERC20Upgradeable, ERC165Upgradeable, PausableUpgradeable, ReentrancyGuardUpgradeable {
@@ -36,10 +36,11 @@ contract Pool is IPool, PoolStorage, ERC20Upgradeable, ERC165Upgradeable, Pausab
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
     /// @notice The address of the address storage contract
+    /// @notice Stored here instead of PoolStorage to avoid Definition of base has to precede definition of derived contract
     ISyntheX public synthex;
     
     /// @dev Initialize the contract
-    function initialize(string memory _name, string memory _symbol, address _synthex) public initializer {
+    function initialize(string memory _name, string memory _symbol, address _synthex, address weth) public initializer {
         __ERC20_init(_name, _symbol);
         __Pausable_init();
         __ReentrancyGuard_init();
@@ -48,6 +49,8 @@ contract Pool is IPool, PoolStorage, ERC20Upgradeable, ERC165Upgradeable, Pausab
         require(ISyntheX(_synthex).supportsInterface(type(ISyntheX).interfaceId), Errors.INVALID_ADDRESS);
         // set addresses
         synthex = ISyntheX(_synthex);
+
+        WETH_ADDRESS = weth;
         
         // paused till (1) collaterals are added, (2) synths are added and (3) feeToken is set
         _pause();
@@ -66,14 +69,8 @@ contract Pool is IPool, PoolStorage, ERC20Upgradeable, ERC165Upgradeable, Pausab
     /* -------------------------------------------------------------------------- */
     /*                              External Functions                            */
     /* -------------------------------------------------------------------------- */
-
-    receive() external payable { 
-        depositETH();
-    }
-
-    fallback() external payable {
-        depositETH();
-    }
+    receive() external payable {}
+    fallback() external payable {}
 
     /**
      * @notice Enable a collateral
@@ -121,7 +118,9 @@ contract Pool is IPool, PoolStorage, ERC20Upgradeable, ERC165Upgradeable, Pausab
     function depositETH() virtual override public payable {
         // check if param _amount == msg.value sent with tx
         require(msg.value > 0, Errors.ZERO_AMOUNT);
-        depositInternal(msg.sender, ETH_ADDRESS, msg.value);
+        // wrap ETH
+        IWETH(WETH_ADDRESS).deposit{value: msg.value}();
+        depositInternal(msg.sender, WETH_ADDRESS, msg.value);
     }
 
     /**
@@ -187,22 +186,11 @@ contract Pool is IPool, PoolStorage, ERC20Upgradeable, ERC165Upgradeable, Pausab
      * @param _collateral The address of the collateral
      * @param _amount The amount of collateral to withdraw
      */
-    function withdraw(address _collateral, uint _amount) virtual override public {
+    function withdraw(address _collateral, uint _amount, bool unwrap) virtual override public {
         // Process withdraw
         withdrawInternal(msg.sender, _collateral, _amount);
         // Transfer collateral to user
-        transferOut(_collateral, msg.sender, _amount);
-    }
-
-    /**
-     * @notice Withdraw eth collateral
-     * @param _amount The amount of eth to withdraw
-     */
-    function withdrawETH(uint _amount) virtual override public {
-        // Process withdraw
-        withdrawInternal(msg.sender, ETH_ADDRESS, _amount);
-        // Transfer ETH to user
-        transferOut(ETH_ADDRESS, msg.sender, _amount); 
+        transferOut(_collateral, msg.sender, _amount, unwrap);
     }
 
     function withdrawInternal(address _account, address _collateral, uint _amount) internal whenNotPaused {
@@ -227,10 +215,11 @@ contract Pool is IPool, PoolStorage, ERC20Upgradeable, ERC165Upgradeable, Pausab
      * @param recipient The address of the recipient
      * @param _amount Amount
      */
-    function transferOut(address _asset, address recipient, uint _amount) internal nonReentrant {
-        if(_asset == ETH_ADDRESS){
-            (bool sent,) = payable(recipient).call{value: msg.value}("");
-            require(sent, "Failed to send Ether");
+    function transferOut(address _asset, address recipient, uint _amount, bool unwrap) internal nonReentrant {
+        if(_asset == WETH_ADDRESS && unwrap){
+            IWETH(WETH_ADDRESS).withdraw(_amount);
+            (bool success, ) = recipient.call{value: _amount}("");
+            require(success, Errors.TRANSFER_FAILED);
         } else {
             IERC20Upgradeable(_asset).safeTransfer(recipient, _amount);
         }
@@ -479,7 +468,7 @@ contract Pool is IPool, PoolStorage, ERC20Upgradeable, ERC165Upgradeable, Pausab
 
         // Transfer refund to user
         if(vars.refundOut > 0){
-            transferOut(_outAsset, _account, vars.refundOut);
+            transferOut(_outAsset, _account, vars.refundOut, false);
         }
 
         vars.amountUSD = vars.amountOut.toUSD(vars.prices[1]);

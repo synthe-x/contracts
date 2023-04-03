@@ -7,7 +7,7 @@ import hre from 'hardhat';
 
 describe("Rewards", function () {
 	let synthex: any,
-		weth: any,
+		aave: any,
 		oracle: any,
 		cryptoPool: any,
 		susd: any,
@@ -24,20 +24,21 @@ describe("Rewards", function () {
 		synthex = deployments.synthex;
 		oracle = deployments.pools[0].oracle;
 		cryptoPool = deployments.pools[0].pool;
-		weth = deployments.pools[0].collateralTokens[1];
+		aave = deployments.pools[0].collateralTokens[1];
+
 		sbtc = deployments.pools[0].synths[0];
 		seth = deployments.pools[0].synths[1];
 		susd = deployments.pools[0].synths[2];
 	});
 
 	it("supply token", async function () {
-		await weth.mint(user1.address, ethers.utils.parseEther("10"));
-		await weth
+		await aave.mint(user1.address, ethers.utils.parseEther("10"));
+		await aave
 			.connect(user1)
 			.approve(cryptoPool.address, ethers.utils.parseEther("10"));
 		await cryptoPool
 			.connect(user1)
-			.deposit(weth.address, ethers.utils.parseEther("10"));
+			.deposit(aave.address, ethers.utils.parseEther("10"));
 
 		expect((await cryptoPool.getAccountLiquidity(user1.address))[1]).eq(
 			ethers.utils.parseEther("10000")
@@ -45,13 +46,13 @@ describe("Rewards", function () {
 	});
 
 	it("supply token with permit", async function () {
-		await weth.mint(user1.address, ethers.utils.parseEther("10"));
+		await aave.mint(user1.address, ethers.utils.parseEther("10"));
 		// permit signature
 		const domain = {
-			name: await weth.name(),
+			name: await aave.name(),
 			version: "1",
 			chainId: hre.network.config.chainId,
-			verifyingContract: weth.address,
+			verifyingContract: aave.address,
 		};
 
 		const Permit = [
@@ -69,14 +70,14 @@ describe("Rewards", function () {
 			owner: user1.address,
 			spender: cryptoPool.address,
 			value,
-			nonce: (await weth.nonces(user1.address)).toHexString(),
+			nonce: (await aave.nonces(user1.address)).toHexString(),
 			deadline,
 		};
         
         const signature = await user1._signTypedData(domain, { Permit }, permit);
         const { v, r, s } = ethers.utils.splitSignature(signature);
 
-        await cryptoPool.connect(user1).depositWithPermit(weth.address, value, deadline, v, r, s);
+        await cryptoPool.connect(user1).depositWithPermit(aave.address, value, deadline, v, r, s);
 
         expect((await cryptoPool.getAccountLiquidity(user1.address))[1]).eq(
             ethers.utils.parseEther("20000")
@@ -84,9 +85,9 @@ describe("Rewards", function () {
 	});
 
 	it("withdraw all", async function () {
-		await cryptoPool.connect(user1).withdraw(weth.address, ethers.utils.parseEther('20'));
+		await cryptoPool.connect(user1).withdraw(aave.address, ethers.utils.parseEther('20'), false);
 
-		expect(await weth.balanceOf(user1.address)).eq(
+		expect(await aave.balanceOf(user1.address)).eq(
 			ethers.utils.parseEther("20")
 		);
 	});

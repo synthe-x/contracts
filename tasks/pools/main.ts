@@ -5,7 +5,7 @@ import { _deploy } from '../../scripts/utils/helper';
 import { _deploy as _deployDefender } from '../../scripts/utils/defender';
 
 
-export default async function main(name: string, symbol: string, isTest: boolean = false): Promise<Contract> {
+export default async function main(name: string, symbol: string, weth: string, isTest: boolean = false): Promise<Contract> {
     if(!isTest) console.log(`Deploying Pool ${name} to ${hre.network.name} (${hre.network.config.chainId}) ...`);
 
 	// read deployments and config
@@ -13,12 +13,13 @@ export default async function main(name: string, symbol: string, isTest: boolean
 	const config = JSON.parse(fs.readFileSync(process.cwd() + `/deployments/${hre.network.config.chainId}/config.json`, "utf8"));
 	
     const synthexAddress = deployments.contracts["SyntheX"].address;
-
+    
     const args = [
         name,
         symbol,
-        synthexAddress
-    ]
+        synthexAddress,
+        weth
+    ];
 
     // deploy synthex
     const pool = await _deploy("Pool", args, deployments, {upgradable: true, name: 'POOL_'+symbol}, config) as Contract;
