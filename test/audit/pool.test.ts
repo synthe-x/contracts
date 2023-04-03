@@ -13,6 +13,7 @@ import type { SyntexMock } from "../../typechain-types";
 import type { OracleMock } from "../../typechain-types";
 import type { ERC20X } from "../../typechain-types";
 import type { SyntheX } from "../../typechain-types";
+import type { WETH9 } from "../../typechain-types";
 import { parseEther } from "ethers/lib/utils";
 import { BigNumber } from "ethers";
 
@@ -34,6 +35,7 @@ describe.only("Pool", function () {
     let paymentToken: ERC20Mock;
     let erc20X: ERC20X;
     let feeToken: ERC20X;
+    let weth: WETH9;
     // let syntex: SyntexMock;
     let synteX: SyntheX;
     let oracle: OracleMock;
@@ -70,6 +72,10 @@ describe.only("Pool", function () {
         erc20_2 = await ERC20Mock.deploy()
         await erc20_2.deployed();
 
+        const WETH9 = await ethers.getContractFactory("WETH9", deployer);
+        weth = await WETH9.deploy()
+        await weth.deployed();
+
         const OracleMock = await ethers.getContractFactory("OracleMock", deployer)
         oracle = await OracleMock.deploy()
         await oracle.deployed()
@@ -86,9 +92,10 @@ describe.only("Pool", function () {
 
         const Pool = await ethers.getContractFactory("Pool", deployer)
         pool = await upgrades.deployProxy(Pool, [
-            "Pool name",// string memory _name,
-            "SMBL",// string memory _symbol,
-            synteX.address// address _synthex
+            "Pool name",    // string memory _name,
+            "SMBL",         // string memory _symbol,
+            synteX.address, // address _synthex
+            weth.address
         ]) as Pool
 
         const ERC20X = await ethers.getContractFactory("ERC20X", deployer)
@@ -288,12 +295,13 @@ describe.only("Pool", function () {
     
                 await pool.connect(user_1).deposit(erc20.address, AMOUNT)
                 //
-                await pool.connect(user_1).withdraw(erc20.address, AMOUNT)
+                const UNWRAP = true
+                await pool.connect(user_1).withdraw(erc20.address, AMOUNT, UNWRAP)
 
                 expect(await erc20.balanceOf(user_1.address)).to.be.eq(AMOUNT)
 
             })
-            it("!!!CRITICAL!!! user cannot withdraw collateral he doesn't own", async() =>{
+            it("user cannot withdraw collateral he doesn't own", async() =>{
                 await pool.updateCollateral(
                     erc20.address, 
                     {
@@ -314,10 +322,9 @@ describe.only("Pool", function () {
     
                 await pool.connect(user_1).deposit(erc20.address, AMOUNT)
                 //
-                await pool.connect(user_2).withdraw(erc20.address, AMOUNT)
-                // await expect(pool.connect(user_2).withdraw(erc20.address, AMOUNT))
-                //     .to.be.reverted
-                console.log("HAS TO BE ZERO", await erc20.balanceOf(user_2.address))
+                const UNWRAP = true
+                await expect(pool.connect(user_2).withdraw(erc20.address, AMOUNT, UNWRAP))
+                    .to.be.revertedWith("9")
             })
         })
         describe("mint", function () {
