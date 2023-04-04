@@ -133,300 +133,327 @@ describe.only("Pool", function () {
     });
 
     afterEach(async () => await snapshotA.restore());
+      
+    describe("enterCollateral", function () {
+        it("user can enter collateral", async() =>{
+            await pool.updateCollateral(
+                erc20.address, 
+                {
+                    isActive : true,
+                    cap : parseEther("1000"),
+                    totalDeposits : parseEther("1000"),
+                    baseLTV : 8000,
+                    liqThreshold : 9000,
+                    liqBonus : 10000 // 0
+                }
+            )   
 
-    describe("", async() => {
+            expect(await pool.connect(user_1).enterCollateral(erc20.address))
+                .to.emit(pool, "CollateralEntered")
+                .withArgs(user_1.address, erc20.address)
+
+            expect(await pool.accountMembership(erc20.address, user_1.address))
+                .to.be.true
+        })
+        it("user cannot enter collateral twice", async () =>{
+            await pool.updateCollateral(
+                erc20.address, 
+                {
+                    isActive : true,
+                    cap : parseEther("1000"),
+                    totalDeposits : parseEther("1000"),
+                    baseLTV : 8000,
+                    liqThreshold : 9000,
+                    liqBonus : 10000 // 0
+                }
+            )   
+            await pool.connect(user_1).enterCollateral(erc20.address)
+                
+            await expect(pool.connect(user_1).enterCollateral(erc20.address))
+                .to.be.revertedWith("5")
+                
+        })
+        it("cannot enter not acitve  collateral", async() =>{
+            await expect( pool.connect(user_1).enterCollateral(erc20.address))
+                .to.be.revertedWith("10")
         
-        describe("enterCollateral", function () {
-            it("user can enter collateral", async() =>{
-                await pool.updateCollateral(
-                    erc20.address, 
-                    {
-                        isActive : true,
-                        cap : parseEther("1000"),
-                        totalDeposits : parseEther("1000"),
-                        baseLTV : 8000,
-                        liqThreshold : 9000,
-                        liqBonus : 10000 // 0
-                    }
-                )   
+        })
+        it("user can exit collateral with deposited collateral", async() =>{
+            await pool.updateCollateral(
+                erc20.address, 
+                {
+                    isActive : true,
+                    cap : parseEther("1000"),
+                    totalDeposits : parseEther("1000"),
+                    baseLTV : 8000,
+                    liqThreshold : 9000,
+                    liqBonus : 10000 // 0
+                }
+            )   
+            //deposit
+            const AMOUNT = parseEther("1")
+            await erc20.mint(user_1.address, AMOUNT )
+            await erc20.connect(user_1).increaseAllowance(pool.address, AMOUNT)
+            await pool.unpause()
+            await pool.connect(user_1).deposit(erc20.address, AMOUNT)
+            expect(await pool.accountCollaterals(user_1.address, 0)).to.be.eq(erc20.address)
 
-                expect(await pool.connect(user_1).enterCollateral(erc20.address))
-                    .to.emit(pool, "CollateralEntered")
-                    .withArgs(user_1.address, erc20.address)
+            await pool.connect(user_1).exitCollateral(erc20.address)
+            //@dev cannot return empty array from mapping in solidity
+            // don't judge me for revert without reason  
+            await expect(pool.accountCollaterals(user_1.address, 0)).to.be.reverted 
+        })
+    })
+    describe("deposit", async() =>{
+        it("user can deposit ERC20", async() =>{
+            await pool.updateCollateral(
+                erc20.address, 
+                {
+                    isActive : true,
+                    cap : parseEther("1000"),
+                    totalDeposits : parseEther("1000"),
+                    baseLTV : 8000,
+                    liqThreshold : 9000,
+                    liqBonus : 10000 // 0
+                }
+            )   
 
-                expect(await pool.accountMembership(erc20.address, user_1.address))
-                    .to.be.true
-            })
-            it("user cannot enter collateral twice", async () =>{
-                await pool.updateCollateral(
-                    erc20.address, 
-                    {
-                        isActive : true,
-                        cap : parseEther("1000"),
-                        totalDeposits : parseEther("1000"),
-                        baseLTV : 8000,
-                        liqThreshold : 9000,
-                        liqBonus : 10000 // 0
-                    }
-                )   
-                await pool.connect(user_1).enterCollateral(erc20.address)
-                 
-                await expect(pool.connect(user_1).enterCollateral(erc20.address))
-                    .to.be.revertedWith("5")
-                 
-            })
-            it("cannot enter not acitve  collateral", async() =>{
-                await expect( pool.connect(user_1).enterCollateral(erc20.address))
-                    .to.be.revertedWith("10")
+            await pool.connect(user_1).enterCollateral(erc20.address)
             
-            })
-            it.skip("user can exit collateral", async() =>{
-                await pool.updateCollateral(
-                    erc20.address, 
-                    {
-                        isActive : true,
-                        cap : parseEther("1000"),
-                        totalDeposits : parseEther("1000"),
-                        baseLTV : 8000,
-                        liqThreshold : 9000,
-                        liqBonus : 10000 // 0
-                    }
-                )   
-                await pool.connect(user_1).enterCollateral(erc20.address)
+            const AMOUNT = parseEther("1")
+            await erc20.mint(user_1.address, AMOUNT )
+            await erc20.connect(user_1).increaseAllowance(pool.address, AMOUNT)
+            await pool.unpause()
 
-                await pool.connect(user_1).exitCollateral(erc20.address)
-    
-            })
+            expect(await pool.connect(user_1).deposit(erc20.address, AMOUNT))
+                .to.emit(pool, "Deposit").withArgs(user_1.address, erc20.address, AMOUNT)
+            expect(await erc20.balanceOf(pool.address)).to.be.eq(AMOUNT)
         })
-        describe("deposit", async() =>{
-            it("user can deposit collateral", async() =>{
-                await pool.updateCollateral(
-                    erc20.address, 
-                    {
-                        isActive : true,
-                        cap : parseEther("1000"),
-                        totalDeposits : parseEther("1000"),
-                        baseLTV : 8000,
-                        liqThreshold : 9000,
-                        liqBonus : 10000 // 0
-                    }
-                )   
-    
-                await pool.connect(user_1).enterCollateral(erc20.address)
-                
-                const AMOUNT = parseEther("1")
-                await erc20.mint(user_1.address, AMOUNT )
-                await erc20.connect(user_1).increaseAllowance(pool.address, AMOUNT)
-                await pool.unpause()
-    
-                expect(await pool.connect(user_1).deposit(erc20.address, AMOUNT))
-                    .to.emit(pool, "Deposit").withArgs(user_1.address, erc20.address, AMOUNT)
-            })
-            it("user cannot deposit while contract on pause", async() =>{
-                const AMOUNT = parseEther("1")
-                await erc20.mint(user_1.address, AMOUNT )
-                await erc20.connect(user_1).increaseAllowance(pool.address, AMOUNT)
-                await expect(pool.connect(user_1).deposit(erc20.address, AMOUNT))
-                    .to.be.revertedWith("Pausable: paused") 
-            })
-            it("user can deposit collateral he hasn't entered", async() =>{
-                await pool.updateCollateral(
-                    erc20.address, 
-                    {
-                        isActive : true,
-                        cap : parseEther("1000"),
-                        totalDeposits : parseEther("1000"),
-                        baseLTV : 8000,
-                        liqThreshold : 9000,
-                        liqBonus : 10000 // 0
-                    }
-                )   
-    
-                const AMOUNT = parseEther("1")
-                await erc20.mint(user_1.address, AMOUNT )
-                await erc20.connect(user_1).increaseAllowance(pool.address, AMOUNT)
-                await pool.unpause()
-    
-                expect(await pool.connect(user_1).deposit(erc20.address, AMOUNT))
-                    .to.emit(pool, "Deposit").withArgs(user_1.address, erc20.address, AMOUNT)
-            })
-            it("user cannot deposit when collateral has exceeded capacity", async() =>{
-                await pool.updateCollateral(
-                    erc20.address, 
-                    {
-                        isActive : true,
-                        cap : parseEther("1"),
-                        totalDeposits : parseEther("1000"),
-                        baseLTV : 8000,
-                        liqThreshold : 9000,
-                        liqBonus : 10000 // 0
-                    }
-                )   
-    
-                const AMOUNT = parseEther("2")
-                await erc20.mint(user_1.address, AMOUNT )
-                await erc20.connect(user_1).increaseAllowance(pool.address, AMOUNT)
-                await pool.unpause()
-                await expect(pool.connect(user_1).deposit(erc20.address, AMOUNT))
-                    .to.be.revertedWith("8")
-            })
-    
+        it("user can deposit ETH", async() =>{
+            await pool.updateCollateral(
+                weth.address, 
+                {
+                    isActive : true,
+                    cap : parseEther("1000"),
+                    totalDeposits : parseEther("1000"),
+                    baseLTV : 8000,
+                    liqThreshold : 9000,
+                    liqBonus : 10000 // 0
+                }
+            )   
+            const AMOUNT = parseEther("1")
+
+            await pool.unpause()
+
+            expect(await pool.connect(user_1).depositETH({value: AMOUNT}))
+                .to.emit(pool, "Deposit").withArgs(user_1.address, weth.address, AMOUNT)
+            expect(await weth.balanceOf(pool.address)).to.be.eq(AMOUNT)
         })
-        describe("withdraw", function () {
-            it("user can withdraw collateral", async() =>{
-                await pool.updateCollateral(
-                    erc20.address, 
-                    {
-                        isActive : true,
-                        cap : parseEther("1000"),
-                        totalDeposits : parseEther("1000"),
-                        baseLTV : 8000,
-                        liqThreshold : 9000,
-                        liqBonus : 10000 // 0
-                    }
-                )   
-    
-                await pool.connect(user_1).enterCollateral(erc20.address)
-                
-                const AMOUNT = parseEther("1")
-                await erc20.mint(user_1.address, AMOUNT )
-                await erc20.connect(user_1).increaseAllowance(pool.address, AMOUNT)
-                await pool.unpause()
-    
-                await pool.connect(user_1).deposit(erc20.address, AMOUNT)
-                //
-                const UNWRAP = true
-                await pool.connect(user_1).withdraw(erc20.address, AMOUNT, UNWRAP)
-
-                expect(await erc20.balanceOf(user_1.address)).to.be.eq(AMOUNT)
-
-            })
-            it("user cannot withdraw collateral he doesn't own", async() =>{
-                await pool.updateCollateral(
-                    erc20.address, 
-                    {
-                        isActive : true,
-                        cap : parseEther("1000"),
-                        totalDeposits : parseEther("1000"),
-                        baseLTV : 8000,
-                        liqThreshold : 9000,
-                        liqBonus : 10000 // 0
-                    }
-                )   
-                await pool.connect(user_1).enterCollateral(erc20.address)
-                
-                const AMOUNT = parseEther("1")
-                await erc20.mint(user_1.address, AMOUNT )
-                await erc20.connect(user_1).increaseAllowance(pool.address, AMOUNT)
-                await pool.unpause()
-    
-                await pool.connect(user_1).deposit(erc20.address, AMOUNT)
-                //
-                const UNWRAP = true
-                await expect(pool.connect(user_2).withdraw(erc20.address, AMOUNT, UNWRAP))
-                    .to.be.revertedWith("9")
-            })
+        it("user cannot deposit while contract on pause", async() =>{
+            const AMOUNT = parseEther("1")
+            await erc20.mint(user_1.address, AMOUNT )
+            await erc20.connect(user_1).increaseAllowance(pool.address, AMOUNT)
+            await expect(pool.connect(user_1).deposit(erc20.address, AMOUNT))
+                .to.be.revertedWith("Pausable: paused") 
         })
-        describe("mint", function () {
-            it("user can mint", async() =>{
-                //setup collareal
-                await pool.updateCollateral(
-                    erc20.address, 
-                    {
-                        isActive : true,
-                        cap : parseEther("1000"),
-                        totalDeposits : parseEther("1000"),
-                        baseLTV : 8000,
-                        liqThreshold : 9000,
-                        liqBonus : 10000 // 0
-                    }
-                )   
-                await pool.connect(user_1).enterCollateral(erc20.address)
-                const AMOUNT_TO_DEPOSIT = parseEther("1")
-                await erc20.mint(user_1.address, AMOUNT_TO_DEPOSIT )
-                await erc20.connect(user_1).increaseAllowance(pool.address, AMOUNT_TO_DEPOSIT)
-                await pool.unpause()
-                
-                //deposit collateral
-                await pool.connect(user_1).deposit(erc20.address, AMOUNT_TO_DEPOSIT)
-                    
-                const MINT_FEE = 0
-                const BURN_FEE = 0
-                await pool.addSynth(erc20X.address, MINT_FEE, BURN_FEE)
+        it("user can deposit collateral he hasn't entered", async() =>{
+            await pool.updateCollateral(
+                erc20.address, 
+                {
+                    isActive : true,
+                    cap : parseEther("1000"),
+                    totalDeposits : parseEther("1000"),
+                    baseLTV : 8000,
+                    liqThreshold : 9000,
+                    liqBonus : 10000 // 0
+                }
+            )   
 
-                const AMOUNT = parseEther("100000")
-                const RECIPIENT = user_1.address
-                          
-                await erc20X.connect(user_1).mint(AMOUNT, RECIPIENT, referee.address)
-                console.log(toEther(await pool.balanceOf(user_1.address)))
-            })
-            it("cannot mint with insufficient  user collateral", async() =>{
-                await pool.unpause()
-                const MINT_FEE = 0
-                const BURN_FEE = 0
-                await pool.addSynth(erc20X.address, MINT_FEE, BURN_FEE)
+            const AMOUNT = parseEther("1")
+            await erc20.mint(user_1.address, AMOUNT )
+            await erc20.connect(user_1).increaseAllowance(pool.address, AMOUNT)
+            await pool.unpause()
 
-                const AMOUNT = parseEther("1")
-                const RECIPIENT = user_1.address
-                const REFERED_BY = ethers.constants.AddressZero
-                
-                await expect(erc20X.connect(user_1).mint(AMOUNT, RECIPIENT, REFERED_BY))
-                    .to.be.revertedWith("6") 
-            })
+            expect(await pool.connect(user_1).deposit(erc20.address, AMOUNT))
+                .to.emit(pool, "Deposit").withArgs(user_1.address, erc20.address, AMOUNT)
         })
-        describe("getAccountLiquidity", function() {
-            it("getAccountLiquidity", async() =>{
-                const BASE_LTV = 8000
-                
-                await pool.updateCollateral(
-                    erc20.address, 
-                    {
-                        isActive : true,
-                        cap : parseEther("1000"),
-                        totalDeposits : parseEther("1000"),
-                        baseLTV : BASE_LTV,
-                        liqThreshold : 9000,
-                        liqBonus : 10000 // 0
-                    }
-                )   
-    
-                await pool.connect(user_1).enterCollateral(erc20.address)
-                
-                const AMOUNT = parseEther("1")
-                await erc20.mint(user_1.address, AMOUNT )
-                await erc20.connect(user_1).increaseAllowance(pool.address, AMOUNT)
-                await pool.unpause()
-    
-                await pool.connect(user_1).deposit(erc20.address, AMOUNT)
-                    
-                // console.log("accountCollateralBalance",
-                //     ethers.utils.formatEther(await pool.accountCollateralBalance(user.address, erc20.address))
-                // )
-                
-                // console.log("accountCollateralBalance calculated",
-                //     ethers.utils.formatEther(AMOUNT.mul(ERC_20_PRICE).div(USD_DECIMALS))
-                // )
+        it("user cannot deposit when collateral has exceeded capacity", async() =>{
+            await pool.updateCollateral(
+                erc20.address, 
+                {
+                    isActive : true,
+                    cap : parseEther("1"),
+                    totalDeposits : parseEther("1000"),
+                    baseLTV : 8000,
+                    liqThreshold : 9000,
+                    liqBonus : 10000 // 0
+                }
+            )   
 
-                let res = await pool.getAccountLiquidity(user_1.address)
-                
-                expect(ethers.utils.formatEther(res.collateral))
-                    .to.be.eq(ethers.utils.formatEther(
-                        AMOUNT
-                            .mul(ERC_20_PRICE).div(USD_DECIMALS)
-                    )
-                    )
-
-                expect(res.liquidity)
-                    .to.be.eq(
-                        AMOUNT
-                            .mul(BASE_LTV).div(BASE_POINTS)
-                            .mul(ERC_20_PRICE).div(USD_DECIMALS)
-                    )
-                // int256 liquidity;
-                // uint256 collateral;
-                // uint256 debt;
-            })
+            const AMOUNT = parseEther("2")
+            await erc20.mint(user_1.address, AMOUNT )
+            await erc20.connect(user_1).increaseAllowance(pool.address, AMOUNT)
+            await pool.unpause()
+            await expect(pool.connect(user_1).deposit(erc20.address, AMOUNT))
+                .to.be.revertedWith("8")
         })
 
     })
+    describe("withdraw", function () {
+        it("user can withdraw collateral", async() =>{
+            await pool.updateCollateral(
+                erc20.address, 
+                {
+                    isActive : true,
+                    cap : parseEther("1000"),
+                    totalDeposits : parseEther("1000"),
+                    baseLTV : 8000,
+                    liqThreshold : 9000,
+                    liqBonus : 10000 // 0
+                }
+            )   
+
+            await pool.connect(user_1).enterCollateral(erc20.address)
+            
+            const AMOUNT = parseEther("1")
+            await erc20.mint(user_1.address, AMOUNT )
+            await erc20.connect(user_1).increaseAllowance(pool.address, AMOUNT)
+            await pool.unpause()
+
+            await pool.connect(user_1).deposit(erc20.address, AMOUNT)
+            //
+            const UNWRAP = true
+            await pool.connect(user_1).withdraw(erc20.address, AMOUNT, UNWRAP)
+
+            expect(await erc20.balanceOf(user_1.address)).to.be.eq(AMOUNT)
+
+        })
+        it("user cannot withdraw collateral he doesn't own", async() =>{
+            await pool.updateCollateral(
+                erc20.address, 
+                {
+                    isActive : true,
+                    cap : parseEther("1000"),
+                    totalDeposits : parseEther("1000"),
+                    baseLTV : 8000,
+                    liqThreshold : 9000,
+                    liqBonus : 10000 // 0
+                }
+            )   
+            await pool.connect(user_1).enterCollateral(erc20.address)
+            
+            const AMOUNT = parseEther("1")
+            await erc20.mint(user_1.address, AMOUNT )
+            await erc20.connect(user_1).increaseAllowance(pool.address, AMOUNT)
+            await pool.unpause()
+
+            await pool.connect(user_1).deposit(erc20.address, AMOUNT)
+            //
+            const UNWRAP = true
+            await expect(pool.connect(user_2).withdraw(erc20.address, AMOUNT, UNWRAP))
+                .to.be.revertedWith("9")
+        })
+    })
+    describe("mint", function () {
+        it("user can mint", async() =>{
+            //setup collareal
+            await pool.updateCollateral(
+                erc20.address, 
+                {
+                    isActive : true,
+                    cap : parseEther("1000"),
+                    totalDeposits : parseEther("1000"),
+                    baseLTV : 8000,
+                    liqThreshold : 9000,
+                    liqBonus : 10000 // 0
+                }
+            )   
+            await pool.connect(user_1).enterCollateral(erc20.address)
+            const AMOUNT_TO_DEPOSIT = parseEther("1")
+            await erc20.mint(user_1.address, AMOUNT_TO_DEPOSIT )
+            await erc20.connect(user_1).increaseAllowance(pool.address, AMOUNT_TO_DEPOSIT)
+            await pool.unpause()
+            
+            //deposit collateral
+            await pool.connect(user_1).deposit(erc20.address, AMOUNT_TO_DEPOSIT)
+                
+            const MINT_FEE = 0
+            const BURN_FEE = 0
+            await pool.addSynth(erc20X.address, MINT_FEE, BURN_FEE)
+
+            const AMOUNT = parseEther("100000")
+            const RECIPIENT = user_1.address
+                        
+            await erc20X.connect(user_1).mint(AMOUNT, RECIPIENT, referee.address)
+            console.log(toEther(await pool.balanceOf(user_1.address)))
+        })
+        it("cannot mint with insufficient  user collateral", async() =>{
+            await pool.unpause()
+            const MINT_FEE = 0
+            const BURN_FEE = 0
+            await pool.addSynth(erc20X.address, MINT_FEE, BURN_FEE)
+
+            const AMOUNT = parseEther("1")
+            const RECIPIENT = user_1.address
+            const REFERED_BY = ethers.constants.AddressZero
+            
+            await expect(erc20X.connect(user_1).mint(AMOUNT, RECIPIENT, REFERED_BY))
+                .to.be.revertedWith("6") 
+        })
+    })
+    describe("getAccountLiquidity", function() {
+        it("getAccountLiquidity", async() =>{
+            const BASE_LTV = 8000
+            
+            await pool.updateCollateral(
+                erc20.address, 
+                {
+                    isActive : true,
+                    cap : parseEther("1000"),
+                    totalDeposits : parseEther("1000"),
+                    baseLTV : BASE_LTV,
+                    liqThreshold : 9000,
+                    liqBonus : 10000 // 0
+                }
+            )   
+
+            await pool.connect(user_1).enterCollateral(erc20.address)
+            
+            const AMOUNT = parseEther("1")
+            await erc20.mint(user_1.address, AMOUNT )
+            await erc20.connect(user_1).increaseAllowance(pool.address, AMOUNT)
+            await pool.unpause()
+
+            await pool.connect(user_1).deposit(erc20.address, AMOUNT)
+                
+            // console.log("accountCollateralBalance",
+            //     ethers.utils.formatEther(await pool.accountCollateralBalance(user.address, erc20.address))
+            // )
+            
+            // console.log("accountCollateralBalance calculated",
+            //     ethers.utils.formatEther(AMOUNT.mul(ERC_20_PRICE).div(USD_DECIMALS))
+            // )
+
+            let res = await pool.getAccountLiquidity(user_1.address)
+            
+            expect(ethers.utils.formatEther(res.collateral))
+                .to.be.eq(ethers.utils.formatEther(
+                    AMOUNT
+                        .mul(ERC_20_PRICE).div(USD_DECIMALS)
+                )
+                )
+
+            expect(res.liquidity)
+                .to.be.eq(
+                    AMOUNT
+                        .mul(BASE_LTV).div(BASE_POINTS)
+                        .mul(ERC_20_PRICE).div(USD_DECIMALS)
+                )
+            // int256 liquidity;
+            // uint256 collateral;
+            // uint256 debt;
+        })
+    })
+
+ 
 })
