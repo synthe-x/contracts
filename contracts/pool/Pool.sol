@@ -109,7 +109,7 @@ contract Pool is IPool, PoolStorage, ERC20Upgradeable, ERC165Upgradeable, Pausab
             }
         }
 
-        require(getAccountLiquidity(msg.sender).liquidity > 0, Errors.INSUFFICIENT_COLLATERAL);
+        require(getAccountLiquidity(msg.sender).liquidity >= 0, Errors.INSUFFICIENT_COLLATERAL);
     }
 
     /**
