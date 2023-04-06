@@ -102,6 +102,9 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
 
     /**
      * @notice Liquidate with this synth
+     * @param account Account to liquidate
+     * @param amount Amount of this token to liquidate
+     * @param outAsset Collateral to receive
      */
     function liquidate(address account, uint256 amount, address outAsset) external whenNotPaused {
         require(amount > 0, Errors.ZERO_AMOUNT);

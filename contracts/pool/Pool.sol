@@ -364,7 +364,6 @@ contract Pool is IPool, PoolStorage, ERC20Upgradeable, ERC165Upgradeable, Pausab
         // check if enabled synth is calling
         // should be able to swap out of disabled (inactive) synths
         if(!synths[msg.sender].isActive) require(synths[msg.sender].isDisabled, Errors.ASSET_NOT_ENABLED);
-        require(synths[_synthTo].isActive, Errors.ASSET_NOT_ACTIVE);
         // ensure exchange is not to same synth
         require(msg.sender != _synthTo, Errors.INVALID_ARGUMENT);
 
@@ -397,7 +396,7 @@ contract Pool is IPool, PoolStorage, ERC20Upgradeable, ERC165Upgradeable, Pausab
      * @notice Liquidate a user's debt
      * @param _liquidator The address of the liquidator
      * @param _account The address of the account to liquidate
-     * @param _amount The amount of debt (in outAsset) to liquidate
+     * @param _amount The amount of debt (in repaying synth) to liquidate
      * @param _outAsset The address of the collateral asset to receive
      * @dev Only Active/Disabled Synth (ERC20X) contract can call this function
      */
@@ -424,12 +423,13 @@ contract Pool is IPool, PoolStorage, ERC20Upgradeable, ERC165Upgradeable, Pausab
         vars.tokens[2] = feeToken;
         vars.prices = priceOracle.getAssetsPrices(vars.tokens);
 
-        vars.amountUSD = _amount.toUSD(vars.prices[0]) * (BASIS_POINTS)/(BASIS_POINTS - synths[msg.sender].burnFee);
+        // Amount of debt to burn (in usd, excluding burnFee)
+        vars.amountUSD = _amount.toUSD(vars.prices[0]) * (BASIS_POINTS)/(BASIS_POINTS + synths[msg.sender].burnFee);
         if(vars.liq.debt < vars.amountUSD) {
             vars.amountUSD = vars.liq.debt;
         }
 
-        // amount in terms of collateral
+        // Amount of debt to burn (in terms of collateral)
         vars.amountOut = vars.amountUSD.toToken(vars.prices[1]);
         vars.penalty = 0;
         vars.refundOut = 0;
@@ -451,11 +451,12 @@ contract Pool is IPool, PoolStorage, ERC20Upgradeable, ERC165Upgradeable, Pausab
             vars.penalty = vars.amountOut * (vars.collateral.liqBonus - BASIS_POINTS) / (BASIS_POINTS);
 
             // if we don't have enough for [complete] bonus, take partial bonus
-            // and refund the rest
             if(vars.ltv * vars.collateral.liqBonus / BASIS_POINTS > SCALER){
                 // penalty = amountOut * (1 - ltv)/ltv 
                 vars.penalty = vars.amountOut * (SCALER - vars.ltv) / (vars.ltv);
-            } else {
+            }
+            // calculate refund if we have enough for bonus + extra
+            else {
                 // refundOut = amountOut * (1 - ltv * liqBonus)
                 vars.refundOut = vars.amountOut * (SCALER - (vars.ltv * vars.collateral.liqBonus / BASIS_POINTS)) / SCALER;
             }
