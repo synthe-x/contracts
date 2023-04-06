@@ -451,11 +451,12 @@ contract Pool is IPool, PoolStorage, ERC20Upgradeable, ERC165Upgradeable, Pausab
             vars.penalty = vars.amountOut * (vars.collateral.liqBonus - BASIS_POINTS) / (BASIS_POINTS);
 
             // if we don't have enough for [complete] bonus, take partial bonus
-            // and refund the rest
             if(vars.ltv * vars.collateral.liqBonus / BASIS_POINTS > SCALER){
                 // penalty = amountOut * (1 - ltv)/ltv 
                 vars.penalty = vars.amountOut * (SCALER - vars.ltv) / (vars.ltv);
-            } else {
+            }
+            // calculate refund if we have enough for bonus + extra
+            else {
                 // refundOut = amountOut * (1 - ltv * liqBonus)
                 vars.refundOut = vars.amountOut * (SCALER - (vars.ltv * vars.collateral.liqBonus / BASIS_POINTS)) / SCALER;
             }
