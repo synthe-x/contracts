@@ -1,4 +1,4 @@
-import hre from "hardhat";
+import hre, { ethers } from "hardhat";
 import { initiate } from "./initiate";
 import newDeployment from "../tasks/new";
 
@@ -12,6 +12,8 @@ export default async function main(isTest: boolean = true) {
 
 	await newDeployment(isTest);
 
+	const initialBalance = await hre.ethers.provider.getBalance(hre.ethers.provider.getSigner().getAddress());
+	
 	// deploy main contracts
 	let contracts: any = {};
 	contracts.synthex = await deploySynthex(isTest);
@@ -27,6 +29,6 @@ export default async function main(isTest: boolean = true) {
 	// reset admins
 	if(!isTest) resetAdmins(isTest)
 
-	if(!isTest) console.log("Deployment complete! 🎉")
+	if(!isTest) console.log("Deployment complete! 🎉", ethers.utils.formatEther(initialBalance.sub(await hre.ethers.provider.getBalance(hre.ethers.provider.getSigner().getAddress()))), "ETH used");
 	return { ...contracts, ...initiates };
 }

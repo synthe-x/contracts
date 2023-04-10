@@ -4,7 +4,7 @@ import { ethers } from "hardhat";
 import { ETH_ADDRESS } from "../../scripts/utils/const";
 import main from "../../scripts/main";
 
-describe("Rewards", function () {
+describe("ETH Collateral", function () {
 	let synthex: any,
 		weth: any,
 		oracle: any,

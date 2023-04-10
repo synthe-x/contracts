@@ -5,7 +5,7 @@ import { ETH_ADDRESS } from "../../scripts/utils/const";
 import main from "../../scripts/main";
 import hre from 'hardhat';
 
-describe("Rewards", function () {
+describe("ERC20 Collateral", function () {
 	let synthex: any,
 		aave: any,
 		oracle: any,

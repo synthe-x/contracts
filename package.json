@@ -10,7 +10,8 @@
     "deploy": "hardhat run scripts",
     "deploy:fork": "hardhat --config hardhat-fork.config.ts run scripts --network hardhat",
     "deploy:testnet": "hardhat run scripts --network arbitrumGoerli",
-    "slither": "slither . --checklist docs/SECURITY.md"
+    "deploy:mainnet": "hardhat run scripts --network arbitrum",
+    "slither": "slither ./contracts --checklist docs/SECURITY.md"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^2.0.2",
