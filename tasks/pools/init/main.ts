@@ -1,6 +1,5 @@
-import hre, { ethers, upgrades } from 'hardhat';
+import hre, { ethers } from 'hardhat';
 import fs from 'fs';
-import { Contract } from 'ethers';
 import { _deploy } from '../../../scripts/utils/helper';
 import { _deploy as _deployDefender } from '../../../scripts/utils/defender';
 

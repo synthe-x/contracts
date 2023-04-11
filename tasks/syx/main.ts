@@ -68,7 +68,7 @@ export default async function main(isTest: boolean = false): Promise<{SYX: Contr
         try{
             await hre.run("verify:verify", {
                 address: SYX.address,
-                constructorArguments: SYXArgs
+                constructorArguments: []
             })
         } catch (err) {
             console.log("Could not verify SYX");

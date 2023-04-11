@@ -28,9 +28,7 @@ export const _deploy = async (
 		constructorArguments: args,
 		block: (await ethers.provider.getBlockNumber()).toString(),
 	};
-	deployments.sources[contractName] = JSON.parse(
-		Contract.interface.format("json") as string
-	);
+	deployments.sources[contractName] = Contract.interface.format("json");
 
 	if (upgradable) {
 		const implementationAddress = await upgrades.erc1967.getImplementationAddress(contract.address);

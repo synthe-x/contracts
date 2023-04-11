@@ -1,12 +1,13 @@
 {
   "name": "synthex",
-  "version": "0.33.0",
-  "latest": "0.33.0",
+  "version": "0.35.0",
+  "latest": "0.35.0",
   "l0Admin": "0x084cD22eA15E4C262408e561a5AFa8431Bd7fa5d",
   "l1Admin": "0x2646306d3191AEE905bf9065bD1B7cC71c9036D0",
   "l2Admin": "0x46c18c6d5526E17B34a3deB43e5E9Ba2A659c23a",
   "rewardAlloc": "10000000",
   "weth": "0x7964Bcc63335E101F23da13583CEaD61d75f863b",
+  "multicall": "0x24125c3374Fe97E26Eeb51ea5e8c621763285D90",
   "esSYX": {
     "initialRewardsDuration": "30",
     "reward": "6000",
