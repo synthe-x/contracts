@@ -1,7 +1,7 @@
 {
   "name": "synthex",
-  "version": "0.35.0",
-  "latest": "0.35.0",
+  "version": "0.36.0",
+  "latest": "0.36.0",
   "l0Admin": "0x084cD22eA15E4C262408e561a5AFa8431Bd7fa5d",
   "l1Admin": "0x2646306d3191AEE905bf9065bD1B7cC71c9036D0",
   "l2Admin": "0x46c18c6d5526E17B34a3deB43e5E9Ba2A659c23a",
@@ -156,6 +156,117 @@
           "price": "1",
           "mintFee": "8",
           "burnFee": "10"
+        }
+      ]
+    },
+    {
+      "name": "Foreign Exchange",
+      "symbol": "F",
+      "rewardSpeed": "100000000000000000",
+      "issuerAlloc": "5000",
+      "collaterals": [
+        {
+          "name": "USD Coin",
+          "symbol": "USDC",
+          "decimals": 18,
+          "address": "0xe87Ad4b7a14D8759BC92DAced7Ba243a23aCEc03",
+          "feed": "0x1692Bdd32F31b831caAc1b0c9fAF68613682813b",
+          "params": {
+            "cap": "100000000000000000000000",
+            "baseLTV": "8000",
+            "liqThreshold": "9000",
+            "liqBonus": "10100"
+          }
+        },
+        {
+          "name": "Tether USD",
+          "symbol": "USDT",
+          "decimals": 18,
+          "feed": "0x0a023a3423D9b27A0BE48c768CCF2dD7877fEf5E",
+          "params": {
+            "cap": "100000000000000000000000",
+            "baseLTV": "8000",
+            "liqThreshold": "9000",
+            "liqBonus": "10100"
+          }
+        },
+        {
+          "name": "DAI Stablecoin",
+          "symbol": "DAI",
+          "decimals": 18,
+          "feed": "0x103b53E977DA6E4Fa92f76369c8b7e20E7fb7fe1",
+          "params": {
+            "cap": "100000000000000000000000",
+            "baseLTV": "8000",
+            "liqThreshold": "9000",
+            "liqBonus": "10100"
+          }
+        }
+      ],
+      "synths": [
+        {
+          "name": "US Dollar",
+          "symbol": "USD",
+          "price": "1.00",
+          "isFeeToken": true,
+          "mintFee": "2",
+          "burnFee": "4"
+        },
+        {
+          "name": "Euro",
+          "symbol": "EUR",
+          "price": "0.85",
+          "mintFee": "2",
+          "burnFee": "4"
+        },
+        {
+          "name": "Japanese Yen",
+          "symbol": "JPY",
+          "price": "0.0094",
+          "mintFee": "2",
+          "burnFee": "4"
+        },
+        {
+          "name": "Canadian Dollar",
+          "symbol": "CAD",
+          "price": "0.80",
+          "mintFee": "5",
+          "burnFee": "7"
+        },
+        {
+          "name": "Singapore Dollar",
+          "symbol": "SGD",
+          "price": "0.75",
+          "mintFee": "5",
+          "burnFee": "7"
+        },
+        {
+          "name": "Swedish Krona",
+          "symbol": "SEK",
+          "price": "0.094",
+          "mintFee": "3",
+          "burnFee": "4"
+        },
+        {
+          "name": "Pound sterling",
+          "symbol": "GBP",
+          "price": "1.22",
+          "mintFee": "3",
+          "burnFee": "4"
+        },
+        {
+          "name": "Swiss Franc",
+          "symbol": "CHF",
+          "price": "1.08",
+          "mintFee": "3",
+          "burnFee": "4"
+        },
+        {
+          "name": "Chinese Yuan",
+          "symbol": "CNY",
+          "price": "1.08",
+          "mintFee": "3",
+          "burnFee": "4"
         }
       ]
     }
