@@ -1,0 +1,44 @@
+Business Source License 1.1
+
+Parameters
+
+Licensor: ChainScore Limited
+Licensed Work: SyntheX
+Use Limitation: Commercial Use
+Change Date: 2024-04-11
+
+Terms
+
+0. Definitions
+
+"Change Date" means the date specified as such above.
+"Commercial Use" means any use of the Licensed Work that is primarily intended for or directed towards commercial advantage or monetary compensation.
+"Licensed Work" means the software identified as such above.
+"Licensor" means the person or entity identified as such above.
+"Licensee" means you and any other person or entity that receives a copy of the Licensed Work from you.
+"Use Limitation" means the restriction specified as such above.
+
+1. Grant of Rights
+
+Subject to the terms and conditions of this License, Licensor hereby grants to Licensee a royalty-free, non-exclusive, non-transferable license to use, modify, and distribute copies of the Licensed Work, provided that:
+
+a) Licensee does not use the Licensed Work in violation of the Use Limitation;
+b) Licensee includes a copy of this License with every copy of the Licensed Work or any portion thereof;
+c) Licensee does not remove or alter any notices or disclaimers contained in or on the Licensed Work;
+d) Licensee complies with all applicable laws and regulations in using, modifying, and distributing the Licensed Work.
+
+2. Change of License Terms
+
+On the Change Date, this License will terminate and Licensor will make available to Licensee a new license for the Licensed Work with terms that are substantially similar to those of a standard open source license, such as Apache 2.0 or MIT.
+
+3. Disclaimer of Warranty
+
+THE LICENSED WORK IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL LICENSOR OR ANY CONTRIBUTORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE LICENSED WORK OR THE USE OR OTHER DEALINGS IN THE LICENSED WORK.
+
+4. Limitation of Liability
+
+IN NO EVENT SHALL LICENSOR OR ANY CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THE LICENSED WORK, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+5. Miscellaneous
+
+This License is governed by the laws of England and Wales, without regard to its conflict of laws principles. Any dispute arising out of or relating to this License shall be subject to the exclusive jurisdiction of the courts of England and Wales. If any provision of this License is held to be invalid or unenforceable by a court of competent jurisdiction, such provision shall be modified to the extent necessary to make it valid and enforceable, and the remaining provisions shall remain in full force and effect. This License constitutes the entire agreement between Licensor and Licensee regarding the Licensed Work and supersedes all prior or contemporaneous communications and proposals, whether oral or written, between them.

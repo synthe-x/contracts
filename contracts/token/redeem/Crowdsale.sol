@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.19;
 
 import "../../synthex/ISyntheX.sol";
@@ -9,6 +9,7 @@ import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 /**
  * @title Crowdsale contract
@@ -17,7 +18,11 @@ import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
  * @notice Also has whitelisting functionality
  * @dev Token release is based on TokenRedeemer contract
  */
-contract Crowdsale is BaseTokenRedeemer, PausableUpgradeable {
+contract Crowdsale is 
+    BaseTokenRedeemer, 
+    PausableUpgradeable, 
+    UUPSUpgradeable 
+{
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
     ISyntheX public synthex;
@@ -31,10 +36,13 @@ contract Crowdsale is BaseTokenRedeemer, PausableUpgradeable {
     // whitelist cap: max amount of SYX tokens that can be purchased by whitelisted users
     uint256 public whitelistCap;
 
-    // exchange rate
+    /// @notice exchange rate
     mapping (address => uint) rate;
     uint public constant RATE_PRECISION = 1e18;
     address public constant ETH_ADDRESS = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
+
+    /// @notice gap for future storage variables
+    uint256[50] private __gap;
 
     function initialize(
         address _synthex,
@@ -55,6 +63,9 @@ contract Crowdsale is BaseTokenRedeemer, PausableUpgradeable {
         require(_synthex != address(0), Errors.INVALID_ADDRESS);
         require(_token != address(0), Errors.INVALID_ADDRESS);
 
+        __Pausable_init();
+        __UUPSUpgradeable_init();
+
         __BaseTokenRedeemer_init(
             _token,
             _lockPeriod,
@@ -71,6 +82,9 @@ contract Crowdsale is BaseTokenRedeemer, PausableUpgradeable {
         synthex = ISyntheX(_synthex);
         merkleRoot = _merkleRoot;
     }
+
+    /// @dev UUPS upgradeable proxy
+    function _authorizeUpgrade(address) internal override onlyL1Admin {}
 
     // Receive ETH
     receive() external payable {
@@ -101,7 +115,6 @@ contract Crowdsale is BaseTokenRedeemer, PausableUpgradeable {
      */
     function buyWithToken_w(address _token, uint _amount, bytes32[] calldata _proof) external whenNotPaused {
         require(block.timestamp >= startTime && block.timestamp <= startTime + whitelistDuration, Errors.INVALID_TIME);
-        require(rate[ETH_ADDRESS] > 0, Errors.TOKEN_NOT_SUPPORTED);
         // verify merkle proof
         require(MerkleProof.verify(_proof, merkleRoot, keccak256(abi.encodePacked(msg.sender))), Errors.INVALID_MERKLE_PROOF);
 
@@ -118,17 +131,6 @@ contract Crowdsale is BaseTokenRedeemer, PausableUpgradeable {
     }
 
     /**
-     * @notice Internal function to buy SYX tokens with ETH
-     * @dev Returns amount of SYX tokens bought
-     */
-    function buyWithETHInternal() internal returns (uint amount) {
-        // start unlock
-        amount = msg.value * rate[ETH_ADDRESS] / RATE_PRECISION;
-        require(amount > 0, Errors.ZERO_AMOUNT);
-        _startUnlock(msg.sender, amount);
-    }
-
-    /**
      * @notice Buy SYX tokens with ERC20 token
      * @dev Only available after whitelist period
      * @param _token Token address to buy SYX
@@ -137,6 +139,18 @@ contract Crowdsale is BaseTokenRedeemer, PausableUpgradeable {
     function buyWithToken(address _token, uint _amount) external whenNotPaused {
         require(block.timestamp >= startTime && block.timestamp <= endTime, Errors.INVALID_TIME);
         buyWithTokenInternal(_token, _amount);
+    }
+
+    /**
+     * @notice Internal function to buy SYX tokens with ETH
+     * @dev Returns amount of SYX tokens bought
+     */
+    function buyWithETHInternal() internal returns (uint amount) {
+        require(rate[ETH_ADDRESS] > 0, Errors.TOKEN_NOT_SUPPORTED);
+        // start unlock
+        amount = msg.value * rate[ETH_ADDRESS] / RATE_PRECISION;
+        require(amount > 0, Errors.ZERO_AMOUNT);
+        _startUnlock(msg.sender, amount);
     }
 
     /**
@@ -194,7 +208,7 @@ contract Crowdsale is BaseTokenRedeemer, PausableUpgradeable {
      * @param _token Token address
      * @param _amount Amount of token to withdraw
      */
-    function withdraw(address _token, uint256 _amount) external onlyL1Admin {
+    function transferOut(address _token, uint256 _amount) external onlyL1Admin {
         if (_token == ETH_ADDRESS) {
             Address.sendValue(payable(msg.sender), _amount);
         } else {

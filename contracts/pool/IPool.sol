@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.19;
 
 import "../utils/oracle/IPriceOracle.sol";
@@ -13,6 +13,7 @@ abstract contract IPool {
     function depositWithPermit(
         address _collateral, 
         uint _amount,
+        uint _approval,
         uint _deadline,
         uint8 _v,
         bytes32 _r,

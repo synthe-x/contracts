@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.19;
 
 import "../../libraries/Errors.sol";
@@ -46,6 +46,9 @@ contract BaseTokenRedeemer {
     mapping(bytes32 => UnlockData) public unlockRequests;
     /// @notice User address to request count mapping
     mapping(address => uint) public unlockRequestCount;
+
+    /// @notice gap to allow future variables to be added
+    uint256[50] private __gap;
 
     /**
      * @notice Constructor

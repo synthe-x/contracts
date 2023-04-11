@@ -1,17 +1,15 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity 0.8.19;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
-import "@openzeppelin/contracts/security/Pausable.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
-import "@openzeppelin/contracts/utils/Address.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20BurnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-ERC20PermitUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 import "../synthex/ISyntheX.sol";
 import "../libraries/Errors.sol";
-
-// erc165
-import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 
 /**
  * @title SyntheX Token contract
@@ -19,30 +17,49 @@ import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
  * @notice SyntheX Token contract, based on OpenZeppelin ERC20
  * @dev Pausable, Burnable, Permit
  */
-contract SyntheXToken is ERC20Permit, ERC165, ERC20Burnable, Pausable {
+contract SyntheXToken is ERC20Upgradeable, ERC20BurnableUpgradeable, ERC20PermitUpgradeable, PausableUpgradeable, UUPSUpgradeable {
     /// @notice System contract to check access control
     ISyntheX public synthex;
 
-    constructor(address _synthex) ERC20("SyntheX Token", "SYX") ERC20Permit("SyntheX Token") {
+    /// @notice gap for future storage variables
+    uint256[50] private __gap;
+
+    function initialize(address _synthex) public initializer {
+        __ERC20_init("SyntheX Token", "SYX");
+        __ERC20Burnable_init();
+        __ERC20Permit_init("SyntheX Token");
+        __Pausable_init();
+        __UUPSUpgradeable_init();
+
         // validate synthex address
-        require(_synthex != address(0), Errors.INVALID_ADDRESS);
-        // check if contract
-        require(Address.isContract(_synthex), Errors.ADDRESS_IS_NOT_CONTRACT);
+        require(ISyntheX(_synthex).supportsInterface(type(ISyntheX).interfaceId), Errors.INVALID_ADDRESS);
         // set synthex
         synthex = ISyntheX(_synthex);
     }
 
+    ///@notice required by the OZ UUPS module
+    function _authorizeUpgrade(address) internal override onlyL1Admin {}
+
+    modifier onlyL1Admin() {
+        require(synthex.isL1Admin(msg.sender), Errors.CALLER_NOT_L1_ADMIN);
+        _;
+    }
+
+    modifier onlyL2Admin() {
+        require(synthex.isL2Admin(msg.sender), Errors.CALLER_NOT_L2_ADMIN);
+        _;
+    }
+
     // support interface
-    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165) returns (bool) {
-        return interfaceId == type(IERC20).interfaceId || interfaceId == type(IERC20Metadata).interfaceId || super.supportsInterface(interfaceId);
+    function supportsInterface(bytes4 interfaceId) public view virtual returns (bool) {
+        return interfaceId == type(IERC20Upgradeable).interfaceId || interfaceId == type(IERC20MetadataUpgradeable).interfaceId;
     }
 
     /**
      * @notice Pause the token transfers, mints and burns
      * @dev Only L2_ADMIN can pause
      */
-    function pause() public {
-        require(synthex.isL2Admin(msg.sender), Errors.CALLER_NOT_L2_ADMIN);
+    function pause() external onlyL2Admin {
         _pause();
     }
 
@@ -50,8 +67,7 @@ contract SyntheXToken is ERC20Permit, ERC165, ERC20Burnable, Pausable {
      * @notice Unpause the token transfers, mints and burns
      * @dev Only L2_ADMIN can unpause
      */
-    function unpause() public {
-        require(synthex.isL2Admin(msg.sender), Errors.CALLER_NOT_L2_ADMIN);
+    function unpause() external onlyL2Admin {
         _unpause();
     }
 
@@ -61,8 +77,7 @@ contract SyntheXToken is ERC20Permit, ERC165, ERC20Burnable, Pausable {
      * @param to Address to mint tokens to
      * @param amount Amount to mint
      */
-    function mint(address to, uint256 amount) public {
-        require(synthex.isL1Admin(msg.sender), Errors.CALLER_NOT_L1_ADMIN);
+    function mint(address to, uint256 amount) public onlyL1Admin {
         _mint(to, amount);
     }
 

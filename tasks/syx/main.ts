@@ -29,7 +29,7 @@ export default async function main(isTest: boolean = false): Promise<{SYX: Contr
     if(!isTest) console.log(`Deploying SYX Token to ${hre.network.name} (${hre.network.config.chainId}) ...`);
     const SYXArgs = [synthexAddress];
     // deploy SYX
-    const SYX = await _deploy("SyntheXToken", SYXArgs, deployments);
+    const SYX = await _deploy("SyntheXToken", SYXArgs, deployments, {upgradable: true});
     if(!isTest) console.log(`SYX deployed at ${SYX.address}`);
 
     /* -------------------------------------------------------------------------- */

@@ -30,9 +30,20 @@ export default async function main(synthConfig: SynthArgs, poolAddress: string, 
 	if(!synth){
 		const symbol = poolSymbol.toLowerCase() + synthConfig.symbol;
 		const name = 'SyntheX ' + synthConfig.name + ' (' + poolName + ')';
+		const args = [name, symbol, poolAddress, synthex.address];
 		// deploy token
-		synth = await _deploy('ERC20X', [name, symbol, poolAddress, synthex.address], deployments, { name: symbol, upgradable: true }, config);
+		synth = await _deploy('ERC20X', args, deployments, { name: symbol, upgradable: true }, config);
 		if(!isTest) console.log(`Token ${name} (${symbol}) deployed at ${synth.address}`);
+		if((hre.network.config as any).isLive){
+			try{
+				await hre.run("verify:verify", {
+					address: synth.address,
+					constructorArguments: []
+				})
+			} catch (err) {
+				console.log("Could not verify vault");
+			}
+		}
 	} else {
 		synth = await ethers.getContractAt('ERC20X', synth);
 	}

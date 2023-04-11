@@ -20,7 +20,7 @@ export default async function main(isTest: boolean = false): Promise<Contract> {
     const args = [deployments.contracts["SyntheX"].address]
 
     // deploy vault
-    const vault = await _deploy("Vault", args, deployments) as Contract;
+    const vault = await _deploy("Vault", args, deployments, { upgradable: true }) as Contract;
     if(!isTest) console.log(`Vault deployed at ${vault.address}`);
     await synthex.setAddress(VAULT, vault.address);
     if(!isTest) console.log(`Vault address set in SyntheX`);
@@ -29,7 +29,7 @@ export default async function main(isTest: boolean = false): Promise<Contract> {
         try{
             await hre.run("verify:verify", {
                 address: vault.address,
-                constructorArguments: args
+                constructorArguments: []
             })
         } catch (err) {
             console.log("Could not verify vault");
