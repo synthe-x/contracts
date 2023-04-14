@@ -20,7 +20,7 @@ export default async function main(isTest: boolean = false): Promise<Contract> {
     const args = [deployments.contracts["SyntheX"].address]
 
     // deploy vault
-    const vault = await _deploy("Vault", args, deployments, { upgradable: true }) as Contract;
+    const vault = await _deploy("Vault", args, deployments, { upgradable: true }, config) as Contract;
     if(!isTest) console.log(`Vault deployed at ${vault.address}`);
     await synthex.setAddress(VAULT, vault.address);
     if(!isTest) console.log(`Vault address set in SyntheX`);

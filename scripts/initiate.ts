@@ -42,6 +42,18 @@ export async function initiate(
   if(!weth){
     console.log("WETH not found, deploying...");
     weth = await _deploy("WETH9", [], deployments, {name: 'WETH9'}, config);
+
+    // save deployments
+    if(!isTest){
+      fs.writeFileSync(
+        process.cwd() + `/deployments/${hre.network.config.chainId}/config.json`,
+        JSON.stringify(config, null, 2)
+      );
+      fs.writeFileSync(
+        process.cwd() + `/deployments/${hre.network.config.chainId}/deployments.json`,
+        JSON.stringify(deployments, null, 2)
+      );
+    }
   } else {
     weth = await ethers.getContractAt("WETH9", weth);
   }

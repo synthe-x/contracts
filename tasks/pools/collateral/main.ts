@@ -8,6 +8,7 @@ import { CollateralArgs } from '../../../deployments/types';
 export default async function main(cConfig: CollateralArgs, poolAddress: string, oracleAddress: string, isTest: boolean = false): Promise<{collateral: Contract, feed: Contract}> {
 	// read deployments and config
 	const deployments = JSON.parse(fs.readFileSync(process.cwd() + `/deployments/${hre.network.config.chainId}/deployments.json`, "utf8"));
+	const config = JSON.parse(fs.readFileSync(process.cwd() + `/deployments/${hre.network.config.chainId}/config.json`, "utf8"));
 
     // get oracle contract
 	const Oracle = await ethers.getContractFactory("PriceOracle");

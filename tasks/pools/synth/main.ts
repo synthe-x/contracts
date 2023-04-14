@@ -74,5 +74,16 @@ export default async function main(synthConfig: SynthArgs, poolAddress: string, 
 		if(!isTest) console.log(`${synthConfig.name} (${synthConfig.symbol}) set as Fee Token ✅`);
 	}
 
+	if(!isTest){
+        fs.writeFileSync(
+            process.cwd() + `/deployments/${hre.network.config.chainId}/config.json`,
+            JSON.stringify(config, null, 2)
+        );
+        fs.writeFileSync(
+            process.cwd() + `/deployments/${hre.network.config.chainId}/deployments.json`,
+            JSON.stringify(deployments, null, 2)
+        );
+    }
+
 	return {synth, feed};
 }

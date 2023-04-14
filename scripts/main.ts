@@ -10,7 +10,6 @@ import fs from 'fs';
 
 export default async function main(isTest: boolean = true) {
 	if(!isTest) console.log(`Deploying to ${hre.network.name} (${hre.network.config.chainId}) ...`);
-
 	await newDeployment(isTest);
 
 	const initialBalance = await hre.ethers.provider.getBalance(hre.ethers.provider.getSigner().getAddress());
