@@ -29,4 +29,6 @@ describe("Testing the complete flow", function () {
     it("should create eth-ceth stable pair", async () => {
         console.log("ceth address", ceth.address, eth.address);
     })
+
+    it("join 10 ETH + 10 cETH", async () => {})
 });

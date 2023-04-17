@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity 0.8.19;
+pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "./AddressStorage.sol";
 
@@ -30,6 +31,7 @@ import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol"
  * @dev Enable/disale trading pool, volatility ratio 
  */
 contract SyntheX is 
+    Initializable,
     ISyntheX, 
     SyntheXStorage, 
     AddressStorage, 
@@ -39,6 +41,11 @@ contract SyntheX is
 {
     /// @notice Using SafeERC20 for ERC20 to avoid reverts
     using SafeERC20Upgradeable for ERC20Upgradeable;
+
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
 
     /**
      * @notice Initialize the contract

@@ -1,6 +1,9 @@
 import { DeployProxyOptions } from "@openzeppelin/hardhat-upgrades/dist/utils";
 import { ethers, OpenzeppelinDefender } from "hardhat";
 import { upgrades } from "hardhat";
+import { utils, Wallet } from "zksync-web3";
+import { HardhatRuntimeEnvironment } from "hardhat/types";
+import { Deployer } from "@matterlabs/hardhat-zksync-deploy";
 
 export const _deploy = async (
 	contractName: string,
@@ -20,7 +23,7 @@ export const _deploy = async (
 	} else {
 		contract = await Contract.deploy(...args);
 	}
-	await contract.deployed();
+	contract = await contract.deployed();
 
 	deployments.contracts[name] = {
 		address: contract.address,

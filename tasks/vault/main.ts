@@ -1,22 +1,17 @@
 import hre, { ethers, upgrades } from 'hardhat';
 import fs from 'fs';
-import { _deploy } from '../../scripts/utils/helper';
+import { _deploy as _deployEVM } from '../../scripts/utils/helper';
 import { _deploy as _deployDefender } from '../../scripts/utils/defender';
 import { Contract } from 'ethers';
 import { VAULT, L1_ADMIN_ROLE, L2_ADMIN_ROLE } from '../../scripts/utils/const';
 
-export default async function main(isTest: boolean = false): Promise<Contract> {
+export default async function main(synthex: Contract, isTest: boolean = false, _deploy = _deployEVM): Promise<Contract> {
     if(!isTest) console.log(`Deploying Vault to ${hre.network.name} (${hre.network.config.chainId}) ...`);
 
 	// read deployments and config
 	const deployments = JSON.parse(fs.readFileSync(process.cwd() + `/deployments/${hre.network.config.chainId}/deployments.json`, "utf8"));
 	const config = JSON.parse(fs.readFileSync(process.cwd() + `/deployments/${hre.network.config.chainId}/config.json`, "utf8"));
 	
-	const [deployer] = await ethers.getSigners();
-
-    // synthex contract
-    const synthex = await ethers.getContractAt("SyntheX", deployments.contracts["SyntheX"].address) as Contract;
-    
     const args = [deployments.contracts["SyntheX"].address]
 
     // deploy vault
@@ -35,8 +30,6 @@ export default async function main(isTest: boolean = false): Promise<Contract> {
             console.log("Could not verify vault");
         }
     }
-
-    // _deployDefender("SyntheX" +'_'+ config.version, synthex);
     
     // save deployments
     if(!isTest){

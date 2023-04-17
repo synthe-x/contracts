@@ -1,22 +1,14 @@
 import hre, { ethers, upgrades } from 'hardhat';
 import fs from 'fs';
-import { _deploy } from '../../../scripts/utils/helper';
+import { _deploy as _deployEVM } from '../../../scripts/utils/helper';
 import { _deploy as _deployDefender } from '../../../scripts/utils/defender';
 import { Contract } from 'ethers';
 import { CollateralArgs } from '../../../deployments/types';
 
-export default async function main(cConfig: CollateralArgs, poolAddress: string, oracleAddress: string, isTest: boolean = false): Promise<{collateral: Contract, feed: Contract}> {
+export default async function main(cConfig: CollateralArgs, pool: Contract, oracle: Contract, isTest: boolean = false, _deploy = _deployEVM): Promise<{collateral: Contract, feed: Contract}> {
 	// read deployments and config
 	const deployments = JSON.parse(fs.readFileSync(process.cwd() + `/deployments/${hre.network.config.chainId}/deployments.json`, "utf8"));
 	const config = JSON.parse(fs.readFileSync(process.cwd() + `/deployments/${hre.network.config.chainId}/config.json`, "utf8"));
-
-    // get oracle contract
-	const Oracle = await ethers.getContractFactory("PriceOracle");
-	const oracle = Oracle.attach(oracleAddress);
-
-	// get pool contract
-	const Pool = await ethers.getContractFactory("Pool");
-	const pool = Pool.attach(poolAddress);
 	
 	// get collateral
 	let collateral: string|Contract = cConfig.address as string;

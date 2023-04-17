@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity 0.8.19;
+pragma solidity ^0.8.0;
 
 import "../../libraries/Errors.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 /**
  * @title TokenRedeemer
@@ -11,7 +12,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeab
  * @notice Users can request to unlock their SYX tokens after a lock period
  * @notice Tokens are released linearly over a period of time (unlock period)
  */
-contract BaseTokenRedeemer {
+contract BaseTokenRedeemer is Initializable {
     /// @notice SafeERC20 library is used for ERC20 operations
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
@@ -59,7 +60,21 @@ contract BaseTokenRedeemer {
         uint _lockPeriod,
         uint _unlockPeriod,
         uint _percUnlockAtRelease
-    ) internal {
+    ) internal onlyInitializing {
+        __BaseTokenRedeemer_init_unchained(
+            _TOKEN,
+            _lockPeriod,
+            _unlockPeriod,
+            _percUnlockAtRelease
+        );
+    }
+
+    function __BaseTokenRedeemer_init_unchained(
+        address _TOKEN,
+        uint _lockPeriod,
+        uint _unlockPeriod,
+        uint _percUnlockAtRelease
+    ) internal onlyInitializing {
         // validate _TOKEN address
         require(_TOKEN != address(0), Errors.INVALID_ADDRESS);
         // check if contract

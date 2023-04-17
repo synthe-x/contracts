@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity 0.8.19;
+pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20BurnableUpgradeable.sol";
@@ -7,6 +7,7 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-ERC20PermitUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "../synthex/ISyntheX.sol";
 import "../libraries/Errors.sol";
@@ -17,12 +18,17 @@ import "../libraries/Errors.sol";
  * @notice SyntheX Token contract, based on OpenZeppelin ERC20
  * @dev Pausable, Burnable, Permit
  */
-contract SyntheXToken is ERC20Upgradeable, ERC20BurnableUpgradeable, ERC20PermitUpgradeable, PausableUpgradeable, UUPSUpgradeable {
+contract SyntheXToken is Initializable, ERC20Upgradeable, ERC20BurnableUpgradeable, ERC20PermitUpgradeable, PausableUpgradeable, UUPSUpgradeable {
     /// @notice System contract to check access control
     ISyntheX public synthex;
 
     /// @notice gap for future storage variables
     uint256[50] private __gap;
+
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
 
     function initialize(address _synthex) public initializer {
         __ERC20_init("SyntheX Token", "SYX");

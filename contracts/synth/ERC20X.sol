@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity 0.8.19;
+pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
@@ -9,6 +9,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-ERC20Pe
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "../synthex/ISyntheX.sol";
 import "../pool/IPool.sol";
@@ -21,6 +22,7 @@ import "../libraries/Errors.sol";
  * @dev ERC20FlashMint for flash loan with fee (used to burn debt)
  */
 contract ERC20X is 
+    Initializable,
     ERC20Upgradeable, 
     ERC20PermitUpgradeable, 
     ERC20FlashMintUpgradeable, 
@@ -41,6 +43,18 @@ contract ERC20X is
     /// @notice Emitted when referred by address
     event Referred(address indexed referredBy, address indexed account);
 
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
+    /**
+     * @notice Initialize the contract
+     * @param _name Name of the token
+     * @param _symbol Symbol of the token
+     * @param _pool Address of the pool
+     * @param _synthex Address of the SyntheX contract
+     */
     function initialize(string memory _name, string memory _symbol, address _pool, address _synthex) initializer external {
         __ERC20_init(_name, _symbol);
         __ERC20Permit_init(_name);

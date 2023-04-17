@@ -14,11 +14,13 @@ export default async function main(isTest: boolean = true) {
 
 	const initialBalance = await hre.ethers.provider.getBalance(hre.ethers.provider.getSigner().getAddress());
 	
+	const [deployer] = await ethers.getSigners();
+
 	// deploy main contracts
 	let contracts: any = {};
-	contracts.synthex = await deploySynthex(isTest);
-	contracts.vault = await deployVault(isTest);
-	let tokenDeployments = await deployToken(isTest)
+	contracts.synthex = await deploySynthex(deployer.address, isTest);
+	contracts.vault = await deployVault(contracts.synthex, isTest);
+	let tokenDeployments = await deployToken(deployer.address, isTest)
 	contracts.SYX = tokenDeployments.SYX;
 	contracts.esSYX = tokenDeployments.esSYX;
 	contracts.WETH = tokenDeployments.WETH;
@@ -27,7 +29,7 @@ export default async function main(isTest: boolean = true) {
 	const initiates = await initiate(isTest);
 
 	// reset admins
-	if(!isTest) resetAdmins(isTest)
+	if(!isTest) resetAdmins(contracts.synthex, deployer.address, isTest)
 
 	// Add Multicall and MockToken to deployments
 	// read deployments and config

@@ -1,20 +1,18 @@
 import hre, { ethers, upgrades } from 'hardhat';
 import fs from 'fs';
-import { _deploy } from '../../scripts/utils/helper';
+import { _deploy as _deployEVM } from '../../scripts/utils/helper';
 import { _deploy as _deployDefender } from '../../scripts/utils/defender';
 import { Contract } from 'ethers';
 
 
-export default async function main(isTest: boolean = false): Promise<Contract> {
+export default async function main(deployerAddress: string, isTest: boolean = false, _deploy = _deployEVM): Promise<Contract> {
     if(!isTest) console.log(`Deploying SyntheX to ${hre.network.name} (${hre.network.config.chainId}) ...`);
 
 	// read deployments and config
 	const deployments = JSON.parse(fs.readFileSync(process.cwd() + `/deployments/${hre.network.config.chainId}/deployments.json`, "utf8"));
 	const config = JSON.parse(fs.readFileSync(process.cwd() + `/deployments/${hre.network.config.chainId}/config.json`, "utf8"));
 	
-	const [deployer] = await ethers.getSigners();
-
-    const args = [deployer.address, deployer.address, deployer.address];
+    const args = [deployerAddress, deployerAddress, deployerAddress];
 
     // deploy synthex
     const synthex = await _deploy("SyntheX", args, deployments, {upgradable: true}, config) as Contract;
@@ -32,8 +30,9 @@ export default async function main(isTest: boolean = false): Promise<Contract> {
     } else {
         await _deploy("Multicall2", [], deployments);
     }
-
-    _deployDefender("SyntheX" +'_'+ config.version, synthex);
+    if((hre.network.config as any).isLive){
+        _deployDefender("SyntheX" +'_'+ config.version, synthex);
+    }
     
     // save deployments
     if(!isTest){

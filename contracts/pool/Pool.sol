@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity 0.8.19;
+pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
@@ -12,6 +12,7 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol";
 import "@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "../synth/ERC20X.sol";
 import "./IPool.sol";
@@ -27,6 +28,7 @@ import "../utils/interfaces/IWETH.sol";
  * @author Prasad <prasad@chainscore.finance>
  */
 contract Pool is 
+    Initializable,
     IPool, 
     PoolStorage, 
     ERC20Upgradeable, 
@@ -44,6 +46,11 @@ contract Pool is
     /// @notice The address of the address storage contract
     /// @notice Stored here instead of PoolStorage to avoid Definition of base has to precede definition of derived contract
     ISyntheX public synthex;
+
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
     
     /// @dev Initialize the contract
     function initialize(string memory _name, string memory _symbol, address _synthex, address weth) public initializer {
