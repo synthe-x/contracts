@@ -1,8 +1,10 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.19;
+pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+
 import "../../synthex/SyntheX.sol";
 
 /**
@@ -10,8 +12,8 @@ import "../../synthex/SyntheX.sol";
  * @notice FeeVault contract to store fees from the protocol
  * @custom:security-contact prasad@chainscore.finance
  */
-contract Vault {
-    using SafeERC20 for ERC20;
+contract Vault is UUPSUpgradeable {
+    using SafeERC20Upgradeable for ERC20Upgradeable;
 
     // AddressStorage contract
     SyntheX public synthex;
@@ -20,12 +22,19 @@ contract Vault {
 
     receive() external payable {}
 
-    /**
-     * @dev Constructor
-     * @param _synthex System contract address
-     */
-    constructor(address _synthex) {
+    function initialize(address _synthex) external initializer {
+        __UUPSUpgradeable_init();
+
         synthex = SyntheX(_synthex);
+    }
+
+    /// @dev UUPS upgradeable proxy
+    function _authorizeUpgrade(address) internal override onlyL1Admin {}
+
+
+    modifier onlyL1Admin() {
+        require(synthex.isL1Admin(msg.sender), Errors.CALLER_NOT_L1_ADMIN);
+        _;
     }
 
     /**
@@ -35,9 +44,15 @@ contract Vault {
      * @notice Only L1_ADMIN can withdraw
      */
     function withdraw(address _tokenAddress, uint256 amount)
-        external
+        external onlyL1Admin
     {
-        require(synthex.isL1Admin(msg.sender), Errors.CALLER_NOT_L1_ADMIN);
-        ERC20(_tokenAddress).safeTransfer(msg.sender, amount);
+        ERC20Upgradeable(_tokenAddress).safeTransfer(msg.sender, amount);
+    }
+
+    function withdrawETH(uint256 amount)
+        external onlyL1Admin
+    {
+        (bool success, ) = payable(msg.sender).call{value: amount}("");
+        require(success, Errors.TRANSFER_FAILED);
     }
 }

@@ -1,5 +1,5 @@
-// SPDX-License-Identifier: MIT
-pragma solidity 0.8.19;
+// SPDX-License-Identifier: BUSL-1.1
+pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
@@ -8,6 +8,8 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-ERC20Pe
 
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "../synthex/ISyntheX.sol";
 import "../pool/IPool.sol";
@@ -19,7 +21,14 @@ import "../libraries/Errors.sol";
  * @dev Synthetic token with minting and burning
  * @dev ERC20FlashMint for flash loan with fee (used to burn debt)
  */
-contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgradeable, PausableUpgradeable, MulticallUpgradeable {
+contract ERC20X is 
+    Initializable,
+    ERC20Upgradeable, 
+    ERC20PermitUpgradeable, 
+    ERC20FlashMintUpgradeable, 
+    PausableUpgradeable, 
+    UUPSUpgradeable 
+{
     // Pool that this token belong to
     IPool public pool; 
     // SyntheX contract 
@@ -31,14 +40,27 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
 
     /// @notice Emitted when flash fee is updated
     event FlashFeeUpdated(uint _flashLoanFee);
-
+    /// @notice Emitted when referred by address
     event Referred(address indexed referredBy, address indexed account);
 
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
+    /**
+     * @notice Initialize the contract
+     * @param _name Name of the token
+     * @param _symbol Symbol of the token
+     * @param _pool Address of the pool
+     * @param _synthex Address of the SyntheX contract
+     */
     function initialize(string memory _name, string memory _symbol, address _pool, address _synthex) initializer external {
         __ERC20_init(_name, _symbol);
+        __ERC20Permit_init(_name);
         __ERC20FlashMint_init();
         __Pausable_init();
-        __Multicall_init();
+        __UUPSUpgradeable_init();
 
         // check if supports interface
         require(IPool(_pool).supportsInterface(type(IPool).interfaceId), Errors.INVALID_ADDRESS);
@@ -48,8 +70,21 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
         synthex = ISyntheX(_synthex);
     }
 
+    ///@notice required by the OZ UUPS module
+    function _authorizeUpgrade(address) internal override onlyL1Admin {}
+
     modifier onlyInternal(){
         require(msg.sender == address(pool), Errors.NOT_AUTHORIZED);
+        _;
+    }
+
+    modifier onlyL1Admin(){
+        require(synthex.isL1Admin(msg.sender), Errors.CALLER_NOT_L1_ADMIN);
+        _;
+    }
+
+    modifier onlyL2Admin(){
+        require(synthex.isL2Admin(msg.sender), Errors.CALLER_NOT_L2_ADMIN);
         _;
     }
 
@@ -142,8 +177,7 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
      * @dev Pause the token
      * @dev Only callable by L2 admin
      */
-    function pause() external {
-        require(synthex.isL2Admin(msg.sender), Errors.CALLER_NOT_L2_ADMIN);
+    function pause() external onlyL2Admin {
         _pause();
     }
 
@@ -151,8 +185,7 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
      * @dev Unpause the token
      * @dev Only callable by L2 admin
      */
-    function unpause() external {
-        require(synthex.isL2Admin(msg.sender), Errors.CALLER_NOT_L2_ADMIN);
+    function unpause() external onlyL2Admin {
         _unpause();
     }
 
@@ -163,8 +196,7 @@ contract ERC20X is ERC20Upgradeable, ERC20PermitUpgradeable, ERC20FlashMintUpgra
      * @notice Update flash fee
      * @param _flashLoanFee New flash fee
      */
-    function updateFlashFee(uint _flashLoanFee) public {
-        require(synthex.isL1Admin(msg.sender), Errors.CALLER_NOT_L1_ADMIN);
+    function updateFlashFee(uint _flashLoanFee) public onlyL1Admin {
         require(_flashLoanFee <= BASIS_POINTS, Errors.INVALID_AMOUNT);
         flashLoanFee = _flashLoanFee;
         emit FlashFeeUpdated(_flashLoanFee);

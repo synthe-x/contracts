@@ -1,5 +1,5 @@
-// SPDX-License-Identifier: MIT
-pragma solidity 0.8.19;
+// SPDX-License-Identifier: BUSL-1.1
+pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20VotesUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20BurnableUpgradeable.sol";
@@ -10,6 +10,7 @@ import "./redeem/BaseTokenRedeemer.sol";
 import "../libraries/Errors.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 /**
  * @title Escrowed SYX
@@ -20,7 +21,18 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
  * @notice Protocol rewards (APR) are distributed in esSYX tokens; and protocol revenue in WETH
  * @notice esSNX tokens can be redeemed for SYX tokens, release period set by BaseTokenRedeemer
  */
-contract EscrowedSYX is UUPSUpgradeable, ERC20VotesUpgradeable, ERC20BurnableUpgradeable, IStaking, BaseTokenRedeemer, AccessControlUpgradeable, PausableUpgradeable {
+contract EscrowedSYX is 
+    Initializable,
+    IStaking, 
+    BaseTokenRedeemer, 
+    ERC20Upgradeable, 
+    ERC20BurnableUpgradeable, 
+    ERC20PermitUpgradeable,
+    ERC20VotesUpgradeable, 
+    AccessControlUpgradeable, 
+    PausableUpgradeable,
+    UUPSUpgradeable 
+{
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
     /// @notice System contract
@@ -44,6 +56,14 @@ contract EscrowedSYX is UUPSUpgradeable, ERC20VotesUpgradeable, ERC20BurnableUpg
     // This role can transfer tokens
     bytes32 public constant AUTHORIZED_SENDER = keccak256("AUTHORIZED_SENDER");
 
+    /// @notice gap for future upgrades
+    uint256[50] private __gap;
+
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
     function initialize(
         address _synthex, 
         address _TOKEN, 
@@ -55,10 +75,11 @@ contract EscrowedSYX is UUPSUpgradeable, ERC20VotesUpgradeable, ERC20BurnableUpg
     ) public initializer {
         __ERC20_init("Escrowed SYX", "esSYX");
         __ERC20Burnable_init();
-        __ERC20Votes_init();
         __ERC20Permit_init("Escrowed SYX");
+        __ERC20Votes_init();
         __AccessControl_init();
         __Pausable_init();
+        __UUPSUpgradeable_init();
 
         __BaseTokenRedeemer_init(_TOKEN, _lockPeriod, _unlockPeriod, _percUnlockAtRelease);
 

@@ -1,0 +1,96 @@
+{
+  "name": "synthex",
+  "version": "0.88.0",
+  "latest": "0.88.0",
+  "l0Admin": "0x084cD22eA15E4C262408e561a5AFa8431Bd7fa5d",
+  "l1Admin": "0x2646306d3191AEE905bf9065bD1B7cC71c9036D0",
+  "l2Admin": "0x46c18c6d5526E17B34a3deB43e5E9Ba2A659c23a",
+  "rewardAlloc": "10000000",
+  "esSYX": {
+    "initialRewardsDuration": "30",
+    "reward": "6000",
+    "lockPeriod": "15552000",
+    "unlockPeriod": "4838400",
+    "percReleaseAtUnlock": "500",
+    "quota": "1000000"
+  },
+  "pools": [
+    {
+      "name": "Crypto Market",
+      "symbol": "C",
+      "rewardSpeed": "100000000000000000",
+      "issuerAlloc": "5000",
+      "collaterals": [
+        {
+          "name": "Ethereum",
+          "symbol": "ETH",
+          "decimals": 18,
+          "price": "2020",
+          "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+          "params": {
+            "cap": "100000000000000000000000",
+            "baseLTV": "6500",
+            "liqThreshold": "9000",
+            "liqBonus": "10500"
+          }
+        },
+        {
+          "name": "Wrapped Bitcoin",
+          "symbol": "WBTC",
+          "decimals": 18,
+          "price": "30220",
+          "params": {
+            "cap": "100000000000000000000000",
+            "baseLTV": "7200",
+            "liqThreshold": "9000",
+            "liqBonus": "10500"
+          }
+        },
+        {
+          "name": "USD Coin",
+          "symbol": "USDC",
+          "decimals": 18,
+          "price": "0.999",
+          "params": {
+            "cap": "1000000000000000000000000",
+            "baseLTV": "7000",
+            "liqThreshold": "8500",
+            "liqBonus": "10200"
+          }
+        }
+      ],
+      "synths": [
+        {
+          "name": "Bitcoin",
+          "symbol": "BTC",
+          "price": "2020",
+          "mintFee": "6",
+          "burnFee": "8"
+        },
+        {
+          "name": "Ethereum",
+          "symbol": "ETH",
+          "price": "2020",
+          "mintFee": "4",
+          "burnFee": "6"
+        },
+        {
+          "name": "US Dollar",
+          "symbol": "USD",
+          "price": "2020",
+          "isFeeToken": true,
+          "mintFee": "4",
+          "burnFee": "2"
+        },
+        {
+          "name": "ChainLink",
+          "symbol": "LINK",
+          "price": "2020",
+          "mintFee": "8",
+          "burnFee": "10"
+        }
+      ]
+    }
+  ],
+  "dummyTokens": []
+}

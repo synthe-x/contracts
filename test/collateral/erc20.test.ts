@@ -5,7 +5,7 @@ import { ETH_ADDRESS } from "../../scripts/utils/const";
 import main from "../../scripts/main";
 import hre from 'hardhat';
 
-describe("Rewards", function () {
+describe("ERC20 Collateral", function () {
 	let synthex: any,
 		aave: any,
 		oracle: any,
@@ -77,7 +77,7 @@ describe("Rewards", function () {
         const signature = await user1._signTypedData(domain, { Permit }, permit);
         const { v, r, s } = ethers.utils.splitSignature(signature);
 
-        await cryptoPool.connect(user1).depositWithPermit(aave.address, value, deadline, v, r, s);
+        await cryptoPool.connect(user1).depositWithPermit(aave.address, value, value, deadline, v, r, s);
 
         expect((await cryptoPool.getAccountLiquidity(user1.address))[1]).eq(
             ethers.utils.parseEther("20000")

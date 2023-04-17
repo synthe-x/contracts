@@ -9,7 +9,7 @@ require('dotenv').config();
 
 const PRIVATE_KEY = process.env.PRIVATE_KEY ?? 'ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80';
 const ARBITRUM_GOERLI_RPC = process.env.ARBITRUM_GOERLI_RPC ?? 'https://goerli.arbitrum.io/rpc';
-
+const ARBITRUM_RPC = process.env.ARBITRUM_RPC ?? 'https://rpc.ankr.com/arbitrum';
 
 const config: any = {
   docgen: {},
@@ -57,14 +57,21 @@ const config: any = {
       url: ARBITRUM_GOERLI_RPC,
       accounts: [`0x${PRIVATE_KEY}`],
       chainId: 421613,
-      gasLimit: 1000000000,
+      gasPrice: 100000000,
+      isLive: true,
+    },
+    arbitrum: {
+      url: ARBITRUM_RPC,
+      accounts: [`0x${PRIVATE_KEY}`],
+      chainId: 42161,
+      gasPrice: 100000000,
       isLive: true,
     },
     goerli: {
       url: "https://rpc.ankr.com/eth_goerli",
       accounts: [`0x${PRIVATE_KEY}`],
       chainId: 5,
-      // gasPrice: 1000000000000 // 1000 wei
+      // gasPrice: 100000000 // 1000 wei
     },
     localhost: {
       url: "http://localhost:8545",
@@ -75,12 +82,13 @@ const config: any = {
   gasReporter: {
     enabled: false,
     currency: 'USD',
-    gasPrice: 13,
+    gasPrice: 1,
     coinmarketcap: process.env.CMC_API_KEY
   },
   etherscan:{
     apiKey: {
-      arbitrumGoerli: process.env.ARBITRUM_GOERLI_ETHERSCAN ?? ''
+      arbitrumGoerli: process.env.ARBISCAN_API ?? '',
+      arbitrumOne: process.env.ARBISCAN_API ?? '',
     }
   }
 };

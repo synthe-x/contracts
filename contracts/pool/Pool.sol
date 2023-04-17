@@ -1,5 +1,5 @@
-// SPDX-License-Identifier: MIT
-pragma solidity 0.8.19;
+// SPDX-License-Identifier: BUSL-1.1
+pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
@@ -11,6 +11,8 @@ import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/draft-IERC20Permit.sol";
 import "@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "../synth/ERC20X.sol";
 import "./IPool.sol";
@@ -20,14 +22,20 @@ import "./PoolStorage.sol";
 import "../synthex/ISyntheX.sol";
 import "../utils/interfaces/IWETH.sol";
 
-import "hardhat/console.sol";
-
 /**
  * @title Pool
  * @notice Pool contract to manage collaterals and debt 
  * @author Prasad <prasad@chainscore.finance>
  */
-contract Pool is IPool, PoolStorage, ERC20Upgradeable, ERC165Upgradeable, PausableUpgradeable, ReentrancyGuardUpgradeable {
+contract Pool is 
+    Initializable,
+    IPool, 
+    PoolStorage, 
+    ERC20Upgradeable, 
+    PausableUpgradeable, 
+    ReentrancyGuardUpgradeable, 
+    UUPSUpgradeable
+{
     /// @notice Using Math for uint256 to calculate minimum and maximum
     using MathUpgradeable for uint256;
     /// @notice for converting token prices
@@ -38,12 +46,18 @@ contract Pool is IPool, PoolStorage, ERC20Upgradeable, ERC165Upgradeable, Pausab
     /// @notice The address of the address storage contract
     /// @notice Stored here instead of PoolStorage to avoid Definition of base has to precede definition of derived contract
     ISyntheX public synthex;
+
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
     
     /// @dev Initialize the contract
     function initialize(string memory _name, string memory _symbol, address _synthex, address weth) public initializer {
         __ERC20_init(_name, _symbol);
         __Pausable_init();
         __ReentrancyGuard_init();
+        __UUPSUpgradeable_init();
 
         // check if valid address
         require(ISyntheX(_synthex).supportsInterface(type(ISyntheX).interfaceId), Errors.INVALID_ADDRESS);
@@ -56,9 +70,12 @@ contract Pool is IPool, PoolStorage, ERC20Upgradeable, ERC165Upgradeable, Pausab
         _pause();
     }
 
+    ///@notice required by the OZ UUPS module
+    function _authorizeUpgrade(address) internal override onlyL1Admin {}
+
     // Support IPool interface
-    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165Upgradeable, IPool) returns (bool) {
-        return interfaceId == type(IPool).interfaceId || super.supportsInterface(interfaceId);
+    function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
+        return interfaceId == type(IPool).interfaceId;
     }
 
     /// @dev Override to disable transfer
@@ -138,17 +155,19 @@ contract Pool is IPool, PoolStorage, ERC20Upgradeable, ERC165Upgradeable, Pausab
      * @notice Deposit collateral
      * @param _collateral The address of the erc20 collateral
      * @param _amount The amount of collateral to deposit
+     * @param _approval The amount of collateral to approve
      */
     function depositWithPermit(
         address _collateral, 
         uint _amount,
+        uint _approval, 
         uint _deadline,
         uint8 _v,
         bytes32 _r,
         bytes32 _s
     ) virtual override public {
         // permit approval
-        IERC20Permit(_collateral).permit(msg.sender, address(this), _amount, _deadline, _v, _r, _s);
+        IERC20Permit(_collateral).permit(msg.sender, address(this), _approval, _deadline, _v, _r, _s);
         // transfer
         IERC20Upgradeable(_collateral).safeTransferFrom(msg.sender, address(this), _amount);
         depositInternal(msg.sender, _collateral, _amount);

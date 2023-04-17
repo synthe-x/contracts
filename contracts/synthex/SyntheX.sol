@@ -1,11 +1,12 @@
-// SPDX-License-Identifier: MIT
-pragma solidity 0.8.19;
+// SPDX-License-Identifier: BUSL-1.1
+pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "./AddressStorage.sol";
 
@@ -29,9 +30,22 @@ import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol"
  * @dev Handle collateral: deposit/withdraw, enable/disable collateral, set collateral cap, volatility ratio
  * @dev Enable/disale trading pool, volatility ratio 
  */
-contract SyntheX is ISyntheX, SyntheXStorage, AccessControlUpgradeable, UUPSUpgradeable, AddressStorage, PausableUpgradeable {
+contract SyntheX is 
+    Initializable,
+    ISyntheX, 
+    SyntheXStorage, 
+    AddressStorage, 
+    AccessControlUpgradeable, 
+    PausableUpgradeable, 
+    UUPSUpgradeable
+{
     /// @notice Using SafeERC20 for ERC20 to avoid reverts
     using SafeERC20Upgradeable for ERC20Upgradeable;
+
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
 
     /**
      * @notice Initialize the contract
@@ -43,14 +57,17 @@ contract SyntheX is ISyntheX, SyntheXStorage, AccessControlUpgradeable, UUPSUpgr
         address _l0Admin, address _l1Admin, address _l2Admin
     ) public initializer {
         __Pausable_init();
-        __UUPSUpgradeable_init();
-
         __AccessControl_init();
+        __UUPSUpgradeable_init();
+        // Set the admin roles
         _setupRole(DEFAULT_ADMIN_ROLE, _l0Admin);
         _setupRole(L1_ADMIN_ROLE, _l1Admin);
         _setupRole(L2_ADMIN_ROLE, _l2Admin);
         _setRoleAdmin(L2_ADMIN_ROLE, L1_ADMIN_ROLE);
     }
+
+    ///@notice required by the OZ UUPS module
+    function _authorizeUpgrade(address) internal override onlyL1Admin {}
 
     function isL0Admin(address _account) public override view returns (bool) {
         return hasRole(DEFAULT_ADMIN_ROLE, _account);
@@ -65,12 +82,12 @@ contract SyntheX is ISyntheX, SyntheXStorage, AccessControlUpgradeable, UUPSUpgr
     }
 
     modifier onlyL1Admin() {
-        require(isL1Admin(msg.sender), Errors.NOT_AUTHORIZED);
+        require(isL1Admin(msg.sender), Errors.CALLER_NOT_L1_ADMIN);
         _;
     }
 
     modifier onlyL2Admin() {
-        require(isL2Admin(msg.sender), Errors.NOT_AUTHORIZED);
+        require(isL2Admin(msg.sender), Errors.CALLER_NOT_L2_ADMIN);
         _;
     }
 
@@ -86,10 +103,6 @@ contract SyntheX is ISyntheX, SyntheXStorage, AccessControlUpgradeable, UUPSUpgr
     /* -------------------------------------------------------------------------- */
     /*                               Admin Functions                              */
     /* -------------------------------------------------------------------------- */
-
-    ///@notice required by the OZ UUPS module
-    function _authorizeUpgrade(address) internal override onlyL1Admin {}
-
     /**
      * @notice Pause the contract
      * @dev Only callable by L2 admin

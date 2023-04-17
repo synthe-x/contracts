@@ -1,11 +1,11 @@
 import hre, { ethers, upgrades } from 'hardhat';
 import fs from 'fs';
 import { Contract } from 'ethers';
-import { _deploy } from '../../scripts/utils/helper';
+import { _deploy as _deployEVM } from '../../scripts/utils/helper';
 import { _deploy as _deployDefender } from '../../scripts/utils/defender';
 
 
-export default async function main(name: string, symbol: string, weth: string, isTest: boolean = false): Promise<Contract> {
+export default async function main(name: string, symbol: string, weth: string, isTest: boolean = false, _deploy = _deployEVM): Promise<Contract> {
     if(!isTest) console.log(`Deploying Pool ${name} to ${hre.network.name} (${hre.network.config.chainId}) ...`);
 
 	// read deployments and config
@@ -35,8 +35,9 @@ export default async function main(name: string, symbol: string, weth: string, i
             console.log("Could not verify pool");
         }
     }
-
-    _deployDefender(symbol +'_'+ config.version, pool)
+    if((hre.network.config as any).isLive){
+        _deployDefender(symbol +'_'+ config.version, pool)
+    }
     
     // save deployments
     if(!isTest){

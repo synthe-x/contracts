@@ -42,9 +42,24 @@ export async function initiate(
   if(!weth){
     console.log("WETH not found, deploying...");
     weth = await _deploy("WETH9", [], deployments, {name: 'WETH9'}, config);
+
+    // save deployments
+    if(!isTest){
+      fs.writeFileSync(
+        process.cwd() + `/deployments/${hre.network.config.chainId}/config.json`,
+        JSON.stringify(config, null, 2)
+      );
+      fs.writeFileSync(
+        process.cwd() + `/deployments/${hre.network.config.chainId}/deployments.json`,
+        JSON.stringify(deployments, null, 2)
+      );
+    }
   } else {
     weth = await ethers.getContractAt("WETH9", weth);
   }
+
+  const synthex = await ethers.getContractAt("SyntheX", deployments.contracts["SyntheX"].address);
+  const esSyx = await ethers.getContractAt("EscrowedSYX", deployments.contracts["EscrowedSYX"].address);
 
   for(let k = 0; k < config.pools.length; k++){
     const poolConfig = config.pools[k];
@@ -58,23 +73,23 @@ export async function initiate(
     } as IPoolData;
 
     poolResult.pool = await deployPool(poolConfig.name, poolConfig.symbol, weth.address, isTest)
-    poolResult.oracle = await deployOracle(poolResult.pool.address, isTest);
+    poolResult.oracle = await deployOracle(poolResult.pool, isTest);
 
-    await initPool(poolResult.pool.address, poolResult.oracle.address, poolConfig.issuerAlloc, poolConfig.rewardSpeed, isTest);
+    await initPool(poolResult.pool, synthex, esSyx.address, poolResult.oracle.address, poolConfig.issuerAlloc, poolConfig.rewardSpeed, isTest);
     
     for(let i = 0; i < poolConfig.collaterals.length; i++){
       let cConfig = poolConfig.collaterals[i];
       if(cConfig.address == ETH_ADDRESS){
         cConfig.address = weth.address;
       }
-      const result = await initCollateral(cConfig, poolResult.pool.address, poolResult.oracle.address, isTest)
+      const result = await initCollateral(cConfig, poolResult.pool, poolResult.oracle, isTest)
       poolResult.collateralTokens.push(result.collateral);
       poolResult.collateralPriceFeeds.push(result.feed);
     }
 
     for(let i = 0; i < poolConfig.synths.length; i++){
       const synthConfig = poolConfig.synths[i];
-      const result = await initSynth(synthConfig, poolResult.pool.address, poolResult.oracle.address, isTest);
+      const result = await initSynth(synthConfig, synthex, poolResult.pool, poolResult.oracle, isTest);
       poolResult.synths.push(result.synth);
       poolResult.synthPriceFeeds.push(result.feed);
     }
