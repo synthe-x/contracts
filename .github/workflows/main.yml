@@ -24,4 +24,4 @@ jobs:
           yarn node &
           yarn deploy
       - name: Run Tests
-        run: yarn test:fork
+        run: yarn test
