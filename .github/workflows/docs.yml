@@ -2,8 +2,8 @@ name: Document with Slither
 
 on:
   pull_request:
-    branches: [main]
-
+    branches: 
+      - main
 jobs:
   document:
     name: Document with Slither
