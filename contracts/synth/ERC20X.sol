@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity 0.8.19;
+pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
@@ -9,6 +9,7 @@ import "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/draft-ERC20Pe
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/MulticallUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "../synthex/ISyntheX.sol";
 import "../pool/IPool.sol";
@@ -21,6 +22,7 @@ import "../libraries/Errors.sol";
  * @dev ERC20FlashMint for flash loan with fee (used to burn debt)
  */
 contract ERC20X is 
+    Initializable,
     ERC20Upgradeable, 
     ERC20PermitUpgradeable, 
     ERC20FlashMintUpgradeable, 
@@ -38,9 +40,22 @@ contract ERC20X is
 
     /// @notice Emitted when flash fee is updated
     event FlashFeeUpdated(uint _flashLoanFee);
-    /// @notice Emitted when referred by address
-    event Referred(address indexed referredBy, address indexed account);
 
+    // gap
+    uint256[49] private __gap;
+
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
+    /**
+     * @notice Initialize the contract
+     * @param _name Name of the token
+     * @param _symbol Symbol of the token
+     * @param _pool Address of the pool
+     * @param _synthex Address of the SyntheX contract
+     */
     function initialize(string memory _name, string memory _symbol, address _pool, address _synthex) initializer external {
         __ERC20_init(_name, _symbol);
         __ERC20Permit_init(_name);
@@ -81,45 +96,45 @@ contract ERC20X is
      * @notice Mint token. Issue debt
      * @param amount Amount of token to mint
      */
-    function mint(uint256 amount, address recipient, address referredBy) external whenNotPaused {
-        // ensure amount is greater than 0
-        require(amount > 0, Errors.ZERO_AMOUNT);
-        uint amountToMint = pool.commitMint(msg.sender, amount);
-        // check if amount is correct
-        require(amountToMint <= amount, Errors.INVALID_AMOUNT);
-        _mint(recipient, amountToMint);
-        if(referredBy != address(0)){
-            emit Referred(referredBy, msg.sender);
-        }
-    }
+    // function mint(uint256 amount, address recipient, address referredBy) external whenNotPaused {
+    //     // ensure amount is greater than 0
+    //     require(amount > 0, Errors.ZERO_AMOUNT);
+    //     uint amountToMint = pool.commitMint(msg.sender, amount);
+    //     // check if amount is correct
+    //     require(amountToMint <= amount, Errors.INVALID_AMOUNT);
+    //     _mint(recipient, amountToMint);
+    //     if(referredBy != address(0)){
+    //         emit Referred(referredBy, msg.sender);
+    //     }
+    // }
 
     /**
      * @notice Burn synth. Repays debt
      * @param amount Amount of token to burn
      */
-    function burn(uint256 amount) external whenNotPaused {
-        require(amount > 0, Errors.ZERO_AMOUNT);
-        uint amountToBurn = pool.commitBurn(msg.sender, amount);
-        // check if amount is correct
-        require(amountToBurn <= amount, Errors.INVALID_AMOUNT);
-        _burn(msg.sender, amountToBurn);
-    }
+    // function burn(uint256 amount) external whenNotPaused {
+    //     require(amount > 0, Errors.ZERO_AMOUNT);
+    //     uint amountToBurn = pool.commitBurn(msg.sender, amount);
+    //     // check if amount is correct
+    //     require(amountToBurn <= amount, Errors.INVALID_AMOUNT);
+    //     _burn(msg.sender, amountToBurn);
+    // }
 
     /**
      * @notice Swap synth to another synth in pool
      * @param amount Amount of token to swap
      * @param synthTo Synth to swap to
      */
-    function swap(uint256 amount, address synthTo, address _recipient, address referredBy) external whenNotPaused {
-        require(amount > 0, Errors.ZERO_AMOUNT);
-        uint amountToSwap = pool.commitSwap(_recipient, amount, synthTo);
-        // check if amount is correct
-        require(amountToSwap <= amount, Errors.INVALID_AMOUNT);
-        _burn(msg.sender, amountToSwap);
-        if(referredBy != address(0)){
-            emit Referred(referredBy, msg.sender);
-        }
-    }
+    // function swap(uint256 amount, address synthTo, address _recipient, address referredBy) external whenNotPaused {
+    //     require(amount > 0, Errors.ZERO_AMOUNT);
+    //     uint amountToSwap = pool.commitSwap(_recipient, amount, synthTo);
+    //     // check if amount is correct
+    //     require(amountToSwap <= amount, Errors.INVALID_AMOUNT);
+    //     _burn(msg.sender, amountToSwap);
+    //     if(referredBy != address(0)){
+    //         emit Referred(referredBy, msg.sender);
+    //     }
+    // }
 
     /**
      * @notice Liquidate with this synth
@@ -127,13 +142,13 @@ contract ERC20X is
      * @param amount Amount of this token to liquidate
      * @param outAsset Collateral to receive
      */
-    function liquidate(address account, uint256 amount, address outAsset) external whenNotPaused {
-        require(amount > 0, Errors.ZERO_AMOUNT);
-        uint amountToBurn = pool.commitLiquidate(msg.sender, account, amount, outAsset);
-        // check if amount is correct
-        require(amountToBurn <= amount, Errors.INVALID_AMOUNT);
-        _burn(msg.sender, amountToBurn);
-    }
+    // function liquidate(address account, uint256 amount, address outAsset) external whenNotPaused {
+    //     require(amount > 0, Errors.ZERO_AMOUNT);
+    //     uint amountToBurn = pool.commitLiquidate(msg.sender, account, amount, outAsset);
+    //     // check if amount is correct
+    //     require(amountToBurn <= amount, Errors.INVALID_AMOUNT);
+    //     _burn(msg.sender, amountToBurn);
+    // }
 
     /* -------------------------------------------------------------------------- */
     /*                            Restricted Functions                            */
@@ -143,7 +158,7 @@ contract ERC20X is
      * @param account Account to mint token
      * @param amount Amount of tokens to mint
      */
-    function mintInternal(address account, uint256 amount) onlyInternal external {
+    function mint(address account, uint256 amount) onlyInternal external {
         _mint(account, amount);
     }
 
@@ -152,7 +167,7 @@ contract ERC20X is
      * @param account Account to burn from
      * @param amount Amount of tokens to burn
      */
-    function burnInternal(address account, uint256 amount) onlyInternal external {
+    function burn(address account, uint256 amount) onlyInternal external {
         _burn(account, amount);
     }
 

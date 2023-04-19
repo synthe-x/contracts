@@ -5,7 +5,7 @@ import main from "../../scripts/main";
 
 describe("Testing ERC20X Upgradeablity", function () {
 
-	let synthex: any, oracle: any, pool: any, eth: any, susd: any, sbtc: any, seth: any, sbtcFeed: any;
+	let synthex: any, oracle: any, pool: any, eth: any, susd: any, sbtc: any, seth: any, sbtcFeed: any, libraries: any;
 	let owner: any, user1: any, user2: any, user3: any;
 
 	beforeEach(async () => {
@@ -13,6 +13,7 @@ describe("Testing ERC20X Upgradeablity", function () {
 		[owner, user1, user2, user3] = await ethers.getSigners();
 
 		const deployments = await loadFixture(main);
+		libraries = deployments.libraries;
 		synthex = deployments.synthex;
 		pool = deployments.pools[0].pool;
 		oracle = deployments.pools[0].oracle;

@@ -26,7 +26,7 @@ describe("Testing the complete flow", function () {
 		cusd = deployments.pools[0].synths[2];
 	});
 
-    it("should create eth-ceth stable pair", async () => {
-        console.log("ceth address", ceth.address, eth.address);
-    })
+    it("should create eth-ceth stable pair", async () => {})
+
+    it("join 10 ETH + 10 cETH", async () => {})
 });

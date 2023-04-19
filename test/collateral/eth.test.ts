@@ -31,14 +31,14 @@ describe("ETH Collateral", function () {
 	});
 
 	it("deposit with depositETH", async function () {
-        await cryptoPool.connect(user1).depositETH({value: ethers.utils.parseEther("10")});
+        await cryptoPool.connect(user1).depositETH(user1.address, {value: ethers.utils.parseEther("10")});
 		expect((await cryptoPool.getAccountLiquidity(user1.address))[1]).eq(
 			ethers.utils.parseEther("10000")
 		);
 	});
 
 	it('withdraw all', async () => {
-		await cryptoPool.connect(user1).depositETH({value: ethers.utils.parseEther("10")});
+		await cryptoPool.connect(user1).depositETH(user1.address, {value: ethers.utils.parseEther("10")});
 		await cryptoPool.connect(user1).withdraw(weth.address, ethers.utils.parseEther("1"), true);
 		// expect((await cryptoPool.getAccountLiquidity(user1.address))[1]).eq(
 		// 	ethers.utils.parseEther("0")

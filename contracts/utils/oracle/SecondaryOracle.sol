@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.19;
+pragma solidity ^0.8.0;
 
 import "@aave/core-v3/contracts/dependencies/chainlink/AggregatorInterface.sol";
 import "@openzeppelin/contracts/utils/math/SignedSafeMath.sol";

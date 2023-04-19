@@ -1,26 +1,29 @@
 import { DeployProxyOptions } from "@openzeppelin/hardhat-upgrades/dist/utils";
 import { ethers, OpenzeppelinDefender } from "hardhat";
 import { upgrades } from "hardhat";
+import { utils, Wallet } from "zksync-web3";
+import { HardhatRuntimeEnvironment } from "hardhat/types";
+import { Deployer } from "@matterlabs/hardhat-zksync-deploy";
 
 export const _deploy = async (
 	contractName: string,
 	args: any[],
 	deployments: any,
-	{upgradable = false, name = contractName} = {},
+	{upgradable = false, name = contractName, libraries = {}} = {},
 	config: any = {},
 ) => {
-	const Contract = await ethers.getContractFactory(contractName);
+	const Contract = await ethers.getContractFactory(contractName, {libraries});
 	let contract;
 	if (upgradable) {
 		// wrap it
-		const deployProxyParams: DeployProxyOptions = { type: 'uups' } as DeployProxyOptions;
+		const deployProxyParams: DeployProxyOptions = { type: 'uups', unsafeAllowLinkedLibraries: true } as DeployProxyOptions;
 		// deploy
 		contract = await upgrades.deployProxy(Contract, args, deployProxyParams);
 		args = [];
 	} else {
 		contract = await Contract.deploy(...args);
 	}
-	await contract.deployed();
+	contract = await contract.deployed();
 
 	deployments.contracts[name] = {
 		address: contract.address,

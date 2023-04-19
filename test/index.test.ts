@@ -27,11 +27,11 @@ describe("Testing the complete flow", function () {
 		const user2Deposit = ethers.utils.parseEther("10");
 		const user3Deposit = ethers.utils.parseEther("200");
 
-		await pool.connect(user1).depositETH({value: user1Deposit});    // $ 20000
+		await pool.connect(user1).depositETH(user1.address, {value: user1Deposit});    // $ 20000
 		// user2 transfers 10 eth to pool
 		// await user2.sendTransaction({to: pool.address, value: user2Deposit}); // $ 10000
-		await pool.connect(user2).depositETH({value: user2Deposit});    // $ 10000
-		await pool.connect(user3).depositETH({value: user3Deposit});   // $ 100000
+		await pool.connect(user2).depositETH(user2.address, {value: user2Deposit});    // $ 10000
+		await pool.connect(user3).depositETH(user3.address, {value: user3Deposit});   // $ 100000
 
 		expect((await pool.getAccountLiquidity(user1.address)).collateral).to.equal(ethers.utils.parseEther('20000'));
 		expect((await pool.getAccountLiquidity(user2.address)).collateral).to.equal(ethers.utils.parseEther('10000'));
@@ -40,9 +40,9 @@ describe("Testing the complete flow", function () {
 
 	it("issue synths", async function () {
 		// user1 issues 10 seth
-        await seth.connect(user1).mint(ethers.utils.parseEther("10"), user1.address, ethers.constants.AddressZero); // $ 10000
+        await pool.connect(user1).mint(seth.address, ethers.utils.parseEther("10"), user1.address); // $ 10000
         // user3 issues 100000 susd
-        await susd.connect(user3).mint(ethers.utils.parseEther("90000"), user3.address, ethers.constants.AddressZero); // $ 90000
+        await pool.connect(user3).mint(susd.address, ethers.utils.parseEther("90000"), user3.address); // $ 90000
 
 		// balance
 		expect(await seth.balanceOf(user1.address)).to.equal(ethers.utils.parseEther("10"));
@@ -56,7 +56,7 @@ describe("Testing the complete flow", function () {
 
     it("swap em", async () => {
         // user1 exchanges 10 seth for 1 sbtc
-        await seth.connect(user1).swap(ethers.utils.parseEther("10"), sbtc.address, user1.address, ethers.constants.AddressZero);
+        await pool.connect(user1).swap(seth.address, ethers.utils.parseEther("10"), sbtc.address, 0, user1.address);
         // check balances
 		const user1Liquidity = await pool.getAccountLiquidity(user1.address);
 		const user3Liquidity = await pool.getAccountLiquidity(user3.address);
@@ -84,14 +84,14 @@ describe("Testing the complete flow", function () {
 
 		// user1 burns 10 seth
 		let sbtcBalance = await sbtc.balanceOf(user1.address);
-		await sbtc.connect(user1).burn(sbtcBalance); // $ 10000
+		await pool.connect(user1).burn(sbtc.address, sbtcBalance); // $ 10000
 		let sbtcToTransfer = await sbtc.balanceOf(user1.address);
 		await sbtc.connect(user1).transfer(user3.address, sbtcToTransfer);
 		// user3 burns 100000 susd
 		let susdBalance = await susd.balanceOf(user3.address);
-		await susd.connect(user3).burn(susdBalance); // $ 30000/118181
+		await pool.connect(user3).burn(susd.address, susdBalance); // $ 30000/118181
 		sbtcBalance = await sbtc.balanceOf(user3.address);
-		await sbtc.connect(user3).burn(sbtcBalance); // $ 45000/118181
+		await pool.connect(user3).burn(sbtc.address, sbtcBalance); // $ 45000/118181
 
 		expect((await pool.getAccountLiquidity(user1.address))[2]).to.be.closeTo(ethers.utils.parseEther("0.00"), ethers.utils.parseEther("0.2"));
 		expect((await pool.getAccountLiquidity(user3.address))[2]).to.be.lessThan(debtUser3);
