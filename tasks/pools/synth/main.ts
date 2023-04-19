@@ -56,7 +56,12 @@ export default async function main(synthConfig: SynthArgs, synthex: Contract, po
 	// set price feed
 	await oracle.setAssetSources([synth.address], [feed.address]);
 
-	await pool.addSynth(synth.address, synthConfig.mintFee, synthConfig.burnFee);
+	await pool.addSynth(synth.address, {
+		isActive: true,
+        isDisabled: false,
+        mintFee: synthConfig.mintFee,
+        burnFee: synthConfig.burnFee
+	});
 	if(!isTest) console.log(`\t\t ${synthConfig.name} (${synthConfig.symbol}) ($${parseFloat(ethers.utils.formatUnits(await feed.latestAnswer(), await feed.decimals())).toFixed(4)}) added  ✨`);
 
 	if(synthConfig.isFeeToken){

@@ -2,9 +2,12 @@ import hre, { ethers, upgrades } from "hardhat";
 import { BigNumber, Contract } from 'ethers';
 import { _deploy } from "./utils/helper";
 import { _deploy as _deployDefender } from "./utils/defender";
-import deployPool from '../tasks/pools/main'
+import deployLibraries from '../tasks/pools/main'
+import deployPool from '../tasks/pools/new/main'
+
 import deployOracle from '../tasks/pools/oracle/main'
 import initPool from '../tasks/pools/init/main'
+
 import initCollateral from '../tasks/pools/collateral/main'
 import initSynth from '../tasks/pools/synth/main'
 import fs from 'fs';
@@ -25,6 +28,11 @@ export interface IPoolData {
 export interface IInitiateResult {
   pools: IPoolData[];
   dummyTokens: Contract[];
+  libraries: {
+    poolLogic: Contract;
+    collateralLogic: Contract;
+    synthLogic: Contract;
+  }
 }
 
 export async function initiate(
@@ -35,7 +43,12 @@ export async function initiate(
 
   let result = {
     pools: [],
-    dummyTokens: []
+    dummyTokens: [],
+    libraries: {
+      poolLogic: {} as Contract,
+      collateralLogic: {} as Contract,
+      synthLogic: {} as Contract,
+    }
   } as IInitiateResult;
 
   let weth = config.weth;
@@ -61,6 +74,8 @@ export async function initiate(
   const synthex = await ethers.getContractAt("SyntheX", deployments.contracts["SyntheX"].address);
   const esSyx = await ethers.getContractAt("EscrowedSYX", deployments.contracts["EscrowedSYX"].address);
 
+  result.libraries = await deployLibraries(isTest);
+
   for(let k = 0; k < config.pools.length; k++){
     const poolConfig = config.pools[k];
     let poolResult = {
@@ -72,7 +87,7 @@ export async function initiate(
       synthPriceFeeds: []
     } as IPoolData;
 
-    poolResult.pool = await deployPool(poolConfig.name, poolConfig.symbol, weth.address, isTest)
+    poolResult.pool = await deployPool(poolConfig.name, poolConfig.symbol, weth.address, result.libraries.poolLogic.address, result.libraries.collateralLogic.address, result.libraries.synthLogic.address, isTest)
     poolResult.oracle = await deployOracle(poolResult.pool, isTest);
 
     await initPool(poolResult.pool, synthex, esSyx.address, poolResult.oracle.address, poolConfig.issuerAlloc, poolConfig.rewardSpeed, isTest);

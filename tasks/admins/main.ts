@@ -19,7 +19,6 @@ export default async function main(synthex: Contract, deployerAddress: string, i
 
     // set admins
 	if(!isTest) console.log("Setting admins... 💬")
-	console.log(DEFAULT_ADMIN_ROLE, config.l0Admin, L1_ADMIN_ROLE, config.l1Admin, L2_ADMIN_ROLE, config.l2Admin);
     await synthex.grantRole(DEFAULT_ADMIN_ROLE, config.l0Admin);
     await synthex.grantRole(L1_ADMIN_ROLE, config.l1Admin);
     await synthex.grantRole(L2_ADMIN_ROLE, config.l2Admin);

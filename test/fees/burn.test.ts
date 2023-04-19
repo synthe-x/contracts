@@ -24,15 +24,15 @@ describe("Testing BurnFee", function () {
 		seth = deployments.pools[0].synths[1];
 		susd = deployments.pools[0].synths[2];
 
-        await cryptoPool.connect(user1).depositETH({value: ethers.utils.parseEther("50")});    // $ 50000
+        await cryptoPool.connect(user1).depositETH(user1.address, {value: ethers.utils.parseEther("50")});    // $ 50000
         expect((await cryptoPool.getAccountLiquidity(user1.address))[1]).to.be.equal(ethers.utils.parseEther("50000"));
 
-        await cryptoPool.connect(user2).depositETH({value: ethers.utils.parseEther("50")});    // $ 50000
+        await cryptoPool.connect(user2).depositETH(user2.address, {value: ethers.utils.parseEther("50")});    // $ 50000
         expect((await cryptoPool.getAccountLiquidity(user2.address))[1]).to.be.equal(ethers.utils.parseEther("50000"));
 
         // Mint synths
-        await seth.connect(user1).mint(ethers.utils.parseEther("10"), user1.address, ethers.constants.AddressZero); // $ 10000
-        await seth.connect(user2).mint(ethers.utils.parseEther("10"), user2.address, ethers.constants.AddressZero); // $ 10000
+        await cryptoPool.connect(user1).mint(seth.address, ethers.utils.parseEther("10"), user1.address); // $ 10000
+        await cryptoPool.connect(user2).mint(seth.address, ethers.utils.parseEther("10"), user2.address); // $ 10000
 	};
 
     describe('Burn fee', async () => { 
@@ -46,7 +46,7 @@ describe("Testing BurnFee", function () {
 
         it("user should be able to burn 1 sETH with 10 sUSD fee", async function () {
             // user1 burns 1.01 seth for repaying $1000 debt (1% fee)
-            await seth.connect(user1).burn(ethers.utils.parseEther("1.01"));
+            await cryptoPool.connect(user1).burn(seth.address, ethers.utils.parseEther("1.01"));
             // 1010 = 1000 + 10 (1%) fee
             let initialAmount = ethers.utils.parseEther("1000");
             let fee = initialAmount.mul(burnFee).div(BASIS_POINTS);
@@ -67,7 +67,7 @@ describe("Testing BurnFee", function () {
             // initial vault balance
             let initialVaultBalance = await susd.balanceOf(vault.address);
             // user1 burns 1.001 seth for repaying $1000 debt (0.1% fee)
-            await seth.connect(user2).burn(ethers.utils.parseEther("1.001"));
+            await cryptoPool.connect(user2).burn(seth.address, ethers.utils.parseEther("1.001"));
             // 1010 = 1000 + 1 (0.1%) fee
             let initialAmount = ethers.utils.parseEther("1000");
             let fee = initialAmount.mul(burnFee).div(BASIS_POINTS);
@@ -97,7 +97,7 @@ describe("Testing BurnFee", function () {
             let initialUser1Debt = (await cryptoPool.getAccountLiquidity(user1.address))[2];
             let initialUser2Debt = (await cryptoPool.getAccountLiquidity(user2.address))[2];
             // user1 swaps 10 seth
-            await seth.connect(user1).burn(ethers.utils.parseEther("1.01"));
+            await cryptoPool.connect(user1).burn(seth.address, ethers.utils.parseEther("1.01"));
             // 10000 = 9900 + 100 (1%) fee
             let initialAmount = ethers.utils.parseEther("1000");
             let fee = initialAmount.mul(burnFee).div(BASIS_POINTS);
@@ -128,7 +128,7 @@ describe("Testing BurnFee", function () {
             // initial vault balance
             let initialVaultBalance = await susd.balanceOf(vault.address);
             // user1 swaps 10 seth
-            await seth.connect(user2).burn(ethers.utils.parseEther("1.001"));
+            await cryptoPool.connect(user2).burn(seth.address, ethers.utils.parseEther("1.001"));
             // 10000 = 9900 + 100 (1%) fee
             let initialAmount = ethers.utils.parseEther("1000");
             let fee = initialAmount.mul(burnFee).div(BASIS_POINTS);

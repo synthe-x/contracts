@@ -6,7 +6,7 @@ import { ethers, upgrades } from "hardhat";
 import main from "../../scripts/main";
 import hre from 'hardhat';
 
-describe("Testing ERC20X Upgradeablity", function () {
+describe("Testing ERC20X Permit", function () {
 
 	let synthex: any, oracle: any, pool: any, eth: any, susd: any, sbtc: any, seth: any, sbtcFeed: any;
 	let owner: any, user1: any, user2: any, user3: any;
@@ -23,9 +23,9 @@ describe("Testing ERC20X Upgradeablity", function () {
 
 	it("Mint 0.1 sBTC", async function () {
         // Deposit 10 ETH to pool
-        await pool.connect(user1).depositETH({value: ethers.utils.parseEther("10")});
+        await pool.connect(user1).depositETH(user1.address, {value: ethers.utils.parseEther("10")});
         // Mint 1 sBTC
-        await sbtc.connect(user1).mint(ethers.utils.parseEther("0.1"), user1.address, ethers.constants.AddressZero);
+        await pool.connect(user1).mint(sbtc.address, ethers.utils.parseEther("0.1"), user1.address);
     });
 
 

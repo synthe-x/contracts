@@ -9,7 +9,6 @@
     "create:node": "hardhat node",
     "deploy": "hardhat run scripts",
     "deploy:zksync:local": "PRIVATE_KEY=7726827caac94a7f9e1b160f7ea819f172f7b6f9d2a97f992c38edeab82d4110 hardhat --config hardhat-zksync-local.config.ts deploy-zksync --script main.ts",
-
     "deploy:fork": "hardhat --config hardhat-fork.config.ts run scripts --network hardhat",
     "deploy:testnet": "hardhat run scripts --network arbitrumGoerli",
     "deploy:mainnet": "hardhat run scripts --network arbitrum",
@@ -29,6 +28,7 @@
     "dotenv": "^16.0.3",
     "ethers": "^5.7.2",
     "hardhat": "^2.12.0",
+    "hardhat-contract-sizer": "^2.8.0",
     "hardhat-gas-reporter": "^1.0.9",
     "hardhat-openzeppelin-defender": "^1.2.5",
     "ts-node": "^10.9.1",
@@ -37,6 +37,7 @@
   },
   "dependencies": {
     "@aave/core-v3": "^1.17.1",
+    "@balancer-labs/v2-interfaces": "^0.4.0",
     "@nomicfoundation/hardhat-chai-matchers": "^1.0.5",
     "@nomicfoundation/hardhat-network-helpers": "^1.0.7",
     "@openzeppelin/contracts": "^4.7.3",
