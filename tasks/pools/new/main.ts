@@ -31,9 +31,12 @@ export default async function main(name: string, symbol: string, weth: string, p
     if(!isTest) console.log(`Pool deployed at ${pool.address}`);
     if((hre.network.config as any).isLive){
         try{
-            await hre.run("verify:verify", {
+            hre.run("verify:verify", {
                 address: pool.address,
                 constructorArguments: []
+            })
+            .catch(err => {
+                console.log("Could not verify pool");
             })
         } catch (err) {
             console.log("Could not verify pool");

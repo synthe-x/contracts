@@ -26,9 +26,12 @@ export default async function main(synthConfig: SynthArgs, synthex: Contract, po
 		if(!isTest) console.log(`Token ${name} (${symbol}) deployed at ${synth.address}`);
 		if((hre.network.config as any).isLive){
 			try{
-				await hre.run("verify:verify", {
+				hre.run("verify:verify", {
 					address: synth.address,
 					constructorArguments: []
+				})
+				.catch(err => {
+					console.log("Could not verify synth", name);
 				})
 			} catch (err) {
 				console.log("Could not verify vault");
@@ -41,14 +44,14 @@ export default async function main(synthConfig: SynthArgs, synthex: Contract, po
 
 	if(synthConfig.isFeedSecondary){
 		// deploy secondary price feed
-		feed = await _deploy('SecondaryOracle', [feed, synthConfig.secondarySource], deployments, {name: `${synthConfig.symbol}_PriceFeed`});
+		feed = await _deploy('SecondaryOracle', [feed, synthConfig.secondarySource], deployments, {name: `${poolSymbol.toLowerCase()}${synthConfig.symbol}_PriceFeed`});
 		if(!isTest) console.log(`Secondary price feed deployed at ${feed.address}`);
 		feed = feed.address;
 	}
 	if(!feed){
 		if(!synthConfig.price) throw new Error('Price not set for ' + synthConfig.symbol);
 		// deploy price feed
-		feed = await _deploy('MockPriceFeed', [ethers.utils.parseUnits(synthConfig.price, 8), 8], deployments, {name: `${synthConfig.symbol}_PriceFeed`});
+		feed = await _deploy('MockPriceFeed', [ethers.utils.parseUnits(synthConfig.price, 8), 8], deployments, {name: `${poolSymbol.toLowerCase()}${synthConfig.symbol}_PriceFeed`});
 		if(!isTest) console.log(`Price feed deployed at ${feed.address}`);
 	} else {
 		feed = await ethers.getContractAt('MockPriceFeed', feed);

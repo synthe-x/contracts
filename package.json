@@ -9,9 +9,10 @@
     "create:node": "hardhat node",
     "deploy": "hardhat run scripts",
     "deploy:zksync:local": "PRIVATE_KEY=7726827caac94a7f9e1b160f7ea819f172f7b6f9d2a97f992c38edeab82d4110 hardhat --config hardhat-zksync-local.config.ts deploy-zksync --script main.ts",
-    "deploy:fork": "hardhat --config hardhat-fork.config.ts run scripts --network hardhat",
-    "deploy:testnet": "hardhat run scripts --network arbitrumGoerli",
-    "deploy:mainnet": "hardhat run scripts --network arbitrum",
+    "deploy:fork": "yarn clean && hardhat --config hardhat-fork.config.ts run scripts --network hardhat",
+    "deploy:testnet": "yarn clean && hardhat run scripts --network arbitrumGoerli",
+    "clean": "hardhat clean",
+    "deploy:mainnet": "yarn clean && hardhat run scripts --network arbitrum",
     "slither": "slither ./contracts --checklist docs/SECURITY.md"
   },
   "devDependencies": {

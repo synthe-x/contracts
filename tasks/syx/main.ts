@@ -60,7 +60,7 @@ export default async function main(deployerAddress: string, isTest: boolean = fa
 
     if((hre.network.config as any).isLive){
         try{
-            await hre.run("verify:verify", {
+            hre.run("verify:verify", {
                 address: esSYX.address,
                 constructorArguments: []
             })
@@ -69,7 +69,7 @@ export default async function main(deployerAddress: string, isTest: boolean = fa
         }
 
         try{
-            await hre.run("verify:verify", {
+            hre.run("verify:verify", {
                 address: SYX.address,
                 constructorArguments: []
             })
