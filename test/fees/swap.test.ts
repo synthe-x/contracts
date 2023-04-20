@@ -25,15 +25,15 @@ describe("Testing SwapFee", function () {
 		seth = deployments.pools[0].synths[1];
 		susd = deployments.pools[0].synths[2];
 
-        await cryptoPool.connect(user1).depositETH({value: ethers.utils.parseEther("50")});    // $ 50000
+        await cryptoPool.connect(user1).depositETH(user1.address, {value: ethers.utils.parseEther("50")});    // $ 50000
         expect((await cryptoPool.getAccountLiquidity(user1.address))[1]).to.be.equal(ethers.utils.parseEther("50000"));
 
-        await cryptoPool.connect(user2).depositETH({value: ethers.utils.parseEther("50")});    // $ 50000
+        await cryptoPool.connect(user2).depositETH(user2.address, {value: ethers.utils.parseEther("50")});    // $ 50000
         expect((await cryptoPool.getAccountLiquidity(user2.address))[1]).to.be.equal(ethers.utils.parseEther("50000"));
 
         // Mint synths
-        await seth.connect(user1).mint(ethers.utils.parseEther("10"), user1.address, ethers.constants.AddressZero); // $ 10000
-        await seth.connect(user2).mint(ethers.utils.parseEther("10"), user2.address, ethers.constants.AddressZero); // $ 10000
+        await cryptoPool.connect(user1).mint(seth.address, ethers.utils.parseEther("10"), user1.address); // $ 10000
+        await cryptoPool.connect(user2).mint(seth.address, ethers.utils.parseEther("10"), user2.address); // $ 10000
 	};
 
     describe('Swap fee', async () => { 
@@ -48,7 +48,7 @@ describe("Testing SwapFee", function () {
 
         it("user should be able to swap 10 sETH to 10000 sUSD with 100 sUSD fee", async function () {
             // user1 swaps 10 seth
-            await seth.connect(user1).swap(ethers.utils.parseEther("10"), susd.address, user1.address, ethers.constants.AddressZero);
+            await cryptoPool.connect(user1).swap(seth.address, ethers.utils.parseEther("10"), susd.address, 0, user1.address);
             // 10000 = 9900 + 100 (1%) fee
             let initialAmount = ethers.utils.parseEther("10000");
             let fee = initialAmount.mul(swapFee).div(BASIS_POINTS);
@@ -70,7 +70,7 @@ describe("Testing SwapFee", function () {
             // initial vault balance
             let initialVaultBalance = await susd.balanceOf(vault.address);
             // user1 swaps 10 seth
-            await seth.connect(user2).swap(ethers.utils.parseEther("10"), susd.address, user2.address, ethers.constants.AddressZero);
+            await cryptoPool.connect(user2).swap(seth.address, ethers.utils.parseEther("10"), susd.address, 0, user2.address);
             // 10000 = 9900 + 100 (1%) fee
             let initialAmount = ethers.utils.parseEther("10000");
             let fee = initialAmount.mul(swapFee).div(BASIS_POINTS);
@@ -101,7 +101,7 @@ describe("Testing SwapFee", function () {
             let initialUser1Debt = (await cryptoPool.getAccountLiquidity(user1.address))[2];
             let initialUser2Debt = (await cryptoPool.getAccountLiquidity(user2.address))[2];
             // user1 swaps 10 seth
-            await seth.connect(user1).swap(ethers.utils.parseEther("10"), susd.address, user1.address, ethers.constants.AddressZero);
+            await cryptoPool.connect(user1).swap(seth.address, ethers.utils.parseEther("10"), susd.address, 0, user1.address);
             // 10000 = 9900 + 100 (1%) fee
             let initialAmount = ethers.utils.parseEther("10000");
             let fee = initialAmount.mul(swapFee).div(BASIS_POINTS);
@@ -134,7 +134,7 @@ describe("Testing SwapFee", function () {
             // initial vault balance
             let initialVaultBalance = await susd.balanceOf(vault.address);
             // user1 swaps 10 seth
-            await seth.connect(user2).swap(ethers.utils.parseEther("10"), susd.address, user2.address, ethers.constants.AddressZero);
+            await cryptoPool.connect(user2).swap(seth.address, ethers.utils.parseEther("10"), susd.address, 0, user2.address);
             // 10000 = 9900 + 100 (1%) fee
             let initialAmount = ethers.utils.parseEther("10000");
             let fee = initialAmount.mul(swapFee).div(BASIS_POINTS);

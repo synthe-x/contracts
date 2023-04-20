@@ -10,6 +10,7 @@ export default {
             },
             // 0.1 gwei
             gasPrice: 1000000000, 
+
             chainId: 42161,
         },
     },

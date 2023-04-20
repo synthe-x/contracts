@@ -38,7 +38,7 @@ describe("ERC20 Collateral", function () {
 			.approve(cryptoPool.address, ethers.utils.parseEther("10"));
 		await cryptoPool
 			.connect(user1)
-			.deposit(aave.address, ethers.utils.parseEther("10"));
+			.deposit(aave.address, ethers.utils.parseEther("10"), user1.address);
 
 		expect((await cryptoPool.getAccountLiquidity(user1.address))[1]).eq(
 			ethers.utils.parseEther("10000")
@@ -77,7 +77,7 @@ describe("ERC20 Collateral", function () {
         const signature = await user1._signTypedData(domain, { Permit }, permit);
         const { v, r, s } = ethers.utils.splitSignature(signature);
 
-        await cryptoPool.connect(user1).depositWithPermit(aave.address, value, value, deadline, v, r, s);
+        await cryptoPool.connect(user1).depositWithPermit(aave.address, value, user1.address, value, deadline, v, r, s);
 
         expect((await cryptoPool.getAccountLiquidity(user1.address))[1]).eq(
             ethers.utils.parseEther("20000")

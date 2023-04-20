@@ -5,45 +5,46 @@ import { _deploy as _deployEVM } from '../../../scripts/utils/helper';
 import { _deploy as _deployDefender } from '../../../scripts/utils/defender';
 
 
-export default async function main(pool: Contract, isTest: boolean = false, _deploy = _deployEVM): Promise<Contract> {
-    if(!isTest) console.log(`Deploying PriceOracle for ${pool.address} to ${hre.network.name} (${hre.network.config.chainId}) ...`);
+export default async function main(name: string, symbol: string, weth: string, poolLogic: string, collateralLogic: string, synthLogic: string, isTest: boolean = false, _deploy = _deployEVM): Promise<Contract> {
+    if(!isTest) console.log(`Deploying Pool ${name} to ${hre.network.name} (${hre.network.config.chainId}) ...`);
 
 	// read deployments and config
 	const deployments = JSON.parse(fs.readFileSync(process.cwd() + `/deployments/${hre.network.config.chainId}/deployments.json`, "utf8"));
 	const config = JSON.parse(fs.readFileSync(process.cwd() + `/deployments/${hre.network.config.chainId}/config.json`, "utf8"));
 	
     const synthexAddress = deployments.contracts["SyntheX"].address;
-
-    // get pool contract
-    const pool_symbol = await pool.symbol();
+    
     const args = [
-        synthexAddress, 
-        [],
-        [],
-        ethers.constants.AddressZero,
-        ethers.constants.AddressZero,
-        1e8
-    ]
+        name,
+        symbol,
+        synthexAddress,
+        weth
+    ];
 
     // deploy synthex
-    const oracle = await _deploy("PriceOracle", args, deployments, {name: 'PriceOracle_'+pool_symbol}) as Contract;
+    const pool = await _deploy("Pool", args, deployments, {upgradable: true, name: 'POOL_'+symbol, libraries: {
+        CollateralLogic: collateralLogic,
+        SynthLogic: synthLogic,
+        PoolLogic: poolLogic
+    }}, config) as Contract;
 
-    if(!isTest) console.log(`PriceOracle deployed at ${oracle.address}`);
+    if(!isTest) console.log(`Pool deployed at ${pool.address}`);
     if((hre.network.config as any).isLive){
         try{
             hre.run("verify:verify", {
-                address: oracle.address,
-                constructorArguments: args
+                address: pool.address,
+                constructorArguments: []
             })
             .catch(err => {
-                console.log("Could not verify oracle");
+                console.log("Could not verify pool");
             })
         } catch (err) {
-            console.log("Could not verify oracle");
+            console.log("Could not verify pool");
         }
     }
-
-    // _deployDefender("SyntheX" +'_'+ config.version, synthex);
+    if((hre.network.config as any).isLive){
+        _deployDefender(symbol +'_'+ config.version, pool)
+    }
     
     // save deployments
     if(!isTest){
@@ -57,6 +58,6 @@ export default async function main(pool: Contract, isTest: boolean = false, _dep
         );
     }
 
-    return oracle;
+    return pool;
 }
 

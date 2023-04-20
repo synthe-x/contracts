@@ -24,8 +24,7 @@ jobs:
           node-version: 16
 
       - name: Install dependencies
-        working-directory: project
-        run: npm ci
+        run: yarn
 
       - name: Document with Slither
         uses: crytic/slither-docs-action@v0

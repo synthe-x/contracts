@@ -35,23 +35,23 @@ describe('Testing liquidation', function () {
 
     await pool
       .connect(user1)
-      .depositETH({
+      .depositETH(user1.address, {
         value: ethers.utils.parseEther('100'),
       })
     await pool
       .connect(user2)
-      .depositETH({
+      .depositETH(user2.address, {
         value: ethers.utils.parseEther('100'),
       })
     await pool
       .connect(user3)
-      .depositETH({
+      .depositETH(user3.address, {
         value: ethers.utils.parseEther('100'),
       })
 
-    await seth.connect(user1).mint(ethers.utils.parseEther('80'), user1.address, ethers.constants.AddressZero) // $ 80000
-    await sbtc.connect(user2).mint(ethers.utils.parseEther('8'), user2.address, ethers.constants.AddressZero) // $ 80000
-    await susd.connect(user3).mint(ethers.utils.parseEther('80000'), user3.address, ethers.constants.AddressZero) // $ 80000
+    await pool.connect(user1).mint(seth.address, ethers.utils.parseEther('80'), user1.address) // $ 80000
+    await pool.connect(user2).mint(sbtc.address, ethers.utils.parseEther('8'), user2.address) // $ 80000
+    await pool.connect(user3).mint(susd.address, ethers.utils.parseEther('80000'), user3.address) // $ 80000
   }
 
   describe('Liquidation @ 85', function () {
@@ -78,9 +78,9 @@ describe('Testing liquidation', function () {
 
       expect(initialLiq[2]/initialLiq[1]).to.be.closeTo(0.866666, 0.001)
       await expect(
-        sbtc
+        pool
           .connect(user2)
-          .liquidate(user1.address, ethers.utils.parseEther('1'), weth.address)
+          .liquidate(sbtc.address, user1.address, ethers.utils.parseEther('1'), weth.address)
       ).to.be.revertedWith(ERRORS.ACCOUNT_BELOW_LIQ_THRESHOLD)
     });
   })
@@ -108,9 +108,9 @@ describe('Testing liquidation', function () {
 
       expect(initialLiq[2]/initialLiq[1]).to.be.closeTo(0.9333333, 0.000001)
       // liquidate 1 BTC
-      await sbtc
+      await pool
         .connect(user2)
-        .liquidate(user1.address, ethers.utils.parseEther('1'), weth.address)
+        .liquidate(sbtc.address, user1.address, ethers.utils.parseEther('1'), weth.address)
 
         
       // check health factor
@@ -125,9 +125,9 @@ describe('Testing liquidation', function () {
       const initialLiqBalance = await pool.accountCollateralBalance(user2.address, weth.address);
 
       // liquidate 6 BTC
-      await sbtc
+      await pool
         .connect(user2)
-        .liquidate(user1.address, ethers.utils.parseEther('6'), weth.address)
+        .liquidate(sbtc.address, user1.address, ethers.utils.parseEther('6'), weth.address)
 
       // check health factor
       const liqNow = await pool.getAccountLiquidity(user1.address)
@@ -140,9 +140,9 @@ describe('Testing liquidation', function () {
     it('tries to liquidate again', async function () {
       // expect tx to revert
       await expect(
-        sbtc
+        pool
           .connect(user2)
-          .liquidate(user1.address, ethers.utils.parseEther('1'), weth.address),
+          .liquidate(sbtc.address, user1.address, ethers.utils.parseEther('1'), weth.address),
       ).to.be.revertedWith(ERRORS.ACCOUNT_BELOW_LIQ_THRESHOLD)
     })
   })
@@ -171,9 +171,9 @@ describe('Testing liquidation', function () {
 
       expect(initialLiq[2]/initialLiq[1]).to.be.closeTo(0.995, 0.001)
       // liquidate 1 BTC
-      await sbtc
+      await pool
         .connect(user2)
-        .liquidate(user1.address, ethers.utils.parseEther('1'), weth.address)
+        .liquidate(sbtc.address, user1.address, ethers.utils.parseEther('1'), weth.address)
 
         
       // check health factor
@@ -188,9 +188,9 @@ describe('Testing liquidation', function () {
       const initialLiqBalance = await pool.accountCollateralBalance(user2.address, weth.address);
 
       // liquidate 6 BTC
-      await sbtc
+      await pool
         .connect(user2)
-        .liquidate(user1.address, ethers.utils.parseEther('7'), weth.address)
+        .liquidate(sbtc.address, user1.address, ethers.utils.parseEther('7'), weth.address)
 
       // check health factor
       const liqNow = await pool.getAccountLiquidity(user1.address)
@@ -232,9 +232,9 @@ describe('Testing liquidation', function () {
 
       expect(initialLiq[2]/initialLiq[1]).to.be.closeTo(1.066666, 0.0001);
       // liquidate
-      await sbtc
+      await pool
         .connect(user2)
-        .liquidate(user1.address, ethers.utils.parseEther('1'), weth.address)
+        .liquidate(sbtc.address, user1.address, ethers.utils.parseEther('1'), weth.address)
 
             
       // liquidator does not get bonus
@@ -249,9 +249,9 @@ describe('Testing liquidation', function () {
       const initialLiqBalance = await pool.accountCollateralBalance(user2.address, weth.address);
 
       // liquidate 6 BTC
-      await sbtc
+      await pool
         .connect(user2)
-        .liquidate(user1.address, ethers.utils.parseEther('7'), weth.address)
+        .liquidate(sbtc.address, user1.address, ethers.utils.parseEther('7'), weth.address)
 
       // check health factor
       const liqNow = await pool.getAccountLiquidity(user1.address);
