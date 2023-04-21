@@ -42,4 +42,6 @@ library Errors {
   string public constant TIME_ENDED = '30';
   string public constant WITHDRAWING_MORE_THAN_ALLOWED = '31';
   string public constant ADDRESS_IS_NOT_CONTRACT = '32';
+
+  string public constant ALREADY_SET = '33';
 }

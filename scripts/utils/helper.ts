@@ -9,14 +9,14 @@ export const _deploy = async (
 	contractName: string,
 	args: any[],
 	deployments: any,
-	{upgradable = false, name = contractName} = {},
+	{upgradable = false, name = contractName, libraries = {}} = {},
 	config: any = {},
 ) => {
-	const Contract = await ethers.getContractFactory(contractName);
+	const Contract = await ethers.getContractFactory(contractName, {libraries});
 	let contract;
 	if (upgradable) {
 		// wrap it
-		const deployProxyParams: DeployProxyOptions = { type: 'uups' } as DeployProxyOptions;
+		const deployProxyParams: DeployProxyOptions = { type: 'uups', unsafeAllowLinkedLibraries: true } as DeployProxyOptions;
 		// deploy
 		contract = await upgrades.deployProxy(Contract, args, deployProxyParams);
 		args = [];

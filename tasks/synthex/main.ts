@@ -24,11 +24,16 @@ export default async function main(deployerAddress: string, isTest: boolean = fa
                 address: synthex.address,
                 constructorArguments: []
             })
+            .catch(err => {
+                console.log("Could not verify synthex");
+            })
         } catch (err) {
             console.log("Could not verify SyntheX");
         }
-    } else {
-        await _deploy("Multicall2", [], deployments);
+    }
+    if(!config.multicall){
+        console.log("Multicall not set, deploying it...");
+        await _deploy("Multicall2", [], deployments, {}, config);
     }
     if((hre.network.config as any).isLive){
         _deployDefender("SyntheX" +'_'+ config.version, synthex);

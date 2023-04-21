@@ -37,26 +37,26 @@ describe("Rewards", function () {
 	});
 
 	it("Should deposit eth", async function () {
-		await cryptoPool.connect(user1).depositETH({value: ethers.utils.parseEther("50")});    // $ 50000
+		await cryptoPool.connect(user1).depositETH(user1.address, {value: ethers.utils.parseEther("50")});    // $ 50000
 		expect((await cryptoPool.getAccountLiquidity(user1.address))[1]).to.equal(ethers.utils.parseEther("50000"));
 
-		await cryptoPool.connect(user2).depositETH({value: ethers.utils.parseEther("50")});    // $ 50000
+		await cryptoPool.connect(user2).depositETH(user2.address, {value: ethers.utils.parseEther("50")});    // $ 50000
 		expect((await cryptoPool.getAccountLiquidity(user2.address))[1]).to.equal(ethers.utils.parseEther("50000"));
 	});
 
 	it("user1 and user2 issue debt", async function () {
 		// user1 issues 10 seth
-        await seth.connect(user1).mint(ethers.utils.parseEther("10"), user1.address, ethers.constants.AddressZero); // $ 10000
+        await cryptoPool.connect(user1).mint(seth.address, ethers.utils.parseEther("10"), user1.address); // $ 10000
         expect((await cryptoPool.getAccountLiquidity(user1.address))[2]).to.be.equal(ethers.utils.parseEther("10000.00"));
 
-		await seth.connect(user2).mint(ethers.utils.parseEther("20"), user2.address, ethers.constants.AddressZero); // $ 20000
+		await cryptoPool.connect(user2).mint(seth.address, ethers.utils.parseEther("20"), user2.address); // $ 20000
         expect((await cryptoPool.getAccountLiquidity(user2.address))[2]).to.be.equal(ethers.utils.parseEther("20000.00"));
 	});
 
 	it("burn after 33 days", async function () {
 		await time.increase(86400 * 33);
-        await seth.connect(user1).burn(ethers.utils.parseEther("10")); 
-        await seth.connect(user2).burn(ethers.utils.parseEther("10"));
+        await cryptoPool.connect(user1).burn(seth.address, ethers.utils.parseEther("10")); 
+        await cryptoPool.connect(user2).burn(seth.address, ethers.utils.parseEther("10"));
 	})
 	
     it("check esSYN rewards", async function () {
@@ -81,7 +81,7 @@ describe("Rewards", function () {
 
 	it("user2 burn remaining debt after 10 days", async function () {
 		await time.increase(86400 * 10);
-        await seth.connect(user2).burn(ethers.utils.parseEther("10"));
+        await cryptoPool.connect(user2).burn(seth.address, ethers.utils.parseEther("10"));
 	})
 
 	it("check esSYN rewards", async function () {

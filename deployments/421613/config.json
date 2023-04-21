@@ -1,7 +1,7 @@
 {
   "name": "synthex",
-  "version": "0.36.0",
-  "latest": "0.36.0",
+  "version": "0.45.0",
+  "latest": "0.45.0",
   "l0Admin": "0x084cD22eA15E4C262408e561a5AFa8431Bd7fa5d",
   "l1Admin": "0x2646306d3191AEE905bf9065bD1B7cC71c9036D0",
   "l2Admin": "0x46c18c6d5526E17B34a3deB43e5E9Ba2A659c23a",
@@ -32,6 +32,18 @@
           "params": {
             "cap": "100000000000000000000000",
             "baseLTV": "6500",
+            "liqThreshold": "9000",
+            "liqBonus": "10500"
+          }
+        },
+        {
+          "name": "Arbitrum",
+          "symbol": "ARB",
+          "decimals": 18,
+          "price": "1.44",
+          "params": {
+            "cap": "100000000000000000000000",
+            "baseLTV": "7200",
             "liqThreshold": "9000",
             "liqBonus": "10500"
           }

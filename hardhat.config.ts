@@ -1,10 +1,11 @@
-import { HardhatUserConfig, task } from "hardhat/config";
 import '@openzeppelin/hardhat-upgrades';
 import "@nomicfoundation/hardhat-toolbox";
 import "hardhat-gas-reporter"
 import "@openzeppelin/hardhat-defender"
 import "hardhat-openzeppelin-defender";
 import 'solidity-docgen';
+import "hardhat-contract-sizer";
+
 require('dotenv').config();
 
 const PRIVATE_KEY = process.env.PRIVATE_KEY ?? 'ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80';
@@ -24,20 +25,11 @@ const config: any = {
   solidity: {
     compilers: [
       {
-        version: "0.8.10",
-        settings: {
-          optimizer: {
-            enabled: true,
-            runs: 200,
-          }
-        },
-      },
-      {
         version: "0.8.19",
         settings: {
           optimizer: {
             enabled: true,
-            runs: 200,
+            runs: 1000,
           }
         },
       },
@@ -52,19 +44,21 @@ const config: any = {
   networks: {
     hardhat: {
       isLive: false,
+      allowUnlimitedContractSize: true,
     },
     arbitrumGoerli: {
       url: ARBITRUM_GOERLI_RPC,
       accounts: [`0x${PRIVATE_KEY}`],
       chainId: 421613,
-      gasPrice: 100000000,
+      gasPrice: 160000000,
+      allowUnlimitedContractSize: true,
       isLive: true,
     },
     arbitrum: {
       url: ARBITRUM_RPC,
       accounts: [`0x${PRIVATE_KEY}`],
       chainId: 42161,
-      gasPrice: 100000000,
+      gasPrice: 120000000,
       isLive: true,
     },
     goerli: {

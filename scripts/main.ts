@@ -35,7 +35,7 @@ export default async function main(isTest: boolean = true) {
 	// read deployments and config
 	const deployments = JSON.parse(fs.readFileSync(process.cwd() + `/deployments/${hre.network.config.chainId}/deployments.json`, "utf8"));
 	const config = JSON.parse(fs.readFileSync(process.cwd() + `/deployments/${hre.network.config.chainId}/config.json`, "utf8"));
-	deployments.contracts["Multicall2"] = {
+	if(!deployments.contracts["Multicall2"]) deployments.contracts["Multicall2"] = {
 		address: config.multicall ?? "",
 		abi: "Multicall2"
 	}
@@ -44,7 +44,7 @@ export default async function main(isTest: boolean = true) {
 
 	// save deployments
 	fs.writeFileSync(process.cwd() + `/deployments/${hre.network.config.chainId}/deployments.json`, JSON.stringify(deployments, null, 2));
-		
+	
 	if(!isTest) console.log("Deployment complete! 🎉", ethers.utils.formatEther(initialBalance.sub(await hre.ethers.provider.getBalance(hre.ethers.provider.getSigner().getAddress()))), "ETH used");
 	return { ...contracts, ...initiates };
 }
