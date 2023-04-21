@@ -22,7 +22,7 @@ export default async function main(synthex: Contract, isTest: boolean = false, _
 
     if((hre.network.config as any).isLive){
         try{
-            hre.run("verify:verify", {
+            await hre.run("verify:verify", {
                 address: vault.address,
                 constructorArguments: []
             })

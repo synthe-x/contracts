@@ -1,14 +1,7 @@
 {
   "name": "synthex",
-<<<<<<< HEAD
-  "version": "1.20.0",
-  "latest": "1.20.0",
-=======
-
-  "version": "1.8.0",
-  "latest": "1.8.0",
-
->>>>>>> bad8169501b098c0eb24119f7e9d6bfcea16e4a9
+  "version": "1.0.0",
+  "latest": "1.0.0",
   "l0Admin": "0x46BD90fE9bFa755Ca438d136BB638a85202d5AfB",
   "l1Admin": "0x46BD90fE9bFa755Ca438d136BB638a85202d5AfB",
   "l2Admin": "0x46BD90fE9bFa755Ca438d136BB638a85202d5AfB",
@@ -44,6 +37,19 @@
           }
         },
         {
+          "name": "Arbitrum",
+          "symbol": "ARB",
+          "decimals": 18,
+          "feed": "0xb2A824043730FE05F3DA2efaFa1CBbe83fa548D6",
+          "address": "0x912CE59144191C1204E64559FE8253a0e49E6548",
+          "params": {
+            "cap": "10000000000000000000000",
+            "baseLTV": "6000",
+            "liqThreshold": "9000",
+            "liqBonus": "10500"
+          }
+        },
+        {
           "name": "Wrapped Bitcoin",
           "symbol": "WBTC",
           "decimals": 18,
@@ -59,7 +65,7 @@
         {
           "name": "USD Coin",
           "symbol": "USDC",
-          "decimals": 18,
+          "decimals": 6,
           "address": "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8",
           "feed": "0x50834F3163758fcC1Df9973b6e91f0F0F0434aD3",
           "params": {
@@ -167,11 +173,11 @@
         {
           "name": "USD Coin",
           "symbol": "USDC",
-          "decimals": 18,
+          "decimals": 6,
           "address": "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8",
           "feed": "0x50834F3163758fcC1Df9973b6e91f0F0F0434aD3",
           "params": {
-            "cap": "100000000000000000000000",
+            "cap": "250000000000",
             "baseLTV": "8000",
             "liqThreshold": "9000",
             "liqBonus": "10250"
@@ -180,11 +186,11 @@
         {
           "name": "Tether USD",
           "symbol": "USDT",
-          "decimals": 18,
+          "decimals": 6,
           "address": "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
           "feed": "0x3f3f5dF88dC9F13eac63DF89EC16ef6e7E25DdE7",
           "params": {
-            "cap": "100000000000000000000000",
+            "cap": "250000000000",
             "baseLTV": "8000",
             "liqThreshold": "9000",
             "liqBonus": "10250"

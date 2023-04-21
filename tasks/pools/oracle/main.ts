@@ -31,7 +31,7 @@ export default async function main(pool: Contract, isTest: boolean = false, _dep
     if(!isTest) console.log(`PriceOracle deployed at ${oracle.address}`);
     if((hre.network.config as any).isLive){
         try{
-            hre.run("verify:verify", {
+            await hre.run("verify:verify", {
                 address: oracle.address,
                 constructorArguments: args
             })

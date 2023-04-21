@@ -27,7 +27,7 @@ export default async function main(isTest: boolean = false, _deploy = _deployEVM
 
     if((hre.network.config as any).isLive){
         try{
-            hre.run("verify:verify", {
+            await hre.run("verify:verify", {
                 address: collateralLogic.address,
                 constructorArguments: []
             })
@@ -35,7 +35,7 @@ export default async function main(isTest: boolean = false, _deploy = _deployEVM
                 console.log("Could not verify collateralLogic");
             })
 
-            hre.run("verify:verify", {
+            await hre.run("verify:verify", {
                 address: poolLogic.address,
                 constructorArguments: []
             })
@@ -43,7 +43,7 @@ export default async function main(isTest: boolean = false, _deploy = _deployEVM
                 console.log("Could not verify collateralLogic");
             })
 
-            hre.run("verify:verify", {
+            await hre.run("verify:verify", {
                 address: synthLogic.address,
                 constructorArguments: []
             })

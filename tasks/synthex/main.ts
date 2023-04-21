@@ -20,7 +20,7 @@ export default async function main(deployerAddress: string, isTest: boolean = fa
     if(!isTest) console.log(`SyntheX deployed at ${synthex.address}`);
     if((hre.network.config as any).isLive){
         try{
-            hre.run("verify:verify", {
+            await hre.run("verify:verify", {
                 address: synthex.address,
                 constructorArguments: []
             })

@@ -26,7 +26,7 @@ export default async function main(synthConfig: SynthArgs, synthex: Contract, po
 		if(!isTest) console.log(`Token ${name} (${symbol}) deployed at ${synth.address}`);
 		if((hre.network.config as any).isLive){
 			try{
-				hre.run("verify:verify", {
+				await hre.run("verify:verify", {
 					address: synth.address,
 					constructorArguments: []
 				})
