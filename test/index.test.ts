@@ -5,7 +5,7 @@ import main from "../scripts/main";
 
 describe("Testing the complete flow", function () {
 
-	let synthex: any, oracle: any, pool: any, eth: any, susd: any, sbtc: any, seth: any, sbtcFeed: any;
+	let synthex: any, oracle: any, pool: any, weth: any, susd: any, sbtc: any, seth: any, sbtcFeed: any;
 	let owner: any, user1: any, user2: any, user3: any;
 
 	before(async () => {
@@ -16,13 +16,14 @@ describe("Testing the complete flow", function () {
 		synthex = deployments.synthex;
 		pool = deployments.pools[0].pool;
 		oracle = deployments.pools[0].oracle;
+		weth = deployments.pools[0].collateralTokens[0];
 		sbtc = deployments.pools[0].synths[0];
 		sbtcFeed = deployments.pools[0].synthPriceFeeds[0];
 		seth = deployments.pools[0].synths[1];
 		susd = deployments.pools[0].synths[2];
 	});
 
-	it("Should stake eth", async function () {
+	it("should deposit eth", async function () {
 		const user1Deposit = ethers.utils.parseEther("20");
 		const user2Deposit = ethers.utils.parseEther("10");
 		const user3Deposit = ethers.utils.parseEther("200");
@@ -38,7 +39,7 @@ describe("Testing the complete flow", function () {
 		expect((await pool.getAccountLiquidity(user3.address)).collateral).to.equal(ethers.utils.parseEther('200000'));
 	});
 
-	it("issue synths", async function () {
+	it("should issue synths", async function () {
 		// user1 issues 10 seth
         await pool.connect(user1).mint(seth.address, ethers.utils.parseEther("10"), user1.address); // $ 10000
         // user3 issues 100000 susd
@@ -54,7 +55,7 @@ describe("Testing the complete flow", function () {
         expect(user3Liquidity[2]).to.be.equal(ethers.utils.parseEther("90000.00"));
 	});
 
-    it("swap em", async () => {
+    it("should swap em", async () => {
         // user1 exchanges 10 seth for 1 sbtc
         await pool.connect(user1).swap(seth.address, ethers.utils.parseEther("10"), sbtc.address, 0, user1.address);
         // check balances
@@ -67,7 +68,7 @@ describe("Testing the complete flow", function () {
 		expect(await sbtc.balanceOf(user1.address)).to.equal(ethers.utils.parseEther("1"));
     })
 
-    it("update debt for users", async () => {
+    it("should update debt for users", async () => {
 		const priorUser1Liquidity = await pool.getAccountLiquidity(user1.address);
 		const priorUser3Liquidity = await pool.getAccountLiquidity(user3.address);
 
@@ -78,7 +79,7 @@ describe("Testing the complete flow", function () {
         expect((await pool.getAccountLiquidity(user3.address))[2]).to.be.equal(priorUser3Liquidity[2].mul('110').div('100'));
     })
 
-	it("burn synths", async function () {
+	it("should be able to burn synths, reduces debt", async function () {
 		const debtUser1 = (await pool.getAccountLiquidity(user1.address))[2]
 		const debtUser3 = (await pool.getAccountLiquidity(user3.address))[2]
 
@@ -93,7 +94,23 @@ describe("Testing the complete flow", function () {
 		sbtcBalance = await sbtc.balanceOf(user3.address);
 		await pool.connect(user3).burn(sbtc.address, sbtcBalance); // $ 45000/118181
 
-		expect((await pool.getAccountLiquidity(user1.address))[2]).to.be.closeTo(ethers.utils.parseEther("0.00"), ethers.utils.parseEther("0.2"));
+		expect((await pool.getAccountLiquidity(user1.address))[2]).to.be.equals(ethers.utils.parseEther("0.00"));
 		expect((await pool.getAccountLiquidity(user3.address))[2]).to.be.lessThan(debtUser3);
+	})
+
+	it("should be able to withdraw collateral, reduces collateral", async function () {
+		await pool.connect(user1).withdraw(weth.address, ethers.utils.parseEther("10"), false);
+		expect(await weth.balanceOf(user1.address)).to.equal(ethers.utils.parseEther("10"));
+		expect((await pool.getAccountLiquidity(user1.address))[1]).to.equal(ethers.utils.parseEther("10000"));
+	})
+
+	it("should not be able to withdraw more than own collateral", async function () {
+		await expect(pool.connect(user1).withdraw(weth.address, ethers.utils.parseEther("11"), false)).to.be.revertedWith("9")
+	})
+
+	it("should not be able to withdraw all if debt is not paid", async function () {
+		// user1 issues 10 seth
+        await pool.connect(user1).mint(seth.address, ethers.utils.parseEther("1"), user1.address); // $ 1000
+		await expect(pool.connect(user1).withdraw(weth.address, ethers.utils.parseEther("10"), false)).to.be.revertedWith("6")
 	})
 });

@@ -191,10 +191,10 @@ contract Pool is
         CollateralLogic.withdraw(
             _collateral, 
             _amount, 
-            getAccountLiquidity(msg.sender),
             collaterals,
             accountCollateralBalance
         );
+        require(getAccountLiquidity(msg.sender).liquidity >= 0, Errors.INSUFFICIENT_COLLATERAL);
         // Transfer collateral to user
         transferOut(_collateral, msg.sender, _amount, unwrap);
     }
@@ -221,8 +221,8 @@ contract Pool is
      * @param _amountIn Amount of synth
      * @dev Only Active Synth (ERC20X) contract can be issued
      */
-    function mint(address _synthIn, uint _amountIn, address _to) virtual override whenNotPaused external returns(uint) {
-        uint mintAmount = SynthLogic.commitMint(
+    function mint(address _synthIn, uint _amountIn, address _to) virtual override whenNotPaused external returns(uint mintAmount) {
+        mintAmount = SynthLogic.commitMint(
             SynthLogic.MintVars(
                 _to,
                 _amountIn, 
@@ -233,71 +233,13 @@ contract Pool is
                 totalSupply(),
                 getTotalDebtUSD(),
                 getAccountLiquidity(msg.sender),
-                synths[_synthIn],
                 issuerAlloc,
                 synthex
-            )
+            ),
+            synths
         );
-
+        // Mint debt to sender
         _mint(msg.sender, mintAmount);
-
-        // vars.tokens = new address[](2);
-        // vars.tokens[0] = _synthIn;
-        // vars.tokens[1] = feeToken;
-        // vars.prices = priceOracle.getAssetsPrices(vars.tokens);
-
-        // // check borrow capacity
-        // int _borrowCapacity = getAccountLiquidity(msg.sender).liquidity;
-        // require(_borrowCapacity > 0, Errors.INSUFFICIENT_COLLATERAL);
- 
-        // // Amount of debt to issue (in usd, including mintFee)
-        // uint amountUSD = _amountIn.toUSD(vars.prices[0]);
-        // uint amountPlusFeeUSD = amountUSD + (amountUSD * (synths[_synthIn].mintFee) / (BASIS_POINTS));
-        // if(_borrowCapacity < int(amountPlusFeeUSD)){
-        //     amountPlusFeeUSD = uint(_borrowCapacity);
-        // }
-
-        // // call for reward distribution before minting
-        // synthex.distribute(msg.sender, totalSupply(), balanceOf(msg.sender));
-
-        // if(totalSupply() == 0){
-        //     // Mint initial debt tokens
-        //     _mint(msg.sender, amountPlusFeeUSD);
-        // } else {
-        //     // Calculate the amount of debt tokens to mint
-        //     // debtSharePrice = totalDebt / totalSupply
-        //     // mintAmount = amountUSD / debtSharePrice 
-        //     uint mintAmount = amountPlusFeeUSD * totalSupply() / getTotalDebtUSD();
-        //     // Mint the debt tokens
-        //     _mint(msg.sender, mintAmount);
-        // }
-
-        // // Amount * (fee * issuerAlloc) is burned from global debt
-        // // Amount * (fee * (1 - issuerAlloc)) to vault
-        // // Fee amount of feeToken: amountUSD * fee * (1 - issuerAlloc) / feeTokenPrice
-        // amountUSD = amountPlusFeeUSD * (BASIS_POINTS) / (BASIS_POINTS + (synths[_synthIn].mintFee));
-        // _amountIn = amountUSD.toToken(vars.prices[0]);
-
-        // uint feeAmount = (
-        //     (amountPlusFeeUSD - amountUSD)      // total fee amount in USD
-        //     * (BASIS_POINTS - issuerAlloc)      // multiplying (1 - issuerAlloc)
-        //     / (BASIS_POINTS))                   // for multiplying issuerAlloc
-        //     .toToken(vars.prices[1]             // to feeToken amount
-        // );                           
-        
-        // // Mint FEE tokens to vault
-        // address vault = synthex.vault();
-        // if(vault != address(0)) {
-        //     IERC20X(feeToken).mint(
-        //         vault,
-        //         feeAmount
-        //     );
-        // }
-
-        // // return the amount of synths to issue
-        // IERC20X(_synthIn).mint(msg.sender, _amountIn);
-
-        // return _amountIn;
     }
 
     /**
@@ -319,59 +261,13 @@ contract Pool is
                 totalSupply(),
                 getUserDebtUSD(msg.sender),
                 getTotalDebtUSD(),
-                synths[_synthIn],
                 issuerAlloc,
                 synthex
-            )
+            ),
+            synths
         );
         
         _burn(msg.sender, burnAmount);
-
-        // DataTypes.Vars_Burn memory vars;
-        // DataTypes.Synth memory synth = synths[_synth];
-        // // check if synth is valid
-        // if(!synth.isActive) require(synth.isDisabled, Errors.ASSET_NOT_ENABLED);
-
-        // vars.tokens = new address[](2);
-        // vars.tokens[0] = _synth;
-        // vars.tokens[1] = feeToken;
-        // vars.prices = priceOracle.getAssetsPrices(vars.tokens);
-
-        // // amount of debt to burn (in usd, including burnFee)
-        // // amountUSD = amount * price / (1 + burnFee)
-        // uint amountUSD = _amount.toUSD(vars.prices[0]) * (BASIS_POINTS) / (BASIS_POINTS + synth.burnFee);
-        // // ensure user has enough debt to burn
-        // uint debt = getUserDebtUSD(msg.sender);
-        // if(debt < amountUSD){
-        //     // amount = debt + debt * burnFee / BASIS_POINTS
-        //     _amount = (debt + (debt * (synth.burnFee) / (BASIS_POINTS))).toToken(vars.prices[0]);
-        //     amountUSD = debt;
-        // }
-        // // ensure user has enough debt to burn
-        // if(amountUSD == 0) return 0;
-
-        // // call for reward distribution
-        // synthex.distribute(msg.sender, totalSupply(), balanceOf(msg.sender));
-
-        // _burn(msg.sender, totalSupply() * amountUSD / getTotalDebtUSD());
-
-        // // Mint fee * (1 - issuerAlloc) to vault
-        // uint feeAmount = (
-        //     (amountUSD * synth.burnFee * (BASIS_POINTS - issuerAlloc) / (BASIS_POINTS)) 
-        //     / BASIS_POINTS          // for multiplying burnFee
-        // ).toToken(vars.prices[1]);  // to feeToken amount
-
-        // address vault = synthex.vault();
-        // if(vault != address(0)) {
-        //     IERC20X(feeToken).mint(
-        //         vault,
-        //         feeAmount
-        //     );
-        // }
-
-        // IERC20X(_synth).burn(msg.sender, _amount);
-
-        // return _amount;
     }
 
     /**
@@ -392,102 +288,12 @@ contract Pool is
                 _kind,
                 priceOracle,
                 feeToken,
-                synths[_synthIn],
-                synths[_synthOut],
                 issuerAlloc,
                 synthex
-            )
+            ),
+            synths
         );
-        
-        // // check if enabled synth is calling
-        // // should be able to swap out of disabled (inactive) synths
-        // if(!synths[_synthIn].isActive) require(synths[_synthIn].isDisabled, Errors.ASSET_NOT_ENABLED);
-        // // ensure exchange is not to same synth
-        // require(_synthIn != _synthOut, Errors.INVALID_ARGUMENT);
-
-        // address[] memory t = new address[](3);
-        // t[0] = _synthIn;
-        // t[1] = _synthOut;
-        // t[2] = feeToken;
-        // uint[] memory prices = priceOracle.getAssetsPrices(t);
-
-        // uint amountUSD = _amountIn.toUSD(prices[0]);
-        // uint fee = amountUSD * (synths[_synthOut].mintFee + synths[_synthIn].burnFee) / BASIS_POINTS;
-        // uint amountOut = (amountUSD - fee).toToken(prices[1]);
-
-        // // 1. Mint (amount - fee) toSynth to recipient
-        // IERC20X(_synthOut).mint(msg.sender, amountOut);
-        // // 2. Mint fee * (1 - issuerAlloc) (in feeToken) to vault
-        // address vault = synthex.vault();
-        // if(vault != address(0)) {
-        //     IERC20X(feeToken).mint(
-        //         vault,
-        //         (fee * (BASIS_POINTS - issuerAlloc)        // multiplying (1 - issuerAlloc)
-        //         / (BASIS_POINTS))                           // for multiplying issuerAlloc
-        //         .toToken(prices[2])
-        //     );
-        // }
-        // // 3. Burn all fromSynth
-        // IERC20X(_synthIn).burn(msg.sender, _amountIn);
-
-        // return amountOut;
     }
-
-    // /**
-    //  * @notice Exchange a synthetic asset for another
-    //  * @param _synthIn The address of the synthetic asset to exchange
-    //  * @param _amountOut The amount of synthetic asset to output
-    //  * @param _synthOut The address of the synthetic asset to receive
-    //  * @dev Only Active/Disabled Synth (ERC20X) contract can call this function
-    //  */
-    // function swapExactAmountOut(address _synthIn, uint _amountOut, address _synthOut) virtual override whenNotPaused external returns(uint) {
-    //     return SwapLogic.commitSwap(
-    //         SwapLogic.SwapVars(
-    //             _synthIn,
-    //             _synthOut,
-    //             _amountOut, 
-    //             SwapLogic.SwapKind.GIVEN_OUT,
-    //             priceOracle,
-    //             feeToken,
-    //             synths[_synthIn],
-    //             synths[_synthOut],
-    //             issuerAlloc,
-    //             synthex
-    //         )
-    //     );
-        // check if enabled synth is calling
-        // should be able to swap out of disabled (inactive) synths
-        // if(!synths[_synthIn].isActive) require(synths[_synthIn].isDisabled, Errors.ASSET_NOT_ENABLED);
-        // // ensure exchange is not to same synth
-        // require(_synthIn != _synthOut, Errors.INVALID_ARGUMENT);
-
-        // address[] memory t = new address[](3);
-        // t[0] = _synthIn;
-        // t[1] = _synthOut;
-        // t[2] = feeToken;
-        // uint[] memory prices = priceOracle.getAssetsPrices(t);
-
-        // uint amountUSD = _amountOut.toUSD(prices[1]);
-        // uint fee = amountUSD - amountUSD * BASIS_POINTS / (BASIS_POINTS + synths[_synthOut].mintFee + synths[_synthIn].burnFee);
-        // uint amountIn = (amountUSD + fee).toToken(prices[1]);
-
-        // // 1. Mint (amount - fee) toSynth to recipient
-        // IERC20X(_synthOut).mint(msg.sender, _amountOut);
-        // // 2. Mint fee * (1 - issuerAlloc) (in feeToken) to vault
-        // address vault = synthex.vault();
-        // if(vault != address(0)) {
-        //     IERC20X(feeToken).mint(
-        //         vault,
-        //         (fee * (BASIS_POINTS - issuerAlloc)        // multiplying (1 - issuerAlloc)
-        //         / (BASIS_POINTS))                           // for multiplying issuerAlloc
-        //         .toToken(prices[2])
-        //     );
-        // }
-        // // 3. Burn all fromSynth
-        // IERC20X(_synthIn).burn(msg.sender, amountIn);
-
-        // return amountIn;
-    // }
 
     /**
      * @notice Liquidate a user's debt
@@ -510,12 +316,12 @@ contract Pool is
                 totalSupply(),
                 getTotalDebtUSD(),
                 getAccountLiquidity(_account),
-                synths[_synthIn],
-                collaterals[_outAsset],
                 issuerAlloc,
                 synthex
             ),
-            accountCollateralBalance
+            accountCollateralBalance,
+            synths,
+            collaterals
         );
         // Transfer refund to user
         if(refundOut > 0){
@@ -523,95 +329,6 @@ contract Pool is
         }
         // Burn debt
         _burn(_account, burnAmount);
-
-        // DataTypes.Vars_Liquidate memory vars;
-        // // check if synth is enabled
-        // if(!synths[_synthIn].isActive) require(synths[_synthIn].isDisabled, Errors.ASSET_NOT_ENABLED);
-
-        // // Get account liquidity
-        // vars.liq = getAccountLiquidity(_account);
-        // vars.collateral = collaterals[_outAsset];
-        // require(vars.liq.debt > 0, Errors.INSUFFICIENT_DEBT);
-        // require(vars.liq.collateral > 0, Errors.INSUFFICIENT_COLLATERAL);
-        // vars.ltv = vars.liq.debt * (SCALER) / (vars.liq.collateral);
-        // require(vars.ltv > vars.collateral.liqThreshold * SCALER / BASIS_POINTS, Errors.ACCOUNT_BELOW_LIQ_THRESHOLD);
-        // // Ensure user has entered the collateral market
-        // require(accountMembership[_outAsset][_account], Errors.ACCOUNT_NOT_ENTERED);
-
-        // vars.tokens = new address[](3);
-        // vars.tokens[0] = _synthIn;
-        // vars.tokens[1] = _outAsset;
-        // vars.tokens[2] = feeToken;
-        // vars.prices = priceOracle.getAssetsPrices(vars.tokens);
-
-        // // Amount of debt to burn (in usd, excluding burnFee)
-        // vars.amountUSD = _amount.toUSD(vars.prices[0]) * (BASIS_POINTS)/(BASIS_POINTS + synths[_synthIn].burnFee);
-        // if(vars.liq.debt < vars.amountUSD) {
-        //     vars.amountUSD = vars.liq.debt;
-        // }
-
-        // // Amount of debt to burn (in terms of collateral)
-        // vars.amountOut = vars.amountUSD.toToken(vars.prices[1]);
-        // vars.penalty = 0;
-        // vars.refundOut = 0;
-
-        // // Sieze collateral
-        // uint balanceOut = accountCollateralBalance[_account][_outAsset];
-        // if(vars.ltv > SCALER){
-        //     // if ltv > 100%, take all collateral, no penalty
-        //     if(vars.amountOut > balanceOut){
-        //         vars.amountOut = balanceOut;
-        //     }
-        // } else {
-        //     // take collateral based on ltv, and apply penalty
-        //     balanceOut = balanceOut * vars.ltv / SCALER;
-        //     if(vars.amountOut > balanceOut){
-        //         vars.amountOut = balanceOut;
-        //     }
-        //     // penalty = amountOut * liqBonus
-        //     vars.penalty = vars.amountOut * (vars.collateral.liqBonus - BASIS_POINTS) / (BASIS_POINTS);
-
-        //     // if we don't have enough for [complete] bonus, take partial bonus
-        //     if(vars.ltv * vars.collateral.liqBonus / BASIS_POINTS > SCALER){
-        //         // penalty = amountOut * (1 - ltv)/ltv 
-        //         vars.penalty = vars.amountOut * (SCALER - vars.ltv) / (vars.ltv);
-        //     }
-        //     // calculate refund if we have enough for bonus + extra
-        //     else {
-        //         // refundOut = amountOut * (1 - ltv * liqBonus)
-        //         vars.refundOut = vars.amountOut * (SCALER - (vars.ltv * vars.collateral.liqBonus / BASIS_POINTS)) / SCALER;
-        //     }
-        // }
-
-        // accountCollateralBalance[_account][_outAsset] -= (vars.amountOut + vars.penalty + vars.refundOut);
-
-        // // Add collateral to liquidator
-        // accountCollateralBalance[msg.sender][_outAsset]+= (vars.amountOut + vars.penalty);
-
-        // // Transfer refund to user
-        // if(vars.refundOut > 0){
-        //     transferOut(_outAsset, _account, vars.refundOut, false);
-        // }
-
-        // vars.amountUSD = vars.amountOut.toUSD(vars.prices[1]);
-        // _burn(_account, totalSupply() * vars.amountUSD / getTotalDebtUSD());
-
-        // // send (burn fee - issuerAlloc) in feeToken to vault
-        // uint fee = vars.amountUSD * (synths[_synthIn].burnFee) / (BASIS_POINTS);
-        // address vault = synthex.vault();
-        // if(vault != address(0)) {
-        //     IERC20X(feeToken).mint(
-        //         vault,
-        //         (fee * (BASIS_POINTS - issuerAlloc)        // multiplying (1 - issuerAlloc)
-        //         / BASIS_POINTS)                            // for multiplying issuerAlloc
-        //         .toToken(vars.prices[2])
-        //     );
-        // }
-
-        // emit Liquidate(msg.sender, _account, _outAsset, vars.amountOut, vars.penalty, vars.refundOut);
-
-        // // amount (in synth) plus burn fee
-        // IERC20X(_synthIn).burn(msg.sender, vars.amountUSD.toToken(vars.prices[0]) * (BASIS_POINTS + synths[_synthIn].burnFee) / (BASIS_POINTS));
     }
 
     /* -------------------------------------------------------------------------- */
@@ -623,7 +340,7 @@ contract Pool is
      * @return liq liquidity The total debt of the account
      */
     function getAccountLiquidity(address _account) virtual override public view returns(DataTypes.AccountLiquidity memory liq) {
-        return PoolLogic.getAccountLiquidity(priceOracle, accountCollaterals[_account], accountCollateralBalance[_account], collaterals, getUserDebtUSD(_account));
+        return PoolLogic.accountLiquidity(priceOracle, accountCollaterals[_account], accountCollateralBalance[_account], collaterals, getUserDebtUSD(_account));
     }
 
     /**
@@ -631,7 +348,7 @@ contract Pool is
      * @return totalDebt The total debt of the trading pool
      */
     function getTotalDebtUSD() virtual override public view returns(uint totalDebt) {
-        return PoolLogic.getTotalDebtUSD(synthsList, priceOracle);
+        return PoolLogic.totalDebtUSD(synthsList, priceOracle);
     }
 
     /**
@@ -640,7 +357,7 @@ contract Pool is
      * @return The debt of the account in this trading pool
      */
     function getUserDebtUSD(address _account) virtual override public view returns(uint){
-        return PoolLogic.getUserDebtUSD(
+        return PoolLogic.userDebtUSD(
             totalSupply(),
             balanceOf(_account),
             getTotalDebtUSD()
@@ -683,16 +400,22 @@ contract Pool is
      * @dev Only callable by L1 admin
      */
     function setPriceOracle(address _priceOracle) external onlyL1Admin {
+        require(_priceOracle != address(0), Errors.INVALID_ARGUMENT);
         priceOracle = IPriceOracle(_priceOracle);
+        require(priceOracle.getAssetPrice(feeToken) > 0, Errors.INVALID_ADDRESS);
         emit PriceOracleUpdated(_priceOracle);
     }
 
     function setIssuerAlloc(uint _issuerAlloc) external onlyL1Admin {
+        require(issuerAlloc <= BASIS_POINTS, Errors.INVALID_ARGUMENT);
         issuerAlloc = _issuerAlloc;
         emit IssuerAllocUpdated(_issuerAlloc);
     }
 
     function setFeeToken(address _feeToken) external onlyL1Admin {
+        require(_feeToken != address(0), Errors.INVALID_ARGUMENT);
+        require(_feeToken != feeToken, Errors.ALREADY_SET);
+        require(synths[_feeToken].isActive, Errors.ASSET_NOT_ACTIVE);
         feeToken = _feeToken;
         emit FeeTokenUpdated(_feeToken);
     }

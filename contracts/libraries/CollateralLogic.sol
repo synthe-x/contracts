@@ -13,9 +13,12 @@ library CollateralLogic {
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
     event CollateralParamsUpdated(address indexed asset, uint cap, uint baseLTV, uint liqThreshold, uint liqBonus, bool isEnabled);
+    
     event CollateralEntered(address indexed user, address indexed collateral);
     event CollateralExited(address indexed user, address indexed collateral);
+    
     event Deposit(address indexed user, address indexed asset, uint256 amount);
+    event Withdraw(address indexed user, address indexed asset, uint256 amount);
 
     /**
      * @notice Enable a collateral
@@ -173,8 +176,6 @@ library CollateralLogic {
     /* -------------------------------------------------------------------------- */
     /*                                  Withdraw                                  */
     /* -------------------------------------------------------------------------- */
-
-    event Withdraw(address indexed user, address indexed asset, uint256 amount);
     
     /**
      * @notice Deposit collateral
@@ -184,10 +185,10 @@ library CollateralLogic {
     function withdraw(
         address _collateral,
         uint _amount,
-        DataTypes.AccountLiquidity memory liq,
         mapping(address => DataTypes.Collateral) storage collaterals,
         mapping(address => mapping(address => uint)) storage accountCollateralBalance
     ) public {
+        require(_amount > 0, Errors.ZERO_AMOUNT);
         // Process withdraw
         DataTypes.Collateral storage supply = collaterals[_collateral];
         // check deposit balance
@@ -195,11 +196,9 @@ library CollateralLogic {
         // allow only upto their deposit balance
         require(depositBalance >= _amount, Errors.INSUFFICIENT_BALANCE);
         // Update balance
-        accountCollateralBalance[msg.sender][_collateral] = depositBalance - (_amount);
+        accountCollateralBalance[msg.sender][_collateral] = depositBalance - _amount;
         // Update collateral supply
-        supply.totalDeposits -= (_amount);
-        // check for positive liquidity
-        require(liq.liquidity >= 0, Errors.INSUFFICIENT_COLLATERAL);
+        supply.totalDeposits -= _amount;
         // Emit successful event
         emit Withdraw(msg.sender, _collateral, _amount);
     }

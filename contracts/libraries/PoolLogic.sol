@@ -111,7 +111,7 @@ library PoolLogic {
     /**
      * @dev Get the total adjusted position of an account: E(amount of an asset)*(volatility ratio of the asset)
      */
-    function getAccountLiquidity(
+    function accountLiquidity(
         IPriceOracle oracle, 
         address[] memory accountCollaterals, 
         mapping(address => uint) storage accountCollateralBalance, 
@@ -144,7 +144,7 @@ library PoolLogic {
      * @dev Get the total debt of a trading pool
      * @return totalDebt The total debt of the trading pool
      */
-    function getTotalDebtUSD(
+    function totalDebtUSD(
         address[] memory _synths, 
         IPriceOracle _oracle
     ) public view returns(uint totalDebt) {
@@ -165,7 +165,7 @@ library PoolLogic {
      * @param balance The balance of the account's debt tokens
      * @param totalDebt The total debt of the trading pool in USD
      */
-    function getUserDebtUSD(
+    function userDebtUSD(
         uint totalSupply, 
         uint balance, 
         uint totalDebt

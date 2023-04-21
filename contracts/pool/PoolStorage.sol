@@ -28,6 +28,7 @@ abstract contract PoolStorage {
     /// @notice Collateral asset addresses. User => Collateral => Balance
     mapping(address => mapping(address => uint256)) public accountCollateralBalance;
     /// @notice Checks in account has entered the market
+    // market -> account -> isMember
     mapping(address => mapping(address => bool)) public accountMembership;
     /// @notice Collaterals the user has deposited
     mapping(address => address[]) public accountCollaterals;

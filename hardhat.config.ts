@@ -58,7 +58,7 @@ const config: any = {
       url: ARBITRUM_RPC,
       accounts: [`0x${PRIVATE_KEY}`],
       chainId: 42161,
-      gasPrice: 100000000,
+      gasPrice: 120000000,
       isLive: true,
     },
     goerli: {
