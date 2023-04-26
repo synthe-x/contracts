@@ -6,12 +6,12 @@ import { _deploy as _deployDefender } from '../../../scripts/utils/defender';
 
 export default async function main(
     pool: Contract, 
+    pyth: string,
     assets: string[], 
     feeds: string[], 
     fallbackOracle : string,
     quoteCurrency: string, 
     quoteCurrencyPrice: string, 
-    oracleType: "PriceOracle"|"PythPriceOracle",
     isTest: boolean = false, 
     _deploy = _deployEVM
 ): Promise<Contract> {
@@ -27,6 +27,7 @@ export default async function main(
     const pool_symbol = await pool.symbol();
     const args = [
         synthexAddress, 
+        pyth,
         assets,
         feeds,
         fallbackOracle,
@@ -35,7 +36,7 @@ export default async function main(
     ]
 
     // deploy synthex
-    const oracle = await _deploy(oracleType, args, deployments, {name: oracleType+'_'+pool_symbol}) as Contract;
+    const oracle = await _deploy("PythPriceOracle", args, deployments, {name: 'PythPriceOracle_'+pool_symbol}) as Contract;
 
     if(!isTest) console.log(`PriceOracle deployed at ${oracle.address}`);
     if((hre.network.config as any).isLive){

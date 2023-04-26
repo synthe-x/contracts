@@ -7,9 +7,10 @@ export default {
         hardhat: {
             forking: {
                 url: "https://rpc.ankr.com/arbitrum",
+                blockNumber: 84110651
             },
             gasPrice: 500000000,
-            chainId: 42161,
+            chainId: 5,
         },
     },
 }

@@ -6,14 +6,17 @@ import "../pool/IPool.sol";
 import "../synth/IERC20X.sol";
 import "../synthex/ISyntheX.sol";
 import "../libraries/Errors.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+
 import "../utils/interfaces/IWETH.sol";
 
 library PoolLogic {
     using PriceConvertor for uint256;
-    using SafeERC20Upgradeable for IERC20Upgradeable;
+    using SafeERC20 for IERC20;
 
     uint constant BASIS_POINTS = 10000;
+    uint constant SCALER = 1e18;
 
     /* -------------------------------------------------------------------------- */
     /*                                 Collaterals                                */
@@ -122,16 +125,17 @@ library PoolLogic {
         for(uint i = 0; i < accountCollaterals.length; i++){
             address collateral = accountCollaterals[i];
             uint price = oracle.getAssetPrice(collateral);
+            uint scaledAmount = (accountCollateralBalance[collateral] * SCALER / 10**ERC20(collateral).decimals());
             // Add the collateral amount
             // AdjustedCollateralAmountUSD = CollateralAmount * Price * volatilityRatio
             liq.liquidity += int(
-                (accountCollateralBalance[collateral]
+                (scaledAmount
                  * (collaterals[collateral].baseLTV)
                  / (BASIS_POINTS))                      // adjust for volatility ratio
                 .toUSD(price));
             // collateralAmountUSD = CollateralAmount * Price 
             liq.collateral += (
-                accountCollateralBalance[collateral]
+                scaledAmount
                 .toUSD(price)
             );
         }

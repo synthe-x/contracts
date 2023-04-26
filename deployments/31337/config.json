@@ -64,7 +64,7 @@
         {
           "name": "USD Coin",
           "symbol": "USDC",
-          "decimals": 18,
+          "decimals": 6,
           "price": "1",
           "params": {
             "cap": "100000000000000000000000",

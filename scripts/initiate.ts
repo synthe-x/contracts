@@ -17,12 +17,13 @@ import { ETH_ADDRESS } from './utils/const';
 export interface IPoolData {
   pool: Contract;
   oracle: Contract;
+  pythOracle: Contract;
   // enabled collaterals
   collateralTokens: Contract[];
-  collateralPriceFeeds: Contract[];
+  collateralPriceFeeds: Contract|null[];
   // enabled pool synths
   synths: Contract[];
-  synthPriceFeeds: Contract[];
+  synthPriceFeeds: Contract|null[];
 }
 
 export interface IInitiateResult {
@@ -81,6 +82,7 @@ export async function initiate(
     let poolResult = {
       pool: {} as Contract,
       oracle: {} as Contract,
+      pythOracle: {} as Contract,
       collateralTokens: [],
       collateralPriceFeeds: [],
       synths: [],
@@ -88,26 +90,49 @@ export async function initiate(
     } as IPoolData;
 
     poolResult.pool = await deployPool(poolConfig.name, poolConfig.symbol, weth.address, result.libraries.poolLogic.address, result.libraries.collateralLogic.address, result.libraries.synthLogic.address, isTest)
-    poolResult.oracle = await deployOracle(poolResult.pool, isTest);
 
-    await initPool(poolResult.pool, synthex, esSyx.address, poolResult.oracle.address, poolConfig.issuerAlloc, poolConfig.rewardSpeed, isTest);
-    
+    let oracleAssets = [];
+    let oracleFeeds = [];
+    let pythSupportedAssets = [];
+    let pythFeeds = [];
+    let baseCurrency: null|string = null;
+    let baseCurrencyPrice: null|string = null;
     for(let i = 0; i < poolConfig.collaterals.length; i++){
       let cConfig = poolConfig.collaterals[i];
       if(cConfig.address == ETH_ADDRESS){
         cConfig.address = weth.address;
       }
-      const result = await initCollateral(cConfig, poolResult.pool, poolResult.oracle, isTest)
+      const result = await initCollateral(cConfig, poolResult.pool, isTest)
       poolResult.collateralTokens.push(result.collateral);
       poolResult.collateralPriceFeeds.push(result.feed);
+      if(result.feed){
+        oracleAssets.push(result.collateral.address);
+        oracleFeeds.push(result.feed.address);
+      }
     }
 
     for(let i = 0; i < poolConfig.synths.length; i++){
       const synthConfig = poolConfig.synths[i];
-      const result = await initSynth(synthConfig, synthex, poolResult.pool, poolResult.oracle, isTest);
+      const result = await initSynth(synthConfig, synthex, poolResult.pool, isTest);
       poolResult.synths.push(result.synth);
       poolResult.synthPriceFeeds.push(result.feed);
+      if(result.feed){
+        oracleAssets.push(result.synth.address);
+        oracleFeeds.push(result.feed.address);
+      }
+      if(synthConfig.isBaseCurrency){
+        baseCurrency = result.synth.address;
+        baseCurrencyPrice = ethers.utils.parseUnits(synthConfig.price, 8).toString();
+      }
     }
+
+    if(!baseCurrency || !baseCurrencyPrice){
+      throw new Error("Base currency not found");
+    }
+
+    poolResult.oracle = await deployOracle(poolResult.pool, oracleAssets, oracleFeeds, ethers.constants.AddressZero, baseCurrency, baseCurrencyPrice, "PriceOracle", isTest);
+
+    await initPool(poolResult.pool, synthex, esSyx.address, poolResult.oracle.address, poolConfig.issuerAlloc, poolConfig.rewardSpeed, isTest);
 
     // unpause to start
     await poolResult.pool.unpause();

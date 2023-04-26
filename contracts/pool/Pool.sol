@@ -194,6 +194,7 @@ contract Pool is
             collaterals,
             accountCollateralBalance
         );
+        // Check if account is positive
         require(getAccountLiquidity(msg.sender).liquidity >= 0, Errors.INSUFFICIENT_COLLATERAL);
         // Transfer collateral to user
         transferOut(_collateral, msg.sender, _amount, unwrap);
@@ -266,7 +267,7 @@ contract Pool is
             ),
             synths
         );
-        
+        // Burn debt from sender
         _burn(msg.sender, burnAmount);
     }
 
