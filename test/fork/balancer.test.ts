@@ -1,10 +1,11 @@
 import { loadFixture } from '@nomicfoundation/hardhat-network-helpers';
 import { expect } from "chai";
 import { BigNumber, Contract } from 'ethers';
-import { ethers } from "hardhat";
+import hre, { ethers } from "hardhat";
 import main from "../../scripts/main";
 import { promises as fs } from "fs";
 import path from 'path';
+import routerMain from '../../tasks/router/main';
 
 const VAULT = '0xBA12222222228d8Ba445958a75a0704d566BF2C8';
 const STABLE_FACTORY = '0x1c99324EDC771c82A0DCCB780CC7DDA0045E50e7';
@@ -13,15 +14,15 @@ function pe(amount: number | string) {
 }
 describe("Testing balancer pool", function () {
 
-	let synthex: any, oracle: any, pool: any, eth: any, cusd: any, cbtc: any, ceth: any, cbtcFeed: any, weth: any, poolTokens: string[];
+	let synthex: any, oracle: any, pool: any, eth: any, ceth: any, weth: any, usdc: any, poolTokens: string[];
 	let owner: any, user1: any, user2: any, user3: any, banalcerPoolId: string, balancerPoolAddress: string;
-	const provider = new ethers.providers.JsonRpcProvider("https://rpc.ankr.com/arbitrum");
+	const provider = new ethers.providers.JsonRpcProvider("https://arb-mainnet.g.alchemy.com/v2/mJSnb6p3QRZdqQIHgJerJCI5M9kul8lo");
 	let balancerPool;
-	let poolFactory: Contract, vault: Contract;
+	let poolFactory: Contract, vault: Contract, router: Contract;
 	const ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 	let mockPoolArgs;
 	let _deployments: any;
-	let deployments: any
+	let deployments: any;
 	const BaseVersion = { version: 3, deployment: '20230206-composable-stable-pool-v3' };
 
 	before(async () => {
@@ -40,11 +41,15 @@ describe("Testing balancer pool", function () {
 		// cusd = deployments.pools[0].synths[2];
 
 		poolFactory = new ethers.Contract(STABLE_FACTORY, _deployments["ComposableStablePoolFactory"], provider);
-		console.log(poolFactory.address);
+		// console.log(poolFactory.address);
 		vault = new ethers.Contract(VAULT, _deployments["Balancer_Vault"], provider);
 		console.log(vault.address);
 
-		weth = new ethers.Contract(eth.address, _deployments["WETH9"], provider)
+		weth = new ethers.Contract(eth.address, _deployments["WETH9"], provider);
+
+		usdc =   new ethers.Contract("0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8", _deployments["ERC20X"], provider);
+
+		console.log(await hre.ethers.provider.getBlockNumber())
 
 	});
 
@@ -89,22 +94,28 @@ describe("Testing balancer pool", function () {
 		balancerPool = new ethers.Contract(balancerPoolAddress, _deployments["ComposableStablePool"], provider);
 
 		banalcerPoolId = await balancerPool.connect(user1).callStatic.getPoolId();
+
+
 		console.log(banalcerPoolId, "poolId");
+
+		// const getPool = await vault.connect(user1).getPool(banalcerPoolId);
+		// console.log("getPool", getPool);
 
 		/////////////////////////////////////
 	});
 
 	it("Mint Tokens", async () => {
 		// deposit eth in synthex pool.
+
 		const deposit = pe("100");
-		await pool.connect(user2).depositETH({ value: deposit });
+		await pool.connect(user2).depositETH(user2.address, { value: deposit });
 		// minth cETH
-		await ceth.connect(user2).mint(pe("50"), user2.address, ethers.constants.AddressZero);
+		await pool.connect(user2).mint(ceth.address, pe("50"), user2.address);
 
 		const deposit1 = pe("200");
-		await pool.connect(user3).depositETH({ value: deposit1 });
+		await pool.connect(user3).depositETH(user3.address, { value: deposit1 });
 		// minth cETH
-		await ceth.connect(user3).mint(pe("100"), user3.address, ethers.constants.AddressZero);
+		await pool.connect(user3).mint(ceth.address, pe("100"), user3.address)
 
 		// const userLiquidity2 = await pool.getAccountLiquidity(user2.address);
 		// const userLiquidity = await pool.getAccountLiquidity(user3.address);
@@ -173,7 +184,7 @@ describe("Testing balancer pool", function () {
 	it("join pool first time", async () => {
 
 		poolTokens = (await vault.connect(user2).getPoolTokens(banalcerPoolId))[0]
-		console.log(poolTokens);
+		// console.log(poolTokens);
 
 		await weth.connect(user2).deposit({ value: pe(20) });
 
@@ -240,18 +251,20 @@ describe("Testing balancer pool", function () {
 
 	})
 
-	it("it sould swap ", async () => {
+	it("it sould batchSwap ", async () => {
 
 		await weth.connect(user1).deposit({ value: pe(10) });
-
+		let balance = await weth.connect(user1).balanceOf(user1.address);
+		console.log(balance.toString(), "balance from swap")
+		console.log(poolTokens, "poolTOkens")
 		let batchSwap = await (await vault.connect(user1).batchSwap(
 			0,
 			[
 				{
 					poolId: banalcerPoolId,
-					assetInIndex: 2,
-					assetOutIndex: 1,
-					amount: pe(2),
+					assetInIndex: 1,
+					assetOutIndex: 2,
+					amount: pe(0.5),
 					userData: "0x"
 				}
 
@@ -263,14 +276,117 @@ describe("Testing balancer pool", function () {
 				recipient: user1.address,
 				toInternalBalance: false
 			},
-			[pe('1'), pe('100000000'), pe('100000000')],
+			['0', pe(0.50), pe(-0.49)],
 			1689740240
 		)
 		).wait(1)
 		console.log("batchSwap", batchSwap.events[0].args)
 	})
 
+	it("It should swap in router", async () => {
+		console.log(await hre.ethers.provider.getBlockNumber())
+		router = await routerMain(weth.address, vault.address, true);
+		console.log("routerAddress", router.address);
+		//approve router
+		await weth.connect(user1).approve(router.address, pe('10000000000'));
+
+		await ceth.connect(user1).approve(router.address, pe("1000000000"));
+
+		await pool.connect(user1).approve(router.address, pe("20000000000"));
+
+		const swap = await(await router.connect(user1).swap(
+			{
+				"kind": 0,
+				"swaps": [
+					{
+						"swap": [
+							{
+								"poolId": "0x64541216bafffeec8ea535bb71fbc927831d0595000100000000000000000002",
+								"assetInIndex": "0",
+								"assetOutIndex": "1",
+								"userData": "0x",
+								"amount": "1000000000000000000"
+							}
+						],
+						"isBalancerPool": true,
+						"limits": [
+							"1000000000000000000",
+							-"1882662266"
+						],
+						"assets": [
+							"0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+							"0xff970a61a04b1ca14834a43f5de4533ebddb5cc8"
+						]
+					}
+				],
+				"deadline": 1692683960,
+				"funds": {
+					"sender": user1.address,
+					"recipient": user1.address,
+					"fromInternalBalance": false,
+					"toInternalBalance": false
+				}
+			}
+		)).wait(1);
+
+		console.log("Swap", swap)
+
+		console.log(await usdc.connect(user1).balanceOf(user1.address))
+	})
 
 
 
 });
+
+// {
+// 	"kind": 0,
+// 	"swaps": [
+// 		{
+// 			"swap": [
+// 				{
+// 					"poolId": "0x19ff30f9b2d32bfb0f21f2db6c6a3a8604eb8c2b00000000000000000000041c",
+// 					"assetInIndex": "0",
+// 					"assetOutIndex": "1",
+// 					"userData": "0x",
+// 					"amount": "1000000000000000000"
+// 				}
+// 			],
+// 			"isBalancerPool": true,
+// 			"limits": [
+// 				pe(1),
+// 				pe(-0.997490050036464600)
+// 			],
+// 			"assets": [
+// 				"0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+// 				"0xa28d78534d18324da06fc487041b1ab4a16d557d"
+// 			]
+// 		},
+// 		{
+// 			"swap": [
+// 				{
+// 					"poolId": "0xbbb3abfa2dd320d85c64e8825c1e32ad0026fae5000000000000000000000000",
+// 					"assetInIndex": 0,
+// 					"assetOutIndex": 1,
+// 					"userData": "0x",
+// 					"amount": "997490050036464700"
+// 				}
+// 			],
+// 			"isBalancerPool": false,
+// 			"limits": [
+// 				pe(0.997490050036464600),
+// 				pe(-1906.1600825832545)
+// 			],
+// 			"assets": [
+// 				"0xa28d78534d18324da06fc487041b1ab4a16d557d",
+// 				"0xe379874446dd29178e68852992daa80be952c0b3"
+// 			]
+// 		}
+// 	],
+// 	"deadline": 1692683960,
+// 	"funds": {
+// 		"sender": user1.address,
+// 		"recipient": user1.address,
+// 		"fromInternalBalance": false,
+// 		"toInternalBalance": false
+// 	}
+// }
