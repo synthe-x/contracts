@@ -2,11 +2,11 @@
 pragma solidity ^0.8.0;
 
 /**
- * @title IPriceOracleGetter
- * @author Aave
+ * @title IPythOracleGetter
+ * @author 
  * @notice Interface for the Aave price oracle.
  */
-interface IPriceOracleGetter {
+interface IPythOracleGetter {
   /**
    * @notice Returns the base currency address
    * @dev Address 0x0 is reserved for USD as base currency.
@@ -26,16 +26,16 @@ interface IPriceOracleGetter {
    * @param asset The address of the asset
    * @return The price of the asset
    */
-  function getAssetPrice(address asset) external view returns (uint);
+  function getAssetPrice(address asset) external returns (uint);
 }
 
 /**
- * @title IPriceOracle interface
- * @dev IAaveOracle without the address provider 
- * @author Aave
+ * @title IPythOracle interface
+ * @dev IPythOracle interface is a subset of the IPythOracleGetter interface
+ * @author 
  * @notice Defines the basic interface for the Aave Oracle
  */
-interface IPriceOracle is IPriceOracleGetter {
+interface IPythOracle is IPythOracleGetter {
   /**
    * @dev Emitted after the base currency is set
    * @param baseCurrency The base currency of used for price quotes
@@ -48,7 +48,7 @@ interface IPriceOracle is IPriceOracleGetter {
    * @param asset The address of the asset
    * @param source The price source of the asset
    */
-  event AssetSourceUpdated(address indexed asset, address indexed source);
+  event AssetSourceUpdated(address indexed asset, bytes32 indexed source);
 
   /**
    * @dev Emitted after the address of fallback oracle is updated
@@ -61,7 +61,7 @@ interface IPriceOracle is IPriceOracleGetter {
    * @param assets The addresses of the assets
    * @param sources The addresses of the price sources
    */
-  function setAssetSources(address[] calldata assets, address[] calldata sources) external;
+  function setAssetSources(address[] calldata assets, bytes32[] calldata sources) external;
 
   /**
    * @notice Sets the fallback oracle
@@ -74,21 +74,21 @@ interface IPriceOracle is IPriceOracleGetter {
    * @param assets The list of assets addresses
    * @return The prices of the given assets
    */
-  function getAssetsPrices(address[] calldata assets) external view returns (uint[] memory);
+  function getAssetsPrices(address[] calldata assets) external returns (uint[] memory);
 
   /**
    * @notice Returns the address of the source for an asset address
    * @param asset The address of the asset
    * @return The address of the source
    */
-  function getSourceOfAsset(address asset) external view returns (address);
+  function getSourceOfAsset(address asset) external view returns (bytes32);
 
   /**
    * @notice Returns the address of the fallback oracle
    * @return The address of the fallback oracle
    */
   function getFallbackOracle() external view returns (address);
-
+  
   /**
    * @notice Updates the prices of the assets passed as parameter
    */

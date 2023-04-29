@@ -4,8 +4,18 @@ import { Contract } from 'ethers';
 import { _deploy as _deployEVM } from '../../../scripts/utils/helper';
 import { _deploy as _deployDefender } from '../../../scripts/utils/defender';
 
-
-export default async function main(pool: Contract, isTest: boolean = false, _deploy = _deployEVM): Promise<Contract> {
+export default async function main(
+    pool: Contract, 
+    pyth: string,
+    assets: string[], 
+    feeds: string[], 
+    fallbackOracle : string,
+    quoteCurrency: string, 
+    quoteCurrencyPrice: string, 
+    oracleType: "PriceOracle"|"PythOracle",
+    isTest: boolean = false, 
+    _deploy = _deployEVM
+): Promise<Contract> {
     if(!isTest) console.log(`Deploying PriceOracle for ${pool.address} to ${hre.network.name} (${hre.network.config.chainId}) ...`);
 
 	// read deployments and config
@@ -16,17 +26,34 @@ export default async function main(pool: Contract, isTest: boolean = false, _dep
 
     // get pool contract
     const pool_symbol = await pool.symbol();
-    const args = [
-        synthexAddress, 
-        [],
-        [],
-        ethers.constants.AddressZero,
-        ethers.constants.AddressZero,
-        1e8
-    ]
+    let args = [];
+    if(oracleType == "PriceOracle"){
+        args = [
+            synthexAddress, 
+            assets,
+            feeds,
+            fallbackOracle,
+            quoteCurrency,
+            quoteCurrencyPrice
+        ]
+    } else {
+        args = [
+            synthexAddress, 
+            pyth,
+            pool.address,
+            assets,
+            feeds,
+            fallbackOracle,
+            quoteCurrency,
+            quoteCurrencyPrice, 
+            {
+                value: '1000000'
+            }
+        ]
+    }
 
     // deploy synthex
-    const oracle = await _deploy("PriceOracle", args, deployments, {name: 'PriceOracle_'+pool_symbol}) as Contract;
+    const oracle = await _deploy(oracleType, args, deployments, {name: oracleType+'_'+pool_symbol}) as Contract;
 
     if(!isTest) console.log(`PriceOracle deployed at ${oracle.address}`);
     if((hre.network.config as any).isLive){
@@ -59,4 +86,3 @@ export default async function main(pool: Contract, isTest: boolean = false, _dep
 
     return oracle;
 }
-
