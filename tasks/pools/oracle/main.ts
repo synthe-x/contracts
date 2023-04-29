@@ -6,12 +6,13 @@ import { _deploy as _deployDefender } from '../../../scripts/utils/defender';
 
 export default async function main(
     pool: Contract, 
+    pyth: string,
     assets: string[], 
     feeds: string[], 
     fallbackOracle : string,
     quoteCurrency: string, 
     quoteCurrencyPrice: string, 
-    oracleType: "PriceOracle"|"PythPriceOracle",
+    oracleType: "PriceOracle"|"PythOracle",
     isTest: boolean = false, 
     _deploy = _deployEVM
 ): Promise<Contract> {
@@ -25,14 +26,31 @@ export default async function main(
 
     // get pool contract
     const pool_symbol = await pool.symbol();
-    const args = [
-        synthexAddress, 
-        assets,
-        feeds,
-        fallbackOracle,
-        quoteCurrency,
-        quoteCurrencyPrice
-    ]
+    let args = [];
+    if(oracleType == "PriceOracle"){
+        args = [
+            synthexAddress, 
+            assets,
+            feeds,
+            fallbackOracle,
+            quoteCurrency,
+            quoteCurrencyPrice
+        ]
+    } else {
+        args = [
+            synthexAddress, 
+            pyth,
+            pool.address,
+            assets,
+            feeds,
+            fallbackOracle,
+            quoteCurrency,
+            quoteCurrencyPrice, 
+            {
+                value: '1000000'
+            }
+        ]
+    }
 
     // deploy synthex
     const oracle = await _deploy(oracleType, args, deployments, {name: oracleType+'_'+pool_symbol}) as Contract;

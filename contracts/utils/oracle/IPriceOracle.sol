@@ -88,4 +88,9 @@ interface IPriceOracle is IPriceOracleGetter {
    * @return The address of the fallback oracle
    */
   function getFallbackOracle() external view returns (address);
+
+  /**
+   * @notice Updates the prices of the assets passed as parameter
+   */
+  function updatePrices(bytes[] calldata pythUpdateData) external;
 }

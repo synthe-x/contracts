@@ -1,14 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {IPythPriceOracle, IPythPriceOracleGetter} from "./IPythPriceOracle.sol";
+import {IPythOracle, IPythOracleGetter} from "./IPythOracle.sol";
 import "../../synthex/SyntheX.sol";
 import "@aave/core-v3/contracts/dependencies/chainlink/AggregatorInterface.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@pythnetwork/pyth-sdk-solidity/IPyth.sol";
 import "@pythnetwork/pyth-sdk-solidity/PythStructs.sol";
-
-import "hardhat/console.sol";
 
 /**
  * @title PriceOracle
@@ -18,10 +16,12 @@ import "hardhat/console.sol";
  * - If the returned price by a Chainlink aggregator is <= 0, the call is forwarded to a fallback oracle
  * - Owned by the Aave governance
  */
-contract PythPriceOracle is IPythPriceOracle {
+contract PythOracle is IPythOracle, AccessControl {
   SyntheX public immutable synthex;
+  IPyth public pyth;
+  bytes32 constant PRICE_UPDATER = keccak256("PRICE_UPDATER");
 
-  IPyth pyth;
+  bool public constant IS_PYTH_ORACLE = true;
 
   mapping(address => bytes32) private assetsSources;
 
@@ -39,6 +39,8 @@ contract PythPriceOracle is IPythPriceOracle {
     _;
   }
 
+  receive() external payable {}
+
   /**
    * @notice Constructor
    * @param _synthex The address of the new System
@@ -52,14 +54,16 @@ contract PythPriceOracle is IPythPriceOracle {
   constructor(
     SyntheX _synthex,
     IPyth _pyth,
+    address pool,
     address[] memory assets,
     bytes32[] memory sources,
     address fallbackOracle,
     address baseCurrency,
     uint baseCurrencyUnit
-  ) {
+  ) payable {
     synthex = _synthex;
     pyth = _pyth;
+    _grantRole(PRICE_UPDATER, pool);
     _setFallbackOracle(fallbackOracle);
     _setAssetsSources(assets, sources);
     BASE_CURRENCY = baseCurrency;
@@ -67,7 +71,11 @@ contract PythPriceOracle is IPythPriceOracle {
     emit BaseCurrencySet(baseCurrency, baseCurrencyUnit);
   }
 
-  /// @inheritdoc IPythPriceOracle
+  function grantRole(bytes32 role, address account) public override onlyAssetListingOrPoolAdmins {
+    _setupRole(role, account);
+  }
+
+  /// @inheritdoc IPythOracle
   function setAssetSources(address[] calldata assets, bytes32[] calldata sources)
     external
     override
@@ -76,7 +84,7 @@ contract PythPriceOracle is IPythPriceOracle {
     _setAssetsSources(assets, sources);
   }
 
-  /// @inheritdoc IPythPriceOracle
+  /// @inheritdoc IPythOracle
   function setFallbackOracle(address fallbackOracle)
     external
     override
@@ -107,21 +115,16 @@ contract PythPriceOracle is IPythPriceOracle {
     emit FallbackOracleUpdated(fallbackOracle);
   }
 
-  /// @inheritdoc IPythPriceOracleGetter
+  /// @inheritdoc IPythOracleGetter
   function getAssetPrice(address asset) public view override returns (uint) {
     bytes32 source = assetsSources[asset];
-
 
     if (asset == BASE_CURRENCY) {
       return BASE_CURRENCY_UNIT;
     } else if (source == bytes32(0)) {
-      console.log("No source");
       return _fallbackOracle.getAssetPrice(asset);
     } else {
-      console.log(uint(source));
-      console.log(address(pyth));
-      PythStructs.Price memory currentBasePrice = pyth.getPriceUnsafe(source);
-      console.log(uint(int(currentBasePrice.price)));
+      PythStructs.Price memory currentBasePrice = pyth.getPrice(source);
       uint256 price = convertToUint(currentBasePrice, 8);
       if (price > 0) {
         return price;
@@ -131,26 +134,33 @@ contract PythPriceOracle is IPythPriceOracle {
     }
   }
 
-    function convertToUint(
-        PythStructs.Price memory price,
-        uint8 targetDecimals
-    ) private pure returns (uint256) {
-      if (price.price < 0 || price.expo > 0 || price.expo < -255) {
-        revert();
-      }
-      uint8 priceDecimals = uint8(uint32(-1 * price.expo));
-      if (targetDecimals - priceDecimals >= 0) {
-        return
-          uint(uint64(price.price)) *
-          10 ** uint32(targetDecimals - priceDecimals);
-      } else {
-        return
-          uint(uint64(price.price)) /
-          10 ** uint32(priceDecimals - targetDecimals);
-      }
-    }
+  function updatePrices(
+    bytes[] calldata pythUpdateData
+  ) external override onlyRole(PRICE_UPDATER) {
+    uint updateFee = pyth.getUpdateFee(pythUpdateData);
+    pyth.updatePriceFeeds{value: updateFee}(pythUpdateData);
+  }
 
-  /// @inheritdoc IPythPriceOracle
+  function convertToUint(
+    PythStructs.Price memory price,
+    uint8 targetDecimals
+  ) private pure returns (uint256) {
+    if (price.price < 0 || price.expo > 0 || price.expo < -255) {
+      revert();
+    }
+    uint8 priceDecimals = uint8(uint32(-1 * price.expo));
+    if (targetDecimals - priceDecimals >= 0) {
+      return
+        uint(uint64(price.price)) *
+        10 ** uint32(targetDecimals - priceDecimals);
+    } else {
+      return
+        uint(uint64(price.price)) /
+        10 ** uint32(priceDecimals - targetDecimals);
+    }
+  }
+
+  /// @inheritdoc IPythOracle
   function getAssetsPrices(address[] calldata assets)
     external
     view
@@ -164,12 +174,12 @@ contract PythPriceOracle is IPythPriceOracle {
     return prices;
   }
 
-  /// @inheritdoc IPythPriceOracle
+  /// @inheritdoc IPythOracle
   function getSourceOfAsset(address asset) external view override returns (bytes32) {
     return assetsSources[asset];
   }
 
-  /// @inheritdoc IPythPriceOracle
+  /// @inheritdoc IPythOracle
   function getFallbackOracle() external view returns (address) {
     return address(_fallbackOracle);
   }

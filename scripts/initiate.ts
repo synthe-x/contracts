@@ -17,7 +17,7 @@ import { ETH_ADDRESS } from './utils/const';
 export interface IPoolData {
   pool: Contract;
   oracle: Contract;
-  pythOracle: Contract;
+  fallbackOracle: Contract;
   // enabled collaterals
   collateralTokens: Contract[];
   collateralPriceFeeds: Contract|null[];
@@ -82,7 +82,7 @@ export async function initiate(
     let poolResult = {
       pool: {} as Contract,
       oracle: {} as Contract,
-      pythOracle: {} as Contract,
+      fallbackOracle: {} as Contract,
       collateralTokens: [],
       collateralPriceFeeds: [],
       synths: [],
@@ -109,6 +109,11 @@ export async function initiate(
         oracleAssets.push(result.collateral.address);
         oracleFeeds.push(result.feed.address);
       }
+      // pyth
+      if(cConfig.pyth){
+        pythSupportedAssets.push(result.collateral.address);
+        pythFeeds.push(cConfig.pyth);
+      }
     }
 
     for(let i = 0; i < poolConfig.synths.length; i++){
@@ -124,13 +129,29 @@ export async function initiate(
         baseCurrency = result.synth.address;
         baseCurrencyPrice = ethers.utils.parseUnits(synthConfig.price, 8).toString();
       }
+      // pyth
+      if(synthConfig.pyth){
+        pythSupportedAssets.push(result.synth.address);
+        pythFeeds.push(synthConfig.pyth);
+      }
     }
 
     if(!baseCurrency || !baseCurrencyPrice){
       throw new Error("Base currency not found");
     }
 
-    poolResult.oracle = await deployOracle(poolResult.pool, oracleAssets, oracleFeeds, ethers.constants.AddressZero, baseCurrency, baseCurrencyPrice, "PriceOracle", isTest);
+    if(poolConfig.pyth){
+      if(oracleFeeds.length > 0){
+        poolResult.fallbackOracle = await deployOracle(poolResult.pool, poolConfig.pyth, oracleAssets, oracleFeeds, ethers.constants.AddressZero, baseCurrency, baseCurrencyPrice, "PriceOracle", isTest);
+      }
+      poolResult.oracle = await deployOracle(poolResult.pool, poolConfig.pyth, pythSupportedAssets, pythFeeds, poolResult.fallbackOracle.address ?? ethers.constants.AddressZero, baseCurrency, baseCurrencyPrice, "PythOracle", isTest);
+      if(!poolResult.fallbackOracle) {
+        poolResult.fallbackOracle = poolResult.oracle;
+      }
+    } else {
+      poolResult.oracle = await deployOracle(poolResult.pool, ethers.constants.AddressZero, oracleAssets, oracleFeeds, ethers.constants.AddressZero, baseCurrency, baseCurrencyPrice, "PriceOracle", isTest);
+      poolResult.fallbackOracle = poolResult.oracle;
+    }
 
     await initPool(poolResult.pool, synthex, esSyx.address, poolResult.oracle.address, poolConfig.issuerAlloc, poolConfig.rewardSpeed, isTest);
 

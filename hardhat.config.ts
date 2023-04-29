@@ -50,9 +50,7 @@ const config: any = {
       url: ARBITRUM_GOERLI_RPC,
       accounts: [`0x${PRIVATE_KEY}`],
       chainId: 421613,
-      gasPrice: 160000000,
-      allowUnlimitedContractSize: true,
-      isLive: true,
+      isLive: false,
     },
     arbitrum: {
       url: ARBITRUM_RPC,

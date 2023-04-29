@@ -7,7 +7,7 @@ import "./PoolStorage.sol";
 abstract contract IPool {
 
     function enterCollateral(address _collateral) external virtual;
-    function exitCollateral(address _collateral) external virtual;
+    function exitCollateral(address _collateral, bytes[] memory priceUpdateData) external virtual;
 
     function deposit(address _collateral, uint _amount, address _account) external virtual;
     function depositWithPermit(
@@ -21,7 +21,7 @@ abstract contract IPool {
         bytes32 _s
     ) external virtual;
     function depositETH(address _account) external virtual payable;
-    function withdraw(address _collateral, uint _amount, bool unwrap) external virtual;
+    function withdraw(address _collateral, uint _amount, bool unwrap, bytes[] memory priceUpdateData) external virtual;
 
     /* -------------------------------------------------------------------------- */
     /*                               Admin Functions                              */
@@ -42,10 +42,10 @@ abstract contract IPool {
     /* -------------------------------------------------------------------------- */
     /*                              Internal Functions                            */
     /* -------------------------------------------------------------------------- */
-    function mint(address _synth, uint _amount, address _to) external virtual returns(uint);
-    function burn(address _synth, uint _amount) external virtual returns(uint);
-    function swap(address _synthIn, uint _amount, address _synthOut, DataTypes.SwapKind _kind, address _to) external virtual returns(uint[2] memory);
-    function liquidate(address _synthIn, address _account, uint _amountIn, address _outAsset) external virtual;
+    function mint(address _synth, uint _amount, address _to, bytes[] memory priceUpdateData) external virtual returns(uint);
+    function burn(address _synth, uint _amount, bytes[] memory priceUpdateData) external virtual returns(uint);
+    function swap(address _synthIn, uint _amount, address _synthOut, DataTypes.SwapKind _kind, address _to, bytes[] memory priceUpdateData) external virtual returns(uint[2] memory);
+    function liquidate(address _synthIn, address _account, uint _amountIn, address _outAsset, bytes[] memory priceUpdateData) external virtual;
 
     /* -------------------------------------------------------------------------- */
     /*                                 Events                                     */

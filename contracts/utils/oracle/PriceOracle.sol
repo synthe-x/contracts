@@ -19,6 +19,8 @@ contract PriceOracle is IPriceOracle {
 
   // Map of asset price sources (asset => priceSource)
   mapping(address => AggregatorInterface) private assetsSources;
+  
+  bool public constant IS_PYTH_ORACLE = false;
 
   IPriceOracleGetter private _fallbackOracle;
   address public immutable override BASE_CURRENCY;
@@ -117,6 +119,8 @@ contract PriceOracle is IPriceOracle {
       }
     }
   }
+
+  function updatePrices(bytes[] calldata) external override {}
 
   /// @inheritdoc IPriceOracle
   function getAssetsPrices(address[] calldata assets)

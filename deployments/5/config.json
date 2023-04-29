@@ -1,7 +1,7 @@
 {
   "name": "synthex",
-  "version": "1.21.0",
-  "latest": "1.21.0",
+  "version": "1.36.0",
+  "latest": "1.36.0",
   "l0Admin": "0x46BD90fE9bFa755Ca438d136BB638a85202d5AfB",
   "l1Admin": "0x46BD90fE9bFa755Ca438d136BB638a85202d5AfB",
   "l2Admin": "0x46BD90fE9bFa755Ca438d136BB638a85202d5AfB",
@@ -22,6 +22,7 @@
       "symbol": "C",
       "rewardSpeed": "100000000000000000",
       "issuerAlloc": "7000",
+      "pyth": "",
       "collaterals": [
         {
           "name": "Ethereum",
@@ -46,10 +47,7 @@
           "name": "Bitcoin",
           "symbol": "BTC",
           "feed": "0x6ce185860a4963106506C203335A2910413708e9",
-          "pyth": {
-            "feedId": "0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43",
-            "isReverse": false
-          },
+          "pyth": "0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43",
           "mintFee": "2",
           "burnFee": "4"
         },
@@ -57,10 +55,7 @@
           "name": "Ethereum",
           "symbol": "ETH",
           "feed": "0x639Fe6ab55C921f74e7fac1ee960C0B6293ba612",
-          "pyth": {
-            "feedId": "0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace",
-            "isReverse": false
-          },
+          "pyth": "0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace",
           "mintFee": "2",
           "burnFee": "4"
         },
@@ -77,10 +72,7 @@
           "name": "ChainLink",
           "symbol": "LINK",
           "feed": "0x86E53CF1B870786351Da77A57575e79CB55812CB",
-          "pyth": {
-            "feedId": "0x8ac0c70fff57e9aefdf5edf44b51d62c2d433653cbb2cf5cc06bb115af04d221",
-            "isReverse": false
-          },
+          "pyth": "0x8ac0c70fff57e9aefdf5edf44b51d62c2d433653cbb2cf5cc06bb115af04d221",
           "mintFee": "2",
           "burnFee": "4"
         },

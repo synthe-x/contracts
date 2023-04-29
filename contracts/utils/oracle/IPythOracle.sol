@@ -2,11 +2,11 @@
 pragma solidity ^0.8.0;
 
 /**
- * @title IPriceOracleGetter
- * @author Aave
+ * @title IPythOracleGetter
+ * @author 
  * @notice Interface for the Aave price oracle.
  */
-interface IPythPriceOracleGetter {
+interface IPythOracleGetter {
   /**
    * @notice Returns the base currency address
    * @dev Address 0x0 is reserved for USD as base currency.
@@ -30,12 +30,12 @@ interface IPythPriceOracleGetter {
 }
 
 /**
- * @title IPriceOracle interface
- * @dev IAaveOracle without the address provider 
- * @author Aave
+ * @title IPythOracle interface
+ * @dev IPythOracle interface is a subset of the IPythOracleGetter interface
+ * @author 
  * @notice Defines the basic interface for the Aave Oracle
  */
-interface IPythPriceOracle is IPythPriceOracleGetter {
+interface IPythOracle is IPythOracleGetter {
   /**
    * @dev Emitted after the base currency is set
    * @param baseCurrency The base currency of used for price quotes
@@ -88,4 +88,9 @@ interface IPythPriceOracle is IPythPriceOracleGetter {
    * @return The address of the fallback oracle
    */
   function getFallbackOracle() external view returns (address);
+  
+  /**
+   * @notice Updates the prices of the assets passed as parameter
+   */
+  function updatePrices(bytes[] calldata pythUpdateData) external;
 }

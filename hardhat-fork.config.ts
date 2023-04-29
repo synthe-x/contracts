@@ -6,11 +6,9 @@ export default {
         ...hardhatConfig.networks,
         hardhat: {
             forking: {
-                url: "https://rpc.ankr.com/arbitrum",
-                blockNumber: 84110651
+                url: "https://arbitrum-goerli.public.blastapi.io"
             },
-            gasPrice: 500000000,
-            chainId: 5,
+            chainId: 421613,
         },
     },
 }

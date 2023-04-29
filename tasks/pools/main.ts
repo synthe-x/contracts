@@ -31,24 +31,15 @@ export default async function main(isTest: boolean = false, _deploy = _deployEVM
                 address: collateralLogic.address,
                 constructorArguments: []
             })
-            .catch((err) => {
-                console.log("Could not verify collateralLogic");
-            })
 
             await hre.run("verify:verify", {
                 address: poolLogic.address,
                 constructorArguments: []
             })
-            .catch((err) => {
-                console.log("Could not verify collateralLogic");
-            })
 
             await hre.run("verify:verify", {
                 address: synthLogic.address,
                 constructorArguments: []
-            })
-            .catch((err) => {
-                console.log("Could not verify collateralLogic");
             })
         } catch (err) {
             console.log("Could not verify libraries");
