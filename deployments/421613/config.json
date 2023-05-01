@@ -1,7 +1,7 @@
 {
   "name": "synthex",
-  "version": "0.66.0",
-  "latest": "0.66.0",
+  "version": "0.67.0",
+  "latest": "0.67.0",
   "l0Admin": "0x084cD22eA15E4C262408e561a5AFa8431Bd7fa5d",
   "l1Admin": "0x2646306d3191AEE905bf9065bD1B7cC71c9036D0",
   "l2Admin": "0x46c18c6d5526E17B34a3deB43e5E9Ba2A659c23a",
@@ -66,7 +66,7 @@
           "name": "Ethereum",
           "symbol": "ETH",
           "feed": "0x62CAe0FA2da220f43a51F86Db2EDb36DcA9A5A08",
-          "pyth": "0xf9c0172ba10dfa4d19088d94f5bf61d3b54d5bd7483a322a982e1373ee8ea31b",
+          "pyth": "0xca80ba6dc32e08d06f1aa886011eed1d77c77be9eb761cc10d72b7d0a2fd57a6",
           "mintFee": "4",
           "burnFee": "6"
         },
@@ -83,7 +83,6 @@
           "name": "ChainLink",
           "symbol": "LINK",
           "feed": "0xd28Ba6CA3bB72bF371b80a2a0a33cBcf9073C954",
-          "pyth": "0x83be4ed61dd8a3518d198098ce37240c494710a7b9d85e35d9fceac21df08994",
           "mintFee": "8",
           "burnFee": "10"
         }
@@ -102,7 +101,6 @@
           "decimals": 18,
           "address": "0xe87Ad4b7a14D8759BC92DAced7Ba243a23aCEc03",
           "feed": "0x1692Bdd32F31b831caAc1b0c9fAF68613682813b",
-          "pyth": "0x41f3625971ca2ed2263e78573fe5ce23e13d2558ed3f2e47ab0f84fb9e7ae722",
           "params": {
             "cap": "100000000000000000000000",
             "baseLTV": "8000",
@@ -137,30 +135,14 @@
         {
           "name": "Euro",
           "symbol": "EUR",
-          "price": "0.85",
           "pyth": "0xc1b12769f6633798d45adfd62bfc70114839232e2949b01fb3d3f927d2606154",
           "mintFee": "2",
-          "burnFee": "4"
-        },
-        {
-          "name": "Singapore Dollar",
-          "symbol": "SGD",
-          "price": "0.75",
-          "mintFee": "5",
-          "burnFee": "7"
-        },
-        {
-          "name": "Swedish Krona",
-          "symbol": "SEK",
-          "price": "0.094",
-          "mintFee": "3",
           "burnFee": "4"
         },
         {
           "name": "Pound sterling",
           "symbol": "GBP",
           "pyth": "0xbcbdc2755bd74a2065f9d3283c2b8acbd898e473bdb90a6764b3dbd467c56ecd",
-          "price": "1.22",
           "mintFee": "3",
           "burnFee": "4"
         }

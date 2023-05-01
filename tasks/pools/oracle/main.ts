@@ -16,7 +16,7 @@ export default async function main(
     isTest: boolean = false, 
     _deploy = _deployEVM
 ): Promise<Contract> {
-    if(!isTest) console.log(`Deploying PriceOracle for ${pool.address} to ${hre.network.name} (${hre.network.config.chainId}) ...`);
+    if(!isTest) console.log(`Deploying ${oracleType} for ${pool.address} to ${hre.network.name} (${hre.network.config.chainId}) ...`);
 
 	// read deployments and config
 	const deployments = JSON.parse(fs.readFileSync(process.cwd() + `/deployments/${hre.network.config.chainId}/deployments.json`, "utf8"));
@@ -45,11 +45,14 @@ export default async function main(
             feeds,
             fallbackOracle,
             quoteCurrency,
-            quoteCurrencyPrice, 
-            {
-                value: '1000000'
-            }
+            quoteCurrencyPrice
         ]
+
+        if(!hre.network.config.zksync){
+            args.push({
+                value: '1000000'
+            })
+        }
     }
 
     // deploy synthex

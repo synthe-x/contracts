@@ -1,11 +1,13 @@
 {
   "name": "synthex",
-  "version": "0.57.0",
-  "latest": "0.57.0",
-  "l0Admin": "0x084cD22eA15E4C262408e561a5AFa8431Bd7fa5d",
-  "l1Admin": "0x2646306d3191AEE905bf9065bD1B7cC71c9036D0",
-  "l2Admin": "0x46c18c6d5526E17B34a3deB43e5E9Ba2A659c23a",
+  "version": "0.82.0",
+  "latest": "0.82.0",
+  "l0Admin": "0x0eD6a1F7a99E8Bc1c752E4515f7AB3aFe20BdBF7",
+  "l1Admin": "0x0eD6a1F7a99E8Bc1c752E4515f7AB3aFe20BdBF7",
+  "l2Admin": "0x0eD6a1F7a99E8Bc1c752E4515f7AB3aFe20BdBF7",
   "rewardAlloc": "10000000",
+  "multicall": "",
+  "weth": "0x5e4ccda7f92283d51144db6198877512662dec5c",
   "esSYX": {
     "initialRewardsDuration": "30",
     "reward": "6000",
@@ -39,9 +41,19 @@
           "name": "USD Coin",
           "symbol": "USDC",
           "decimals": 18,
-          "price": "0.999",
-          "address": "0x0faF6df7054946141266420b43783387A78d82A9",
           "pyth": "0x41f3625971ca2ed2263e78573fe5ce23e13d2558ed3f2e47ab0f84fb9e7ae722",
+          "params": {
+            "cap": "1000000000000000000000000",
+            "baseLTV": "7000",
+            "liqThreshold": "8500",
+            "liqBonus": "10200"
+          }
+        },
+        {
+          "name": "ChainLink",
+          "symbol": "LINK",
+          "decimals": 18,
+          "pyth": "0x83be4ed61dd8a3518d198098ce37240c494710a7b9d85e35d9fceac21df08994",
           "params": {
             "cap": "1000000000000000000000000",
             "baseLTV": "7000",
@@ -75,9 +87,16 @@
           "burnFee": "2"
         },
         {
-          "name": "ChainLink",
-          "symbol": "LINK",
-          "pyth": "0x83be4ed61dd8a3518d198098ce37240c494710a7b9d85e35d9fceac21df08994",
+          "name": "Ripple",
+          "symbol": "XRP",
+          "pyth": "0xbfaf7739cb6fe3e1c57a0ac08e1d931e9e6062d476fa57804e165ab572b5b621",
+          "mintFee": "8",
+          "burnFee": "10"
+        },
+        {
+          "name": "Binance Coin",
+          "symbol": "BNB",
+          "pyth": "0xecf553770d9b10965f8fb64771e93f5690a182edc32be4a3236e0caaa6e0581a",
           "mintFee": "8",
           "burnFee": "10"
         }

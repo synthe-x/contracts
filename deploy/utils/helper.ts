@@ -16,7 +16,7 @@ export const _deploy = (
 		{upgradable = false, name = contractName} = {},
 		config: any = {}
 		) {
-
+		
 	const Contract = await deployer.loadArtifact(contractName);
 
 	let contract: Contract;

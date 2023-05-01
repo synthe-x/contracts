@@ -60,10 +60,9 @@ export default async function main(cConfig: CollateralArgs, pool: Contract, isTe
 		if(!isTest) console.log(`Using PriceFeed for ${cConfig.symbol} ($${parseFloat(ethers.utils.formatUnits(await feed.latestAnswer(), await feed.decimals())).toFixed(4)}) at ${feed.address}`);
 	}
 
-
-
 	// Enabling collateral
 	await pool.updateCollateral(collateral.address, {...cConfig.params, isActive: true, totalDeposits: 0});
+
 	if(!isTest) console.log(`\t Collateral ${cConfig.symbol} added successfully ✅`);
 
 	return {collateral, feed};

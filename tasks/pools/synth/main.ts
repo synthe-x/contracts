@@ -10,8 +10,6 @@ export default async function main(synthConfig: SynthArgs, synthex: Contract, po
 	const deployments = JSON.parse(fs.readFileSync(process.cwd() + `/deployments/${hre.network.config.chainId}/deployments.json`, "utf8"));
 	const config = JSON.parse(fs.readFileSync(process.cwd() + `/deployments/${hre.network.config.chainId}/config.json`, "utf8"));
 	
-	const [deployer] = await ethers.getSigners();
-
 	// get pool contract
 	const poolName = await pool.name();
 	const poolSymbol = await pool.symbol();
@@ -69,6 +67,8 @@ export default async function main(synthConfig: SynthArgs, synthex: Contract, po
 	if(!isTest) console.log(`\t\t ${synthConfig.name} (${synthConfig.symbol}) added  ✨`);
 
 	if(synthConfig.isFeeToken){
+		// wait for 2 sec
+		await new Promise(resolve => setTimeout(resolve, 60000));
 		await pool.setFeeToken(synth.address);
 		if(!isTest) console.log(`${synthConfig.name} (${synthConfig.symbol}) set as Fee Token ✅`);
 	}
