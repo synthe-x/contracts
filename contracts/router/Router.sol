@@ -12,15 +12,13 @@ import "../pool/IPool.sol";
 import "../libraries/DataTypes.sol";
 import "hardhat/console.sol";
 
+// TODO: Extend Multicall, Permit
 contract Router {
-    IWETH private immutable _weth;
     using SafeERC20 for IERC20;
 
-    constructor(IWETH weth, address _vault) {
-        _weth = weth;
-        vault = IVault(_vault);
-    }
-
+    IWETH private immutable _weth;
+    address private constant _ETH = address(0);
+    IVault private immutable vault;
    
     struct Swap {
         IVault.BatchSwapStep[] swap;
@@ -36,13 +34,18 @@ contract Router {
         IVault.FundManagement funds;
     }
 
+    /* -------------------------------------------------------------------------- */
+    /*                                 Initialize                                */
+    /* -------------------------------------------------------------------------- */
+    constructor(IWETH weth, address _vault) {
+        _weth = weth;
+        vault = IVault(_vault);
+    }
+
     // Sentinel value used to indicate WETH with wrapping/unwrapping semantics. The zero address is a good choice for
     // multiple reasons: it is cheap to pass as a calldata argument, it is a known invalid token and non-contract, and
     // it is an address Pools cannot register as a token.
-    address private constant _ETH = address(0);
-
-    IVault private immutable vault;
-
+    // TODO: Non reentrancy
     function swap(SwapData memory swapDatas) external returns (uint256) {
         uint amount;
 
@@ -65,7 +68,7 @@ contract Router {
         );
         uint256 amountOut = swapDatas.swaps[0].swap[0].amount;
 
-        address sender = swapDatas.funds.sender;
+        address sender = msg.sender; // swapDatas.funds.sender;
 
         address payable recipient = swapDatas.funds.recipient;
         // change recipient and sender to router contract for swaping stages.
@@ -89,38 +92,40 @@ contract Router {
                 IAsset asset = swapDatas.swaps[i].assets[
                     swapDatas.swaps[i].swap[0].assetInIndex
                 ];
-                console.log("asset", address(asset));
-                console.log("amountOut1", amountOut);
+                // console.log("asset", address(asset));
+                // console.log("amountOut1", amountOut);
                 IERC20(address(asset)).approve(address(vault), amountOut);
+                // TODO: last -> recipient sender
                 int256[] memory res = _swapInBalancer(
                     swapDatas.swaps[i],
                     swapDatas
                 );
                 uint256[2] memory res1 = _getMinMax(res);
                 amountOut = res1[0];
-                console.log("amountOut", amountOut);
+                // console.log("amountOut", amountOut);
             } else {
                 // inside synthex pool
                 swapDatas.swaps[i].swap[0].amount = amountOut;
+                // TODO: last -> recipient sender
                 amountOut = _swapInSynthex(swapDatas.swaps[i], swapDatas);
             }
 
-            if (i == swapDatas.swaps.length - 1) {
-                IAsset asset = swapDatas
-                    .swaps[swapDatas.swaps.length - 1]
-                    .assets[
-                        swapDatas
-                            .swaps[swapDatas.swaps.length - 1]
-                            .swap[
-                                swapDatas
-                                    .swaps[swapDatas.swaps.length - 1]
-                                    .swap
-                                    .length - 1
-                            ]
-                            .assetOutIndex
-                    ];
-                _sendAsset(asset, amountOut, recipient);
-            }
+            // if (i == swapDatas.swaps.length - 1) {
+            //     IAsset asset = swapDatas
+            //         .swaps[swapDatas.swaps.length - 1]
+            //         .assets[
+            //             swapDatas
+            //                 .swaps[swapDatas.swaps.length - 1]
+            //                 .swap[
+            //                     swapDatas
+            //                         .swaps[swapDatas.swaps.length - 1]
+            //                         .swap
+            //                         .length - 1
+            //                 ]
+            //                 .assetOutIndex
+            //         ];
+            //     _sendAsset(asset, amountOut, recipient);
+            // }
         }
         return amountOut;
     }
@@ -152,13 +157,13 @@ contract Router {
         Swap memory _swap,
         SwapData memory swapDatas
     ) internal returns (int256[] memory) {
-        console.logBytes32(_swap.swap[0].poolId);
-        console.log(_swap.swap[0].amount);
-        console.logAddress(address(_swap.assets[0]));
-        (address add, IVault.PoolSpecialization spe) = vault.getPool(
-            _swap.swap[0].poolId
-        );
-        console.log("address", add);
+        // console.logBytes32(_swap.swap[0].poolId);
+        // console.log(_swap.swap[0].amount);
+        // console.logAddress(address(_swap.assets[0]));
+        // (address add, IVault.PoolSpecialization spe) = vault.getPool(
+        //     _swap.swap[0].poolId
+        // );
+        // console.log("address", add);
         return
             vault.batchSwap(
                 swapDatas.kind,
@@ -300,7 +305,8 @@ contract Router {
             _WETH().withdraw(amount);
 
             // Then, the withdrawn ETH is sent to the recipient.
-            recipient.call{value: amount}("");
+            (bool success,) = recipient.call{value: amount}("");
+            require(success, "Errors.ETH_TRANSFER_FAILED");
         } else {
             IERC20 token = _asIERC20(asset);
             token.safeTransfer(recipient, amount);
