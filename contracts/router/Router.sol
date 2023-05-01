@@ -7,6 +7,7 @@ import "@balancer-labs/v2-interfaces/contracts/vault/IAsset.sol";
 import "@balancer-labs/v2-interfaces/contracts/solidity-utils/helpers/BalancerErrors.sol";
 import {IVault} from "@balancer-labs/v2-interfaces/contracts/vault/IVault.sol";
 import {IWETH} from "@balancer-labs/v2-interfaces/contracts/solidity-utils/misc/IWETH.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 import "../pool/IPool.sol";
 import "../libraries/DataTypes.sol";
 import "hardhat/console.sol";
@@ -20,21 +21,10 @@ contract Router {
         vault = IVault(_vault);
     }
 
-    // struct Fee {
-    //     uint128 burnFee;
-    //     uint128 mintFee;
-    // }
-
-    // struct TokenPrice {
-    //     uint256 tokenIn;
-    //     uint256 tokenOut;
-    // }
-
+   
     struct Swap {
         IVault.BatchSwapStep[] swap;
         int256[] limits;
-        // Fee fee;
-        // TokenPrice price;
         IAsset[] assets;
         bool isBalancerPool;
     }
@@ -85,6 +75,7 @@ contract Router {
 
         for (uint i = 0; i < swapDatas.swaps.length; i++) {
             if (i == 0) {
+                
                 IAsset asset = swapDatas.swaps[0].assets[
                     swapDatas.swaps[0].swap[0].assetInIndex
                 ];
@@ -95,10 +86,11 @@ contract Router {
             if (swapDatas.swaps[i].isBalancerPool == true) {
                 // inside balancer function
                 swapDatas.swaps[i].swap[0].amount = amountOut;
-                 IAsset asset = swapDatas.swaps[0].assets[
-                    swapDatas.swaps[0].swap[0].assetInIndex
+                IAsset asset = swapDatas.swaps[i].assets[
+                    swapDatas.swaps[i].swap[0].assetInIndex
                 ];
-
+                console.log("asset", address(asset));
+                console.log("amountOut1", amountOut);
                 IERC20(address(asset)).approve(address(vault), amountOut);
                 int256[] memory res = _swapInBalancer(
                     swapDatas.swaps[i],
@@ -106,6 +98,7 @@ contract Router {
                 );
                 uint256[2] memory res1 = _getMinMax(res);
                 amountOut = res1[0];
+                console.log("amountOut", amountOut);
             } else {
                 // inside synthex pool
                 swapDatas.swaps[i].swap[0].amount = amountOut;
@@ -190,10 +183,13 @@ contract Router {
         DataTypes.SwapKind kind = swapDatas.kind == IVault.SwapKind.GIVEN_IN
             ? DataTypes.SwapKind.GIVEN_IN
             : DataTypes.SwapKind.GIVEN_OUT;
-
-        // address poolAddress = address(uint160(bytes20(_swap.swap[0].poolId)));
-
-        address poolAddress = bytesToAddress(_swap.swap[0].poolId);
+        console.logBytes32(_swap.swap[0].poolId);
+        // console.log(
+        //     "string",
+        //     stringToAddress(slice(bytes32ToHexString(_swap.swap[0].poolId)))
+        // );
+        address poolAddress =  stringToAddress(slice(bytes32ToHexString(_swap.swap[0].poolId))); //(_swap.swap[0].poolId);
+        console.log("poolAddress", poolAddress);
         uint256[2] memory res = IPool(poolAddress).swap(
             _synthIn,
             _amount,
@@ -325,41 +321,98 @@ contract Router {
         _require(msg.sender == address(_WETH()), Errors.ETH_TRANSFER);
     }
 
-    function bytesToHex(
-        bytes memory data
-    ) internal pure returns (string memory) {
+    function toHexString(uint8 value) internal pure returns (string memory) {
         bytes memory alphabet = "0123456789abcdef";
-        bytes memory str = new bytes(2 * data.length);
-        for (uint i = 0; i < data.length; i++) {
-            str[2 * i] = alphabet[uint(uint8(data[i] >> 4))];
-            str[2 * i + 1] = alphabet[uint(uint8(data[i] & 0x0f))];
-        }
+        bytes memory str = new bytes(2);
+        str[0] = alphabet[value >> 4];
+        str[1] = alphabet[value & 0x0f];
         return string(str);
     }
 
-    function bytesToAddress(bytes32 data) internal returns (address) {
-        return address(uint160(uint256(data)));
-        // string memory str = "";
-
-        // for (uint i = 0; i < 42; i++) {
-        //     str = string.concate(str, data[i]);
-        // }
-
-        // return address(str);
+    function concatenateStrings(
+        string memory a,
+        string memory b
+    ) internal pure returns (string memory) {
+        return string(abi.encodePacked(a, b));
     }
 
-    // function bytesToHex1(bytes32 value) internal returns (string memory) {
-    //     bytes memory bytesArray = new bytes(32);
-    //     assembly {
-    //         mstore(add(bytesArray, 32), value)
-    //     }
-    //     uint i;
-    //     for (i = 0; i < 32 && bytesArray[i] == 0; i++) {}
-    //     string memory hexString = "0x";
-    //     for (; i < 32; i++) {
-    //         hexString = hexString + hex(bytesArray[i], 2);
-    //     }
-    // }
+    function bytes32ToHexString(
+        bytes32 value
+    ) internal pure returns (string memory) {
+        bytes memory bytesArray = new bytes(32);
+        assembly {
+            mstore(add(bytesArray, 32), value)
+        }
+        string memory hexString = "0x";
+        for (uint i = 0; i < 32; i++) {
+            hexString = concatenateStrings(
+                hexString,
+                toHexString(uint8(bytesArray[i]))
+            );
+        }
+        return hexString;
+    }
+
+    function slice(string memory str) internal pure returns (string memory) {
+        bytes memory strBytes = bytes(str);
+        require(strBytes.length >= 42, "String too short");
+        bytes memory result = new bytes(42);
+        for (uint i = 0; i < 42; i++) {
+            result[i] = strBytes[i];
+        }
+        return string(result);
+    }
+
+    function stringToAddress(
+        string memory _address
+    ) public pure returns (address) {
+        // Remove 0x prefix if it exists
+        if (
+            bytes(_address).length >= 2 &&
+            bytes(_address)[0] == "0" &&
+            (bytes(_address)[1] == "x" || bytes(_address)[1] == "X")
+        ) {
+            _address = substring(_address, 2, bytes(_address).length);
+        }
+
+        bytes memory _bytes = bytes(_address);
+        uint160 _parsedBytes = 0;
+        for (uint256 i = 0; i < _bytes.length; i += 2) {
+            _parsedBytes = uint160(SafeMath.mul(_parsedBytes, 256));
+            uint8 _byteValue = parseByteToUint8(_bytes[i]);
+            _byteValue = uint8(SafeMath.mul(_byteValue, 16));
+            _byteValue = uint8(
+                SafeMath.add(_byteValue, parseByteToUint8(_bytes[i + 1]))
+            );
+            _parsedBytes = uint160(SafeMath.add(_parsedBytes, _byteValue));
+        }
+        return address(_parsedBytes);
+    }
+
+    function substring(
+        string memory _str,
+        uint256 _start,
+        uint256 _end
+    ) internal pure returns (string memory) {
+        bytes memory _strBytes = bytes(_str);
+        bytes memory _result = new bytes(_end - _start);
+        for (uint256 i = _start; i < _end; i++) {
+            _result[i - _start] = _strBytes[i];
+        }
+        return string(_result);
+    }
+
+    function parseByteToUint8(bytes1 _byte) internal pure returns (uint8) {
+        if (uint8(_byte) >= 48 && uint8(_byte) <= 57) {
+            return uint8(_byte) - 48;
+        } else if (uint8(_byte) >= 65 && uint8(_byte) <= 70) {
+            return uint8(_byte) - 55;
+        } else if (uint8(_byte) >= 97 && uint8(_byte) <= 102) {
+            return uint8(_byte) - 87;
+        } else {
+            revert(string(abi.encodePacked("Invalid byte value: ", _byte)));
+        }
+    }
 }
 
 //bytes32(uint256(uint160(addr)) << 96);

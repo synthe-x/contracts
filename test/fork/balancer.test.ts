@@ -14,7 +14,7 @@ function pe(amount: number | string) {
 }
 describe("Testing balancer pool", function () {
 
-	let synthex: any, oracle: any, pool: any, eth: any, ceth: any, weth: any, usdc: any, poolTokens: string[];
+	let synthex: any, oracle: any, pool: any, eth: any, cusd: any, ceth: any, weth: any, usdc: any, poolTokens: string[];
 	let owner: any, user1: any, user2: any, user3: any, banalcerPoolId: string, balancerPoolAddress: string;
 	const provider = new ethers.providers.JsonRpcProvider("https://arb-mainnet.g.alchemy.com/v2/mJSnb6p3QRZdqQIHgJerJCI5M9kul8lo");
 	let balancerPool;
@@ -38,7 +38,7 @@ describe("Testing balancer pool", function () {
 		// oracle = deployments.pools[0].oracle;
 
 		ceth = deployments.pools[0].synths[1];
-		// cusd = deployments.pools[0].synths[2];
+		cusd = deployments.pools[0].synths[2];
 
 		poolFactory = new ethers.Contract(STABLE_FACTORY, _deployments["ComposableStablePoolFactory"], provider);
 		// console.log(poolFactory.address);
@@ -47,7 +47,7 @@ describe("Testing balancer pool", function () {
 
 		weth = new ethers.Contract(eth.address, _deployments["WETH9"], provider);
 
-		usdc =   new ethers.Contract("0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8", _deployments["ERC20X"], provider);
+		usdc = new ethers.Contract("0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8", _deployments["ERC20X"], provider);
 
 		console.log(await hre.ethers.provider.getBlockNumber())
 
@@ -253,7 +253,7 @@ describe("Testing balancer pool", function () {
 
 	it("it sould batchSwap ", async () => {
 
-		await weth.connect(user1).deposit({ value: pe(10) });
+		await weth.connect(user1).deposit({ value: pe(1.5) });
 		let balance = await weth.connect(user1).balanceOf(user1.address);
 		console.log(balance.toString(), "balance from swap")
 		console.log(poolTokens, "poolTOkens")
@@ -283,7 +283,7 @@ describe("Testing balancer pool", function () {
 		console.log("batchSwap", batchSwap.events[0].args)
 	})
 
-	it("It should swap in router", async () => {
+	it("It should swap in router for balancer", async () => {
 		console.log(await hre.ethers.provider.getBlockNumber())
 		router = await routerMain(weth.address, vault.address, true);
 		console.log("routerAddress", router.address);
@@ -293,8 +293,8 @@ describe("Testing balancer pool", function () {
 		await ceth.connect(user1).approve(router.address, pe("1000000000"));
 
 		await pool.connect(user1).approve(router.address, pe("20000000000"));
-
-		const swap = await(await router.connect(user1).swap(
+		console.log("weth", await weth.connect(user1).balanceOf(user1.address))
+		const swap = await (await router.connect(user1).swap(
 			{
 				"kind": 0,
 				"swaps": [
@@ -311,11 +311,80 @@ describe("Testing balancer pool", function () {
 						"isBalancerPool": true,
 						"limits": [
 							"1000000000000000000",
-							-"1882662266"
+							"-1882662266"
 						],
 						"assets": [
 							"0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
 							"0xff970a61a04b1ca14834a43f5de4533ebddb5cc8"
+						]
+					},
+					{
+						"swap": [
+							{
+								"poolId": "0x64541216bafffeec8ea535bb71fbc927831d0595000100000000000000000002",
+								"assetInIndex": "1",
+								"assetOutIndex": "0",
+								"userData": "0x",
+								"amount": "1882662266"
+							}
+						],
+						"isBalancerPool": true,
+						"limits": [
+							"-900000000000000000",
+							"1984354965"
+						],
+						"assets": [
+							"0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+							"0xff970a61a04b1ca14834a43f5de4533ebddb5cc8"
+						]
+					},
+
+				],
+				"deadline": 1692683960,
+				"funds": {
+					"sender": user1.address,
+					"recipient": user1.address,
+					"fromInternalBalance": false,
+					"toInternalBalance": false
+				}
+			}
+		)).wait(1);
+
+		console.log("Swap", swap)
+
+		console.log("usdc", await usdc.connect(user1).balanceOf(user1.address))
+		console.log("weth", await weth.connect(user1).balanceOf(user1.address))
+		console.log("ceth", await ceth.connect(user1).balanceOf(user1.address))
+	});
+
+	it("It should swap in router for synthex", async () => {
+		console.log(await hre.ethers.provider.getBlockNumber())
+		// router = await routerMain(weth.address, vault.address, true);
+		// console.log("routerAddress", router.address);
+		
+		console.log("ceth", await ceth.connect(user1).balanceOf(user1.address))
+		const swap = await (await router.connect(user1).swap(
+			{
+				"kind": 0,
+				"swaps": [
+					{
+						"swap": [
+							{
+								"poolId": "0xbbb3abfa2dd320d85c64e8825c1e32ad0026fae5000000000000000000000000",
+								"assetInIndex": 0,
+								"assetOutIndex": 1,
+								"userData": "0x",
+								"amount": "300000000000000000"
+							}
+						],
+						"isBalancerPool": false,
+						"limits": [
+							"300000000000000000",
+							"-570420511593375000000"
+						],
+						"assets": [
+							"0xa28d78534d18324da06fc487041b1ab4a16d557d",
+							"0xe379874446dd29178e68852992daa80be952c0b3"
 						]
 					}
 				],
@@ -331,7 +400,8 @@ describe("Testing balancer pool", function () {
 
 		console.log("Swap", swap)
 
-		console.log(await usdc.connect(user1).balanceOf(user1.address))
+		console.log("csdc", await cusd.connect(user1).balanceOf(user1.address))
+		console.log("ceth", await ceth.connect(user1).balanceOf(user1.address))
 	})
 
 
