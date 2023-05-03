@@ -1,25 +1,28 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@balancer-labs/v2-interfaces/contracts/vault/IAsset.sol";
 import "@balancer-labs/v2-interfaces/contracts/solidity-utils/helpers/BalancerErrors.sol";
 import {IVault} from "@balancer-labs/v2-interfaces/contracts/vault/IVault.sol";
 import {IWETH} from "@balancer-labs/v2-interfaces/contracts/solidity-utils/misc/IWETH.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts/utils/Multicall.sol";
 import "../pool/IPool.sol";
 import "../libraries/DataTypes.sol";
 import "hardhat/console.sol";
 
 // TODO: Extend Multicall, Permit
-contract Router {
+contract Router is ReentrancyGuard, Multicall {
     using SafeERC20 for IERC20;
 
-    IWETH private immutable _weth;
+    IWETH _weth;
     address private constant _ETH = address(0);
-    IVault private immutable vault;
-   
+    IVault vault;
+
     struct Swap {
         IVault.BatchSwapStep[] swap;
         int256[] limits;
@@ -30,8 +33,14 @@ contract Router {
     struct SwapData {
         IVault.SwapKind kind;
         Swap[] swaps;
-        uint256 deadline;
         IVault.FundManagement funds;
+        uint256 deadline;
+    }
+
+    struct Approval {
+        uint8 v;
+        bytes32 r;
+        bytes32 s;
     }
 
     /* -------------------------------------------------------------------------- */
@@ -42,20 +51,36 @@ contract Router {
         vault = IVault(_vault);
     }
 
-    // Sentinel value used to indicate WETH with wrapping/unwrapping semantics. The zero address is a good choice for
-    // multiple reasons: it is cheap to pass as a calldata argument, it is a known invalid token and non-contract, and
-    // it is an address Pools cannot register as a token.
-    // TODO: Non reentrancy
-    function swap(SwapData memory swapDatas) external returns (uint256) {
-        uint amount;
+    function swap(
+        SwapData memory swapDatas
+    ) public nonReentrant returns (uint256) {
+        
+        require(swapDatas.kind == IVault.SwapKind.GIVEN_IN, "SWAP_KIND_GIVEN_IN_ONLY_ALLOWED");
 
-        if (swapDatas.kind == IVault.SwapKind.GIVEN_IN) {
-            amount = _swapGivenIn(swapDatas); // amountOut;
-        }
-        // else if (swapDatas.kind == IVault.SwapKind.GIVEN_OUT) {
-        //     amount = _swapGivenOut(swapDatas);
+        // if (swapDatas.kind == IVault.SwapKind.GIVEN_IN) {
+            return _swapGivenIn(swapDatas); // amountOut;
         // }
-        return amount;
+        // else if (swapDatas.kind == IVault.SwapKind.GIVEN_OUT) {
+        //     return _swapGivenOut(swapDatas);
+        // }
+        
+    }
+
+    function permitRouter(
+        uint256 amount,
+        uint256 deadline,
+        address asset,
+        Approval memory approval
+    ) public {
+        IERC20Permit(asset).permit(
+            msg.sender,
+            address(this),
+            amount,
+            deadline,
+            approval.v,
+            approval.r,
+            approval.s
+        );
     }
 
     function _swapGivenIn(
@@ -63,12 +88,11 @@ contract Router {
     ) internal returns (uint256) {
         require(
             swapDatas.funds.fromInternalBalance == false,
-            // Errors.INVALID_ETH_INTERNAL_BALANCE
             "INVALID_ETH_INTERNAL_BALANCE"
         );
         uint256 amountOut = swapDatas.swaps[0].swap[0].amount;
 
-        address sender = msg.sender; // swapDatas.funds.sender;
+        address sender = msg.sender; 
 
         address payable recipient = swapDatas.funds.recipient;
         // change recipient and sender to router contract for swaping stages.
@@ -78,7 +102,6 @@ contract Router {
 
         for (uint i = 0; i < swapDatas.swaps.length; i++) {
             if (i == 0) {
-                
                 IAsset asset = swapDatas.swaps[0].assets[
                     swapDatas.swaps[0].swap[0].assetInIndex
                 ];
@@ -92,40 +115,28 @@ contract Router {
                 IAsset asset = swapDatas.swaps[i].assets[
                     swapDatas.swaps[i].swap[0].assetInIndex
                 ];
-                // console.log("asset", address(asset));
-                // console.log("amountOut1", amountOut);
+
                 IERC20(address(asset)).approve(address(vault), amountOut);
-                // TODO: last -> recipient sender
+
+                if (i == swapDatas.swaps.length - 1) {
+                    swapDatas.funds.recipient = recipient;
+                }
                 int256[] memory res = _swapInBalancer(
                     swapDatas.swaps[i],
                     swapDatas
                 );
                 uint256[2] memory res1 = _getMinMax(res);
                 amountOut = res1[0];
-                // console.log("amountOut", amountOut);
+               
             } else {
                 // inside synthex pool
                 swapDatas.swaps[i].swap[0].amount = amountOut;
-                // TODO: last -> recipient sender
+
+                if (i == swapDatas.swaps.length - 1) {
+                    swapDatas.funds.recipient = recipient;
+                }
                 amountOut = _swapInSynthex(swapDatas.swaps[i], swapDatas);
             }
-
-            // if (i == swapDatas.swaps.length - 1) {
-            //     IAsset asset = swapDatas
-            //         .swaps[swapDatas.swaps.length - 1]
-            //         .assets[
-            //             swapDatas
-            //                 .swaps[swapDatas.swaps.length - 1]
-            //                 .swap[
-            //                     swapDatas
-            //                         .swaps[swapDatas.swaps.length - 1]
-            //                         .swap
-            //                         .length - 1
-            //                 ]
-            //                 .assetOutIndex
-            //         ];
-            //     _sendAsset(asset, amountOut, recipient);
-            // }
         }
         return amountOut;
     }
@@ -157,13 +168,6 @@ contract Router {
         Swap memory _swap,
         SwapData memory swapDatas
     ) internal returns (int256[] memory) {
-        // console.logBytes32(_swap.swap[0].poolId);
-        // console.log(_swap.swap[0].amount);
-        // console.logAddress(address(_swap.assets[0]));
-        // (address add, IVault.PoolSpecialization spe) = vault.getPool(
-        //     _swap.swap[0].poolId
-        // );
-        // console.log("address", add);
         return
             vault.batchSwap(
                 swapDatas.kind,
@@ -188,13 +192,9 @@ contract Router {
         DataTypes.SwapKind kind = swapDatas.kind == IVault.SwapKind.GIVEN_IN
             ? DataTypes.SwapKind.GIVEN_IN
             : DataTypes.SwapKind.GIVEN_OUT;
-        console.logBytes32(_swap.swap[0].poolId);
-        // console.log(
-        //     "string",
-        //     stringToAddress(slice(bytes32ToHexString(_swap.swap[0].poolId)))
-        // );
-        address poolAddress =  stringToAddress(slice(bytes32ToHexString(_swap.swap[0].poolId))); //(_swap.swap[0].poolId);
-        console.log("poolAddress", poolAddress);
+
+        address poolAddress = bytes32ToAddress(_swap.swap[0].poolId);
+
         uint256[2] memory res = IPool(poolAddress).swap(
             _synthIn,
             _amount,
@@ -305,7 +305,7 @@ contract Router {
             _WETH().withdraw(amount);
 
             // Then, the withdrawn ETH is sent to the recipient.
-            (bool success,) = recipient.call{value: amount}("");
+            (bool success, ) = recipient.call{value: amount}("");
             require(success, "Errors.ETH_TRANSFER_FAILED");
         } else {
             IERC20 token = _asIERC20(asset);
@@ -327,100 +327,7 @@ contract Router {
         _require(msg.sender == address(_WETH()), Errors.ETH_TRANSFER);
     }
 
-    function toHexString(uint8 value) internal pure returns (string memory) {
-        bytes memory alphabet = "0123456789abcdef";
-        bytes memory str = new bytes(2);
-        str[0] = alphabet[value >> 4];
-        str[1] = alphabet[value & 0x0f];
-        return string(str);
-    }
-
-    function concatenateStrings(
-        string memory a,
-        string memory b
-    ) internal pure returns (string memory) {
-        return string(abi.encodePacked(a, b));
-    }
-
-    function bytes32ToHexString(
-        bytes32 value
-    ) internal pure returns (string memory) {
-        bytes memory bytesArray = new bytes(32);
-        assembly {
-            mstore(add(bytesArray, 32), value)
-        }
-        string memory hexString = "0x";
-        for (uint i = 0; i < 32; i++) {
-            hexString = concatenateStrings(
-                hexString,
-                toHexString(uint8(bytesArray[i]))
-            );
-        }
-        return hexString;
-    }
-
-    function slice(string memory str) internal pure returns (string memory) {
-        bytes memory strBytes = bytes(str);
-        require(strBytes.length >= 42, "String too short");
-        bytes memory result = new bytes(42);
-        for (uint i = 0; i < 42; i++) {
-            result[i] = strBytes[i];
-        }
-        return string(result);
-    }
-
-    function stringToAddress(
-        string memory _address
-    ) public pure returns (address) {
-        // Remove 0x prefix if it exists
-        if (
-            bytes(_address).length >= 2 &&
-            bytes(_address)[0] == "0" &&
-            (bytes(_address)[1] == "x" || bytes(_address)[1] == "X")
-        ) {
-            _address = substring(_address, 2, bytes(_address).length);
-        }
-
-        bytes memory _bytes = bytes(_address);
-        uint160 _parsedBytes = 0;
-        for (uint256 i = 0; i < _bytes.length; i += 2) {
-            _parsedBytes = uint160(SafeMath.mul(_parsedBytes, 256));
-            uint8 _byteValue = parseByteToUint8(_bytes[i]);
-            _byteValue = uint8(SafeMath.mul(_byteValue, 16));
-            _byteValue = uint8(
-                SafeMath.add(_byteValue, parseByteToUint8(_bytes[i + 1]))
-            );
-            _parsedBytes = uint160(SafeMath.add(_parsedBytes, _byteValue));
-        }
-        return address(_parsedBytes);
-    }
-
-    function substring(
-        string memory _str,
-        uint256 _start,
-        uint256 _end
-    ) internal pure returns (string memory) {
-        bytes memory _strBytes = bytes(_str);
-        bytes memory _result = new bytes(_end - _start);
-        for (uint256 i = _start; i < _end; i++) {
-            _result[i - _start] = _strBytes[i];
-        }
-        return string(_result);
-    }
-
-    function parseByteToUint8(bytes1 _byte) internal pure returns (uint8) {
-        if (uint8(_byte) >= 48 && uint8(_byte) <= 57) {
-            return uint8(_byte) - 48;
-        } else if (uint8(_byte) >= 65 && uint8(_byte) <= 70) {
-            return uint8(_byte) - 55;
-        } else if (uint8(_byte) >= 97 && uint8(_byte) <= 102) {
-            return uint8(_byte) - 87;
-        } else {
-            revert(string(abi.encodePacked("Invalid byte value: ", _byte)));
-        }
+    function bytes32ToAddress(bytes32 poolId) public pure returns (address) {
+        return address(uint160(uint256(poolId)));
     }
 }
-
-//bytes32(uint256(uint160(addr)) << 96);
-
-//  address(uint160(bytes20(b)))
