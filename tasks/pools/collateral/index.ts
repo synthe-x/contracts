@@ -3,24 +3,23 @@ import { CollateralArgs } from "../../../deployments/types";
 import main from "./main";
 
 const cConfig: CollateralArgs = {
-    "name": "USD Coin",
-    "symbol": "USDC",
-    "decimals": 18,
-    "feed": "0x1692Bdd32F31b831caAc1b0c9fAF68613682813b",
-    "params": {
-        "cap": "100000000000000000000000",
-        "baseLTV": 7000,
-        "liqThreshold": 8500,
-        "liqBonus": 10200
+    name: "Lodestar USD Coin",
+    symbol: "lUSDC",
+    decimals: 18,
+    address: "0x605a9d845B9ab16675Db2713F30C5134BFf5e055",
+    params: {
+        cap: "100000000000000000000000",
+        baseLTV: 7000,
+        liqThreshold: 8500,
+        liqBonus: 10200
     },
     price: null,
     isNew: false,
-    isCToken: false,
+    isCToken: true,
     isAToken: false,
     poolAddressesProvider: null,
     isFeedSecondary: false,
     secondarySource: null,
-    address: null
 };
 
 async function index(cConfig: CollateralArgs, oracleAddress: string, poolAddress: string) {
@@ -30,10 +29,13 @@ async function index(cConfig: CollateralArgs, oracleAddress: string, poolAddress
 	const oracle = Oracle.attach(oracleAddress);
     
 	// get pool contract
-	const Pool = await ethers.getContractFactory("Pool");
-	const pool = Pool.attach(poolAddress);
+	const pool = await ethers.getContractAt("Pool", poolAddress);
     
-    main(cConfig, oracle, pool);
+    const result = await main(cConfig, pool);
+    if(result.feed){
+        // await oracle.setAssetSources([result.collateral.address], [result.feed.address]);
+        console.log([result.collateral.address], [result.feed.address]);
+    }
 }
 
-index(cConfig, "0x0D909F54332fe2003b6eF779FB7C8a3c5b1b9b6f", "0x705A774d9542bfd793A2b74bec245028aD6F0042");
+index(cConfig, "0x685CD63b437b3A97271Ad351C4110333b17171c2", "0x4c6c8BF00017545711A6bC26B0f8040190A356e8");

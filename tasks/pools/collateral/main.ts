@@ -18,8 +18,9 @@ export default async function main(cConfig: CollateralArgs, pool: Contract, isTe
 	if(cConfig.isCToken){
 		const cToken = await ethers.getContractAt('CTokenInterface', collateral);
 		const comptroller = await cToken.comptroller();
-		feed = await _deploy('CompoundOracle', [comptroller, cToken.address, cConfig.decimals], deployments, {name: `${cConfig.symbol}_PriceFeed`});
-		if(!isTest) console.log(`Deployed CompoundOracle for ${cConfig.symbol} at ${feed.address}`);
+		feed = await _deploy('LodestarPriceOracle', [comptroller, cToken.address, cConfig.decimals], deployments, {name: `${cConfig.symbol}_PriceFeed`});
+		console.log((await feed.latestAnswer()).toString(), (await feed.decimals()).toString());
+		if(!isTest) console.log(`Deployed CompoundOracle for ${cConfig.symbol} at ${feed.address} ($${parseFloat(ethers.utils.formatUnits(await feed.latestAnswer(), await feed.decimals())).toFixed(4)})`);
 		feed = feed.address;
 	}
 	// handle aave based collateral (aTokens)
@@ -61,7 +62,8 @@ export default async function main(cConfig: CollateralArgs, pool: Contract, isTe
 	}
 
 	// Enabling collateral
-	await pool.updateCollateral(collateral.address, {...cConfig.params, isActive: true, totalDeposits: 0});
+	console.log(collateral.address, {...cConfig.params, isActive: true, totalDeposits: 0});
+	// await pool.updateCollateral(collateral.address, {...cConfig.params, isActive: true, totalDeposits: 0});
 
 	if(!isTest) console.log(`\t Collateral ${cConfig.symbol} added successfully ✅`);
 
