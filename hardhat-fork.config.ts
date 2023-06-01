@@ -6,9 +6,9 @@ export default {
         ...hardhatConfig.networks,
         hardhat: {
             forking: {
-                url: "https://arbitrum-goerli.public.blastapi.io"
+                url: "https://arb1.croswap.com/rpc"
             },
-            chainId: 421613,
+            chainId: 42161,
         },
     },
 }

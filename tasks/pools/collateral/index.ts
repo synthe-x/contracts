@@ -6,11 +6,11 @@ const cConfig: CollateralArgs = {
     name: "Lodestar USD Coin",
     symbol: "lUSDC",
     decimals: 18,
-    address: "0x605a9d845B9ab16675Db2713F30C5134BFf5e055",
+    address: "0x7b571111dAFf9428f7563582242eD29E5949970e",
     params: {
         cap: "100000000000000000000000",
-        baseLTV: 7000,
-        liqThreshold: 8500,
+        baseLTV: 6000,
+        liqThreshold: 8800,
         liqBonus: 10200
     },
     price: null,
@@ -20,6 +20,7 @@ const cConfig: CollateralArgs = {
     poolAddressesProvider: null,
     isFeedSecondary: false,
     secondarySource: null,
+    feed: null
 };
 
 async function index(cConfig: CollateralArgs, oracleAddress: string, poolAddress: string) {
@@ -38,4 +39,4 @@ async function index(cConfig: CollateralArgs, oracleAddress: string, poolAddress
     }
 }
 
-index(cConfig, "0x685CD63b437b3A97271Ad351C4110333b17171c2", "0x4c6c8BF00017545711A6bC26B0f8040190A356e8");
+index(cConfig, "0x42E67C879DE46086A175eC5C2760DaF78F75045D", "0x8d6E834277E4f513BacF83B0A87524c913eF8691");
