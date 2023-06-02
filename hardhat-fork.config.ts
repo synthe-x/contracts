@@ -6,9 +6,8 @@ export default {
         ...hardhatConfig.networks,
         hardhat: {
             forking: {
-                url: "https://rpc.ankr.com/arbitrum",
+                url: "https://arb1.croswap.com/rpc"
             },
-            gasPrice: 500000000,
             chainId: 42161,
         },
     },

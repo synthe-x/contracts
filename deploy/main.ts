@@ -47,10 +47,7 @@ export default async function (hre: HardhatRuntimeEnvironment, isTest: boolean =
 	// read deployments and config
 	const deployments = JSON.parse(fs.readFileSync(process.cwd() + `/deployments/${hre.network.config.chainId}/deployments.json`, "utf8"));
 	const config = JSON.parse(fs.readFileSync(process.cwd() + `/deployments/${hre.network.config.chainId}/config.json`, "utf8"));
-	deployments.contracts["Multicall2"] = {
-		address: config.multicall ?? "",
-		abi: "Multicall2"
-	}
+
 	deployments.sources["Multicall2"] = (await ethers.getContractFactory("Multicall2")).interface.format("json")
 	deployments.sources["MockToken"] = (await ethers.getContractFactory("MockToken")).interface.format("json")
 

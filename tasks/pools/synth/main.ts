@@ -5,13 +5,11 @@ import { _deploy as _deployDefender } from '../../../scripts/utils/defender';
 import { Contract } from 'ethers';
 import { SynthArgs } from '../../../deployments/types';
 
-export default async function main(synthConfig: SynthArgs, synthex: Contract, pool: Contract, oracle: Contract, isTest: boolean = false, _deploy = _deployEVM): Promise<{synth: Contract, feed: Contract}> {
+export default async function main(synthConfig: SynthArgs, synthex: Contract, pool: Contract, isTest: boolean = false, _deploy = _deployEVM): Promise<{synth: Contract, feed: Contract|null}> {
 	// read deployments and config
 	const deployments = JSON.parse(fs.readFileSync(process.cwd() + `/deployments/${hre.network.config.chainId}/deployments.json`, "utf8"));
 	const config = JSON.parse(fs.readFileSync(process.cwd() + `/deployments/${hre.network.config.chainId}/config.json`, "utf8"));
 	
-	const [deployer] = await ethers.getSigners();
-
 	// get pool contract
 	const poolName = await pool.name();
 	const poolSymbol = await pool.symbol();
@@ -40,7 +38,7 @@ export default async function main(synthConfig: SynthArgs, synthex: Contract, po
 	} else {
 		synth = await ethers.getContractAt('ERC20X', synth);
 	}
-	let feed: string|Contract = synthConfig.feed as string;
+	let feed: string|Contract|null = synthConfig.feed as string;
 
 	if(synthConfig.isFeedSecondary){
 		// deploy secondary price feed
@@ -49,15 +47,16 @@ export default async function main(synthConfig: SynthArgs, synthex: Contract, po
 		feed = feed.address;
 	}
 	if(!feed){
-		if(!synthConfig.price) throw new Error('Price not set for ' + synthConfig.symbol);
-		// deploy price feed
-		feed = await _deploy('MockPriceFeed', [ethers.utils.parseUnits(synthConfig.price, 8), 8], deployments, {name: `${poolSymbol.toLowerCase()}${synthConfig.symbol}_PriceFeed`});
-		if(!isTest) console.log(`Price feed deployed at ${feed.address}`);
+		console.log('No price feed found for ' + synthConfig.symbol);
+		feed = null;
+		// if(!synthConfig.price) throw new Error('Price not set for ' + synthConfig.symbol);
+		// // deploy price feed
+		// feed = await _deploy('MockPriceFeed', [ethers.utils.parseUnits(synthConfig.price, 8), 8], deployments, {name: `${poolSymbol.toLowerCase()}${synthConfig.symbol}_PriceFeed`});
+		// if(!isTest) console.log(`Price feed deployed at ${feed.address}`);
 	} else {
 		feed = await ethers.getContractAt('MockPriceFeed', feed);
+		console.log(`Using Price Feed for ${synthConfig.symbol} ${feed.address}  ($${parseFloat(ethers.utils.formatUnits(await feed.latestAnswer(), await feed.decimals())).toFixed(4)})`);
 	}
-	// set price feed
-	await oracle.setAssetSources([synth.address], [feed.address]);
 
 	await pool.addSynth(synth.address, {
 		isActive: true,
@@ -65,9 +64,11 @@ export default async function main(synthConfig: SynthArgs, synthex: Contract, po
         mintFee: synthConfig.mintFee,
         burnFee: synthConfig.burnFee
 	});
-	if(!isTest) console.log(`\t\t ${synthConfig.name} (${synthConfig.symbol}) ($${parseFloat(ethers.utils.formatUnits(await feed.latestAnswer(), await feed.decimals())).toFixed(4)}) added  ✨`);
+	if(!isTest) console.log(`\t\t ${synthConfig.name} (${synthConfig.symbol}) added  ✨`);
 
 	if(synthConfig.isFeeToken){
+		// wait for 2 sec
+		await new Promise(resolve => setTimeout(resolve, 60000));
 		await pool.setFeeToken(synth.address);
 		if(!isTest) console.log(`${synthConfig.name} (${synthConfig.symbol}) set as Fee Token ✅`);
 	}

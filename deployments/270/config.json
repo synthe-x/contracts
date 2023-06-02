@@ -1,7 +1,7 @@
 {
   "name": "synthex",
-  "version": "0.88.0",
-  "latest": "0.88.0",
+  "version": "0.78.0",
+  "latest": "0.78.0",
   "l0Admin": "0x084cD22eA15E4C262408e561a5AFa8431Bd7fa5d",
   "l1Admin": "0x2646306d3191AEE905bf9065bD1B7cC71c9036D0",
   "l2Admin": "0x46c18c6d5526E17B34a3deB43e5E9Ba2A659c23a",
@@ -20,28 +20,17 @@
       "symbol": "C",
       "rewardSpeed": "100000000000000000",
       "issuerAlloc": "5000",
+      "pyth": "0xC38B1dd611889Abc95d4E0a472A667c3671c08DE",
       "collaterals": [
         {
           "name": "Ethereum",
           "symbol": "ETH",
           "decimals": 18,
-          "price": "2020",
           "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+          "pyth": "0xca80ba6dc32e08d06f1aa886011eed1d77c77be9eb761cc10d72b7d0a2fd57a6",
           "params": {
             "cap": "100000000000000000000000",
             "baseLTV": "6500",
-            "liqThreshold": "9000",
-            "liqBonus": "10500"
-          }
-        },
-        {
-          "name": "Wrapped Bitcoin",
-          "symbol": "WBTC",
-          "decimals": 18,
-          "price": "30220",
-          "params": {
-            "cap": "100000000000000000000000",
-            "baseLTV": "7200",
             "liqThreshold": "9000",
             "liqBonus": "10500"
           }
@@ -51,6 +40,8 @@
           "symbol": "USDC",
           "decimals": 18,
           "price": "0.999",
+          "address": "0x0faF6df7054946141266420b43783387A78d82A9",
+          "pyth": "0x41f3625971ca2ed2263e78573fe5ce23e13d2558ed3f2e47ab0f84fb9e7ae722",
           "params": {
             "cap": "1000000000000000000000000",
             "baseLTV": "7000",
@@ -63,21 +54,22 @@
         {
           "name": "Bitcoin",
           "symbol": "BTC",
-          "price": "2020",
+          "pyth": "0xf9c0172ba10dfa4d19088d94f5bf61d3b54d5bd7483a322a982e1373ee8ea31b",
           "mintFee": "6",
           "burnFee": "8"
         },
         {
           "name": "Ethereum",
           "symbol": "ETH",
-          "price": "2020",
+          "pyth": "0xca80ba6dc32e08d06f1aa886011eed1d77c77be9eb761cc10d72b7d0a2fd57a6",
           "mintFee": "4",
           "burnFee": "6"
         },
         {
           "name": "US Dollar",
           "symbol": "USD",
-          "price": "2020",
+          "price": "1",
+          "isBaseCurrency": true,
           "isFeeToken": true,
           "mintFee": "4",
           "burnFee": "2"
@@ -85,7 +77,7 @@
         {
           "name": "ChainLink",
           "symbol": "LINK",
-          "price": "2020",
+          "pyth": "0x83be4ed61dd8a3518d198098ce37240c494710a7b9d85e35d9fceac21df08994",
           "mintFee": "8",
           "burnFee": "10"
         }

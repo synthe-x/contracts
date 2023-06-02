@@ -1,7 +1,7 @@
 {
   "name": "synthex",
-  "version": "1.1.0",
-  "latest": "1.1.0",
+  "version": "1.6.0",
+  "latest": "1.6.0",
   "l0Admin": "0x46BD90fE9bFa755Ca438d136BB638a85202d5AfB",
   "l1Admin": "0x46BD90fE9bFa755Ca438d136BB638a85202d5AfB",
   "l2Admin": "0x46BD90fE9bFa755Ca438d136BB638a85202d5AfB",
@@ -29,6 +29,10 @@
           "decimals": 18,
           "feed": "0x639Fe6ab55C921f74e7fac1ee960C0B6293ba612",
           "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+          "pyth": {
+            "feedId": "0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace",
+            "isReverse": false
+          },
           "params": {
             "cap": "1000000000000000000000",
             "baseLTV": "6500",
@@ -42,6 +46,10 @@
           "decimals": 18,
           "feed": "0xb2A824043730FE05F3DA2efaFa1CBbe83fa548D6",
           "address": "0x912CE59144191C1204E64559FE8253a0e49E6548",
+          "pyth": {
+            "feedId": "0x3fa4252848f9f0a1480be62745a4629d9eb1322aebab8a791e344b3b9c1adcf5",
+            "isReverse": false
+          },
           "params": {
             "cap": "10000000000000000000000",
             "baseLTV": "6000",
@@ -68,6 +76,10 @@
           "decimals": 6,
           "address": "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8",
           "feed": "0x50834F3163758fcC1Df9973b6e91f0F0F0434aD3",
+          "pyth": {
+            "feedId": "0x3fa4252848f9f0a1480be62745a4629d9eb1322aebab8a791e344b3b9c1adcf5",
+            "isReverse": false
+          },
           "params": {
             "cap": "250000000000",
             "baseLTV": "7000",
@@ -81,6 +93,10 @@
           "name": "Bitcoin",
           "symbol": "BTC",
           "feed": "0x6ce185860a4963106506C203335A2910413708e9",
+          "pyth": {
+            "feedId": "0xe62df6c8b4a85fe1a67db44dc12de5db330f7ac66b72dc658afedf0f4a415b43",
+            "isReverse": false
+          },
           "mintFee": "2",
           "burnFee": "4"
         },
@@ -88,6 +104,10 @@
           "name": "Ethereum",
           "symbol": "ETH",
           "feed": "0x639Fe6ab55C921f74e7fac1ee960C0B6293ba612",
+          "pyth": {
+            "feedId": "0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace",
+            "isReverse": false
+          },
           "mintFee": "2",
           "burnFee": "4"
         },
@@ -96,6 +116,7 @@
           "symbol": "USD",
           "price": "1",
           "isFeeToken": true,
+          "isBaseCurrency": true,
           "mintFee": "2",
           "burnFee": "4"
         },
@@ -103,6 +124,10 @@
           "name": "ChainLink",
           "symbol": "LINK",
           "feed": "0x86E53CF1B870786351Da77A57575e79CB55812CB",
+          "pyth": {
+            "feedId": "0x8ac0c70fff57e9aefdf5edf44b51d62c2d433653cbb2cf5cc06bb115af04d221",
+            "isReverse": false
+          },
           "mintFee": "2",
           "burnFee": "4"
         },
@@ -117,6 +142,10 @@
           "name": "Binance Coin",
           "symbol": "BNB",
           "feed": "0x6970460aabF80C5BE983C6b74e5D06dEDCA95D4A",
+          "pyth": {
+            "feedId": "0x2f95862b045670cd22bee3114c39763a4a08beeb663b145d283c31d7d1101c4f",
+            "isReverse": false
+          },
           "mintFee": "2",
           "burnFee": "4"
         },
@@ -124,6 +153,10 @@
           "name": "Solana",
           "symbol": "SOL",
           "feed": "0x24ceA4b8ce57cdA5058b924B9B9987992450590c",
+          "pyth": {
+            "feedId": "0xef0d8b6fda2ceba41da15d4095d1da392a0d2f8ed0c6c7bc0f4cfac8c280b56d",
+            "isReverse": false
+          },
           "mintFee": "2",
           "burnFee": "4"
         },
@@ -131,6 +164,10 @@
           "name": "Polkadot",
           "symbol": "DOT",
           "feed": "0xa6bC5bAF2000424e90434bA7104ee399dEe80DEc",
+          "pyth": {
+            "feedId": "0xca3eed9b267293f6595901c734c7525ce8ef49adafe8284606ceb307afa2ca5b",
+            "isReverse": false
+          },
           "mintFee": "2",
           "burnFee": "4"
         },
@@ -138,6 +175,10 @@
           "name": "Near Protocol",
           "symbol": "NEAR",
           "feed": "0xBF5C3fB2633e924598A46B9D07a174a9DBcF57C0",
+          "pyth": {
+            "feedId": "0xc415de8d2eba7db216527dff4b60e8f3a5311c740dadb233e13e12547e226750",
+            "isReverse": false
+          },
           "mintFee": "2",
           "burnFee": "4"
         },
@@ -145,6 +186,10 @@
           "name": "Cardano",
           "symbol": "ADA",
           "feed": "0xD9f615A9b820225edbA2d821c4A696a0924051c6",
+          "pyth": {
+            "feedId": "0x2a01deaec9e51a579277b34b122399984d0bbf57e2458a7e42fecd2829867a0d",
+            "isReverse": false
+          },
           "mintFee": "2",
           "burnFee": "4"
         },
@@ -152,6 +197,10 @@
           "name": "Polygon",
           "symbol": "MATIC",
           "feed": "0x52099D4523531f678Dfc568a7B1e5038aadcE1d6",
+          "pyth": {
+            "feedId": "0x5de33a9112c2b700b8d30b8a3402c103578ccfa2765696471cc672bd5cf6ac52",
+            "isReverse": false
+          },
           "mintFee": "2",
           "burnFee": "4"
         },
@@ -159,6 +208,10 @@
           "name": "DogeCoin",
           "symbol": "DOGE",
           "feed": "0x9A7FB1b3950837a8D9b40517626E11D4127C098C",
+          "pyth": {
+            "feedId": "0xdcef50dd0a4cd2dcc17e45df1676dcb336a11a61c69df7a0299b0150c672d25c",
+            "isReverse": false
+          },
           "mintFee": "2",
           "burnFee": "4"
         }
@@ -216,6 +269,7 @@
           "symbol": "USD",
           "price": "1.00",
           "isFeeToken": true,
+          "isBaseCurrency": true,
           "mintFee": "2",
           "burnFee": "4"
         },

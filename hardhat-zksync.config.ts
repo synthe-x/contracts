@@ -71,12 +71,19 @@ const config: any = {
     version: "1.3.8",
     compilerSource: "binary",  // binary or docker (deprecated)
     settings: {
-      experimental: {
-        compilerSource: "binary", // Deprecated! use, compilerSource: "binary"
-        tag: "latest"   // Deprecated: used for compilerSource: "docker"
-      },
       optimizer: {
         enabled: true, // optional. True by default
+      },
+      libraries: {
+        "contracts/libraries/CollateralLogic.sol": {
+          CollateralLogic: "0x223b1B5eEbC7C71aee8E5BDE6bE5D091eae3a523"
+        },
+        "contracts/libraries/PoolLogic.sol": {
+          PoolLogic: "0xA675C98539232EC8787c3466E22fB9610DE82D10"
+        },
+        "contracts/libraries/SynthLogic.sol": {
+          SynthLogic: "0x6c4c9C9534ebEf55caD7885d32726334E05fffb9"
+        }
       }
     }
   },

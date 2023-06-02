@@ -8,13 +8,16 @@
     "console": "hardhat console",
     "create:node": "hardhat node",
     "deploy": "hardhat run scripts",
+    "compile:zksync:local": "hardhat --config hardhat-zksync-local.config.ts compile",
     "deploy:zksync:local": "PRIVATE_KEY=7726827caac94a7f9e1b160f7ea819f172f7b6f9d2a97f992c38edeab82d4110 hardhat --config hardhat-zksync-local.config.ts deploy-zksync --script main.ts",
-
-    "deploy:fork": "yarn clean && hardhat --config hardhat-fork.config.ts run scripts --network hardhat",
-    "deploy:testnet": "yarn clean && hardhat run scripts --network arbitrumGoerli",
+    "deploy:zksync:local:lib": "PRIVATE_KEY=7726827caac94a7f9e1b160f7ea819f172f7b6f9d2a97f992c38edeab82d4110 hardhat --config hardhat-zksync-local.config.ts deploy-zksync --script libraries.ts",
+    "compile:zksync:testnet": "hardhat --config hardhat-zksync.config.ts compile",
+    "deploy:zksync:testnet": "hardhat --config hardhat-zksync.config.ts deploy-zksync --script main.ts",
+    "deploy:zksync:testnet:lib": "hardhat --config hardhat-zksync.config.ts deploy-zksync --script libraries.ts",
+    "deploy:fork": "hardhat --config hardhat-fork.config.ts run scripts --network hardhat",
+    "deploy:testnet": "hardhat run scripts --network arbitrumGoerli",
     "clean": "hardhat clean",
     "deploy:mainnet": "yarn clean && hardhat run scripts --network arbitrum",
-
     "slither": "slither ./contracts --checklist docs/SECURITY.md"
   },
   "devDependencies": {
@@ -45,6 +48,8 @@
     "@nomicfoundation/hardhat-network-helpers": "^1.0.7",
     "@openzeppelin/contracts": "^4.7.3",
     "@openzeppelin/contracts-upgradeable": "^4.8.0",
+    "@pythnetwork/pyth-evm-js": "^1.10.0",
+    "@pythnetwork/pyth-sdk-solidity": "^2.2.1",
     "@typechain/ethers-v5": "^10.2.0",
     "@typechain/hardhat": "^6.1.5",
     "chai": "^4.3.6",

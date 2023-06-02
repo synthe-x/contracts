@@ -31,7 +31,7 @@ import "../libraries/SynthLogic.sol";
  * @notice Pool contract to manage collaterals and debt 
  * @author Prasad <prasad@chainscore.finance>
  */
-contract Pool is 
+contract Pool is
     Initializable,
     IPool, 
     PoolStorage, 
@@ -108,7 +108,8 @@ contract Pool is
      * @notice Exit a collateral
      * @param _collateral The address of the collateral
      */
-    function exitCollateral(address _collateral) virtual override public {
+    function exitCollateral(address _collateral, bytes[] memory pythUpdateData) virtual override public {
+        priceOracle.updatePrices(pythUpdateData);
         CollateralLogic.exitCollateral(
             _collateral,
             accountMembership,
@@ -186,7 +187,8 @@ contract Pool is
      * @param _collateral The address of the collateral
      * @param _amount The amount of collateral to withdraw
      */
-    function withdraw(address _collateral, uint _amount, bool unwrap) virtual override public {
+    function withdraw(address _collateral, uint _amount, bool unwrap, bytes[] memory pythUpdateData) virtual override public {
+        priceOracle.updatePrices(pythUpdateData);
         // Process withdrawal
         CollateralLogic.withdraw(
             _collateral, 
@@ -194,6 +196,7 @@ contract Pool is
             collaterals,
             accountCollateralBalance
         );
+        // Check if account is positive
         require(getAccountLiquidity(msg.sender).liquidity >= 0, Errors.INSUFFICIENT_COLLATERAL);
         // Transfer collateral to user
         transferOut(_collateral, msg.sender, _amount, unwrap);
@@ -221,7 +224,8 @@ contract Pool is
      * @param _amountIn Amount of synth
      * @dev Only Active Synth (ERC20X) contract can be issued
      */
-    function mint(address _synthIn, uint _amountIn, address _to) virtual override whenNotPaused external returns(uint mintAmount) {
+    function mint(address _synthIn, uint _amountIn, address _to, bytes[] memory pythUpdateData) virtual override whenNotPaused external returns(uint mintAmount) {
+        priceOracle.updatePrices(pythUpdateData);
         mintAmount = SynthLogic.commitMint(
             SynthLogic.MintVars(
                 _to,
@@ -250,7 +254,8 @@ contract Pool is
      * @notice The amount of synths to burn is calculated based on the amount of debt tokens burned
      * @dev Only Active/Disabled Synth (ERC20X) contract can call this function
      */
-    function burn(address _synthIn, uint _amountIn) virtual override whenNotPaused external returns(uint burnAmount) {
+    function burn(address _synthIn, uint _amountIn, bytes[] memory pythUpdateData) virtual override whenNotPaused external returns(uint burnAmount) {
+        priceOracle.updatePrices(pythUpdateData);
         burnAmount = SynthLogic.commitBurn(
             SynthLogic.BurnVars(
                 _amountIn, 
@@ -266,7 +271,7 @@ contract Pool is
             ),
             synths
         );
-        
+        // Burn debt from sender
         _burn(msg.sender, burnAmount);
     }
 
@@ -278,7 +283,8 @@ contract Pool is
      * @param _kind The type of exchange to perform
      * @dev Only Active/Disabled Synth (ERC20X) contract can call this function
      */
-    function swap(address _synthIn, uint _amount, address _synthOut, DataTypes.SwapKind _kind, address _to) virtual override whenNotPaused external returns(uint[2] memory) {
+    function swap(address _synthIn, uint _amount, address _synthOut, DataTypes.SwapKind _kind, address _to, bytes[] memory pythUpdateData) virtual override whenNotPaused external returns(uint[2] memory) {
+        priceOracle.updatePrices(pythUpdateData);
         return SynthLogic.commitSwap(
             SynthLogic.SwapVars(
                 _to,
@@ -303,7 +309,8 @@ contract Pool is
      * @param _outAsset The address of the collateral asset to receive
      * @dev Only Active/Disabled Synth (ERC20X) contract can call this function
      */
-    function liquidate(address _synthIn, address _account, uint _amount, address _outAsset) virtual override whenNotPaused external {
+    function liquidate(address _synthIn, address _account, uint _amount, address _outAsset, bytes[] memory pythUpdateData) virtual override whenNotPaused external {
+        priceOracle.updatePrices(pythUpdateData);
         require(accountMembership[_outAsset][_account], Errors.ACCOUNT_NOT_ENTERED);
         (uint refundOut, uint burnAmount) = SynthLogic.commitLiquidate(
             SynthLogic.LiquidateVars(
@@ -401,7 +408,7 @@ contract Pool is
      */
     function setPriceOracle(address _priceOracle) external onlyL1Admin {
         require(_priceOracle != address(0), Errors.INVALID_ARGUMENT);
-        priceOracle = IPriceOracle(_priceOracle);
+        priceOracle = IPriceOracle(payable(_priceOracle));
         require(priceOracle.getAssetPrice(feeToken) > 0, Errors.INVALID_ADDRESS);
         emit PriceOracleUpdated(_priceOracle);
     }

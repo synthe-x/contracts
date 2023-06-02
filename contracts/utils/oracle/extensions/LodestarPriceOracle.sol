@@ -2,11 +2,11 @@
 pragma solidity ^0.8.0;
 
 import "@aave/core-v3/contracts/dependencies/chainlink/AggregatorInterface.sol";
-import "../interfaces/compound/CTokenInterface.sol";
-import "../interfaces/compound/CTokenInterface.sol";
-import "../interfaces/compound/ComptrollerInterface.sol";
+import "../../interfaces/compound/CTokenInterface.sol";
+import "../../interfaces/compound/ComptrollerInterface.sol";
+import "./IPriceOracleETH.sol";
 
-contract CompoundOracle is AggregatorInterface {
+contract LodestarPriceOracle is AggregatorInterface {
     ComptrollerInterface public comptroller;
     CTokenInterface public cToken;
 
@@ -23,13 +23,12 @@ contract CompoundOracle is AggregatorInterface {
     }
 
     function latestAnswer() public view override returns (int256) {
-        // decimals = 18 + 18; so we divide by 10 ** 28 so final answer is in 8 decimals
-        // console.log(comptroller.oracle().getUnderlyingPrice(cToken));
+        // decimals = 18 + 8 + 18; so we divide by 10 ** 36 so final answer is in 8 decimals
         return
-            int(
-                comptroller.oracle().getUnderlyingPrice(cToken) *
-                   cToken.exchangeRateStored()
-            ) / (10 ** 28);
+            int(comptroller.oracle().getUnderlyingPrice(cToken)) * 
+            AggregatorInterface(IPriceOracleETH(address(comptroller.oracle())).ethUsdAggregator()).latestAnswer() *
+            int(cToken.exchangeRateStored()) / 
+            (10 ** 46);
     }
 
     function decimals() external pure returns (uint8) {

@@ -24,9 +24,6 @@ export default async function main(deployerAddress: string, isTest: boolean = fa
                 address: synthex.address,
                 constructorArguments: []
             })
-            .catch(err => {
-                console.log("Could not verify synthex");
-            })
         } catch (err) {
             console.log("Could not verify SyntheX");
         }
