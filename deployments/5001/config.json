@@ -1,0 +1,180 @@
+{
+    "name": "synthex",
+    "version": "0.113.0",
+    "latest": "0.113.0",
+    "l0Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+    "l1Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+    "l2Admin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+    "rewardAlloc": "10000000",
+    "weth": "0x55f317247632d42584848064A0cC0190fE1f6c58",
+    "multicall": "0x57EDC329875967fC3D8081C3A893854f5B91376A",
+    "esSYX": {
+      "initialRewardsDuration": "30",
+      "reward": "6000",
+      "lockPeriod": "15552000",
+      "unlockPeriod": "4838400",
+      "percReleaseAtUnlock": "500",
+      "quota": "1000000"
+    },
+    "pools": [
+      {
+        "name": "Crypto Market",
+        "symbol": "C",
+        "rewardSpeed": "100000000000000000",
+        "issuerAlloc": "5000",
+        "pyth": "0xA2aa501b19aff244D90cc15a4Cf739D2725B5729",
+        "collaterals": [
+          {
+            "name": "BitDAO",
+            "symbol": "BIT",
+            "decimals": 18,
+            "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+            "pyth": "0x0e9ec6a3f2fba0a3df73db71c84d736b8fc1970577639c9456a2fee0c8f66d93",
+            "params": {
+              "cap": "100000000000000000000000000",
+              "baseLTV": "6500",
+              "liqThreshold": "9000",
+              "liqBonus": "10500"
+            }
+          },
+          {
+            "name": "Tether USD",
+            "symbol": "USDT",
+            "decimals": 8,
+            "pyth": "0x1fc18861232290221461220bd4e2acd1dcdfbc89c84092c93c18bdc7756c1588",
+            "params": {
+              "cap": "10000000000000000000",
+              "baseLTV": "7000",
+              "liqThreshold": "8500",
+              "liqBonus": "10200"
+            }
+          },
+          {
+            "name": "Ethereum",
+            "symbol": "ETH",
+            "decimals": 18,
+            "pyth": "0xca80ba6dc32e08d06f1aa886011eed1d77c77be9eb761cc10d72b7d0a2fd57a6",
+            "params": {
+              "cap": "100000000000000000000000000",
+              "baseLTV": "7000",
+              "liqThreshold": "8500",
+              "liqBonus": "10200"
+            }
+          }
+        ],
+        "synths": [
+          {
+            "name": "Bitcoin",
+            "symbol": "BTC",
+            "pyth": "0xf9c0172ba10dfa4d19088d94f5bf61d3b54d5bd7483a322a982e1373ee8ea31b",
+            "mintFee": "10",
+            "burnFee": "15"
+          },
+          {
+            "name": "Ethereum",
+            "symbol": "ETH",
+            "pyth": "0xca80ba6dc32e08d06f1aa886011eed1d77c77be9eb761cc10d72b7d0a2fd57a6",
+            "mintFee": "10",
+            "burnFee": "15"
+          },
+          {
+            "name": "US Dollar",
+            "symbol": "USD",
+            "price": "1",
+            "isBaseCurrency": true,
+            "isFeeToken": true,
+            "mintFee": "10",
+            "burnFee": "15"
+          },
+          {
+            "name": "Ripple",
+            "symbol": "XRP",
+            "pyth": "0xbfaf7739cb6fe3e1c57a0ac08e1d931e9e6062d476fa57804e165ab572b5b621",
+            "mintFee": "10",
+            "burnFee": "15"
+          },
+          {
+            "name": "Binance Coin",
+            "symbol": "BNB",
+            "pyth": "0xecf553770d9b10965f8fb64771e93f5690a182edc32be4a3236e0caaa6e0581a",
+            "mintFee": "10",
+            "burnFee": "15"
+          }
+        ]
+      },
+      {
+        "name": "Stock Exchange",
+        "symbol": "S",
+        "rewardSpeed": "100000000000000000",
+        "issuerAlloc": "5000",
+        "pyth": "0xA2aa501b19aff244D90cc15a4Cf739D2725B5729",
+        "collaterals": [
+          {
+            "name": "BitDAO",
+            "symbol": "BIT",
+            "decimals": 18,
+            "address": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+            "pyth": "0x0e9ec6a3f2fba0a3df73db71c84d736b8fc1970577639c9456a2fee0c8f66d93",
+            "params": {
+              "cap": "10000000000000000000000000000",
+              "baseLTV": "6500",
+              "liqThreshold": "9000",
+              "liqBonus": "10500"
+            }
+          },
+          {
+            "name": "USD Coin",
+            "symbol": "USDC",
+            "decimals": 6,
+            "pyth": "0x41f3625971ca2ed2263e78573fe5ce23e13d2558ed3f2e47ab0f84fb9e7ae722",
+            "params": {
+              "cap": "1000000000000000000000",
+              "baseLTV": "7000",
+              "liqThreshold": "8500",
+              "liqBonus": "10200"
+            }
+          }
+        ],
+        "synths": [
+          {
+            "name": "Apple",
+            "symbol": "AAPL",
+            "pyth": "0xafcc9a5bb5eefd55e12b6f0b4c8e6bccf72b785134ee232a5d175afd082e8832",
+            "mintFee": "10",
+            "burnFee": "15"
+          },
+          {
+            "name": "Microsoft",
+            "symbol": "MSFT",
+            "pyth": "0x4e10201a9ad79892f1b4e9a468908f061f330272c7987ddc6506a254f77becd7",
+            "mintFee": "10",
+            "burnFee": "15"
+          },
+          {
+            "name": "US Dollar",
+            "symbol": "USD",
+            "price": "1",
+            "isBaseCurrency": true,
+            "isFeeToken": true,
+            "mintFee": "10",
+            "burnFee": "15"
+          },
+          {
+            "name": "Google",
+            "symbol": "GOOGL",
+            "pyth": "0xabb1a3382ab1c96282e4ee8c847acc0efdb35f0564924b35f3246e8f401b2a3d",
+            "mintFee": "10",
+            "burnFee": "15"
+          },
+          {
+            "name": "Coinbase",
+            "symbol": "COIN",
+            "pyth": "0xa29b53fbc56604ef1f2b65e89e48b0f09bb77b3fb890f4c70ee8cbd68a12a94b",
+            "mintFee": "10",
+            "burnFee": "15"
+          }
+        ]
+      }
+    ],
+    "dummyTokens": []
+  }
